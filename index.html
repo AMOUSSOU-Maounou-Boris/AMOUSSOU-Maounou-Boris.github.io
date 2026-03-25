@@ -5,91 +5,107 @@
 
 <style>
 body {
+    font-family: Arial;
     margin:0;
-    font-family: Arial, sans-serif;
-    display:flex;
-    background:#f5f7fa;
+    background:#eef2f3;
 }
 
-/* SIDEBAR */
-.sidebar {
-    width:280px;
-    background:#0a1f44;
-    color:white;
-    height:100vh;
-    padding:20px;
+/* NAVBAR */
+nav {
+    background:#0a192f;
+    padding:15px;
     text-align:center;
 }
 
-.profile-pic {
-    width:130px;
-    height:130px;
-    border-radius:50%;
-    object-fit:cover;
-    border:3px solid white;
-}
-
-/* NAV */
-.navbar {
-    margin-top:20px;
-}
-
-.navbar a {
-    display:block;
+nav a {
     color:white;
+    margin:15px;
     text-decoration:none;
-    margin:10px 0;
     font-weight:bold;
 }
 
-/* CONTENT */
-.content {
-    flex:1;
+/* MAIN LAYOUT */
+.container {
+    display:flex;
+}
+
+/* LEFT SIDE */
+.left {
+    width:30%;
+    background:#0a192f;
+    color:white;
     padding:30px;
+    text-align:center;
+    min-height:100vh;
+}
+
+.left img {
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid white;
+}
+
+.search-box {
+    margin-top:20px;
+}
+
+.search-box input {
+    padding:10px;
+    width:80%;
+    border-radius:20px;
+    border:none;
+}
+
+/* RIGHT SIDE */
+.right {
+    width:70%;
+    padding:40px;
+}
+
+/* CARDS */
+.card {
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+    box-shadow:0px 4px 10px rgba(0,0,0,0.1);
 }
 
 /* SLIDER */
 .slider {
+    position:relative;
     width:100%;
-    max-width:600px;
     height:300px;
-    margin:auto;
     overflow:hidden;
     border-radius:10px;
 }
 
 .slide {
-    display:none;
+    position:absolute;
+    width:100%;
+    height:100%;
+    opacity:0;
+    transition:1s;
 }
 
 .slide img {
     width:100%;
-    height:300px;
+    height:100%;
     object-fit:cover;
-    object-position:top;
 }
 
 .active {
-    display:block;
-}
-
-/* CARD */
-.card {
-    background:white;
-    padding:20px;
-    margin:20px auto;
-    max-width:600px;
-    border-radius:10px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    opacity:1;
 }
 
 /* FOOTER */
 footer {
-    text-align:center;
-    margin-top:30px;
-    padding:20px;
-    background:#0a1f44;
+    background:#0a192f;
     color:white;
+    text-align:center;
+    padding:20px;
 }
 
 footer a {
@@ -103,63 +119,79 @@ footer a {
 
 <body>
 
+<nav>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="research.html">Research</a>
+    <a href="cv.html">Resume</a>
+    <a href="contact.html">Contact</a>
+</nav>
+
+<div class="container">
+
 <!-- LEFT -->
-<div class="sidebar">
+<div class="left">
 
-<img src="profile.jpg" class="profile-pic">
+    <img src="profile.jpg">
 
-<h2>Maounou Boris</h2>
-<p>Chemical Engineer</p>
+    <h2>Maounou Boris AMOUSSOU</h2>
+    <p>Chemical Engineer<br>Green Chemistry & Environment</p>
 
-<div class="navbar">
-<a href="index.html">Home</a>
-<a href="about.html">About</a>
-<a href="research.html">Research</a>
-<a href="cv.html">Resume</a>
-<a href="contact.html">Contact</a>
-</div>
+    <!-- SEARCH -->
+    <div class="search-box">
+        <input type="text" placeholder="Search...">
+    </div>
 
 </div>
 
 <!-- RIGHT -->
-<div class="content">
+<div class="right">
 
 <!-- SLIDER -->
 <div class="slider">
-
-<div class="slide active">
-<img src="stage1.jpg">
+    <div class="slide active">
+        <img src="stage1.jpg">
+    </div>
+    <div class="slide">
+        <img src="stage2.jpg">
+    </div>
+    <div class="slide">
+        <img src="stage3.jpg">
+    </div>
 </div>
 
-<div class="slide">
-<img src="stage2.jpg">
-</div>
-
-<div class="slide">
-<img src="stage3.jpg">
-</div>
-
-</div>
-
-<!-- CONTENT -->
+<!-- PROFILE -->
 <div class="card">
-<h2>Welcome</h2>
+<h2>Profile</h2>
 <p>
-Welcome to my academic and professional portfolio in chemical engineering,
-focused on green chemistry and sustainable technologies.
+Chemical engineer specialized in green chemistry, catalysis and environmental processes.
 </p>
 </div>
 
+<!-- EXPERIENCE -->
 <div class="card">
 <h2>Experience</h2>
 <p>
-International research experience in Canada and current research work in France.
+International research experience in Montreal (Canada) and current research internship in Poitiers (France).
 </p>
 </div>
 
+<!-- SKILLS -->
+<div class="card">
+<h2>Skills</h2>
+<p>
+Electrochemistry, Catalysis, Materials Science, Environmental Chemistry
+</p>
+</div>
+
+</div>
+
+</div>
+
+<!-- FOOTER -->
 <footer>
 
-<p>© 2026 Maounou Boris — All rights reserved</p>
+<p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
 
 <a href="#">Google Scholar</a>
 <a href="#">LinkedIn</a>
@@ -168,21 +200,18 @@ International research experience in Canada and current research work in France.
 
 </footer>
 
-</div>
-
-<!-- SCRIPT SLIDER -->
 <script>
 let slides = document.querySelectorAll(".slide");
 let index = 0;
 
-function showSlide() {
+function showSlides() {
     slides.forEach(slide => slide.classList.remove("active"));
     index++;
     if(index >= slides.length){ index = 0; }
     slides[index].classList.add("active");
 }
 
-setInterval(showSlide, 3000);
+setInterval(showSlides, 3000);
 </script>
 
 </body>
