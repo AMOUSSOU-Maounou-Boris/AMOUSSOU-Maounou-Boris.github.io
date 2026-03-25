@@ -4,8 +4,13 @@
 <title>Home | Maounou Boris</title>
 
 <style>
-body { font-family: Arial; margin:0; background:#eef2f3; }
+body {
+    font-family: Arial;
+    margin:0;
+    background:#eef2f3;
+}
 
+/* NAVBAR */
 nav {
     background:#0a192f;
     padding:15px;
@@ -19,6 +24,39 @@ nav a {
     font-weight:bold;
 }
 
+/* HEADER */
+.header {
+    background:#0a192f;
+    color:white;
+    padding:50px 20px;
+}
+
+.header-content {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:40px;
+}
+
+/* PHOTO */
+.header img {
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid white;
+}
+
+/* TEXT */
+.header-text {
+    max-width:500px;
+}
+
+.header-text h1 {
+    margin-bottom:10px;
+}
+
+/* SECTIONS */
 section {
     width:80%;
     margin:40px auto;
@@ -26,17 +64,30 @@ section {
 
 .card {
     background:white;
-    padding:20px;
-    border-radius:10px;
+    padding:25px;
+    border-radius:12px;
     margin:20px 0;
+    box-shadow:0px 4px 10px rgba(0,0,0,0.1);
 }
 
+/* BUTTON */
 .button {
+    display:inline-block;
+    margin-top:15px;
     background:#0a192f;
     color:white;
     padding:10px 15px;
     border-radius:8px;
     text-decoration:none;
+}
+
+/* FOOTER */
+footer {
+    background:#0a192f;
+    color:white;
+    text-align:center;
+    padding:20px;
+    margin-top:40px;
 }
 </style>
 
@@ -44,6 +95,7 @@ section {
 
 <body>
 
+<!-- NAV -->
 <nav>
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
@@ -52,18 +104,74 @@ section {
     <a href="contact.html">Contact</a>
 </nav>
 
+<!-- HEADER -->
+<div class="header">
+    <div class="header-content">
+
+        <img src="profile.jpg">
+
+        <div class="header-text">
+            <h1>Maounou Boris AMOUSSOU</h1>
+            <p>Chemical Engineer | Green Chemistry, Catalysis & Environment</p>
+
+            <a href="contact.html" class="button">Contact Me</a>
+        </div>
+
+    </div>
+</div>
+
+<!-- ABOUT -->
 <section>
 <div class="card">
-<h1>Maounou Boris AMOUSSOU</h1>
-<p>Chemical Engineer | Green Chemistry, Catalysis & Environment</p>
-
-<img src="profile.jpg" style="width:150px; border-radius:50%;">
-
-<p>Welcome to my academic and professional portfolio.</p>
-
-<a href="contact.html" class="button">Contact Me</a>
+<h2>👨‍🔬 Profile</h2>
+<p>
+Chemical engineer specialized in green chemistry, catalysis, and environmental processes.
+My work focuses on sustainable energy, innovative materials, and environmental solutions.
+</p>
 </div>
+
+<!-- EXPERIENCE -->
+<div class="card">
+<h2>🌍 Experience</h2>
+<p>
+International research experience in Montreal (Canada), working on electrochemical and
+photocatalytic approaches for sustainable energy production.
+</p>
+
+<p>
+Currently completing my final-year research internship in Poitiers (France),
+focusing on advanced materials for energy applications.
+</p>
+</div>
+
+<!-- SKILLS -->
+<div class="card">
+<h2>🧪 Skills</h2>
+<p>
+✔ Electrochemistry<br>
+✔ Catalysis<br>
+✔ Materials Science<br>
+✔ Environmental Chemistry<br>
+✔ Data Analysis
+</p>
+</div>
+
+<!-- PROJECTS -->
+<div class="card">
+<h2>🚀 Projects</h2>
+<p>
+Research projects focused on energy transition, sustainable technologies,
+and environmental remediation.
+</p>
+</div>
+
 </section>
+
+<!-- FOOTER -->
+<footer>
+<p>© 2026 Maounou Boris AMOUSSOU</p>
+<p>Contact: tonemail@gmail.com</p>
+</footer>
 
 </body>
 </html>
