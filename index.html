@@ -24,12 +24,12 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <img src="profile.jpg" class="profile-img">
+    <img src="profile.jpg" class="profile-img" alt="Profile photo">
 
     <h2>Maounou Boris AMOUSSOU</h2>
     <p>Chemical Engineer<br>Green Chemistry & Environment</p>
 
-    <!-- SEARCH GOOGLE QUI FONCTIONNE -->
+    <!-- SEARCH -->
     <form action="https://www.google.com/search" method="GET" target="_blank">
       <input type="text" name="q" placeholder="Search on Google..." class="search-box">
     </form>
@@ -41,9 +41,19 @@
 
     <!-- SLIDER -->
     <div class="slider">
-      <img src="stage1.jpg" class="slide active">
-      <img src="stage2.jpg" class="slide">
-      <img src="stage3.jpg" class="slide">
+
+      <div class="slide active">
+        <img src="stage1.jpg" alt="Lab work 1">
+      </div>
+
+      <div class="slide">
+        <img src="stage2.jpg" alt="Lab work 2">
+      </div>
+
+      <div class="slide">
+        <img src="stage3.jpg" alt="Lab work 3">
+      </div>
+
     </div>
 
     <!-- PROFILE -->
@@ -80,13 +90,13 @@
 
 <!-- FOOTER -->
 <footer>
-  <p>© 2026 Maounou Boris AMOUSSOU - All rights reserved</p>
+  <p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
 
   <div class="socials">
-    <a href="#">Google Scholar</a>
-    <a href="#">ResearchGate</a>
-    <a href="#">LinkedIn</a>
-    <a href="#">Facebook</a>
+    <a href="https://scholar.google.com" target="_blank">Google Scholar</a>
+    <a href="https://www.researchgate.net" target="_blank">ResearchGate</a>
+    <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
+    <a href="https://www.facebook.com" target="_blank">Facebook</a>
   </div>
 </footer>
 
@@ -95,11 +105,13 @@
 let slides = document.querySelectorAll(".slide");
 let index = 0;
 
-setInterval(() => {
-  slides[index].classList.remove("active");
+function showSlide() {
+  slides.forEach(s => s.classList.remove("active"));
   index = (index + 1) % slides.length;
   slides[index].classList.add("active");
-}, 3000);
+}
+
+setInterval(showSlide, 3000);
 </script>
 
 </body>
