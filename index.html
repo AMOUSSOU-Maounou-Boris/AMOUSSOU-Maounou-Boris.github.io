@@ -11,22 +11,42 @@ body {
     background: linear-gradient(to right, #eef2f3, #dfe9f3);
 }
 
+/* HEADER */
 header {
     background: #0a192f;
     color: white;
     padding: 40px;
-    text-align: center;
 }
 
-h1 {
-    margin: 0;
+/* FLEX HEADER */
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
 }
 
+/* IMAGE */
+.header-container img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid white;
+}
+
+/* TEXT */
+.header-text {
+    text-align: left;
+}
+
+/* SECTION */
 section {
     width: 80%;
     margin: 40px auto;
 }
 
+/* CARD */
 .card {
     background: white;
     padding: 20px;
@@ -35,56 +55,107 @@ section {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-a {
-    color: #0077b5;
+/* BUTTON */
+.button {
+    display: inline-block;
+    padding: 10px 15px;
+    background: #0a192f;
+    color: white;
+    border-radius: 8px;
     text-decoration: none;
+    margin-top: 10px;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #0a192f;
+    color: white;
+}
+
+footer a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
 }
 </style>
 </head>
 
 <body>
 
-<header style="display: flex; align-items: center; justify-content: center; gap: 30px;">
+<header>
+    <div class="header-container">
+        <img src="profile.jpg" alt="Profile photo">
 
-    <img src="profile.jpg" alt="Profile photo"
-    style="width:150px; height:150px; object-fit: cover; border-radius:50%; border:4px solid white;">
-
-    <div style="text-align:left;">
-        <h1>Maounou Boris AMOUSSOU</h1>
-        <p>Chemical Engineer | Green Chemistry, Catalysis & Environment</p>
+        <div class="header-text">
+            <h1>Maounou Boris AMOUSSOU</h1>
+            <p>Chemical Engineer | Green Chemistry, Catalysis & Environment</p>
+        </div>
     </div>
-
 </header>
 
 <section>
 
     <div class="card">
-        <h2>👨‍🔬 Profile</h2>
+        <h2>👨‍🔬 About Me</h2>
         <p>
         Chemical engineer specialized in green chemistry, catalysis, and environmental processes.
-        My work focuses on developing innovative solutions for energy transition
-        and sustainable resource management.
+        My work focuses on sustainable energy and innovative environmental solutions.
         </p>
     </div>
 
     <div class="card">
-        <h2>🌍 Experience</h2>
+        <h2>🌍 Research Interests</h2>
         <p>
-        International research experience in Montreal (Canada), working on electrochemical
-        and photocatalytic approaches for sustainable energy production.
-        </p>
-
-        <p>
-        Currently completing my final-year research internship in Poitiers (France),
-        focusing on advanced materials for energy applications.
+        - Sustainable energy systems<br>
+        - Electrochemical processes<br>
+        - Environmental catalysis<br>
+        - Advanced materials for energy applications
         </p>
     </div>
 
     <div class="card">
         <h2>🧪 Skills</h2>
         <p>
-        Electrochemistry • Catalysis • Functional Materials • Environmental Remediation • Physico-chemical Analysis
+        <b>Technical:</b> Electrochemistry • Catalysis • Materials characterization<br><br>
+        <b>Analytical:</b> Data analysis • Physico-chemical interpretation
         </p>
+    </div>
+
+    <div class="card">
+        <h2>🌎 Experience</h2>
+        <p>
+        International research experience in Montreal (Canada), working on sustainable energy processes.
+        </p>
+        <p>
+        Currently completing a final-year research internship in Poitiers (France), focusing on advanced materials.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>🎓 Academic Journey</h2>
+        <p>
+        🇫🇷 Master in Green Chemistry, Catalysis & Environment<br>
+        🇨🇦 Research experience in Montreal
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>📂 Projects</h2>
+        <p>
+        Research projects related to green chemistry, environmental processes, and sustainable energy.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>📚 Publications</h2>
+        <p>Coming soon</p>
+    </div>
+
+    <div class="card">
+        <h2>📄 Resume</h2>
+        <a href="CV.pdf" class="button" target="_blank">Download CV</a>
     </div>
 
     <div class="card">
@@ -97,6 +168,15 @@ a {
     </div>
 
 </section>
+
+<footer>
+    <p>© 2026 Maounou Boris AMOUSSOU</p>
+    <p>
+        <a href="#">Google Scholar</a> |
+        <a href="#">ResearchGate</a> |
+        <a href="https://www.linkedin.com/in/maounou-boris-amoussou-1aa02a214/">LinkedIn</a>
+    </p>
+</footer>
 
 </body>
 </html>
