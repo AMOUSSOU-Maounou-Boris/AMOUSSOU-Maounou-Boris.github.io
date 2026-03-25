@@ -1,0 +1,121 @@
+body {
+    margin:0;
+    font-family:'Segoe UI', sans-serif;
+    display:flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width:300px;
+    background:#0a1f44;
+    color:white;
+    height:100vh;
+    position:fixed;
+    padding:20px;
+    text-align:center;
+}
+
+.profile-pic {
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid white;
+    margin-bottom:15px;
+    transition:0.4s;
+}
+
+.profile-pic:hover {
+    transform:scale(1.1);
+}
+
+.sidebar h1 {
+    font-size:22px;
+}
+
+.sidebar p {
+    font-size:14px;
+}
+
+.search {
+    margin-top:20px;
+    padding:10px;
+    border-radius:20px;
+    border:none;
+    width:90%;
+}
+
+/* CONTENT */
+.content {
+    margin-left:300px;
+    width:100%;
+}
+
+/* NAVBAR */
+.navbar {
+    background:#0a1f44;
+    padding:15px;
+    text-align:center;
+}
+
+.navbar a {
+    color:white;
+    margin:0 15px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+/* CARDS */
+.card {
+    background:white;
+    padding:25px;
+    margin:25px;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    transition:0.3s;
+}
+
+.card:hover {
+    transform:translateY(-5px);
+}
+
+/* ANIMATION */
+.hidden {
+    opacity:0;
+    transform:translateY(30px);
+    transition:0.8s;
+}
+
+.show {
+    opacity:1;
+    transform:translateY(0);
+}
+
+/* SLIDER */
+.slider {
+    height:300px;
+    overflow:hidden;
+    margin:25px;
+    border-radius:15px;
+}
+
+.slide img {
+    width:100%;
+    height:300px;
+    object-fit:cover;
+    object-position:top center;
+}
+
+/* FOOTER */
+footer {
+    text-align:center;
+    padding:20px;
+    background:#0a1f44;
+    color:white;
+}
+
+footer a {
+    color:white;
+    margin:10px;
+    text-decoration:none;
+}
