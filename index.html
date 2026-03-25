@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Home | Maounou Boris</title>
+<title>Maounou Boris</title>
 
 <style>
 body {
@@ -24,22 +24,22 @@ nav a {
     font-weight:bold;
 }
 
-/* HEADER */
-.header {
+/* MAIN LAYOUT */
+.container {
+    display:flex;
+}
+
+/* LEFT SIDE */
+.left {
+    width:30%;
     background:#0a192f;
     color:white;
-    padding:50px 20px;
+    padding:30px;
+    text-align:center;
+    min-height:100vh;
 }
 
-.header-content {
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:40px;
-}
-
-/* PHOTO */
-.header img {
+.left img {
     width:150px;
     height:150px;
     object-fit:cover;
@@ -47,38 +47,57 @@ nav a {
     border:4px solid white;
 }
 
-/* TEXT */
-.header-text {
-    max-width:500px;
+.search-box {
+    margin-top:20px;
 }
 
-.header-text h1 {
-    margin-bottom:10px;
-}
-
-/* SECTIONS */
-section {
+.search-box input {
+    padding:10px;
     width:80%;
-    margin:40px auto;
+    border-radius:20px;
+    border:none;
 }
 
+/* RIGHT SIDE */
+.right {
+    width:70%;
+    padding:40px;
+}
+
+/* CARDS */
 .card {
     background:white;
-    padding:25px;
-    border-radius:12px;
-    margin:20px 0;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
     box-shadow:0px 4px 10px rgba(0,0,0,0.1);
 }
 
-/* BUTTON */
-.button {
-    display:inline-block;
-    margin-top:15px;
-    background:#0a192f;
-    color:white;
-    padding:10px 15px;
-    border-radius:8px;
-    text-decoration:none;
+/* SLIDER */
+.slider {
+    position:relative;
+    width:100%;
+    height:300px;
+    overflow:hidden;
+    border-radius:10px;
+}
+
+.slide {
+    position:absolute;
+    width:100%;
+    height:100%;
+    opacity:0;
+    transition:1s;
+}
+
+.slide img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.active {
+    opacity:1;
 }
 
 /* FOOTER */
@@ -87,7 +106,12 @@ footer {
     color:white;
     text-align:center;
     padding:20px;
-    margin-top:40px;
+}
+
+footer a {
+    color:white;
+    margin:10px;
+    text-decoration:none;
 }
 </style>
 
@@ -95,7 +119,6 @@ footer {
 
 <body>
 
-<!-- NAV -->
 <nav>
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
@@ -104,74 +127,92 @@ footer {
     <a href="contact.html">Contact</a>
 </nav>
 
-<!-- HEADER -->
-<div class="header">
-    <div class="header-content">
+<div class="container">
 
-        <img src="profile.jpg">
+<!-- LEFT -->
+<div class="left">
 
-        <div class="header-text">
-            <h1>Maounou Boris AMOUSSOU</h1>
-            <p>Chemical Engineer | Green Chemistry, Catalysis & Environment</p>
+    <img src="profile.jpg">
 
-            <a href="contact.html" class="button">Contact Me</a>
-        </div>
+    <h2>Maounou Boris AMOUSSOU</h2>
+    <p>Chemical Engineer<br>Green Chemistry & Environment</p>
 
+    <!-- SEARCH -->
+    <div class="search-box">
+        <input type="text" placeholder="Search...">
+    </div>
+
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+
+<!-- SLIDER -->
+<div class="slider">
+    <div class="slide active">
+        <img src="stage1.jpg">
+    </div>
+    <div class="slide">
+        <img src="stage2.jpg">
+    </div>
+    <div class="slide">
+        <img src="stage3.jpg">
     </div>
 </div>
 
-<!-- ABOUT -->
-<section>
+<!-- PROFILE -->
 <div class="card">
-<h2>👨‍🔬 Profile</h2>
+<h2>Profile</h2>
 <p>
-Chemical engineer specialized in green chemistry, catalysis, and environmental processes.
-My work focuses on sustainable energy, innovative materials, and environmental solutions.
+Chemical engineer specialized in green chemistry, catalysis and environmental processes.
 </p>
 </div>
 
 <!-- EXPERIENCE -->
 <div class="card">
-<h2>🌍 Experience</h2>
+<h2>Experience</h2>
 <p>
-International research experience in Montreal (Canada), working on electrochemical and
-photocatalytic approaches for sustainable energy production.
-</p>
-
-<p>
-Currently completing my final-year research internship in Poitiers (France),
-focusing on advanced materials for energy applications.
+International research experience in Montreal (Canada) and current research internship in Poitiers (France).
 </p>
 </div>
 
 <!-- SKILLS -->
 <div class="card">
-<h2>🧪 Skills</h2>
+<h2>Skills</h2>
 <p>
-✔ Electrochemistry<br>
-✔ Catalysis<br>
-✔ Materials Science<br>
-✔ Environmental Chemistry<br>
-✔ Data Analysis
+Electrochemistry, Catalysis, Materials Science, Environmental Chemistry
 </p>
 </div>
 
-<!-- PROJECTS -->
-<div class="card">
-<h2>🚀 Projects</h2>
-<p>
-Research projects focused on energy transition, sustainable technologies,
-and environmental remediation.
-</p>
 </div>
 
-</section>
+</div>
 
 <!-- FOOTER -->
 <footer>
-<p>© 2026 Maounou Boris AMOUSSOU</p>
-<p>Contact: tonemail@gmail.com</p>
+
+<p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
+
+<a href="#">Google Scholar</a>
+<a href="#">LinkedIn</a>
+<a href="#">ResearchGate</a>
+<a href="#">Facebook</a>
+
 </footer>
+
+<script>
+let slides = document.querySelectorAll(".slide");
+let index = 0;
+
+function showSlides() {
+    slides.forEach(slide => slide.classList.remove("active"));
+    index++;
+    if(index >= slides.length){ index = 0; }
+    slides[index].classList.add("active");
+}
+
+setInterval(showSlides, 3000);
+</script>
 
 </body>
 </html>
