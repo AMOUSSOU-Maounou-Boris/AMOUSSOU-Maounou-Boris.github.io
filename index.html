@@ -1,217 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Maounou Boris</title>
-
-<style>
-body {
-    font-family: Arial;
-    margin:0;
-    background:#eef2f3;
-}
-
-/* NAVBAR */
-nav {
-    background:#0a192f;
-    padding:15px;
-    text-align:center;
-}
-
-nav a {
-    color:white;
-    margin:15px;
-    text-decoration:none;
-    font-weight:bold;
-}
-
-/* MAIN LAYOUT */
-.container {
-    display:flex;
-}
-
-/* LEFT SIDE */
-.left {
-    width:30%;
-    background:#0a192f;
-    color:white;
-    padding:30px;
-    text-align:center;
-    min-height:100vh;
-}
-
-.left img {
-    width:150px;
-    height:150px;
-    object-fit:cover;
-    border-radius:50%;
-    border:4px solid white;
-}
-
-.search-box {
-    margin-top:20px;
-}
-
-.search-box input {
-    padding:10px;
-    width:80%;
-    border-radius:20px;
-    border:none;
-}
-
-/* RIGHT SIDE */
-.right {
-    width:70%;
-    padding:40px;
-}
-
-/* CARDS */
-.card {
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    margin-bottom:20px;
-    box-shadow:0px 4px 10px rgba(0,0,0,0.1);
-}
-
-/* SLIDER */
-.slider {
-    position:relative;
-    width:100%;
-    height:300px;
-    overflow:hidden;
-    border-radius:10px;
-}
-
-.slide {
-    position:absolute;
-    width:100%;
-    height:100%;
-    opacity:0;
-    transition:1s;
-}
-
-.slide img {
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
-
-.active {
-    opacity:1;
-}
-
-/* FOOTER */
-footer {
-    background:#0a192f;
-    color:white;
-    text-align:center;
-    padding:20px;
-}
-
-footer a {
-    color:white;
-    margin:10px;
-    text-decoration:none;
-}
-</style>
-
+<title>Home</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<nav>
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="research.html">Research</a>
-    <a href="cv.html">Resume</a>
-    <a href="contact.html">Contact</a>
-</nav>
+<div class="sidebar">
+<img src="images/profile.jpg" class="profile-pic">
 
-<div class="container">
+<h1>Maounou Boris AMOUSSOU</h1>
+<p>Chemical Engineer<br>Green Chemistry & Environment</p>
 
-<!-- LEFT -->
-<div class="left">
-
-    <img src="profile.jpg">
-
-    <h2>Maounou Boris AMOUSSOU</h2>
-    <p>Chemical Engineer<br>Green Chemistry & Environment</p>
-
-    <!-- SEARCH -->
-    <div class="search-box">
-        <input type="text" placeholder="Search...">
-    </div>
-
+<input type="text" placeholder="Search..." class="search">
 </div>
 
-<!-- RIGHT -->
-<div class="right">
+<div class="content">
 
-<!-- SLIDER -->
+<div class="navbar">
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="research.html">Research</a>
+<a href="cv.html">Resume</a>
+<a href="contact.html">Contact</a>
+</div>
+
 <div class="slider">
-    <div class="slide active">
-        <img src="stage1.jpg">
-    </div>
-    <div class="slide">
-        <img src="stage2.jpg">
-    </div>
-    <div class="slide">
-        <img src="stage3.jpg">
-    </div>
+<img src="images/photo1.jpg" class="slide">
 </div>
 
-<!-- PROFILE -->
-<div class="card">
-<h2>Profile</h2>
-<p>
-Chemical engineer specialized in green chemistry, catalysis and environmental processes.
-</p>
+<div class="card hidden">
+<h2>Welcome</h2>
+<p>Welcome to my academic and professional portfolio.</p>
 </div>
 
-<!-- EXPERIENCE -->
-<div class="card">
-<h2>Experience</h2>
-<p>
-International research experience in Montreal (Canada) and current research internship in Poitiers (France).
-</p>
-</div>
-
-<!-- SKILLS -->
-<div class="card">
-<h2>Skills</h2>
-<p>
-Electrochemistry, Catalysis, Materials Science, Environmental Chemistry
-</p>
-</div>
-
-</div>
-
-</div>
-
-<!-- FOOTER -->
 <footer>
-
 <p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
-
 <a href="#">Google Scholar</a>
 <a href="#">LinkedIn</a>
 <a href="#">ResearchGate</a>
 <a href="#">Facebook</a>
-
 </footer>
 
+</div>
+
 <script>
-let slides = document.querySelectorAll(".slide");
-let index = 0;
-
-function showSlides() {
-    slides.forEach(slide => slide.classList.remove("active"));
-    index++;
-    if(index >= slides.length){ index = 0; }
-    slides[index].classList.add("active");
+const observer = new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+entry.target.classList.add('show');
 }
-
-setInterval(showSlides, 3000);
+});
+});
+document.querySelectorAll('.hidden').forEach(el=>observer.observe(el));
 </script>
 
 </body>
