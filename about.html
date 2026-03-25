@@ -1,65 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>About</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About - Maounou Boris AMOUSSOU</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="sidebar">
-<img src="images/profile.jpg" class="profile-pic">
-<h1>Maounou Boris AMOUSSOU</h1>
-<p>Chemical Engineer</p>
+<!-- NAVBAR -->
+<nav>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="research.html">Research</a></li>
+    <li><a href="resume.html">Resume</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+
+  <!-- SIDEBAR (IDENTIQUE À INDEX) -->
+  <aside class="sidebar">
+    <img src="profile.jpg" class="profile-img">
+
+    <h2>Maounou Boris AMOUSSOU</h2>
+    <p>Chemical Engineer<br>Green Chemistry & Environment</p>
+
+    <form action="https://www.google.com/search" method="GET" target="_blank">
+      <input type="text" name="q" placeholder="Search on Google..." class="search-box">
+    </form>
+  </aside>
+
+  <!-- CONTENU -->
+  <main>
+
+    <section class="card">
+      <h3>About Me</h3>
+
+      <p>
+        I am a Chemical Engineer specialized in Green Chemistry, Catalysis, and Environmental Processes,
+        currently completing a Master's degree at the University of Poitiers (France).
+      </p>
+
+      <p>
+        My academic journey has been strongly oriented toward sustainable development, energy transition,
+        and innovative solutions for environmental challenges.
+      </p>
+
+      <p>
+        I also gained international research experience in Montreal (Canada), where I worked on advanced
+        electrochemical and photocatalytic approaches for sustainable energy production.
+      </p>
+
+      <p>
+        I am particularly interested in developing efficient and environmentally friendly technologies
+        for future energy systems.
+      </p>
+
+    </section>
+
+  </main>
+
 </div>
 
-<div class="content">
-
-<div class="navbar">
-<a href="index.html">Home</a>
-<a href="about.html">About</a>
-<a href="research.html">Research</a>
-<a href="cv.html">Resume</a>
-<a href="contact.html">Contact</a>
-</div>
-
-<div class="card">
-<h2>About Me</h2>
-
-<p>
-I am a Chemical Engineer specialized in Green Chemistry, Catalysis, and Environmental Processes,
-currently completing a Master's degree at the University of Poitiers (France).
-</p>
-
-<p>
-My academic journey has been strongly oriented toward sustainable development, energy transition,
-and innovative solutions for environmental challenges.
-</p>
-
-<p>
-I also gained international research experience in Montreal (Canada), where I worked on advanced
-electrochemical and photocatalytic approaches for sustainable energy production.
-</p>
-
-<p>
-I am particularly interested in developing efficient and environmentally friendly technologies
-for future energy systems.
-</p>
-
-</div>
-
-<footer>© 2026 All rights reserved</footer>
-
-</div>
-
-<script>
-const observer=new IntersectionObserver(entries=>{
-entries.forEach(entry=>{
-if(entry.isIntersecting){entry.target.classList.add('show');}
-});
-});
-document.querySelectorAll('.hidden').forEach(el=>observer.observe(el));
-</script>
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
+</footer>
 
 </body>
 </html>
