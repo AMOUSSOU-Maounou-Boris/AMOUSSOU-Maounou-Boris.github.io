@@ -50,6 +50,14 @@
       <button class="subsection-toggle" onclick="toggleSection('my-account-panel')">My account</button>
 
       <div id="my-account-panel" class="subsection-content hidden-panel">
+        <div class="profile-preview-card">
+          <div id="profile-avatar-preview" class="member-avatar large-avatar">MB</div>
+          <div class="profile-preview-text">
+            <h4 id="profile-preview-name">Member profile</h4>
+            <p id="profile-preview-role">Scientific member space</p>
+          </div>
+        </div>
+
         <p id="user-info" class="user-status"></p>
         <p id="presence-self" class="user-status"></p>
 
@@ -64,6 +72,31 @@
 
         <label class="field-label">Email address</label>
         <input type="email" id="profile-email" class="auth-input readonly-input" readonly>
+
+        <label class="field-label">Profile photo URL</label>
+        <input type="text" id="profile-photo-url" class="auth-input" placeholder="Paste an image URL">
+
+        <label class="field-label">Short bio</label>
+        <textarea id="profile-bio" class="profile-textarea" placeholder="Write a short academic bio..."></textarea>
+
+        <label class="field-label">Institution</label>
+        <input type="text" id="profile-institution" class="auth-input" placeholder="Institution / University / Lab">
+
+        <label class="field-label">Location</label>
+        <input type="text" id="profile-location" class="auth-input" placeholder="City / Country">
+
+        <label class="field-label">Favorite field</label>
+        <input type="text" id="profile-field" class="auth-input" placeholder="Green chemistry, catalysis, materials...">
+
+        <label class="field-label">Avatar color</label>
+        <div class="color-row">
+          <button type="button" class="color-dot color-1 active-color" onclick="setAvatarColor('#16385d', this)"></button>
+          <button type="button" class="color-dot color-2" onclick="setAvatarColor('#6c2bd9', this)"></button>
+          <button type="button" class="color-dot color-3" onclick="setAvatarColor('#0f766e', this)"></button>
+          <button type="button" class="color-dot color-4" onclick="setAvatarColor('#b45309', this)"></button>
+          <button type="button" class="color-dot color-5" onclick="setAvatarColor('#be123c', this)"></button>
+        </div>
+        <input type="hidden" id="profile-avatar-color" value="#16385d">
 
         <div class="auth-actions">
           <button class="auth-btn" onclick="saveProfile()">Save profile</button>
@@ -95,6 +128,64 @@
       <div id="online-users"></div>
     </section>
 
+    <section class="card academic-hub-card">
+      <button class="hub-toggle" onclick="toggleSection('academic-hub-panel')">
+        Academic Hub
+      </button>
+
+      <div id="academic-hub-panel" class="hub-panel">
+        <div class="hub-grid">
+          <div class="hub-box">
+            <h4>Collaboration</h4>
+            <p>
+              Explore research partnerships, interdisciplinary exchange, student projects,
+              and scientific networking opportunities.
+            </p>
+          </div>
+
+          <div class="hub-box">
+            <h4>Communications</h4>
+            <p>
+              Share scientific announcements, conference updates, presentation ideas,
+              and research news with the community.
+            </p>
+          </div>
+
+          <div class="hub-box">
+            <h4>Lab Activity</h4>
+            <p>
+              Highlight laboratory observations, experimental progress, research routines,
+              and technical reflections from ongoing work.
+            </p>
+          </div>
+
+          <div class="hub-box">
+            <h4>Scientific Interests</h4>
+            <p>
+              Green chemistry, catalysis, environmental treatment, materials science,
+              electrochemistry, and sustainable energy transitions.
+            </p>
+          </div>
+
+          <div class="hub-box">
+            <h4>Opportunities</h4>
+            <p>
+              Discuss seminars, internships, thesis opportunities, mobility programs,
+              and future academic perspectives.
+            </p>
+          </div>
+
+          <div class="hub-box">
+            <h4>Community Spirit</h4>
+            <p>
+              Build a respectful and active scientific space where every member can publish,
+              react, comment, and share constructive opinions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="card post" id="post1">
       <h3>Scientific Insight</h3>
       <p class="date">March 2026</p>
@@ -113,13 +204,22 @@
       <div class="comments-box">
         <h4>Comments</h4>
 
-        <div class="emoji-bar">
+        <div class="emoji-bar large-emoji-bar">
           <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😀')">😀</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','👍')">👍</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🎉')">🎉</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🔥')">🔥</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😄')">😄</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😍')">😍</button>
           <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','👏')">👏</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🔥')">🔥</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🎉')">🎉</button>
           <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','❤️')">❤️</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','👍')">👍</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🙏')">🙏</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🧪')">🧪</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🔬')">🔬</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🌍')">🌍</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','⚗️')">⚗️</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','💡')">💡</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','⭐')">⭐</button>
         </div>
 
         <div class="new-comment">
@@ -140,6 +240,15 @@
       <div class="new-comment">
         <input type="text" id="community-title" class="text-input" placeholder="Title">
         <textarea id="community-text" placeholder="Write your publication..."></textarea>
+
+        <div class="emoji-bar">
+          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🧪')">🧪</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🔬')">🔬</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🌍')">🌍</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','💡')">💡</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','✨')">✨</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','👏')">👏</button>
+        </div>
 
         <button class="small-btn" onclick="publishCommunityPost()">Publish</button>
         <p id="community-message" class="dark-message"></p>
@@ -242,11 +351,33 @@
     });
   }
 
+  function getInitials(firstName, lastName, fullName) {
+    const f = (firstName || "").trim();
+    const l = (lastName || "").trim();
+    if (f || l) return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
+
+    const parts = (fullName || "Member").trim().split(" ").filter(Boolean);
+    return (parts.slice(0, 2).map(p => p.charAt(0)).join("") || "MB").toUpperCase();
+  }
+
+  function avatarHtml(profile, sizeClass = "") {
+    const photo = profile?.photoURL || "";
+    const color = profile?.avatarColor || "#16385d";
+    const initials = escapeHtml(getInitials(profile?.firstName, profile?.lastName, profile?.fullName));
+
+    if (photo) {
+      return `<div class="member-avatar ${sizeClass}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
+    }
+
+    return `<div class="member-avatar ${sizeClass}" style="background:${escapeHtml(color)}">${initials}</div>`;
+  }
+
   function insertEmoji(targetId, emoji) {
     const input = document.getElementById(targetId);
     if (!input) return;
     input.value += emoji;
     input.focus();
+    updateProfilePreview();
   }
 
   function openSignupModal() {
@@ -271,6 +402,36 @@
 
   function toggleMemberZone(show) {
     document.getElementById("member-zone").classList.toggle("hidden-block", !show);
+  }
+
+  function setAvatarColor(color, btn) {
+    document.getElementById("profile-avatar-color").value = color;
+    document.querySelectorAll(".color-dot").forEach(dot => dot.classList.remove("active-color"));
+    btn.classList.add("active-color");
+    updateProfilePreview();
+  }
+
+  function updateProfilePreview() {
+    const firstName = document.getElementById("profile-firstname")?.value.trim() || "";
+    const lastName = document.getElementById("profile-lastname")?.value.trim() || "";
+    const photoURL = document.getElementById("profile-photo-url")?.value.trim() || "";
+    const institution = document.getElementById("profile-institution")?.value.trim() || "Scientific member space";
+    const color = document.getElementById("profile-avatar-color")?.value || "#16385d";
+
+    const fullName = `${firstName} ${lastName}`.trim() || "Member profile";
+    document.getElementById("profile-preview-name").textContent = fullName;
+    document.getElementById("profile-preview-role").textContent = institution;
+
+    const preview = document.getElementById("profile-avatar-preview");
+    if (!preview) return;
+
+    if (photoURL) {
+      preview.innerHTML = `<img src="${photoURL}" alt="avatar">`;
+      preview.style.background = "transparent";
+    } else {
+      preview.textContent = getInitials(firstName, lastName, fullName);
+      preview.style.background = color;
+    }
   }
 
   async function ensurePostExists(postId) {
@@ -304,6 +465,12 @@
     const finalFirstName = firstName || existingData.firstName || "";
     const finalLastName = lastName || existingData.lastName || "";
     const finalPhone = extras.phone || existingData.phone || "";
+    const finalBio = extras.bio || existingData.bio || "";
+    const finalInstitution = extras.institution || existingData.institution || "";
+    const finalLocation = extras.location || existingData.location || "";
+    const finalField = extras.favoriteField || existingData.favoriteField || "";
+    const finalPhotoURL = extras.photoURL || existingData.photoURL || "";
+    const finalAvatarColor = extras.avatarColor || existingData.avatarColor || "#16385d";
     const finalFullName = `${finalFirstName} ${finalLastName}`.trim() || user.displayName || "Member";
 
     const payload = {
@@ -313,6 +480,12 @@
       fullName: finalFullName,
       phone: finalPhone,
       email: user.email || "",
+      bio: finalBio,
+      institution: finalInstitution,
+      location: finalLocation,
+      favoriteField: finalField,
+      photoURL: finalPhotoURL,
+      avatarColor: finalAvatarColor,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
@@ -331,6 +504,23 @@
     document.getElementById("profile-lastname").value = profile?.lastName || "";
     document.getElementById("profile-phone").value = profile?.phone || "";
     document.getElementById("profile-email").value = user?.email || "";
+    document.getElementById("profile-photo-url").value = profile?.photoURL || "";
+    document.getElementById("profile-bio").value = profile?.bio || "";
+    document.getElementById("profile-institution").value = profile?.institution || "";
+    document.getElementById("profile-location").value = profile?.location || "";
+    document.getElementById("profile-field").value = profile?.favoriteField || "";
+    document.getElementById("profile-avatar-color").value = profile?.avatarColor || "#16385d";
+
+    document.querySelectorAll(".color-dot").forEach(dot => dot.classList.remove("active-color"));
+    const currentColor = profile?.avatarColor || "#16385d";
+    const matching = document.querySelector(`.color-dot[data-color="${currentColor}"]`);
+    if (matching) matching.classList.add("active-color");
+    else {
+      const firstDot = document.querySelector(".color-dot");
+      if (firstDot) firstDot.classList.add("active-color");
+    }
+
+    updateProfilePreview();
   }
 
   async function signUp() {
@@ -369,6 +559,12 @@
         fullName,
         phone,
         email,
+        bio: "",
+        institution: "",
+        location: "",
+        favoriteField: "",
+        photoURL: "",
+        avatarColor: "#16385d",
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -404,6 +600,12 @@
     const firstName = document.getElementById("profile-firstname").value.trim();
     const lastName = document.getElementById("profile-lastname").value.trim();
     const phone = document.getElementById("profile-phone").value.trim();
+    const photoURL = document.getElementById("profile-photo-url").value.trim();
+    const bio = document.getElementById("profile-bio").value.trim();
+    const institution = document.getElementById("profile-institution").value.trim();
+    const location = document.getElementById("profile-location").value.trim();
+    const favoriteField = document.getElementById("profile-field").value.trim();
+    const avatarColor = document.getElementById("profile-avatar-color").value.trim() || "#16385d";
 
     if (!firstName || !lastName) {
       setMessage("profile-message", "First name and last name are required.", true);
@@ -422,6 +624,12 @@
         fullName,
         phone,
         email: user.email || "",
+        photoURL,
+        bio,
+        institution,
+        location,
+        favoriteField,
+        avatarColor,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
 
@@ -434,6 +642,7 @@
       }
 
       document.getElementById("user-info").textContent = `Connected as ${fullName}`;
+      updateProfilePreview();
       setMessage("profile-message", "Profile saved successfully.");
     } catch (error) {
       setMessage("profile-message", error.message, true);
@@ -489,24 +698,42 @@
   }
 
   function loadOnlineUsers() {
-    rtdb.ref("/status").on("value", (snapshot) => {
+    rtdb.ref("/status").on("value", async (snapshot) => {
       const container = document.getElementById("online-users");
       let html = "";
 
+      const items = [];
       snapshot.forEach((child) => {
-        const data = child.val() || {};
+        items.push({ uid: child.key, ...child.val() });
+      });
+
+      for (const data of items) {
+        let profileData = {};
+        try {
+          const doc = await db.collection("users").doc(data.uid).get();
+          if (doc.exists) profileData = doc.data();
+        } catch (e) {}
+
+        const mergedProfile = {
+          fullName: profileData.fullName || data.fullName || "Member",
+          firstName: profileData.firstName || "",
+          lastName: profileData.lastName || "",
+          photoURL: profileData.photoURL || "",
+          avatarColor: profileData.avatarColor || "#16385d"
+        };
+
         const online = data.state === "online";
 
         html += `
           <div class="online-user">
-            <span class="${online ? "dot-online" : "dot-offline"}"></span>
+            ${avatarHtml(mergedProfile)}
             <div>
-              <div class="online-name">${escapeHtml(data.fullName || "Member")}</div>
+              <div class="online-name">${escapeHtml(mergedProfile.fullName || "Member")}</div>
               <div class="online-time">${online ? "online" : "last seen"} • ${escapeHtml(formatPresenceTime(data.last_changed))}</div>
             </div>
           </div>
         `;
-      });
+      }
 
       container.innerHTML = html || "<p class='no-online'>No member activity yet.</p>";
     });
@@ -551,6 +778,10 @@
         text,
         userId: user.uid,
         authorName: userInfo.fullName || user.displayName || "Member",
+        firstName: userInfo.firstName || "",
+        lastName: userInfo.lastName || "",
+        photoURL: userInfo.photoURL || "",
+        avatarColor: userInfo.avatarColor || "#16385d",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -584,6 +815,10 @@
         text,
         userId: user.uid,
         authorName: userInfo.fullName || user.displayName || "Member",
+        firstName: userInfo.firstName || "",
+        lastName: userInfo.lastName || "",
+        photoURL: userInfo.photoURL || "",
+        avatarColor: userInfo.avatarColor || "#16385d",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -646,14 +881,19 @@
 
           html += `
             <div class="reply">
-              <div class="comment-header-line">
-                <div class="comment-meta">
-                  <strong>${escapeHtml(r.authorName || "Member")}</strong>
-                  <span class="comment-time">${escapeHtml(formatDateTime(r.createdAt))}</span>
+              <div class="comment-layout">
+                ${avatarHtml(r)}
+                <div class="comment-content">
+                  <div class="comment-header-line">
+                    <div class="comment-meta">
+                      <strong>${escapeHtml(r.authorName || "Member")}</strong>
+                      <span class="comment-time">${escapeHtml(formatDateTime(r.createdAt))}</span>
+                    </div>
+                    ${canDelete ? `<button class="delete-btn" onclick="deleteReply('${postId}','${commentId}','${doc.id}')">Delete</button>` : ""}
+                  </div>
+                  <div class="comment-text">${escapeHtml(r.text || "")}</div>
                 </div>
-                ${canDelete ? `<button class="delete-btn" onclick="deleteReply('${postId}','${commentId}','${doc.id}')">Delete</button>` : ""}
               </div>
-              <div class="comment-text">${escapeHtml(r.text || "")}</div>
             </div>
           `;
         });
@@ -677,22 +917,36 @@
 
           html += `
             <div class="comment">
-              <div class="comment-header-line">
-                <div class="comment-meta">
-                  <strong>${escapeHtml(c.authorName || "Member")}</strong>
-                  <span class="comment-time">${escapeHtml(formatDateTime(c.createdAt))}</span>
+              <div class="comment-layout">
+                ${avatarHtml(c, "comment-avatar")}
+                <div class="comment-content">
+                  <div class="comment-header-line">
+                    <div class="comment-meta">
+                      <strong>${escapeHtml(c.authorName || "Member")}</strong>
+                      <span class="comment-time">${escapeHtml(formatDateTime(c.createdAt))}</span>
+                    </div>
+                    ${canDelete ? `<button class="delete-btn" onclick="deleteComment('${postId}','${doc.id}')">Delete</button>` : ""}
+                  </div>
+
+                  <div class="comment-text">${escapeHtml(c.text || "")}</div>
+
+                  <div class="emoji-bar small-emoji-bar">
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','👍')">👍</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','👏')">👏</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','🔥')">🔥</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','❤️')">❤️</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','🧪')">🧪</button>
+                    <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','🔬')">🔬</button>
+                  </div>
+
+                  <div class="reply-box">
+                    <input type="text" id="reply-input-${doc.id}" placeholder="Reply to this comment...">
+                    <button class="small-btn" onclick="addReply('${postId}', '${doc.id}')">Reply</button>
+                  </div>
+
+                  <div id="replies-${doc.id}" class="replies"></div>
                 </div>
-                ${canDelete ? `<button class="delete-btn" onclick="deleteComment('${postId}','${doc.id}')">Delete</button>` : ""}
               </div>
-
-              <div class="comment-text">${escapeHtml(c.text || "")}</div>
-
-              <div class="reply-box">
-                <input type="text" id="reply-input-${doc.id}" placeholder="Reply to this comment...">
-                <button class="small-btn" onclick="addReply('${postId}', '${doc.id}')">Reply</button>
-              </div>
-
-              <div id="replies-${doc.id}" class="replies"></div>
             </div>
           `;
         });
@@ -724,6 +978,10 @@
       await db.collection("communityPosts").add({
         userId: user.uid,
         authorName: profile.fullName || user.displayName || "Member",
+        firstName: profile.firstName || "",
+        lastName: profile.lastName || "",
+        photoURL: profile.photoURL || "",
+        avatarColor: profile.avatarColor || "#16385d",
         title,
         text,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -760,6 +1018,10 @@
           text,
           userId: user.uid,
           authorName: profile.fullName || user.displayName || "Member",
+          firstName: profile.firstName || "",
+          lastName: profile.lastName || "",
+          photoURL: profile.photoURL || "",
+          avatarColor: profile.avatarColor || "#16385d",
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
@@ -824,14 +1086,19 @@
 
           html += `
             <div class="reply">
-              <div class="comment-header-line">
-                <div class="comment-meta">
-                  <strong>${escapeHtml(c.authorName || "Member")}</strong>
-                  <span class="comment-time">${escapeHtml(formatDateTime(c.createdAt))}</span>
+              <div class="comment-layout">
+                ${avatarHtml(c)}
+                <div class="comment-content">
+                  <div class="comment-header-line">
+                    <div class="comment-meta">
+                      <strong>${escapeHtml(c.authorName || "Member")}</strong>
+                      <span class="comment-time">${escapeHtml(formatDateTime(c.createdAt))}</span>
+                    </div>
+                    ${canDelete ? `<button class="delete-btn" onclick="deleteCommunityComment('${postId}','${doc.id}')">Delete</button>` : ""}
+                  </div>
+                  <div class="comment-text">${escapeHtml(c.text || "")}</div>
                 </div>
-                ${canDelete ? `<button class="delete-btn" onclick="deleteCommunityComment('${postId}','${doc.id}')">Delete</button>` : ""}
               </div>
-              <div class="comment-text">${escapeHtml(c.text || "")}</div>
             </div>
           `;
         });
@@ -851,29 +1118,42 @@
 
         html += `
           <div class="comment community-post-card">
-            <div class="comment-header-line">
-              <div class="comment-meta">
-                <strong>${escapeHtml(p.authorName || "Member")}</strong>
-                <span class="comment-time">${escapeHtml(formatDateTime(p.createdAt))}</span>
+            <div class="comment-layout">
+              ${avatarHtml(p, "comment-avatar")}
+              <div class="comment-content">
+                <div class="comment-header-line">
+                  <div class="comment-meta">
+                    <strong>${escapeHtml(p.authorName || "Member")}</strong>
+                    <span class="comment-time">${escapeHtml(formatDateTime(p.createdAt))}</span>
+                  </div>
+                  ${canDelete ? `<button class="delete-btn" onclick="deleteCommunityPost('${doc.id}')">Delete</button>` : ""}
+                </div>
+
+                ${p.title ? `<h4 class="community-title">${escapeHtml(p.title)}</h4>` : ""}
+                <div class="comment-text">${escapeHtml(p.text || "")}</div>
+
+                <div class="emoji-bar small-emoji-bar">
+                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','👏')">👏</button>
+                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','🔥')">🔥</button>
+                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','❤️')">❤️</button>
+                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','🧪')">🧪</button>
+                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','🔬')">🔬</button>
+                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','💡')">💡</button>
+                </div>
+
+                <div class="reply-box">
+                  <input type="text" id="community-comment-input-${doc.id}" placeholder="Give your opinion or comment...">
+                  <button class="small-btn" onclick="addCommunityComment('${doc.id}')">Comment</button>
+                </div>
+
+                <div id="community-comments-${doc.id}" class="replies"></div>
               </div>
-              ${canDelete ? `<button class="delete-btn" onclick="deleteCommunityPost('${doc.id}')">Delete</button>` : ""}
             </div>
-
-            ${p.title ? `<h4 class="community-title">${escapeHtml(p.title)}</h4>` : ""}
-            <div class="comment-text">${escapeHtml(p.text || "")}</div>
-
-            <div class="reply-box">
-              <input type="text" id="community-comment-input-${doc.id}" placeholder="Give your opinion or comment...">
-              <button class="small-btn" onclick="addCommunityComment('${doc.id}')">Comment</button>
-            </div>
-
-            <div id="community-comments-${doc.id}" class="replies"></div>
           </div>
         `;
       });
 
       document.getElementById("community-posts").innerHTML = html || "<p class='dark-note'>No publication yet.</p>";
-
       snapshot.forEach((doc) => loadCommunityComments(doc.id));
     });
   }
@@ -983,6 +1263,21 @@
     loadComments("post1");
     loadOnlineUsers();
     loadCommunityPosts();
+  });
+
+  document.addEventListener("input", (e) => {
+    if (
+      e.target.id === "profile-firstname" ||
+      e.target.id === "profile-lastname" ||
+      e.target.id === "profile-photo-url" ||
+      e.target.id === "profile-institution"
+    ) {
+      updateProfilePreview();
+    }
+  });
+
+  document.querySelectorAll(".color-dot").forEach((dot) => {
+    dot.setAttribute("data-color", dot.getAttribute("onclick").match(/'([^']+)'/)[1]);
   });
 </script>
 </body>
