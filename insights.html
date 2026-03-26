@@ -7,8 +7,9 @@
 <link rel="stylesheet" href="style.css">
 
 <!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 </head>
 
 <body>
@@ -30,18 +31,22 @@
 <img src="profile.jpg" class="profile-img">
 <h2>Maounou Boris AMOUSSOU</h2>
 <p>Chemical Engineer<br>Green Chemistry & Environment</p>
+
+<!-- LOGIN -->
+<button onclick="login()">Login with Google</button>
+<button onclick="logout()">Logout</button>
+
+<p id="user-info"></p>
+
 </aside>
 
 <main>
 
-<!-- POST -->
 <section class="card post" id="post1">
 <h3>Photocatalysis and Water Treatment</h3>
 <p class="date">March 2026</p>
 
-<p>
-BaTiO₃-based photocatalysts for degradation of persistent pollutants in water.
-</p>
+<p>BaTiO₃-based photocatalysts for degradation of pollutants.</p>
 
 <div class="actions">
 <button onclick="likePost('post1')">👍 Like <span id="likes-post1">0</span></button>
@@ -57,15 +62,10 @@ BaTiO₃-based photocatalysts for degradation of persistent pollutants in water.
 </section>
 
 </main>
-
 </div>
 
-<footer>
-<p>© 2026 Maounou Boris AMOUSSOU</p>
-</footer>
-
 <script>
-/* 🔥 COLLE TA CONFIG ICI */
+/* 🔥 CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
   authDomain: "boris-research-hub.firebaseapp.com",
@@ -77,7 +77,30 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.firestore();
+const auth = firebase.auth();
+
+/* 🔐 LOGIN */
+function login(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider);
+}
+
+/* 🚪 LOGOUT */
+function logout(){
+  auth.signOut();
+}
+
+/* 👤 USER STATE */
+auth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById("user-info").innerHTML =
+      `<img src="${user.photoURL}" width="30"> ${user.displayName}`;
+  } else {
+    document.getElementById("user-info").innerText = "Not connected";
+  }
+});
 
 /* 👍 LIKE */
 function likePost(postId){
@@ -93,27 +116,33 @@ function likePost(postId){
   });
 }
 
-/* 🔄 UPDATE LIKE */
+/* 🔄 LOAD LIKES */
 function loadLikes(postId){
-  const ref = db.collection("posts").doc(postId);
-
-  ref.onSnapshot(doc=>{
+  db.collection("posts").doc(postId)
+  .onSnapshot(doc=>{
     if(doc.exists){
       document.getElementById("likes-"+postId).innerText = doc.data().likes;
     }
   });
 }
 
-/* 💬 COMMENT */
+/* 💬 COMMENT AVEC USER */
 function addComment(postId){
+  const user = auth.currentUser;
   const input = document.getElementById("comment-input-"+postId);
-  const text = input.value;
 
-  if(text.trim() === "") return;
+  if(!user){
+    alert("Login first !");
+    return;
+  }
+
+  if(input.value.trim() === "") return;
 
   db.collection("comments").add({
     postId: postId,
-    text: text,
+    text: input.value,
+    name: user.displayName,
+    photo: user.photoURL,
     date: new Date()
   });
 
@@ -123,15 +152,23 @@ function addComment(postId){
 /* 🔄 LOAD COMMENTS */
 function loadComments(postId){
   db.collection("comments")
-    .where("postId","==",postId)
-    .orderBy("date")
-    .onSnapshot(snapshot=>{
-      let html = "";
-      snapshot.forEach(doc=>{
-        html += `<p class="comment">${doc.data().text}</p>`;
-      });
-      document.getElementById("comments-"+postId).innerHTML = html;
+  .where("postId","==",postId)
+  .orderBy("date")
+  .onSnapshot(snapshot=>{
+    let html = "";
+    snapshot.forEach(doc=>{
+      const c = doc.data();
+
+      html += `
+      <div class="comment">
+        <img src="${c.photo}" width="30">
+        <b>${c.name}</b>
+        <p>${c.text}</p>
+      </div>`;
     });
+
+    document.getElementById("comments-"+postId).innerHTML = html;
+  });
 }
 
 /* INIT */
