@@ -9,6 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -38,7 +39,7 @@
       <input type="password" id="login-password" placeholder="Password" class="auth-input" autocomplete="current-password">
 
       <div class="auth-actions">
-        <button class="auth-btn" onclick="toggleSignup()">Sign up</button>
+        <button class="auth-btn" onclick="openSignupModal()">Sign up</button>
         <button class="auth-btn" onclick="signIn()">Login</button>
       </div>
 
@@ -49,25 +50,12 @@
 
       <p id="auth-message" class="auth-message"></p>
       <p id="user-info" class="user-status">Not connected</p>
+      <p id="presence-self" class="user-status"></p>
+    </div>
 
-      <!-- hidden by default -->
-      <div id="signup-section" class="signup-section hidden-signup">
-        <h4>Create an account</h4>
-
-        <input type="text" id="signup-firstname" placeholder="First name" class="auth-input" autocomplete="given-name">
-        <input type="text" id="signup-lastname" placeholder="Last name" class="auth-input" autocomplete="family-name">
-        <input type="tel" id="signup-phone" placeholder="Phone number" class="auth-input" autocomplete="tel">
-        <input type="email" id="signup-email" placeholder="Email" class="auth-input" autocomplete="email">
-        <input type="password" id="signup-password" placeholder="Password" class="auth-input" autocomplete="new-password">
-        <input type="password" id="signup-password-confirm" placeholder="Confirm password" class="auth-input" autocomplete="new-password">
-
-        <div class="auth-actions">
-          <button class="auth-btn" onclick="signUp()">Create account</button>
-          <button class="auth-btn secondary" onclick="toggleSignup()">Close</button>
-        </div>
-
-        <p id="signup-message" class="auth-message"></p>
-      </div>
+    <div class="online-box">
+      <h3>Online members</h3>
+      <div id="online-users"></div>
     </div>
   </aside>
 
@@ -90,6 +78,15 @@
       <div class="comments-box">
         <h4>Comments</h4>
 
+        <div class="emoji-bar">
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😀')">😀</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','👍')">👍</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🎉')">🎉</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🔥')">🔥</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','👏')">👏</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','❤️')">❤️</button>
+        </div>
+
         <div class="new-comment">
           <textarea id="comment-input-post1" placeholder="Write a comment..."></textarea>
           <button class="small-btn" onclick="addComment('post1')">Send</button>
@@ -111,6 +108,28 @@
   </main>
 </div>
 
+<!-- SIGNUP MODAL -->
+<div id="signup-modal" class="modal hidden-modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeSignupModal()">×</button>
+    <h3>Create an account</h3>
+
+    <input type="text" id="signup-firstname" placeholder="First name" class="auth-input" autocomplete="given-name">
+    <input type="text" id="signup-lastname" placeholder="Last name" class="auth-input" autocomplete="family-name">
+    <input type="tel" id="signup-phone" placeholder="Phone number" class="auth-input" autocomplete="tel">
+    <input type="email" id="signup-email" placeholder="Email" class="auth-input" autocomplete="email">
+    <input type="password" id="signup-password" placeholder="Password" class="auth-input" autocomplete="new-password">
+    <input type="password" id="signup-password-confirm" placeholder="Confirm password" class="auth-input" autocomplete="new-password">
+
+    <div class="auth-actions">
+      <button class="auth-btn" onclick="signUp()">Create account</button>
+      <button class="auth-btn secondary" onclick="closeSignupModal()">Close</button>
+    </div>
+
+    <p id="signup-message" class="modal-message"></p>
+  </div>
+</div>
+
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
@@ -119,28 +138,40 @@
     storageBucket: "boris-research-hub.firebasestorage.app",
     messagingSenderId: "71055508172",
     appId: "1:71055508172:web:72229e3f5ad664eb35b869",
-    measurementId: "G-9Q6SJ96NBS"
+    measurementId: "G-9Q6SJ96NBS",
+    databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com"
   };
 
   firebase.initializeApp(firebaseConfig);
 
   const db = firebase.firestore();
   const auth = firebase.auth();
+  const rtdb = firebase.database();
 
   function setMessage(id, text, isError = false) {
     const el = document.getElementById(id);
     el.textContent = text;
-    el.style.color = isError ? "#ffd2d2" : "#d9f6dd";
+    el.style.color = isError ? "#b00020" : "#0b7a3b";
   }
 
   function clearMessage(id) {
     document.getElementById(id).textContent = "";
   }
 
-  function toggleSignup() {
-    document.getElementById("signup-section").classList.toggle("hidden-signup");
+  function openSignupModal() {
+    document.getElementById("signup-modal").classList.remove("hidden-modal");
     clearMessage("signup-message");
   }
+
+  function closeSignupModal() {
+    document.getElementById("signup-modal").classList.add("hidden-modal");
+    clearMessage("signup-message");
+  }
+
+  window.addEventListener("click", (e) => {
+    const modal = document.getElementById("signup-modal");
+    if (e.target === modal) closeSignupModal();
+  });
 
   function escapeHtml(value) {
     return String(value)
@@ -161,6 +192,24 @@
       hour: "2-digit",
       minute: "2-digit"
     });
+  }
+
+  function formatPresenceTime(ms) {
+    if (!ms) return "";
+    const date = new Date(ms);
+    return date.toLocaleString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  function insertEmoji(targetId, emoji) {
+    const input = document.getElementById(targetId);
+    input.value += emoji;
+    input.focus();
   }
 
   async function ensurePostExists(postId) {
@@ -219,13 +268,7 @@
       });
 
       setMessage("signup-message", "Account created successfully.");
-
-      document.getElementById("signup-firstname").value = "";
-      document.getElementById("signup-lastname").value = "";
-      document.getElementById("signup-phone").value = "";
-      document.getElementById("signup-email").value = "";
-      document.getElementById("signup-password").value = "";
-      document.getElementById("signup-password-confirm").value = "";
+      closeSignupModal();
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         setMessage("signup-message", "This email is already in use.", true);
@@ -279,7 +322,7 @@
 
     try {
       await auth.sendPasswordResetEmail(email);
-      setMessage("auth-message", "Password reset email sent.");
+      setMessage("auth-message", "Password reset email sent. Check inbox and spam.");
     } catch (error) {
       setMessage("auth-message", error.message, true);
     }
@@ -289,21 +332,74 @@
     auth.signOut();
   }
 
+  function setupPresence(user, fullName) {
+    const uid = user.uid;
+    const userStatusRef = rtdb.ref("/status/" + uid);
+    const connectedRef = rtdb.ref(".info/connected");
+
+    connectedRef.on("value", async (snap) => {
+      if (snap.val() === false) return;
+
+      userStatusRef.onDisconnect().set({
+        state: "offline",
+        fullName: fullName || user.displayName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      }).then(() => {
+        userStatusRef.set({
+          state: "online",
+          fullName: fullName || user.displayName || "Member",
+          last_changed: firebase.database.ServerValue.TIMESTAMP
+        });
+      });
+    });
+  }
+
+  function loadOnlineUsers() {
+    rtdb.ref("/status").on("value", (snapshot) => {
+      const container = document.getElementById("online-users");
+      let html = "";
+
+      snapshot.forEach((child) => {
+        const data = child.val();
+        const isOnline = data && data.state === "online";
+        const dotClass = isOnline ? "dot-online" : "dot-offline";
+        const label = isOnline
+          ? `online • ${formatPresenceTime(data.last_changed)}`
+          : `last seen • ${formatPresenceTime(data.last_changed)}`;
+
+        html += `
+          <div class="online-user">
+            <span class="${dotClass}"></span>
+            <div>
+              <div class="online-name">${escapeHtml(data.fullName || "Member")}</div>
+              <div class="online-time">${escapeHtml(label)}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html || "<p class='no-online'>No member activity yet.</p>";
+    });
+  }
+
   auth.onAuthStateChanged(async (user) => {
     const el = document.getElementById("user-info");
+    const selfPresence = document.getElementById("presence-self");
 
     if (user) {
       const userDoc = await db.collection("users").doc(user.uid).get();
       const info = userDoc.exists ? userDoc.data() : null;
+      const fullName = info ? info.fullName : (user.displayName || "Member");
 
-      if (info) {
-        el.textContent = `Connected as ${info.fullName}`;
-      } else {
-        el.textContent = `Connected`;
-      }
+      el.textContent = `Connected as ${fullName}`;
+      selfPresence.textContent = "● You are online";
+      setupPresence(user, fullName);
     } else {
       el.textContent = "Not connected";
+      selfPresence.textContent = "";
     }
+
+    loadComments("post1");
   });
 
   async function likePost(postId) {
@@ -358,11 +454,7 @@
     const user = auth.currentUser;
     if (!user) return;
 
-    const commentRef = db.collection("posts")
-      .doc(postId)
-      .collection("comments")
-      .doc(commentId);
-
+    const commentRef = db.collection("posts").doc(postId).collection("comments").doc(commentId);
     const doc = await commentRef.get();
     if (!doc.exists) return;
 
@@ -371,7 +463,11 @@
       return;
     }
 
-    await commentRef.delete();
+    const repliesSnap = await commentRef.collection("replies").get();
+    const batch = db.batch();
+    repliesSnap.forEach((replyDoc) => batch.delete(replyDoc.ref));
+    batch.delete(commentRef);
+    await batch.commit();
   }
 
   async function addReply(postId, commentId) {
@@ -487,6 +583,13 @@
 
               <div class="comment-text">${escapeHtml(c.text || "")}</div>
 
+              <div class="emoji-bar small-emoji-bar">
+                <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${commentId}','😀')">😀</button>
+                <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${commentId}','👍')">👍</button>
+                <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${commentId}','🔥')">🔥</button>
+                <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${commentId}','❤️')">❤️</button>
+              </div>
+
               <div class="reply-box">
                 <input type="text" id="reply-input-${commentId}" placeholder="Reply to this comment...">
                 <button class="small-btn" onclick="addReply('${postId}', '${commentId}')">Reply</button>
@@ -507,10 +610,7 @@
   ensurePostExists("post1").then(() => {
     loadLikes("post1");
     loadComments("post1");
-  });
-
-  auth.onAuthStateChanged(() => {
-    loadComments("post1");
+    loadOnlineUsers();
   });
 </script>
 
