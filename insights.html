@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insights</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="insights.css" />
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -13,7 +14,7 @@
 </head>
 <body>
 
-<nav>
+<nav class="insights-nav">
   <ul>
     <li><a href="index.html">Home</a></li>
     <li><a href="about.html">About</a></li>
@@ -24,8 +25,8 @@
   </ul>
 </nav>
 
-<div class="container">
-  <aside class="sidebar">
+<div class="insights-container">
+  <aside class="insights-sidebar">
     <img src="profile.jpg" class="profile-img" alt="Profile photo">
 
     <h2>Maounou Boris AMOUSSOU</h2>
@@ -45,7 +46,6 @@
       <p id="auth-message" class="auth-message"></p>
     </div>
 
-    <!-- Visible seulement après connexion -->
     <div id="member-zone" class="hidden-block">
       <button class="subsection-toggle" onclick="toggleSection('my-account-panel')">My account</button>
 
@@ -89,7 +89,7 @@
     </div>
   </aside>
 
-  <main>
+  <main class="insights-main">
     <section class="card">
       <h3>Online members</h3>
       <div id="online-users"></div>
@@ -134,7 +134,7 @@
     <section class="card">
       <h3>Community publications</h3>
       <p class="small-note dark-note">
-        Logged-in members can publish text on the site.
+        Logged-in members can publish. Everyone can read, comment, and share opinions.
       </p>
 
       <div class="new-comment">
@@ -151,16 +151,15 @@
     <footer class="page-footer">
       <p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
       <div class="socials">
-        <a href="#" target="_blank" rel="noopener noreferrer">Google Scholar</a>
-        <a href="#" target="_blank" rel="noopener noreferrer">ResearchGate</a>
-        <a href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="#">Google Scholar</a>
+        <a href="#">ResearchGate</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Facebook</a>
       </div>
     </footer>
   </main>
 </div>
 
-<!-- SIGNUP MODAL -->
 <div id="signup-modal" class="modal hidden-modal">
   <div class="modal-content">
     <button class="modal-close" onclick="closeSignupModal()">×</button>
@@ -738,6 +737,38 @@
     }
   }
 
+  async function addCommunityComment(postId) {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please sign in first.");
+      return;
+    }
+
+    const input = document.getElementById(`community-comment-input-${postId}`);
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    try {
+      const userSnap = await db.collection("users").doc(user.uid).get();
+      const profile = userSnap.data() || {};
+
+      await db.collection("communityPosts")
+        .doc(postId)
+        .collection("comments")
+        .add({
+          text,
+          userId: user.uid,
+          authorName: profile.fullName || user.displayName || "Member",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+      input.value = "";
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
   async function deleteCommunityPost(postId) {
     const user = auth.currentUser;
     if (!user) return;
@@ -752,7 +783,61 @@
       return;
     }
 
+    const commentsSnap = await ref.collection("comments").get();
+    const batch = db.batch();
+    commentsSnap.forEach(c => batch.delete(c.ref));
+    batch.delete(ref);
+    await batch.commit();
+  }
+
+  async function deleteCommunityComment(postId, commentId) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const ref = db.collection("communityPosts").doc(postId).collection("comments").doc(commentId);
+    const snap = await ref.get();
+    if (!snap.exists) return;
+
+    if (snap.data().userId !== user.uid) {
+      alert("You can only delete your own comment.");
+      return;
+    }
+
     await ref.delete();
+  }
+
+  function loadCommunityComments(postId) {
+    const container = document.getElementById(`community-comments-${postId}`);
+    if (!container) return;
+
+    db.collection("communityPosts")
+      .doc(postId)
+      .collection("comments")
+      .orderBy("createdAt", "asc")
+      .onSnapshot((snapshot) => {
+        const currentUser = auth.currentUser;
+        let html = "";
+
+        snapshot.forEach((doc) => {
+          const c = doc.data();
+          const canDelete = currentUser && currentUser.uid === c.userId;
+
+          html += `
+            <div class="reply">
+              <div class="comment-header-line">
+                <div class="comment-meta">
+                  <strong>${escapeHtml(c.authorName || "Member")}</strong>
+                  <span class="comment-time">${escapeHtml(formatDateTime(c.createdAt))}</span>
+                </div>
+                ${canDelete ? `<button class="delete-btn" onclick="deleteCommunityComment('${postId}','${doc.id}')">Delete</button>` : ""}
+              </div>
+              <div class="comment-text">${escapeHtml(c.text || "")}</div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html || "<p class='dark-note'>No comments yet.</p>";
+      });
   }
 
   function loadCommunityPosts() {
@@ -765,7 +850,7 @@
         const canDelete = currentUser && currentUser.uid === p.userId;
 
         html += `
-          <div class="comment">
+          <div class="comment community-post-card">
             <div class="comment-header-line">
               <div class="comment-meta">
                 <strong>${escapeHtml(p.authorName || "Member")}</strong>
@@ -776,11 +861,20 @@
 
             ${p.title ? `<h4 class="community-title">${escapeHtml(p.title)}</h4>` : ""}
             <div class="comment-text">${escapeHtml(p.text || "")}</div>
+
+            <div class="reply-box">
+              <input type="text" id="community-comment-input-${doc.id}" placeholder="Give your opinion or comment...">
+              <button class="small-btn" onclick="addCommunityComment('${doc.id}')">Comment</button>
+            </div>
+
+            <div id="community-comments-${doc.id}" class="replies"></div>
           </div>
         `;
       });
 
       document.getElementById("community-posts").innerHTML = html || "<p class='dark-note'>No publication yet.</p>";
+
+      snapshot.forEach((doc) => loadCommunityComments(doc.id));
     });
   }
 
@@ -825,7 +919,19 @@
 
       const communitySnap = await db.collection("communityPosts").where("userId", "==", uid).get();
       for (const p of communitySnap.docs) {
-        await p.ref.delete();
+        const postComments = await p.ref.collection("comments").get();
+        const batch = db.batch();
+        postComments.forEach(pc => batch.delete(pc.ref));
+        batch.delete(p.ref);
+        await batch.commit();
+      }
+
+      const allCommunityPosts = await db.collection("communityPosts").get();
+      for (const postDoc of allCommunityPosts.docs) {
+        const myComments = await postDoc.ref.collection("comments").where("userId", "==", uid).get();
+        for (const c of myComments.docs) {
+          await c.ref.delete();
+        }
       }
 
       await db.collection("users").doc(uid).delete();
