@@ -34,26 +34,23 @@
     <div class="auth-box">
       <h3>Member Access</h3>
 
-      <!-- LOGIN SECTION -->
-      <div class="auth-panel">
-        <input type="email" id="login-email" placeholder="Email" class="auth-input" autocomplete="email">
-        <input type="password" id="login-password" placeholder="Password" class="auth-input" autocomplete="current-password">
+      <input type="email" id="login-email" placeholder="Email" class="auth-input" autocomplete="email">
+      <input type="password" id="login-password" placeholder="Password" class="auth-input" autocomplete="current-password">
 
-        <div class="auth-actions">
-          <button class="auth-btn" onclick="toggleSignup()">Sign up</button>
-          <button class="auth-btn" onclick="signIn()">Login</button>
-        </div>
-
-        <div class="auth-actions">
-          <button class="auth-btn secondary" onclick="resetPassword()">Reset password</button>
-          <button class="auth-btn secondary" onclick="logout()">Logout</button>
-        </div>
-
-        <p id="auth-message" class="auth-message"></p>
-        <p id="user-info" class="user-status">Not connected</p>
+      <div class="auth-actions">
+        <button class="auth-btn" onclick="toggleSignup()">Sign up</button>
+        <button class="auth-btn" onclick="signIn()">Login</button>
       </div>
 
-      <!-- SIGNUP SUBSECTION -->
+      <div class="auth-actions">
+        <button class="auth-btn secondary" onclick="resetPassword()">Reset password</button>
+        <button class="auth-btn secondary" onclick="logout()">Logout</button>
+      </div>
+
+      <p id="auth-message" class="auth-message"></p>
+      <p id="user-info" class="user-status">Not connected</p>
+
+      <!-- hidden by default -->
       <div id="signup-section" class="signup-section hidden-signup">
         <h4>Create an account</h4>
 
@@ -141,9 +138,29 @@
   }
 
   function toggleSignup() {
-    const box = document.getElementById("signup-section");
-    box.classList.toggle("hidden-signup");
+    document.getElementById("signup-section").classList.toggle("hidden-signup");
     clearMessage("signup-message");
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function formatDateTime(timestamp) {
+    if (!timestamp) return "";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleString("fr-FR", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
   }
 
   async function ensurePostExists(postId) {
@@ -202,6 +219,7 @@
       });
 
       setMessage("signup-message", "Account created successfully.");
+
       document.getElementById("signup-firstname").value = "";
       document.getElementById("signup-lastname").value = "";
       document.getElementById("signup-phone").value = "";
@@ -279,9 +297,9 @@
       const info = userDoc.exists ? userDoc.data() : null;
 
       if (info) {
-        el.textContent = `Connected as ${info.fullName} (${info.email})`;
+        el.textContent = `Connected as ${info.fullName}`;
       } else {
-        el.textContent = `Connected as ${user.email}`;
+        el.textContent = `Connected`;
       }
     } else {
       el.textContent = "Not connected";
@@ -329,12 +347,31 @@
       .add({
         text,
         userId: user.uid,
-        authorEmail: user.email,
-        authorName: userInfo ? userInfo.fullName : (user.displayName || user.email),
+        authorName: userInfo ? userInfo.fullName : (user.displayName || "Member"),
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
     input.value = "";
+  }
+
+  async function deleteComment(postId, commentId) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const commentRef = db.collection("posts")
+      .doc(postId)
+      .collection("comments")
+      .doc(commentId);
+
+    const doc = await commentRef.get();
+    if (!doc.exists) return;
+
+    if (doc.data().userId !== user.uid) {
+      alert("You can only delete your own comment.");
+      return;
+    }
+
+    await commentRef.delete();
   }
 
   async function addReply(postId, commentId) {
@@ -360,21 +397,33 @@
       .add({
         text,
         userId: user.uid,
-        authorEmail: user.email,
-        authorName: userInfo ? userInfo.fullName : (user.displayName || user.email),
+        authorName: userInfo ? userInfo.fullName : (user.displayName || "Member"),
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
     input.value = "";
   }
 
-  function escapeHtml(value) {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+  async function deleteReply(postId, commentId, replyId) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const replyRef = db.collection("posts")
+      .doc(postId)
+      .collection("comments")
+      .doc(commentId)
+      .collection("replies")
+      .doc(replyId);
+
+    const doc = await replyRef.get();
+    if (!doc.exists) return;
+
+    if (doc.data().userId !== user.uid) {
+      alert("You can only delete your own reply.");
+      return;
+    }
+
+    await replyRef.delete();
   }
 
   function loadReplies(postId, commentId) {
@@ -387,15 +436,21 @@
       .collection("replies")
       .orderBy("createdAt", "asc")
       .onSnapshot((snapshot) => {
+        const currentUser = auth.currentUser;
         let html = "";
 
         snapshot.forEach((doc) => {
           const r = doc.data();
+          const canDelete = currentUser && r.userId === currentUser.uid;
+
           html += `
             <div class="reply">
-              <div class="comment-meta">
-                <strong>${escapeHtml(r.authorName || "Member")}</strong>
-                <span class="comment-email">${escapeHtml(r.authorEmail || "")}</span>
+              <div class="comment-header-line">
+                <div class="comment-meta">
+                  <strong>${escapeHtml(r.authorName || "Member")}</strong>
+                  <span class="comment-time">${escapeHtml(formatDateTime(r.createdAt))}</span>
+                </div>
+                ${canDelete ? `<button class="delete-btn" onclick="deleteReply('${postId}','${commentId}','${doc.id}')">Delete</button>` : ""}
               </div>
               <div class="comment-text">${escapeHtml(r.text || "")}</div>
             </div>
@@ -412,18 +467,24 @@
       .collection("comments")
       .orderBy("createdAt", "asc")
       .onSnapshot((snapshot) => {
+        const currentUser = auth.currentUser;
         let html = "";
 
         snapshot.forEach((doc) => {
           const c = doc.data();
           const commentId = doc.id;
+          const canDelete = currentUser && c.userId === currentUser.uid;
 
           html += `
             <div class="comment">
-              <div class="comment-meta">
-                <strong>${escapeHtml(c.authorName || "Member")}</strong>
-                <span class="comment-email">${escapeHtml(c.authorEmail || "")}</span>
+              <div class="comment-header-line">
+                <div class="comment-meta">
+                  <strong>${escapeHtml(c.authorName || "Member")}</strong>
+                  <span class="comment-time">${escapeHtml(formatDateTime(c.createdAt))}</span>
+                </div>
+                ${canDelete ? `<button class="delete-btn" onclick="deleteComment('${postId}','${commentId}')">Delete</button>` : ""}
               </div>
+
               <div class="comment-text">${escapeHtml(c.text || "")}</div>
 
               <div class="reply-box">
@@ -445,6 +506,10 @@
 
   ensurePostExists("post1").then(() => {
     loadLikes("post1");
+    loadComments("post1");
+  });
+
+  auth.onAuthStateChanged(() => {
     loadComments("post1");
   });
 </script>
