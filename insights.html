@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Insights</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -43,19 +43,78 @@
         <button class="auth-btn" onclick="signIn()">Login</button>
       </div>
 
-      <div class="auth-actions">
-        <button class="auth-btn secondary" onclick="resetPassword()">Reset password</button>
-        <button class="auth-btn secondary" onclick="logout()">Logout</button>
-      </div>
-
       <p id="auth-message" class="auth-message"></p>
-      <p id="user-info" class="user-status">Not connected</p>
-      <p id="presence-self" class="user-status"></p>
     </div>
 
-    <div class="online-box">
-      <h3>Online members</h3>
-      <div id="online-users"></div>
+    <!-- Sous-sections visibles seulement quand connecté -->
+    <div id="member-sections" class="hidden-block">
+      <div class="subsection">
+        <button class="subsection-toggle" onclick="toggleSection('account-panel')">
+          My account
+        </button>
+
+        <div id="account-panel" class="subsection-content">
+          <p id="user-info" class="user-status">Not connected</p>
+          <p id="presence-self" class="user-status"></p>
+
+          <label class="field-label">First name</label>
+          <input type="text" id="profile-firstname" class="auth-input" placeholder="First name">
+
+          <label class="field-label">Last name</label>
+          <input type="text" id="profile-lastname" class="auth-input" placeholder="Last name">
+
+          <label class="field-label">Phone number</label>
+          <input type="tel" id="profile-phone" class="auth-input" placeholder="Phone number">
+
+          <label class="field-label">Email address (cannot be changed)</label>
+          <input type="email" id="profile-email" class="auth-input readonly-input" readonly>
+
+          <div class="auth-actions">
+            <button class="auth-btn" onclick="saveProfile()">Save profile</button>
+            <button class="auth-btn secondary" onclick="logout()">Logout</button>
+          </div>
+
+          <div class="auth-actions">
+            <button class="auth-btn secondary" onclick="toggleSection('security-panel')">Security</button>
+            <button class="auth-btn danger" onclick="toggleSection('delete-panel')">Delete account</button>
+          </div>
+
+          <p id="profile-message" class="auth-message"></p>
+        </div>
+      </div>
+
+      <div id="security-panel" class="subsection-content hidden-panel">
+        <h4>Security</h4>
+        <p class="small-note">To receive a reset email, use the email of your account.</p>
+        <div class="auth-actions">
+          <button class="auth-btn secondary" onclick="resetPasswordForCurrentUser()">Reset password</button>
+        </div>
+        <p id="security-message" class="auth-message"></p>
+      </div>
+
+      <div id="delete-panel" class="subsection-content hidden-panel">
+        <h4>Delete my account</h4>
+        <p class="small-note">
+          This will delete your account and your profile data from the site.
+        </p>
+
+        <input type="password" id="delete-password" class="auth-input" placeholder="Enter your password to confirm">
+
+        <div class="auth-actions">
+          <button class="auth-btn danger" onclick="deleteMyAccount()">Confirm delete</button>
+        </div>
+
+        <p id="delete-message" class="auth-message"></p>
+      </div>
+
+      <div class="online-box">
+        <button class="subsection-toggle" onclick="toggleSection('online-members-panel')">
+          Online members
+        </button>
+        <div id="online-members-panel" class="subsection-content">
+          <div id="online-users"></div>
+        </div>
+      </div>
     </div>
   </aside>
 
@@ -148,30 +207,20 @@
   const auth = firebase.auth();
   const rtdb = firebase.database();
 
+  let presenceConnectedRef = null;
+  let presenceStatusRef = null;
+
   function setMessage(id, text, isError = false) {
     const el = document.getElementById(id);
+    if (!el) return;
     el.textContent = text;
     el.style.color = isError ? "#b00020" : "#0b7a3b";
   }
 
   function clearMessage(id) {
-    document.getElementById(id).textContent = "";
+    const el = document.getElementById(id);
+    if (el) el.textContent = "";
   }
-
-  function openSignupModal() {
-    document.getElementById("signup-modal").classList.remove("hidden-modal");
-    clearMessage("signup-message");
-  }
-
-  function closeSignupModal() {
-    document.getElementById("signup-modal").classList.add("hidden-modal");
-    clearMessage("signup-message");
-  }
-
-  window.addEventListener("click", (e) => {
-    const modal = document.getElementById("signup-modal");
-    if (e.target === modal) closeSignupModal();
-  });
 
   function escapeHtml(value) {
     return String(value)
@@ -208,8 +257,36 @@
 
   function insertEmoji(targetId, emoji) {
     const input = document.getElementById(targetId);
+    if (!input) return;
     input.value += emoji;
     input.focus();
+  }
+
+  function openSignupModal() {
+    document.getElementById("signup-modal").classList.remove("hidden-modal");
+    clearMessage("signup-message");
+  }
+
+  function closeSignupModal() {
+    document.getElementById("signup-modal").classList.add("hidden-modal");
+    clearMessage("signup-message");
+  }
+
+  window.addEventListener("click", (e) => {
+    const modal = document.getElementById("signup-modal");
+    if (e.target === modal) closeSignupModal();
+  });
+
+  function toggleSection(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle("hidden-panel");
+  }
+
+  function showMemberSections(show) {
+    const section = document.getElementById("member-sections");
+    if (!section) return;
+    section.classList.toggle("hidden-block", !show);
   }
 
   async function ensurePostExists(postId) {
@@ -223,6 +300,54 @@
         likes: 0
       });
     }
+  }
+
+  async function ensureUserProfile(user, extras = {}) {
+    const userRef = db.collection("users").doc(user.uid);
+    const snap = await userRef.get();
+
+    const nameParts = (user.displayName || "").trim().split(" ").filter(Boolean);
+    const fallbackFirstName = extras.firstName || nameParts[0] || "Member";
+    const fallbackLastName = extras.lastName || nameParts.slice(1).join(" ") || "";
+    const fallbackFullName = `${fallbackFirstName} ${fallbackLastName}`.trim();
+
+    const payload = {
+      uid: user.uid,
+      firstName: extras.firstName || fallbackFirstName,
+      lastName: extras.lastName || fallbackLastName,
+      fullName: extras.fullName || fallbackFullName,
+      phone: extras.phone || "",
+      email: user.email || extras.email || "",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (!snap.exists) {
+      await userRef.set({
+        ...payload,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    } else {
+      const existing = snap.data() || {};
+      await userRef.set({
+        uid: user.uid,
+        firstName: existing.firstName || payload.firstName,
+        lastName: existing.lastName || payload.lastName,
+        fullName: existing.fullName || payload.fullName,
+        phone: existing.phone || payload.phone,
+        email: existing.email || payload.email,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+
+    const fresh = await userRef.get();
+    return fresh.data();
+  }
+
+  function fillProfileForm(data, user) {
+    document.getElementById("profile-firstname").value = data?.firstName || "";
+    document.getElementById("profile-lastname").value = data?.lastName || "";
+    document.getElementById("profile-phone").value = data?.phone || "";
+    document.getElementById("profile-email").value = user?.email || data?.email || "";
   }
 
   async function signUp() {
@@ -254,17 +379,18 @@
       const cred = await auth.createUserWithEmailAndPassword(email, password);
 
       await cred.user.updateProfile({
-        displayName: `${firstName} ${lastName}`
+        displayName: `${firstName} ${lastName}`.trim()
       });
 
       await db.collection("users").doc(cred.user.uid).set({
+        uid: cred.user.uid,
         firstName,
         lastName,
-        fullName: `${firstName} ${lastName}`,
+        fullName: `${firstName} ${lastName}`.trim(),
         phone,
         email,
-        uid: cred.user.uid,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
       setMessage("signup-message", "Account created successfully.");
@@ -303,49 +429,91 @@
         error.code === "auth/user-not-found" ||
         error.code === "auth/invalid-email"
       ) {
-        setMessage("auth-message", "Email ou mot de passe incorrect.", true);
+        setMessage("auth-message", "Email or password incorrect.", true);
       } else {
         setMessage("auth-message", error.message, true);
       }
     }
   }
 
-  async function resetPassword() {
-    const email = document.getElementById("login-email").value.trim();
+  async function resetPasswordForCurrentUser() {
+    const user = auth.currentUser;
 
-    clearMessage("auth-message");
+    clearMessage("security-message");
 
-    if (!email) {
-      setMessage("auth-message", "Enter your email first.", true);
+    if (!user || !user.email) {
+      setMessage("security-message", "No connected user found.", true);
       return;
     }
 
     try {
-      await auth.sendPasswordResetEmail(email);
-      setMessage("auth-message", "Password reset email sent. Check inbox and spam.");
+      await auth.sendPasswordResetEmail(user.email);
+      setMessage("security-message", "Password reset email sent. Check inbox and spam.");
     } catch (error) {
-      setMessage("auth-message", error.message, true);
+      setMessage("security-message", error.message, true);
     }
   }
 
-  function logout() {
-    auth.signOut();
+  async function saveProfile() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    clearMessage("profile-message");
+
+    const firstName = document.getElementById("profile-firstname").value.trim();
+    const lastName = document.getElementById("profile-lastname").value.trim();
+    const phone = document.getElementById("profile-phone").value.trim();
+
+    if (!firstName || !lastName || !phone) {
+      setMessage("profile-message", "First name, last name and phone are required.", true);
+      return;
+    }
+
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    try {
+      await user.updateProfile({ displayName: fullName });
+
+      await db.collection("users").doc(user.uid).set({
+        uid: user.uid,
+        firstName,
+        lastName,
+        fullName,
+        phone,
+        email: user.email || "",
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      if (presenceStatusRef) {
+        await presenceStatusRef.set({
+          state: "online",
+          fullName,
+          last_changed: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
+
+      document.getElementById("user-info").textContent = `Connected as ${fullName}`;
+      setMessage("profile-message", "Profile updated successfully.");
+    } catch (error) {
+      setMessage("profile-message", error.message, true);
+    }
   }
 
   function setupPresence(user, fullName) {
-    const uid = user.uid;
-    const userStatusRef = rtdb.ref("/status/" + uid);
-    const connectedRef = rtdb.ref(".info/connected");
+    cleanupPresence();
 
-    connectedRef.on("value", async (snap) => {
+    presenceStatusRef = rtdb.ref("/status/" + user.uid);
+    presenceConnectedRef = rtdb.ref(".info/connected");
+
+    presenceConnectedRef.on("value", (snap) => {
       if (snap.val() === false) return;
 
-      userStatusRef.onDisconnect().set({
+      presenceStatusRef.onDisconnect().set({
         state: "offline",
         fullName: fullName || user.displayName || "Member",
         last_changed: firebase.database.ServerValue.TIMESTAMP
       }).then(() => {
-        userStatusRef.set({
+        presenceStatusRef.set({
           state: "online",
           fullName: fullName || user.displayName || "Member",
           last_changed: firebase.database.ServerValue.TIMESTAMP
@@ -354,14 +522,24 @@
     });
   }
 
+  function cleanupPresence() {
+    try {
+      if (presenceConnectedRef) presenceConnectedRef.off();
+      if (presenceStatusRef) presenceStatusRef.off();
+    } catch (_) {}
+
+    presenceConnectedRef = null;
+    presenceStatusRef = null;
+  }
+
   function loadOnlineUsers() {
     rtdb.ref("/status").on("value", (snapshot) => {
       const container = document.getElementById("online-users");
       let html = "";
 
       snapshot.forEach((child) => {
-        const data = child.val();
-        const isOnline = data && data.state === "online";
+        const data = child.val() || {};
+        const isOnline = data.state === "online";
         const dotClass = isOnline ? "dot-online" : "dot-offline";
         const label = isOnline
           ? `online • ${formatPresenceTime(data.last_changed)}`
@@ -382,20 +560,94 @@
     });
   }
 
+  async function deleteMyAccount() {
+    const user = auth.currentUser;
+    const password = document.getElementById("delete-password").value;
+
+    clearMessage("delete-message");
+
+    if (!user || !user.email) {
+      setMessage("delete-message", "No connected user found.", true);
+      return;
+    }
+
+    if (!password) {
+      setMessage("delete-message", "Enter your password to confirm.", true);
+      return;
+    }
+
+    try {
+      const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+      await user.reauthenticateWithCredential(credential);
+
+      const uid = user.uid;
+
+      // Efface la présence
+      await rtdb.ref("/status/" + uid).remove();
+
+      // Efface le profil utilisateur
+      await db.collection("users").doc(uid).delete();
+
+      // Efface les commentaires de l'utilisateur sur post1
+      const commentsSnap = await db.collection("posts").doc("post1").collection("comments").where("userId", "==", uid).get();
+      const batch1 = db.batch();
+      commentsSnap.forEach((doc) => batch1.delete(doc.ref));
+      await batch1.commit();
+
+      // Efface les réponses de l'utilisateur dans les commentaires existants
+      const allCommentsSnap = await db.collection("posts").doc("post1").collection("comments").get();
+      for (const commentDoc of allCommentsSnap.docs) {
+        const repliesSnap = await commentDoc.ref.collection("replies").where("userId", "==", uid).get();
+        if (!repliesSnap.empty) {
+          const batchReplies = db.batch();
+          repliesSnap.forEach((replyDoc) => batchReplies.delete(replyDoc.ref));
+          await batchReplies.commit();
+        }
+      }
+
+      await user.delete();
+      alert("Your account and site data were deleted.");
+    } catch (error) {
+      setMessage("delete-message", error.message, true);
+    }
+  }
+
+  function logout() {
+    const user = auth.currentUser;
+    if (user) {
+      rtdb.ref("/status/" + user.uid).set({
+        state: "offline",
+        fullName: user.displayName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      }).finally(() => auth.signOut());
+    } else {
+      auth.signOut();
+    }
+  }
+
   auth.onAuthStateChanged(async (user) => {
-    const el = document.getElementById("user-info");
+    const userInfoEl = document.getElementById("user-info");
     const selfPresence = document.getElementById("presence-self");
 
-    if (user) {
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      const info = userDoc.exists ? userDoc.data() : null;
-      const fullName = info ? info.fullName : (user.displayName || "Member");
+    clearMessage("profile-message");
+    clearMessage("security-message");
+    clearMessage("delete-message");
 
-      el.textContent = `Connected as ${fullName}`;
+    if (user) {
+      showMemberSections(true);
+
+      const profile = await ensureUserProfile(user);
+      const fullName = profile?.fullName || user.displayName || "Member";
+
+      fillProfileForm(profile, user);
+      userInfoEl.textContent = `Connected as ${fullName}`;
       selfPresence.textContent = "● You are online";
+
       setupPresence(user, fullName);
     } else {
-      el.textContent = "Not connected";
+      showMemberSections(false);
+      cleanupPresence();
+      userInfoEl.textContent = "Not connected";
       selfPresence.textContent = "";
     }
 
