@@ -245,3 +245,149 @@ footer {
 .page-footer {
   margin-top: 30px;
 }
+.auth-box {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.auth-box h3,
+.auth-box h4 {
+  margin-bottom: 12px;
+  color: white;
+  font-size: 18px;
+}
+
+.auth-input {
+  width: 90%;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.auth-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.auth-btn {
+  background: white;
+  color: #0b2239;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.auth-btn.secondary {
+  background: #dfe7f3;
+}
+
+.user-status,
+.auth-message {
+  color: white;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.signup-section {
+  margin-top: 18px;
+  padding: 14px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+}
+
+.hidden-signup {
+  display: none;
+}
+
+.post .date {
+  color: #667;
+  margin-bottom: 14px;
+}
+
+.actions {
+  margin: 16px 0;
+}
+
+.comments-box {
+  margin-top: 20px;
+}
+
+.new-comment textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cfd8e3;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.small-btn {
+  background: #0b2239;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.comment {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f7f9fc;
+  border: 1px solid #e3e8f0;
+}
+
+.comment-meta {
+  margin-bottom: 8px;
+  color: #223;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.comment-email {
+  font-size: 13px;
+  color: #667;
+}
+
+.comment-text {
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+
+.reply-box {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.reply-box input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cfd8e3;
+}
+
+.reply {
+  margin-top: 8px;
+  margin-left: 18px;
+  padding: 10px 12px;
+  border-left: 3px solid #0b2239;
+  background: white;
+  border-radius: 8px;
+}
+
+.page-footer {
+  margin-top: 30px;
+}
