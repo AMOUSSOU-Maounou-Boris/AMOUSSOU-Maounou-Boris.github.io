@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home | Boris Research Hub</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="home.css" />
+</head>
+<body class="home-page">
+
+  <nav class="top-nav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="research.html">Research</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="insights.html">Insights</a></li>
+    </ul>
+  </nav>
+
+  <div class="home-layout">
+    <aside class="home-sidebar">
+      <img src="profile.jpg" alt="Profile photo" class="home-profile-img">
+
+      <h1 class="home-name">Maounou Boris AMOUSSOU</h1>
+      <p class="home-role">Chemical Engineer</p>
+      <p class="home-role small">Green Chemistry &amp; Environment</p>
+
+      <div class="sidebar-search">
+        <input type="text" id="site-search" placeholder="Search page..." />
+        <button type="button" onclick="searchSite()">Search</button>
+      </div>
+    </aside>
+
+    <main class="home-main">
+      <section class="hero-block">
+        <div class="hero-text">
+          <h2>Welcome to my scientific universe</h2>
+          <p>
+            Discover my academic journey, my research activities, my laboratory experience,
+            my scientific communications, and my interests in green chemistry,
+            catalysis, environment, and sustainable energy.
+          </p>
+        </div>
+
+        <section class="hero-slider">
+          <div class="slides-wrapper">
+            <div class="slide active">
+              <img src="photo1.jpg" alt="Laboratory photo">
+            </div>
+            <div class="slide">
+              <img src="photo2.jpg" alt="Conference photo">
+            </div>
+            <div class="slide">
+              <img src="photo3.jpg" alt="Research activity photo">
+            </div>
+          </div>
+
+          <button class="slider-btn prev" onclick="changeSlide(-1)">❮</button>
+          <button class="slider-btn next" onclick="changeSlide(1)">❯</button>
+
+          <div class="slider-dots">
+            <span class="dot active" onclick="goToSlide(0)"></span>
+            <span class="dot" onclick="goToSlide(1)"></span>
+            <span class="dot" onclick="goToSlide(2)"></span>
+          </div>
+        </section>
+      </section>
+
+      <section class="home-info">
+        <div class="info-card">
+          <h3>Research Focus</h3>
+          <p>
+            My work explores materials chemistry, photocatalysis, electrocatalysis,
+            environmental treatment, and clean energy production strategies.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <h3>Academic Path</h3>
+          <p>
+            This site presents my scientific training, my academic achievements,
+            my projects, and my future research ambitions.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <h3>Scientific Activities</h3>
+          <p>
+            You will find here information about my conferences, collaborations,
+            laboratory work, and scientific communication.
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".slide");
+    const dots = document.querySelectorAll(".dot");
+    let autoSlide = null;
+
+    function showSlide(index) {
+      if (!slides.length) return;
+
+      if (index >= slides.length) {
+        currentSlide = 0;
+      } else if (index < 0) {
+        currentSlide = slides.length - 1;
+      } else {
+        currentSlide = index;
+      }
+
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("active", i === currentSlide);
+      });
+
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i === currentSlide);
+      });
+    }
+
+    function changeSlide(step) {
+      showSlide(currentSlide + step);
+      restartAutoSlide();
+    }
+
+    function goToSlide(index) {
+      showSlide(index);
+      restartAutoSlide();
+    }
+
+    function startAutoSlide() {
+      autoSlide = setInterval(() => {
+        showSlide(currentSlide + 1);
+      }, 4000);
+    }
+
+    function restartAutoSlide() {
+      clearInterval(autoSlide);
+      startAutoSlide();
+    }
+
+    function searchSite() {
+      const q = document.getElementById("site-search").value.trim().toLowerCase();
+      if (!q) return;
+
+      if (q.includes("about")) window.location.href = "about.html";
+      else if (q.includes("research")) window.location.href = "research.html";
+      else if (q.includes("resume") || q.includes("cv")) window.location.href = "resume.html";
+      else if (q.includes("contact")) window.location.href = "contact.html";
+      else if (q.includes("insight")) window.location.href = "insights.html";
+      else if (q.includes("home")) window.location.href = "index.html";
+      else alert("No direct result found.");
+    }
+
+    showSlide(0);
+    startAutoSlide();
+  </script>
+</body>
+</html>
