@@ -1,119 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maounou Boris AMOUSSOU</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home | Boris Research Hub</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="home.css" />
 </head>
+<body class="home-page">
 
-<body>
+  <nav class="top-nav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="research.html">Research</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="insights.html">Insights</a></li>
+    </ul>
+  </nav>
 
-<!-- NAVBAR -->
-<nav>
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="research.html">Research</a></li>
-    <li><a href="resume.html">Resume</a></li>
-    <li><a href="contact.html">Contact</a></li>
-    <li><a href="insights.html">Insights</a></li>
-  </ul>
-</nav>
+  <div class="home-layout">
+    <aside class="home-sidebar">
+      <img src="profile.jpg" alt="Profile photo" class="home-profile-img">
 
-<div class="container">
+      <h1 class="home-name">Maounou Boris AMOUSSOU</h1>
+      <p class="home-role">Chemical Engineer</p>
+      <p class="home-role small">Green Chemistry &amp; Environment</p>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <img src="profile.jpg" class="profile-img" alt="Profile photo">
-
-    <h2>Maounou Boris AMOUSSOU</h2>
-    <p>Chemical Engineer<br>Green Chemistry & Environment</p>
-
-    <!-- SEARCH -->
-    <form action="https://www.google.com/search" method="GET" target="_blank">
-      <input type="text" name="q" placeholder="Search on Google..." class="search-box">
-    </form>
-
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main>
-
-    <!-- SLIDER -->
-    <div class="slider">
-
-      <div class="slide active">
-        <img src="stage1.jpg" alt="Lab work 1">
+      <div class="sidebar-search">
+        <input type="text" id="site-search" placeholder="Search page..." />
+        <button type="button" onclick="searchSite()">Search</button>
       </div>
+    </aside>
 
-      <div class="slide">
-        <img src="stage2.jpg" alt="Lab work 2">
-      </div>
+    <main class="home-main">
+      <section class="hero-block">
+        <div class="hero-text">
+          <h2>Welcome to my scientific universe</h2>
+          <p>
+            Discover my academic journey, my research activities, my laboratory experience,
+            my scientific communications, and my interests in green chemistry,
+            catalysis, environment, and sustainable energy.
+          </p>
+        </div>
 
-      <div class="slide">
-        <img src="stage3.jpg" alt="Lab work 3">
-      </div>
+        <section class="hero-slider">
+          <div class="slides-wrapper">
+            <div class="slide active">
+              <img src="photo1.jpg" alt="Laboratory photo">
+            </div>
+            <div class="slide">
+              <img src="photo2.jpg" alt="Conference photo">
+            </div>
+            <div class="slide">
+              <img src="photo3.jpg" alt="Research activity photo">
+            </div>
+          </div>
 
-    </div>
+          <button class="slider-btn prev" onclick="changeSlide(-1)">❮</button>
+          <button class="slider-btn next" onclick="changeSlide(1)">❯</button>
 
-    <!-- PROFILE -->
-    <section class="card">
-      <h3>Profile</h3>
-      <p>
-        Chemical engineer specialized in green chemistry, catalysis and environmental processes.
-        Focused on sustainable energy and environmental solutions.
-      </p>
-    </section>
+          <div class="slider-dots">
+            <span class="dot active" onclick="goToSlide(0)"></span>
+            <span class="dot" onclick="goToSlide(1)"></span>
+            <span class="dot" onclick="goToSlide(2)"></span>
+          </div>
+        </section>
+      </section>
 
-    <!-- EXPERIENCE -->
-    <section class="card">
-      <h3>Experience</h3>
-      <p>
-        International research experience in Montreal (Canada) working on electrochemical
-        and photocatalytic approaches for sustainable energy production.
-      </p>
-      <p>
-        Currently completing a final-year research internship in Poitiers (France).
-      </p>
-    </section>
+      <section class="home-info">
+        <div class="info-card">
+          <h3>Research Focus</h3>
+          <p>
+            My work explores materials chemistry, photocatalysis, electrocatalysis,
+            environmental treatment, and clean energy production strategies.
+          </p>
+        </div>
 
-    <!-- SKILLS -->
-    <section class="card">
-      <h3>Skills</h3>
-      <p>
-        Electrochemistry • Catalysis • Materials Science • Environmental Chemistry
-      </p>
-    </section>
+        <div class="info-card">
+          <h3>Academic Path</h3>
+          <p>
+            This site presents my scientific training, my academic achievements,
+            my projects, and my future research ambitions.
+          </p>
+        </div>
 
-  </main>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
-
-  <div class="socials">
-    <a href="https://scholar.google.com" target="_blank">Google Scholar</a>
-    <a href="https://www.researchgate.net" target="_blank">ResearchGate</a>
-    <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
-    <a href="https://www.facebook.com" target="_blank">Facebook</a>
+        <div class="info-card">
+          <h3>Scientific Activities</h3>
+          <p>
+            You will find here information about my conferences, collaborations,
+            laboratory work, and scientific communication.
+          </p>
+        </div>
+      </section>
+    </main>
   </div>
-</footer>
 
-<!-- SCRIPT SLIDER -->
-<script>
-let slides = document.querySelectorAll(".slide");
-let index = 0;
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".slide");
+    const dots = document.querySelectorAll(".dot");
+    let autoSlide = null;
 
-function showSlide() {
-  slides.forEach(s => s.classList.remove("active"));
-  index = (index + 1) % slides.length;
-  slides[index].classList.add("active");
-}
+    function showSlide(index) {
+      if (!slides.length) return;
 
-setInterval(showSlide, 3000);
-</script>
+      if (index >= slides.length) {
+        currentSlide = 0;
+      } else if (index < 0) {
+        currentSlide = slides.length - 1;
+      } else {
+        currentSlide = index;
+      }
 
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("active", i === currentSlide);
+      });
+
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i === currentSlide);
+      });
+    }
+
+    function changeSlide(step) {
+      showSlide(currentSlide + step);
+      restartAutoSlide();
+    }
+
+    function goToSlide(index) {
+      showSlide(index);
+      restartAutoSlide();
+    }
+
+    function startAutoSlide() {
+      autoSlide = setInterval(() => {
+        showSlide(currentSlide + 1);
+      }, 4000);
+    }
+
+    function restartAutoSlide() {
+      clearInterval(autoSlide);
+      startAutoSlide();
+    }
+
+    function searchSite() {
+      const q = document.getElementById("site-search").value.trim().toLowerCase();
+      if (!q) return;
+
+      if (q.includes("about")) window.location.href = "about.html";
+      else if (q.includes("research")) window.location.href = "research.html";
+      else if (q.includes("resume") || q.includes("cv")) window.location.href = "resume.html";
+      else if (q.includes("contact")) window.location.href = "contact.html";
+      else if (q.includes("insight")) window.location.href = "insights.html";
+      else if (q.includes("home")) window.location.href = "index.html";
+      else alert("No direct result found.");
+    }
+
+    showSlide(0);
+    startAutoSlide();
+  </script>
 </body>
 </html>
