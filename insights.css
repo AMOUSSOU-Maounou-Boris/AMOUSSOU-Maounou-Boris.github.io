@@ -1,6 +1,10 @@
 .insights-nav {
   background: #0b2239;
   padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
 }
 
 .insights-nav ul {
@@ -20,6 +24,21 @@
 
 .insights-nav a:hover {
   text-decoration: underline;
+}
+
+.lang-switcher {
+  display: flex;
+  gap: 8px;
+}
+
+.lang-switcher button {
+  border: none;
+  background: rgba(255,255,255,0.14);
+  color: white;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-weight: 700;
 }
 
 .insights-container {
@@ -309,6 +328,65 @@
   font-size: 13px;
 }
 
+.inbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.inbox-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  color: white;
+}
+
+.message-thread-card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.hidden-thread {
+  display: none;
+}
+
+.thread-messages {
+  max-height: 280px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+.message-bubble {
+  background: rgba(255,255,255,0.92);
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.own-bubble {
+  border-left: 4px solid #0b2239;
+}
+
+.message-bubble-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.message-time {
+  font-size: 12px;
+  color: #667;
+  margin-top: 6px;
+}
+
 .academic-hub-card {
   padding: 0;
   overflow: hidden;
@@ -420,6 +498,26 @@
   padding: 8px 14px;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.mini-btn {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.message-btn {
+  background: #dbe9f8;
+  color: #0b2239;
+  border: none;
+  padding: 6px 9px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.inline-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .comment {
@@ -584,6 +682,11 @@
 }
 
 @media (max-width: 900px) {
+  .insights-nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .insights-container {
     grid-template-columns: 1fr;
   }
