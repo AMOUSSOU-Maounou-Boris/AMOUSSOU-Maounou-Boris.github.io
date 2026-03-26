@@ -10,7 +10,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 </head>
 <body>
 
@@ -80,6 +79,7 @@
         <h4>Delete my account</h4>
         <p class="small-note">This deletes your account and your data on this site.</p>
         <input type="password" id="delete-password" class="auth-input" placeholder="Confirm with your password">
+
         <div class="auth-actions">
           <button class="auth-btn danger" onclick="deleteMyAccount()">Delete my account</button>
         </div>
@@ -124,13 +124,6 @@
 
         <div class="new-comment">
           <textarea id="comment-input-post1" placeholder="Write a comment..."></textarea>
-
-          <div class="upload-row">
-            <input type="file" id="comment-file-post1" accept=".pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-            <button class="small-btn secondary-btn" id="record-comment-btn" onclick="toggleCommentRecording()">🎤 Start voice</button>
-            <span id="comment-recording-status" class="small-note dark-note"></span>
-          </div>
-
           <button class="small-btn" onclick="addComment('post1')">Send</button>
         </div>
 
@@ -141,18 +134,12 @@
     <section class="card">
       <h3>Community publications</h3>
       <p class="small-note dark-note">
-        Logged-in members can publish a text, a voice note, and a PDF/Word/Excel file.
+        Logged-in members can publish text on the site.
       </p>
 
       <div class="new-comment">
         <input type="text" id="community-title" class="text-input" placeholder="Title">
         <textarea id="community-text" placeholder="Write your publication..."></textarea>
-
-        <div class="upload-row">
-          <input type="file" id="community-file" accept=".pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
-          <button class="small-btn secondary-btn" id="record-post-btn" onclick="togglePostRecording()">🎤 Start voice</button>
-          <span id="post-recording-status" class="small-note dark-note"></span>
-        </div>
 
         <button class="small-btn" onclick="publishCommunityPost()">Publish</button>
         <p id="community-message" class="dark-message"></p>
@@ -212,20 +199,9 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
   const rtdb = firebase.database();
-  const storage = firebase.storage();
 
   let presenceConnectedRef = null;
   let presenceStatusRef = null;
-
-  let commentRecorder = null;
-  let commentChunks = [];
-  let commentAudioBlob = null;
-  let commentRecording = false;
-
-  let postRecorder = null;
-  let postChunks = [];
-  let postAudioBlob = null;
-  let postRecording = false;
 
   function setMessage(id, text, isError = false) {
     const el = document.getElementById(id);
@@ -298,54 +274,6 @@
     document.getElementById("member-zone").classList.toggle("hidden-block", !show);
   }
 
-  function getAllowedMime(file) {
-    const allowed = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ];
-    return allowed.includes(file.type);
-  }
-
-  async function uploadFileToStorage(file, folder, uid) {
-    if (!file) return null;
-
-    if (!getAllowedMime(file)) {
-      throw new Error("Only PDF, Word and Excel files are allowed.");
-    }
-
-    const safeName = Date.now() + "_" + file.name.replace(/[^\w.\-]/g, "_");
-    const path = `${folder}/${uid}/${safeName}`;
-    const ref = storage.ref(path);
-    await ref.put(file);
-    const url = await ref.getDownloadURL();
-
-    return {
-      name: file.name,
-      type: file.type,
-      url,
-      storagePath: path
-    };
-  }
-
-  async function uploadAudioBlob(blob, folder, uid) {
-    if (!blob) return null;
-
-    const path = `${folder}/${uid}/${Date.now()}_voice.webm`;
-    const ref = storage.ref(path);
-    await ref.put(blob, { contentType: "audio/webm" });
-    const url = await ref.getDownloadURL();
-
-    return {
-      name: "voice.webm",
-      type: "audio/webm",
-      url,
-      storagePath: path
-    };
-  }
-
   async function ensurePostExists(postId) {
     const ref = db.collection("posts").doc(postId);
     const snap = await ref.get();
@@ -372,12 +300,19 @@
       lastName = parts.slice(1).join(" ") || "";
     }
 
+    const existingData = snap.exists ? snap.data() : {};
+
+    const finalFirstName = firstName || existingData.firstName || "";
+    const finalLastName = lastName || existingData.lastName || "";
+    const finalPhone = extras.phone || existingData.phone || "";
+    const finalFullName = `${finalFirstName} ${finalLastName}`.trim() || user.displayName || "Member";
+
     const payload = {
       uid: user.uid,
-      firstName: firstName || (snap.exists ? (snap.data().firstName || "") : ""),
-      lastName: lastName || (snap.exists ? (snap.data().lastName || "") : ""),
-      fullName: `${firstName || (snap.exists ? (snap.data().firstName || "") : "")} ${lastName || (snap.exists ? (snap.data().lastName || "") : "")}`.trim() || user.displayName || "Member",
-      phone: extras.phone || (snap.exists ? (snap.data().phone || "") : ""),
+      firstName: finalFirstName,
+      lastName: finalLastName,
+      fullName: finalFullName,
+      phone: finalPhone,
       email: user.email || "",
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -414,6 +349,11 @@
 
     if (password !== confirm) {
       setMessage("signup-message", "Passwords do not match.", true);
+      return;
+    }
+
+    if (password.length < 6) {
+      setMessage("signup-message", "Password must contain at least 6 characters.", true);
       return;
     }
 
@@ -573,158 +513,6 @@
     });
   }
 
-  async function deleteStoragePath(path) {
-    if (!path) return;
-    try {
-      await storage.ref(path).delete();
-    } catch (e) {}
-  }
-
-  async function deleteMyAccount() {
-    const user = auth.currentUser;
-    const password = document.getElementById("delete-password").value;
-
-    if (!user || !user.email) {
-      setMessage("profile-message", "No connected user found.", true);
-      return;
-    }
-
-    if (!password) {
-      setMessage("profile-message", "Enter your password to confirm.", true);
-      return;
-    }
-
-    try {
-      const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
-      await user.reauthenticateWithCredential(credential);
-
-      const uid = user.uid;
-
-      // supprimer le statut
-      await rtdb.ref("/status/" + uid).remove();
-
-      // supprimer les commentaires du post principal
-      const commentsSnap = await db.collection("posts").doc("post1").collection("comments").where("userId", "==", uid).get();
-      for (const docSnap of commentsSnap.docs) {
-        const data = docSnap.data();
-        if (data.file?.storagePath) await deleteStoragePath(data.file.storagePath);
-        if (data.voice?.storagePath) await deleteStoragePath(data.voice.storagePath);
-
-        const repliesSnap = await docSnap.ref.collection("replies").get();
-        const batchReplies = db.batch();
-        repliesSnap.forEach(r => batchReplies.delete(r.ref));
-        await batchReplies.commit();
-
-        await docSnap.ref.delete();
-      }
-
-      // supprimer les réponses de l'utilisateur dans les autres commentaires
-      const allCommentsSnap = await db.collection("posts").doc("post1").collection("comments").get();
-      for (const c of allCommentsSnap.docs) {
-        const repliesSnap = await c.ref.collection("replies").where("userId", "==", uid).get();
-        for (const r of repliesSnap.docs) {
-          const d = r.data();
-          if (d.file?.storagePath) await deleteStoragePath(d.file.storagePath);
-          if (d.voice?.storagePath) await deleteStoragePath(d.voice.storagePath);
-          await r.ref.delete();
-        }
-      }
-
-      // supprimer les publications communautaires
-      const communitySnap = await db.collection("communityPosts").where("userId", "==", uid).get();
-      for (const p of communitySnap.docs) {
-        const data = p.data();
-        if (data.file?.storagePath) await deleteStoragePath(data.file.storagePath);
-        if (data.voice?.storagePath) await deleteStoragePath(data.voice.storagePath);
-        await p.ref.delete();
-      }
-
-      // supprimer profil
-      await db.collection("users").doc(uid).delete();
-
-      // supprimer compte auth
-      await user.delete();
-
-      alert("Your account and your site data have been deleted.");
-    } catch (error) {
-      setMessage("profile-message", error.message, true);
-    }
-  }
-
-  function logout() {
-    const user = auth.currentUser;
-    if (!user) {
-      auth.signOut();
-      return;
-    }
-
-    rtdb.ref("/status/" + user.uid).set({
-      state: "offline",
-      fullName: user.displayName || "Member",
-      last_changed: firebase.database.ServerValue.TIMESTAMP
-    }).finally(() => auth.signOut());
-  }
-
-  async function toggleCommentRecording() {
-    const btn = document.getElementById("record-comment-btn");
-    const status = document.getElementById("comment-recording-status");
-
-    if (!commentRecording) {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      commentChunks = [];
-      commentRecorder = new MediaRecorder(stream);
-
-      commentRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) commentChunks.push(e.data);
-      };
-
-      commentRecorder.onstop = () => {
-        commentAudioBlob = new Blob(commentChunks, { type: "audio/webm" });
-        status.textContent = "Voice ready";
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      commentRecorder.start();
-      commentRecording = true;
-      btn.textContent = "⏹ Stop voice";
-      status.textContent = "Recording...";
-    } else {
-      commentRecorder.stop();
-      commentRecording = false;
-      btn.textContent = "🎤 Start voice";
-    }
-  }
-
-  async function togglePostRecording() {
-    const btn = document.getElementById("record-post-btn");
-    const status = document.getElementById("post-recording-status");
-
-    if (!postRecording) {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      postChunks = [];
-      postRecorder = new MediaRecorder(stream);
-
-      postRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) postChunks.push(e.data);
-      };
-
-      postRecorder.onstop = () => {
-        postAudioBlob = new Blob(postChunks, { type: "audio/webm" });
-        status.textContent = "Voice ready";
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      postRecorder.start();
-      postRecording = true;
-      btn.textContent = "⏹ Stop voice";
-      status.textContent = "Recording...";
-    } else {
-      postRecorder.stop();
-      postRecording = false;
-      btn.textContent = "🎤 Start voice";
-    }
-  }
-
   async function likePost(postId) {
     await ensurePostExists(postId);
     const ref = db.collection("posts").doc(postId);
@@ -750,32 +538,24 @@
     }
 
     const text = document.getElementById(`comment-input-${postId}`).value.trim();
-    const file = document.getElementById(`comment-file-${postId}`).files[0] || null;
 
-    if (!text && !file && !commentAudioBlob) {
-      alert("Write a comment, add a file, or record a voice note.");
+    if (!text) {
+      alert("Write a comment first.");
       return;
     }
 
     try {
       const userSnap = await db.collection("users").doc(user.uid).get();
       const userInfo = userSnap.data() || {};
-      const fileUpload = await uploadFileToStorage(file, "commentFiles", user.uid);
-      const voiceUpload = await uploadAudioBlob(commentAudioBlob, "commentVoices", user.uid);
 
       await db.collection("posts").doc(postId).collection("comments").add({
         text,
         userId: user.uid,
         authorName: userInfo.fullName || user.displayName || "Member",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        file: fileUpload,
-        voice: voiceUpload
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
       document.getElementById(`comment-input-${postId}`).value = "";
-      document.getElementById(`comment-file-${postId}`).value = "";
-      commentAudioBlob = null;
-      document.getElementById("comment-recording-status").textContent = "";
     } catch (error) {
       alert(error.message);
     }
@@ -825,9 +605,6 @@
       return;
     }
 
-    if (data.file?.storagePath) await deleteStoragePath(data.file.storagePath);
-    if (data.voice?.storagePath) await deleteStoragePath(data.voice.storagePath);
-
     const replies = await ref.collection("replies").get();
     const batch = db.batch();
     replies.forEach(r => batch.delete(r.ref));
@@ -851,32 +628,14 @@
     await ref.delete();
   }
 
-  function renderAttachmentBlock(data) {
-    let html = "";
-
-    if (data.file?.url) {
-      html += `
-        <div class="attachment-box">
-          📎 <a href="${data.file.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.file.name || "document")}</a>
-        </div>
-      `;
-    }
-
-    if (data.voice?.url) {
-      html += `
-        <div class="attachment-box">
-          <audio controls src="${data.voice.url}"></audio>
-        </div>
-      `;
-    }
-
-    return html;
-  }
-
   function loadReplies(postId, commentId) {
     const container = document.getElementById(`replies-${commentId}`);
 
-    db.collection("posts").doc(postId).collection("comments").doc(commentId).collection("replies")
+    db.collection("posts")
+      .doc(postId)
+      .collection("comments")
+      .doc(commentId)
+      .collection("replies")
       .orderBy("createdAt", "asc")
       .onSnapshot((snapshot) => {
         const currentUser = auth.currentUser;
@@ -905,7 +664,9 @@
   }
 
   function loadComments(postId) {
-    db.collection("posts").doc(postId).collection("comments")
+    db.collection("posts")
+      .doc(postId)
+      .collection("comments")
       .orderBy("createdAt", "asc")
       .onSnapshot((snapshot) => {
         const currentUser = auth.currentUser;
@@ -926,7 +687,6 @@
               </div>
 
               <div class="comment-text">${escapeHtml(c.text || "")}</div>
-              ${renderAttachmentBlock(c)}
 
               <div class="reply-box">
                 <input type="text" id="reply-input-${doc.id}" placeholder="Reply to this comment...">
@@ -952,34 +712,26 @@
 
     const title = document.getElementById("community-title").value.trim();
     const text = document.getElementById("community-text").value.trim();
-    const file = document.getElementById("community-file").files[0] || null;
 
-    if (!title && !text && !file && !postAudioBlob) {
-      setMessage("community-message", "Add a title, text, voice or file.", true);
+    if (!title && !text) {
+      setMessage("community-message", "Add a title or text.", true);
       return;
     }
 
     try {
       const userSnap = await db.collection("users").doc(user.uid).get();
       const profile = userSnap.data() || {};
-      const fileUpload = await uploadFileToStorage(file, "communityFiles", user.uid);
-      const voiceUpload = await uploadAudioBlob(postAudioBlob, "communityVoices", user.uid);
 
       await db.collection("communityPosts").add({
         userId: user.uid,
         authorName: profile.fullName || user.displayName || "Member",
         title,
         text,
-        file: fileUpload,
-        voice: voiceUpload,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
       document.getElementById("community-title").value = "";
       document.getElementById("community-text").value = "";
-      document.getElementById("community-file").value = "";
-      postAudioBlob = null;
-      document.getElementById("post-recording-status").textContent = "";
       setMessage("community-message", "Publication posted successfully.");
     } catch (error) {
       setMessage("community-message", error.message, true);
@@ -1000,8 +752,6 @@
       return;
     }
 
-    if (data.file?.storagePath) await deleteStoragePath(data.file.storagePath);
-    if (data.voice?.storagePath) await deleteStoragePath(data.voice.storagePath);
     await ref.delete();
   }
 
@@ -1026,13 +776,79 @@
 
             ${p.title ? `<h4 class="community-title">${escapeHtml(p.title)}</h4>` : ""}
             <div class="comment-text">${escapeHtml(p.text || "")}</div>
-            ${renderAttachmentBlock(p)}
           </div>
         `;
       });
 
       document.getElementById("community-posts").innerHTML = html || "<p class='dark-note'>No publication yet.</p>";
     });
+  }
+
+  async function deleteMyAccount() {
+    const user = auth.currentUser;
+    const password = document.getElementById("delete-password").value;
+
+    if (!user || !user.email) {
+      setMessage("profile-message", "No connected user found.", true);
+      return;
+    }
+
+    if (!password) {
+      setMessage("profile-message", "Enter your password to confirm.", true);
+      return;
+    }
+
+    try {
+      const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+      await user.reauthenticateWithCredential(credential);
+
+      const uid = user.uid;
+
+      await rtdb.ref("/status/" + uid).remove();
+
+      const commentsSnap = await db.collection("posts").doc("post1").collection("comments").where("userId", "==", uid).get();
+      for (const docSnap of commentsSnap.docs) {
+        const repliesSnap = await docSnap.ref.collection("replies").get();
+        const batchReplies = db.batch();
+        repliesSnap.forEach(r => batchReplies.delete(r.ref));
+        await batchReplies.commit();
+        await docSnap.ref.delete();
+      }
+
+      const allCommentsSnap = await db.collection("posts").doc("post1").collection("comments").get();
+      for (const c of allCommentsSnap.docs) {
+        const repliesSnap = await c.ref.collection("replies").where("userId", "==", uid).get();
+        for (const r of repliesSnap.docs) {
+          await r.ref.delete();
+        }
+      }
+
+      const communitySnap = await db.collection("communityPosts").where("userId", "==", uid).get();
+      for (const p of communitySnap.docs) {
+        await p.ref.delete();
+      }
+
+      await db.collection("users").doc(uid).delete();
+      await user.delete();
+
+      alert("Your account and your site data have been deleted.");
+    } catch (error) {
+      setMessage("profile-message", error.message, true);
+    }
+  }
+
+  function logout() {
+    const user = auth.currentUser;
+    if (!user) {
+      auth.signOut();
+      return;
+    }
+
+    rtdb.ref("/status/" + user.uid).set({
+      state: "offline",
+      fullName: user.displayName || "Member",
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    }).finally(() => auth.signOut());
   }
 
   auth.onAuthStateChanged(async (user) => {
