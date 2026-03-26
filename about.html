@@ -1,76 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About - Maounou Boris AMOUSSOU</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About | Boris Research Hub</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="about.css" />
 </head>
-
 <body>
 
-<!-- NAVBAR -->
-<nav>
+<nav class="about-nav">
   <ul>
     <li><a href="index.html">Home</a></li>
-    <li><a href="about.html">About</a></li>
+    <li><a href="about.html" class="active-link">About</a></li>
     <li><a href="research.html">Research</a></li>
     <li><a href="resume.html">Resume</a></li>
     <li><a href="contact.html">Contact</a></li>
-    <a href="insights.html">Insights</a>
+    <li><a href="insights.html">Insights</a></li>
   </ul>
 </nav>
 
-<div class="container">
-
-  <!-- SIDEBAR (IDENTIQUE À INDEX) -->
-  <aside class="sidebar">
-    <img src="profile.jpg" class="profile-img">
-
+<div class="about-container">
+  <aside class="about-sidebar">
+    <div class="about-avatar-circle">MBA</div>
     <h2>Maounou Boris AMOUSSOU</h2>
-    <p>Chemical Engineer<br>Green Chemistry & Environment</p>
+    <p>Chemical Engineer<br>Green Chemistry &amp; Environment</p>
 
-    <form action="https://www.google.com/search" method="GET" target="_blank">
-      <input type="text" name="q" placeholder="Search on Google..." class="search-box">
-    </form>
+    <div class="about-side-card">
+      <h3>Profile</h3>
+      <p>Master's student in chemistry with a strong interest in sustainable development, catalysis, environmental processes, and clean energy systems.</p>
+    </div>
+
+    <div class="about-side-card">
+      <h3>Focus Areas</h3>
+      <ul>
+        <li>Green chemistry</li>
+        <li>Catalysis</li>
+        <li>Environmental treatment</li>
+        <li>Electrochemistry</li>
+        <li>Photocatalysis</li>
+      </ul>
+    </div>
   </aside>
 
-  <!-- CONTENU -->
-  <main>
-
-    <section class="card">
-      <h3>About Me</h3>
-
+  <main class="about-main">
+    <section class="about-hero-card">
+      <span class="about-badge">About Me</span>
+      <h1>Academic identity and scientific direction</h1>
       <p>
-        I am a Chemical Engineer specialized in Green Chemistry, Catalysis, and Environmental Processes,
-        currently completing a Master's degree at the University of Poitiers (France).
+        I am a Chemical Engineer specialized in Green Chemistry, Catalysis,
+        and Environmental Processes, currently completing a Master's degree
+        at the University of Poitiers, France.
       </p>
-
-      <p>
-        My academic journey has been strongly oriented toward sustainable development, energy transition,
-        and innovative solutions for environmental challenges.
-      </p>
-
-      <p>
-        I also gained international research experience in Montreal (Canada), where I worked on advanced
-        electrochemical and photocatalytic approaches for sustainable energy production.
-      </p>
-
-      <p>
-        I am particularly interested in developing efficient and environmentally friendly technologies
-        for future energy systems.
-      </p>
-
     </section>
 
+    <section class="about-grid">
+      <article class="about-card">
+        <h3>Academic journey</h3>
+        <p>
+          My academic path has been strongly oriented toward sustainable development,
+          energy transition, and innovative solutions for environmental challenges.
+        </p>
+      </article>
+
+      <article class="about-card">
+        <h3>Research experience</h3>
+        <p>
+          I gained international research experience in Montreal, Canada, where I worked
+          on advanced electrochemical and photocatalytic approaches for sustainable energy production.
+        </p>
+      </article>
+
+      <article class="about-card">
+        <h3>Scientific interests</h3>
+        <p>
+          I am particularly interested in developing efficient and environmentally friendly
+          technologies for future energy systems.
+        </p>
+      </article>
+
+      <article class="about-card">
+        <h3>Core values</h3>
+        <p>
+          I value scientific rigor, curiosity, collaboration, and the design of practical
+          solutions for environmental and societal needs.
+        </p>
+      </article>
+    </section>
+
+    <section class="about-highlight-card">
+      <h3>Professional vision</h3>
+      <p>
+        My objective is to contribute to scientific research and technological innovation
+        in the fields of green chemistry, energy conversion, and environmental remediation,
+        while building strong international collaborations and impactful academic work.
+      </p>
+    </section>
+
+    <footer class="about-footer">
+      <p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
+    </footer>
   </main>
-
 </div>
-
-<!-- FOOTER -->
-<footer>
-  <p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
-</footer>
 
 </body>
 </html>
