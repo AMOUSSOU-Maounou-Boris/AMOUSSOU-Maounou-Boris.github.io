@@ -10,6 +10,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 </head>
 <body>
 
@@ -25,7 +26,6 @@
 </nav>
 
 <div class="container">
-
   <aside class="sidebar">
     <img src="profile.jpg" class="profile-img" alt="Profile photo">
 
@@ -46,79 +46,55 @@
       <p id="auth-message" class="auth-message"></p>
     </div>
 
-    <!-- Sous-sections visibles seulement quand connecté -->
-    <div id="member-sections" class="hidden-block">
-      <div class="subsection">
-        <button class="subsection-toggle" onclick="toggleSection('account-panel')">
-          My account
-        </button>
+    <!-- Visible seulement après connexion -->
+    <div id="member-zone" class="hidden-block">
+      <button class="subsection-toggle" onclick="toggleSection('my-account-panel')">My account</button>
 
-        <div id="account-panel" class="subsection-content">
-          <p id="user-info" class="user-status">Not connected</p>
-          <p id="presence-self" class="user-status"></p>
+      <div id="my-account-panel" class="subsection-content hidden-panel">
+        <p id="user-info" class="user-status"></p>
+        <p id="presence-self" class="user-status"></p>
 
-          <label class="field-label">First name</label>
-          <input type="text" id="profile-firstname" class="auth-input" placeholder="First name">
+        <label class="field-label">First name</label>
+        <input type="text" id="profile-firstname" class="auth-input" placeholder="First name">
 
-          <label class="field-label">Last name</label>
-          <input type="text" id="profile-lastname" class="auth-input" placeholder="Last name">
+        <label class="field-label">Last name</label>
+        <input type="text" id="profile-lastname" class="auth-input" placeholder="Last name">
 
-          <label class="field-label">Phone number</label>
-          <input type="tel" id="profile-phone" class="auth-input" placeholder="Phone number">
+        <label class="field-label">Phone number</label>
+        <input type="tel" id="profile-phone" class="auth-input" placeholder="Phone number">
 
-          <label class="field-label">Email address (cannot be changed)</label>
-          <input type="email" id="profile-email" class="auth-input readonly-input" readonly>
+        <label class="field-label">Email address</label>
+        <input type="email" id="profile-email" class="auth-input readonly-input" readonly>
 
-          <div class="auth-actions">
-            <button class="auth-btn" onclick="saveProfile()">Save profile</button>
-            <button class="auth-btn secondary" onclick="logout()">Logout</button>
-          </div>
-
-          <div class="auth-actions">
-            <button class="auth-btn secondary" onclick="toggleSection('security-panel')">Security</button>
-            <button class="auth-btn danger" onclick="toggleSection('delete-panel')">Delete account</button>
-          </div>
-
-          <p id="profile-message" class="auth-message"></p>
-        </div>
-      </div>
-
-      <div id="security-panel" class="subsection-content hidden-panel">
-        <h4>Security</h4>
-        <p class="small-note">To receive a reset email, use the email of your account.</p>
         <div class="auth-actions">
-          <button class="auth-btn secondary" onclick="resetPasswordForCurrentUser()">Reset password</button>
+          <button class="auth-btn" onclick="saveProfile()">Save profile</button>
+          <button class="auth-btn secondary" onclick="sendResetForCurrentUser()">Reset password</button>
         </div>
-        <p id="security-message" class="auth-message"></p>
-      </div>
 
-      <div id="delete-panel" class="subsection-content hidden-panel">
+        <div class="auth-actions">
+          <button class="auth-btn secondary" onclick="logout()">Logout</button>
+        </div>
+
+        <hr class="soft-line">
+
         <h4>Delete my account</h4>
-        <p class="small-note">
-          This will delete your account and your profile data from the site.
-        </p>
-
-        <input type="password" id="delete-password" class="auth-input" placeholder="Enter your password to confirm">
-
+        <p class="small-note">This deletes your account and your data on this site.</p>
+        <input type="password" id="delete-password" class="auth-input" placeholder="Confirm with your password">
         <div class="auth-actions">
-          <button class="auth-btn danger" onclick="deleteMyAccount()">Confirm delete</button>
+          <button class="auth-btn danger" onclick="deleteMyAccount()">Delete my account</button>
         </div>
 
-        <p id="delete-message" class="auth-message"></p>
-      </div>
-
-      <div class="online-box">
-        <button class="subsection-toggle" onclick="toggleSection('online-members-panel')">
-          Online members
-        </button>
-        <div id="online-members-panel" class="subsection-content">
-          <div id="online-users"></div>
-        </div>
+        <p id="profile-message" class="auth-message"></p>
       </div>
     </div>
   </aside>
 
   <main>
+    <section class="card">
+      <h3>Online members</h3>
+      <div id="online-users"></div>
+    </section>
+
     <section class="card post" id="post1">
       <h3>Scientific Insight</h3>
       <p class="date">March 2026</p>
@@ -148,11 +124,41 @@
 
         <div class="new-comment">
           <textarea id="comment-input-post1" placeholder="Write a comment..."></textarea>
+
+          <div class="upload-row">
+            <input type="file" id="comment-file-post1" accept=".pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            <button class="small-btn secondary-btn" id="record-comment-btn" onclick="toggleCommentRecording()">🎤 Start voice</button>
+            <span id="comment-recording-status" class="small-note dark-note"></span>
+          </div>
+
           <button class="small-btn" onclick="addComment('post1')">Send</button>
         </div>
 
         <div id="comments-post1"></div>
       </div>
+    </section>
+
+    <section class="card">
+      <h3>Community publications</h3>
+      <p class="small-note dark-note">
+        Logged-in members can publish a text, a voice note, and a PDF/Word/Excel file.
+      </p>
+
+      <div class="new-comment">
+        <input type="text" id="community-title" class="text-input" placeholder="Title">
+        <textarea id="community-text" placeholder="Write your publication..."></textarea>
+
+        <div class="upload-row">
+          <input type="file" id="community-file" accept=".pdf,.doc,.docx,.xls,.xlsx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+          <button class="small-btn secondary-btn" id="record-post-btn" onclick="togglePostRecording()">🎤 Start voice</button>
+          <span id="post-recording-status" class="small-note dark-note"></span>
+        </div>
+
+        <button class="small-btn" onclick="publishCommunityPost()">Publish</button>
+        <p id="community-message" class="dark-message"></p>
+      </div>
+
+      <div id="community-posts"></div>
     </section>
 
     <footer class="page-footer">
@@ -206,9 +212,20 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
   const rtdb = firebase.database();
+  const storage = firebase.storage();
 
   let presenceConnectedRef = null;
   let presenceStatusRef = null;
+
+  let commentRecorder = null;
+  let commentChunks = [];
+  let commentAudioBlob = null;
+  let commentRecording = false;
+
+  let postRecorder = null;
+  let postChunks = [];
+  let postAudioBlob = null;
+  let postRecording = false;
 
   function setMessage(id, text, isError = false) {
     const el = document.getElementById(id);
@@ -217,13 +234,8 @@
     el.style.color = isError ? "#b00020" : "#0b7a3b";
   }
 
-  function clearMessage(id) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = "";
-  }
-
   function escapeHtml(value) {
-    return String(value)
+    return String(value || "")
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
@@ -264,12 +276,12 @@
 
   function openSignupModal() {
     document.getElementById("signup-modal").classList.remove("hidden-modal");
-    clearMessage("signup-message");
+    setMessage("signup-message", "");
   }
 
   function closeSignupModal() {
     document.getElementById("signup-modal").classList.add("hidden-modal");
-    clearMessage("signup-message");
+    setMessage("signup-message", "");
   }
 
   window.addEventListener("click", (e) => {
@@ -279,25 +291,70 @@
 
   function toggleSection(id) {
     const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.toggle("hidden-panel");
+    if (el) el.classList.toggle("hidden-panel");
   }
 
-  function showMemberSections(show) {
-    const section = document.getElementById("member-sections");
-    if (!section) return;
-    section.classList.toggle("hidden-block", !show);
+  function toggleMemberZone(show) {
+    document.getElementById("member-zone").classList.toggle("hidden-block", !show);
+  }
+
+  function getAllowedMime(file) {
+    const allowed = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ];
+    return allowed.includes(file.type);
+  }
+
+  async function uploadFileToStorage(file, folder, uid) {
+    if (!file) return null;
+
+    if (!getAllowedMime(file)) {
+      throw new Error("Only PDF, Word and Excel files are allowed.");
+    }
+
+    const safeName = Date.now() + "_" + file.name.replace(/[^\w.\-]/g, "_");
+    const path = `${folder}/${uid}/${safeName}`;
+    const ref = storage.ref(path);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+
+    return {
+      name: file.name,
+      type: file.type,
+      url,
+      storagePath: path
+    };
+  }
+
+  async function uploadAudioBlob(blob, folder, uid) {
+    if (!blob) return null;
+
+    const path = `${folder}/${uid}/${Date.now()}_voice.webm`;
+    const ref = storage.ref(path);
+    await ref.put(blob, { contentType: "audio/webm" });
+    const url = await ref.getDownloadURL();
+
+    return {
+      name: "voice.webm",
+      type: "audio/webm",
+      url,
+      storagePath: path
+    };
   }
 
   async function ensurePostExists(postId) {
     const ref = db.collection("posts").doc(postId);
-    const doc = await ref.get();
+    const snap = await ref.get();
 
-    if (!doc.exists) {
+    if (!snap.exists) {
       await ref.set({
         title: "Scientific Insight",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        likes: 0
+        likes: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     }
   }
@@ -306,48 +363,40 @@
     const userRef = db.collection("users").doc(user.uid);
     const snap = await userRef.get();
 
-    const nameParts = (user.displayName || "").trim().split(" ").filter(Boolean);
-    const fallbackFirstName = extras.firstName || nameParts[0] || "Member";
-    const fallbackLastName = extras.lastName || nameParts.slice(1).join(" ") || "";
-    const fallbackFullName = `${fallbackFirstName} ${fallbackLastName}`.trim();
+    let firstName = extras.firstName || "";
+    let lastName = extras.lastName || "";
+
+    if (!firstName && !lastName && user.displayName) {
+      const parts = user.displayName.trim().split(" ");
+      firstName = parts[0] || "";
+      lastName = parts.slice(1).join(" ") || "";
+    }
 
     const payload = {
       uid: user.uid,
-      firstName: extras.firstName || fallbackFirstName,
-      lastName: extras.lastName || fallbackLastName,
-      fullName: extras.fullName || fallbackFullName,
-      phone: extras.phone || "",
-      email: user.email || extras.email || "",
+      firstName: firstName || (snap.exists ? (snap.data().firstName || "") : ""),
+      lastName: lastName || (snap.exists ? (snap.data().lastName || "") : ""),
+      fullName: `${firstName || (snap.exists ? (snap.data().firstName || "") : "")} ${lastName || (snap.exists ? (snap.data().lastName || "") : "")}`.trim() || user.displayName || "Member",
+      phone: extras.phone || (snap.exists ? (snap.data().phone || "") : ""),
+      email: user.email || "",
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     if (!snap.exists) {
-      await userRef.set({
-        ...payload,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-    } else {
-      const existing = snap.data() || {};
-      await userRef.set({
-        uid: user.uid,
-        firstName: existing.firstName || payload.firstName,
-        lastName: existing.lastName || payload.lastName,
-        fullName: existing.fullName || payload.fullName,
-        phone: existing.phone || payload.phone,
-        email: existing.email || payload.email,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
     }
+
+    await userRef.set(payload, { merge: true });
 
     const fresh = await userRef.get();
     return fresh.data();
   }
 
-  function fillProfileForm(data, user) {
-    document.getElementById("profile-firstname").value = data?.firstName || "";
-    document.getElementById("profile-lastname").value = data?.lastName || "";
-    document.getElementById("profile-phone").value = data?.phone || "";
-    document.getElementById("profile-email").value = user?.email || data?.email || "";
+  function fillProfile(profile, user) {
+    document.getElementById("profile-firstname").value = profile?.firstName || "";
+    document.getElementById("profile-lastname").value = profile?.lastName || "";
+    document.getElementById("profile-phone").value = profile?.phone || "";
+    document.getElementById("profile-email").value = user?.email || "";
   }
 
   async function signUp() {
@@ -356,55 +405,39 @@
     const phone = document.getElementById("signup-phone").value.trim();
     const email = document.getElementById("signup-email").value.trim();
     const password = document.getElementById("signup-password").value;
-    const confirmPassword = document.getElementById("signup-password-confirm").value;
+    const confirm = document.getElementById("signup-password-confirm").value;
 
-    clearMessage("signup-message");
-
-    if (!firstName || !lastName || !phone || !email || !password || !confirmPassword) {
-      setMessage("signup-message", "Please fill in all fields.", true);
+    if (!firstName || !lastName || !email || !password || !confirm) {
+      setMessage("signup-message", "Please fill in the required fields.", true);
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (password !== confirm) {
       setMessage("signup-message", "Passwords do not match.", true);
-      return;
-    }
-
-    if (password.length < 6) {
-      setMessage("signup-message", "Password must contain at least 6 characters.", true);
       return;
     }
 
     try {
       const cred = await auth.createUserWithEmailAndPassword(email, password);
+      const fullName = `${firstName} ${lastName}`.trim();
 
-      await cred.user.updateProfile({
-        displayName: `${firstName} ${lastName}`.trim()
-      });
+      await cred.user.updateProfile({ displayName: fullName });
 
       await db.collection("users").doc(cred.user.uid).set({
         uid: cred.user.uid,
         firstName,
         lastName,
-        fullName: `${firstName} ${lastName}`.trim(),
+        fullName,
         phone,
         email,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      setMessage("signup-message", "Account created successfully.");
       closeSignupModal();
+      setMessage("auth-message", "Account created successfully.");
     } catch (error) {
-      if (error.code === "auth/email-already-in-use") {
-        setMessage("signup-message", "This email is already in use.", true);
-      } else if (error.code === "auth/invalid-email") {
-        setMessage("signup-message", "Invalid email address.", true);
-      } else if (error.code === "auth/weak-password") {
-        setMessage("signup-message", "Password is too weak.", true);
-      } else {
-        setMessage("signup-message", error.message, true);
-      }
+      setMessage("signup-message", error.message, true);
     }
   }
 
@@ -412,10 +445,8 @@
     const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value;
 
-    clearMessage("auth-message");
-
     if (!email || !password) {
-      setMessage("auth-message", "Please enter your email and password.", true);
+      setMessage("auth-message", "Enter your email and password.", true);
       return;
     }
 
@@ -423,34 +454,7 @@
       await auth.signInWithEmailAndPassword(email, password);
       setMessage("auth-message", "Login successful.");
     } catch (error) {
-      if (
-        error.code === "auth/invalid-login-credentials" ||
-        error.code === "auth/wrong-password" ||
-        error.code === "auth/user-not-found" ||
-        error.code === "auth/invalid-email"
-      ) {
-        setMessage("auth-message", "Email or password incorrect.", true);
-      } else {
-        setMessage("auth-message", error.message, true);
-      }
-    }
-  }
-
-  async function resetPasswordForCurrentUser() {
-    const user = auth.currentUser;
-
-    clearMessage("security-message");
-
-    if (!user || !user.email) {
-      setMessage("security-message", "No connected user found.", true);
-      return;
-    }
-
-    try {
-      await auth.sendPasswordResetEmail(user.email);
-      setMessage("security-message", "Password reset email sent. Check inbox and spam.");
-    } catch (error) {
-      setMessage("security-message", error.message, true);
+      setMessage("auth-message", "Email or password incorrect.", true);
     }
   }
 
@@ -458,14 +462,12 @@
     const user = auth.currentUser;
     if (!user) return;
 
-    clearMessage("profile-message");
-
     const firstName = document.getElementById("profile-firstname").value.trim();
     const lastName = document.getElementById("profile-lastname").value.trim();
     const phone = document.getElementById("profile-phone").value.trim();
 
-    if (!firstName || !lastName || !phone) {
-      setMessage("profile-message", "First name, last name and phone are required.", true);
+    if (!firstName || !lastName) {
+      setMessage("profile-message", "First name and last name are required.", true);
       return;
     }
 
@@ -493,7 +495,22 @@
       }
 
       document.getElementById("user-info").textContent = `Connected as ${fullName}`;
-      setMessage("profile-message", "Profile updated successfully.");
+      setMessage("profile-message", "Profile saved successfully.");
+    } catch (error) {
+      setMessage("profile-message", error.message, true);
+    }
+  }
+
+  async function sendResetForCurrentUser() {
+    const user = auth.currentUser;
+    if (!user || !user.email) {
+      setMessage("profile-message", "No connected user found.", true);
+      return;
+    }
+
+    try {
+      await auth.sendPasswordResetEmail(user.email);
+      setMessage("profile-message", "Reset email sent.");
     } catch (error) {
       setMessage("profile-message", error.message, true);
     }
@@ -526,7 +543,7 @@
     try {
       if (presenceConnectedRef) presenceConnectedRef.off();
       if (presenceStatusRef) presenceStatusRef.off();
-    } catch (_) {}
+    } catch (e) {}
 
     presenceConnectedRef = null;
     presenceStatusRef = null;
@@ -539,18 +556,14 @@
 
       snapshot.forEach((child) => {
         const data = child.val() || {};
-        const isOnline = data.state === "online";
-        const dotClass = isOnline ? "dot-online" : "dot-offline";
-        const label = isOnline
-          ? `online • ${formatPresenceTime(data.last_changed)}`
-          : `last seen • ${formatPresenceTime(data.last_changed)}`;
+        const online = data.state === "online";
 
         html += `
           <div class="online-user">
-            <span class="${dotClass}"></span>
+            <span class="${online ? "dot-online" : "dot-offline"}"></span>
             <div>
               <div class="online-name">${escapeHtml(data.fullName || "Member")}</div>
-              <div class="online-time">${escapeHtml(label)}</div>
+              <div class="online-time">${online ? "online" : "last seen"} • ${escapeHtml(formatPresenceTime(data.last_changed))}</div>
             </div>
           </div>
         `;
@@ -560,19 +573,24 @@
     });
   }
 
+  async function deleteStoragePath(path) {
+    if (!path) return;
+    try {
+      await storage.ref(path).delete();
+    } catch (e) {}
+  }
+
   async function deleteMyAccount() {
     const user = auth.currentUser;
     const password = document.getElementById("delete-password").value;
 
-    clearMessage("delete-message");
-
     if (!user || !user.email) {
-      setMessage("delete-message", "No connected user found.", true);
+      setMessage("profile-message", "No connected user found.", true);
       return;
     }
 
     if (!password) {
-      setMessage("delete-message", "Enter your password to confirm.", true);
+      setMessage("profile-message", "Enter your password to confirm.", true);
       return;
     }
 
@@ -582,120 +600,211 @@
 
       const uid = user.uid;
 
-      // Efface la présence
+      // supprimer le statut
       await rtdb.ref("/status/" + uid).remove();
 
-      // Efface le profil utilisateur
-      await db.collection("users").doc(uid).delete();
-
-      // Efface les commentaires de l'utilisateur sur post1
+      // supprimer les commentaires du post principal
       const commentsSnap = await db.collection("posts").doc("post1").collection("comments").where("userId", "==", uid).get();
-      const batch1 = db.batch();
-      commentsSnap.forEach((doc) => batch1.delete(doc.ref));
-      await batch1.commit();
+      for (const docSnap of commentsSnap.docs) {
+        const data = docSnap.data();
+        if (data.file?.storagePath) await deleteStoragePath(data.file.storagePath);
+        if (data.voice?.storagePath) await deleteStoragePath(data.voice.storagePath);
 
-      // Efface les réponses de l'utilisateur dans les commentaires existants
+        const repliesSnap = await docSnap.ref.collection("replies").get();
+        const batchReplies = db.batch();
+        repliesSnap.forEach(r => batchReplies.delete(r.ref));
+        await batchReplies.commit();
+
+        await docSnap.ref.delete();
+      }
+
+      // supprimer les réponses de l'utilisateur dans les autres commentaires
       const allCommentsSnap = await db.collection("posts").doc("post1").collection("comments").get();
-      for (const commentDoc of allCommentsSnap.docs) {
-        const repliesSnap = await commentDoc.ref.collection("replies").where("userId", "==", uid).get();
-        if (!repliesSnap.empty) {
-          const batchReplies = db.batch();
-          repliesSnap.forEach((replyDoc) => batchReplies.delete(replyDoc.ref));
-          await batchReplies.commit();
+      for (const c of allCommentsSnap.docs) {
+        const repliesSnap = await c.ref.collection("replies").where("userId", "==", uid).get();
+        for (const r of repliesSnap.docs) {
+          const d = r.data();
+          if (d.file?.storagePath) await deleteStoragePath(d.file.storagePath);
+          if (d.voice?.storagePath) await deleteStoragePath(d.voice.storagePath);
+          await r.ref.delete();
         }
       }
 
+      // supprimer les publications communautaires
+      const communitySnap = await db.collection("communityPosts").where("userId", "==", uid).get();
+      for (const p of communitySnap.docs) {
+        const data = p.data();
+        if (data.file?.storagePath) await deleteStoragePath(data.file.storagePath);
+        if (data.voice?.storagePath) await deleteStoragePath(data.voice.storagePath);
+        await p.ref.delete();
+      }
+
+      // supprimer profil
+      await db.collection("users").doc(uid).delete();
+
+      // supprimer compte auth
       await user.delete();
-      alert("Your account and site data were deleted.");
+
+      alert("Your account and your site data have been deleted.");
     } catch (error) {
-      setMessage("delete-message", error.message, true);
+      setMessage("profile-message", error.message, true);
     }
   }
 
   function logout() {
     const user = auth.currentUser;
-    if (user) {
-      rtdb.ref("/status/" + user.uid).set({
-        state: "offline",
-        fullName: user.displayName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      }).finally(() => auth.signOut());
-    } else {
+    if (!user) {
       auth.signOut();
+      return;
+    }
+
+    rtdb.ref("/status/" + user.uid).set({
+      state: "offline",
+      fullName: user.displayName || "Member",
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    }).finally(() => auth.signOut());
+  }
+
+  async function toggleCommentRecording() {
+    const btn = document.getElementById("record-comment-btn");
+    const status = document.getElementById("comment-recording-status");
+
+    if (!commentRecording) {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      commentChunks = [];
+      commentRecorder = new MediaRecorder(stream);
+
+      commentRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) commentChunks.push(e.data);
+      };
+
+      commentRecorder.onstop = () => {
+        commentAudioBlob = new Blob(commentChunks, { type: "audio/webm" });
+        status.textContent = "Voice ready";
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      commentRecorder.start();
+      commentRecording = true;
+      btn.textContent = "⏹ Stop voice";
+      status.textContent = "Recording...";
+    } else {
+      commentRecorder.stop();
+      commentRecording = false;
+      btn.textContent = "🎤 Start voice";
     }
   }
 
-  auth.onAuthStateChanged(async (user) => {
-    const userInfoEl = document.getElementById("user-info");
-    const selfPresence = document.getElementById("presence-self");
+  async function togglePostRecording() {
+    const btn = document.getElementById("record-post-btn");
+    const status = document.getElementById("post-recording-status");
 
-    clearMessage("profile-message");
-    clearMessage("security-message");
-    clearMessage("delete-message");
+    if (!postRecording) {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      postChunks = [];
+      postRecorder = new MediaRecorder(stream);
 
-    if (user) {
-      showMemberSections(true);
+      postRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) postChunks.push(e.data);
+      };
 
-      const profile = await ensureUserProfile(user);
-      const fullName = profile?.fullName || user.displayName || "Member";
+      postRecorder.onstop = () => {
+        postAudioBlob = new Blob(postChunks, { type: "audio/webm" });
+        status.textContent = "Voice ready";
+        stream.getTracks().forEach(track => track.stop());
+      };
 
-      fillProfileForm(profile, user);
-      userInfoEl.textContent = `Connected as ${fullName}`;
-      selfPresence.textContent = "● You are online";
-
-      setupPresence(user, fullName);
+      postRecorder.start();
+      postRecording = true;
+      btn.textContent = "⏹ Stop voice";
+      status.textContent = "Recording...";
     } else {
-      showMemberSections(false);
-      cleanupPresence();
-      userInfoEl.textContent = "Not connected";
-      selfPresence.textContent = "";
+      postRecorder.stop();
+      postRecording = false;
+      btn.textContent = "🎤 Start voice";
     }
-
-    loadComments("post1");
-  });
+  }
 
   async function likePost(postId) {
     await ensurePostExists(postId);
     const ref = db.collection("posts").doc(postId);
 
     await db.runTransaction(async (tx) => {
-      const doc = await tx.get(ref);
-      const likes = (doc.data().likes || 0) + 1;
+      const snap = await tx.get(ref);
+      const likes = (snap.data()?.likes || 0) + 1;
       tx.update(ref, { likes });
     });
   }
 
   function loadLikes(postId) {
-    db.collection("posts").doc(postId).onSnapshot((doc) => {
-      const likes = doc.exists ? (doc.data().likes || 0) : 0;
-      document.getElementById(`likes-${postId}`).textContent = likes;
+    db.collection("posts").doc(postId).onSnapshot((snap) => {
+      document.getElementById(`likes-${postId}`).textContent = snap.exists ? (snap.data().likes || 0) : 0;
     });
   }
 
   async function addComment(postId) {
     const user = auth.currentUser;
-    const input = document.getElementById(`comment-input-${postId}`);
-    const text = input.value.trim();
-
     if (!user) {
       alert("Please sign in first.");
       return;
     }
 
+    const text = document.getElementById(`comment-input-${postId}`).value.trim();
+    const file = document.getElementById(`comment-file-${postId}`).files[0] || null;
+
+    if (!text && !file && !commentAudioBlob) {
+      alert("Write a comment, add a file, or record a voice note.");
+      return;
+    }
+
+    try {
+      const userSnap = await db.collection("users").doc(user.uid).get();
+      const userInfo = userSnap.data() || {};
+      const fileUpload = await uploadFileToStorage(file, "commentFiles", user.uid);
+      const voiceUpload = await uploadAudioBlob(commentAudioBlob, "commentVoices", user.uid);
+
+      await db.collection("posts").doc(postId).collection("comments").add({
+        text,
+        userId: user.uid,
+        authorName: userInfo.fullName || user.displayName || "Member",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        file: fileUpload,
+        voice: voiceUpload
+      });
+
+      document.getElementById(`comment-input-${postId}`).value = "";
+      document.getElementById(`comment-file-${postId}`).value = "";
+      commentAudioBlob = null;
+      document.getElementById("comment-recording-status").textContent = "";
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  async function addReply(postId, commentId) {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please sign in first.");
+      return;
+    }
+
+    const input = document.getElementById(`reply-input-${commentId}`);
+    const text = input.value.trim();
+
     if (!text) return;
 
-    const userDoc = await db.collection("users").doc(user.uid).get();
-    const userInfo = userDoc.exists ? userDoc.data() : null;
-
-    await ensurePostExists(postId);
+    const userSnap = await db.collection("users").doc(user.uid).get();
+    const userInfo = userSnap.data() || {};
 
     await db.collection("posts")
       .doc(postId)
       .collection("comments")
+      .doc(commentId)
+      .collection("replies")
       .add({
         text,
         userId: user.uid,
-        authorName: userInfo ? userInfo.fullName : (user.displayName || "Member"),
+        authorName: userInfo.fullName || user.displayName || "Member",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -706,82 +815,68 @@
     const user = auth.currentUser;
     if (!user) return;
 
-    const commentRef = db.collection("posts").doc(postId).collection("comments").doc(commentId);
-    const doc = await commentRef.get();
-    if (!doc.exists) return;
+    const ref = db.collection("posts").doc(postId).collection("comments").doc(commentId);
+    const snap = await ref.get();
+    if (!snap.exists) return;
 
-    if (doc.data().userId !== user.uid) {
+    const data = snap.data();
+    if (data.userId !== user.uid) {
       alert("You can only delete your own comment.");
       return;
     }
 
-    const repliesSnap = await commentRef.collection("replies").get();
+    if (data.file?.storagePath) await deleteStoragePath(data.file.storagePath);
+    if (data.voice?.storagePath) await deleteStoragePath(data.voice.storagePath);
+
+    const replies = await ref.collection("replies").get();
     const batch = db.batch();
-    repliesSnap.forEach((replyDoc) => batch.delete(replyDoc.ref));
-    batch.delete(commentRef);
+    replies.forEach(r => batch.delete(r.ref));
+    batch.delete(ref);
     await batch.commit();
-  }
-
-  async function addReply(postId, commentId) {
-    const user = auth.currentUser;
-    const input = document.getElementById(`reply-input-${commentId}`);
-    const text = input.value.trim();
-
-    if (!user) {
-      alert("Please sign in first.");
-      return;
-    }
-
-    if (!text) return;
-
-    const userDoc = await db.collection("users").doc(user.uid).get();
-    const userInfo = userDoc.exists ? userDoc.data() : null;
-
-    await db.collection("posts")
-      .doc(postId)
-      .collection("comments")
-      .doc(commentId)
-      .collection("replies")
-      .add({
-        text,
-        userId: user.uid,
-        authorName: userInfo ? userInfo.fullName : (user.displayName || "Member"),
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-    input.value = "";
   }
 
   async function deleteReply(postId, commentId, replyId) {
     const user = auth.currentUser;
     if (!user) return;
 
-    const replyRef = db.collection("posts")
-      .doc(postId)
-      .collection("comments")
-      .doc(commentId)
-      .collection("replies")
-      .doc(replyId);
+    const ref = db.collection("posts").doc(postId).collection("comments").doc(commentId).collection("replies").doc(replyId);
+    const snap = await ref.get();
+    if (!snap.exists) return;
 
-    const doc = await replyRef.get();
-    if (!doc.exists) return;
-
-    if (doc.data().userId !== user.uid) {
+    if (snap.data().userId !== user.uid) {
       alert("You can only delete your own reply.");
       return;
     }
 
-    await replyRef.delete();
+    await ref.delete();
+  }
+
+  function renderAttachmentBlock(data) {
+    let html = "";
+
+    if (data.file?.url) {
+      html += `
+        <div class="attachment-box">
+          📎 <a href="${data.file.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.file.name || "document")}</a>
+        </div>
+      `;
+    }
+
+    if (data.voice?.url) {
+      html += `
+        <div class="attachment-box">
+          <audio controls src="${data.voice.url}"></audio>
+        </div>
+      `;
+    }
+
+    return html;
   }
 
   function loadReplies(postId, commentId) {
-    const repliesContainer = document.getElementById(`replies-${commentId}`);
+    const container = document.getElementById(`replies-${commentId}`);
 
-    db.collection("posts")
-      .doc(postId)
-      .collection("comments")
-      .doc(commentId)
-      .collection("replies")
+    db.collection("posts").doc(postId).collection("comments").doc(commentId).collection("replies")
       .orderBy("createdAt", "asc")
       .onSnapshot((snapshot) => {
         const currentUser = auth.currentUser;
@@ -805,14 +900,12 @@
           `;
         });
 
-        repliesContainer.innerHTML = html;
+        container.innerHTML = html;
       });
   }
 
   function loadComments(postId) {
-    db.collection("posts")
-      .doc(postId)
-      .collection("comments")
+    db.collection("posts").doc(postId).collection("comments")
       .orderBy("createdAt", "asc")
       .onSnapshot((snapshot) => {
         const currentUser = auth.currentUser;
@@ -820,7 +913,6 @@
 
         snapshot.forEach((doc) => {
           const c = doc.data();
-          const commentId = doc.id;
           const canDelete = currentUser && c.userId === currentUser.uid;
 
           html += `
@@ -830,41 +922,146 @@
                   <strong>${escapeHtml(c.authorName || "Member")}</strong>
                   <span class="comment-time">${escapeHtml(formatDateTime(c.createdAt))}</span>
                 </div>
-                ${canDelete ? `<button class="delete-btn" onclick="deleteComment('${postId}','${commentId}')">Delete</button>` : ""}
+                ${canDelete ? `<button class="delete-btn" onclick="deleteComment('${postId}','${doc.id}')">Delete</button>` : ""}
               </div>
 
               <div class="comment-text">${escapeHtml(c.text || "")}</div>
-
-              <div class="emoji-bar small-emoji-bar">
-                <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${commentId}','😀')">😀</button>
-                <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${commentId}','👍')">👍</button>
-                <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${commentId}','🔥')">🔥</button>
-                <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${commentId}','❤️')">❤️</button>
-              </div>
+              ${renderAttachmentBlock(c)}
 
               <div class="reply-box">
-                <input type="text" id="reply-input-${commentId}" placeholder="Reply to this comment...">
-                <button class="small-btn" onclick="addReply('${postId}', '${commentId}')">Reply</button>
+                <input type="text" id="reply-input-${doc.id}" placeholder="Reply to this comment...">
+                <button class="small-btn" onclick="addReply('${postId}', '${doc.id}')">Reply</button>
               </div>
 
-              <div id="replies-${commentId}" class="replies"></div>
+              <div id="replies-${doc.id}" class="replies"></div>
             </div>
           `;
         });
 
-        const commentsContainer = document.getElementById(`comments-${postId}`);
-        commentsContainer.innerHTML = html;
-
+        document.getElementById(`comments-${postId}`).innerHTML = html;
         snapshot.forEach((doc) => loadReplies(postId, doc.id));
       });
   }
+
+  async function publishCommunityPost() {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please sign in first.");
+      return;
+    }
+
+    const title = document.getElementById("community-title").value.trim();
+    const text = document.getElementById("community-text").value.trim();
+    const file = document.getElementById("community-file").files[0] || null;
+
+    if (!title && !text && !file && !postAudioBlob) {
+      setMessage("community-message", "Add a title, text, voice or file.", true);
+      return;
+    }
+
+    try {
+      const userSnap = await db.collection("users").doc(user.uid).get();
+      const profile = userSnap.data() || {};
+      const fileUpload = await uploadFileToStorage(file, "communityFiles", user.uid);
+      const voiceUpload = await uploadAudioBlob(postAudioBlob, "communityVoices", user.uid);
+
+      await db.collection("communityPosts").add({
+        userId: user.uid,
+        authorName: profile.fullName || user.displayName || "Member",
+        title,
+        text,
+        file: fileUpload,
+        voice: voiceUpload,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.getElementById("community-title").value = "";
+      document.getElementById("community-text").value = "";
+      document.getElementById("community-file").value = "";
+      postAudioBlob = null;
+      document.getElementById("post-recording-status").textContent = "";
+      setMessage("community-message", "Publication posted successfully.");
+    } catch (error) {
+      setMessage("community-message", error.message, true);
+    }
+  }
+
+  async function deleteCommunityPost(postId) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const ref = db.collection("communityPosts").doc(postId);
+    const snap = await ref.get();
+    if (!snap.exists) return;
+
+    const data = snap.data();
+    if (data.userId !== user.uid) {
+      alert("You can only delete your own publication.");
+      return;
+    }
+
+    if (data.file?.storagePath) await deleteStoragePath(data.file.storagePath);
+    if (data.voice?.storagePath) await deleteStoragePath(data.voice.storagePath);
+    await ref.delete();
+  }
+
+  function loadCommunityPosts() {
+    db.collection("communityPosts").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+      const currentUser = auth.currentUser;
+      let html = "";
+
+      snapshot.forEach((doc) => {
+        const p = doc.data();
+        const canDelete = currentUser && currentUser.uid === p.userId;
+
+        html += `
+          <div class="comment">
+            <div class="comment-header-line">
+              <div class="comment-meta">
+                <strong>${escapeHtml(p.authorName || "Member")}</strong>
+                <span class="comment-time">${escapeHtml(formatDateTime(p.createdAt))}</span>
+              </div>
+              ${canDelete ? `<button class="delete-btn" onclick="deleteCommunityPost('${doc.id}')">Delete</button>` : ""}
+            </div>
+
+            ${p.title ? `<h4 class="community-title">${escapeHtml(p.title)}</h4>` : ""}
+            <div class="comment-text">${escapeHtml(p.text || "")}</div>
+            ${renderAttachmentBlock(p)}
+          </div>
+        `;
+      });
+
+      document.getElementById("community-posts").innerHTML = html || "<p class='dark-note'>No publication yet.</p>";
+    });
+  }
+
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      toggleMemberZone(true);
+      const profile = await ensureUserProfile(user);
+
+      fillProfile(profile, user);
+      document.getElementById("user-info").textContent = `Connected as ${profile.fullName || user.displayName || "Member"}`;
+      document.getElementById("presence-self").textContent = "● You are online";
+
+      setupPresence(user, profile.fullName || user.displayName || "Member");
+    } else {
+      toggleMemberZone(false);
+      cleanupPresence();
+      document.getElementById("user-info").textContent = "";
+      document.getElementById("presence-self").textContent = "";
+    }
+
+    loadComments("post1");
+    loadCommunityPosts();
+  });
 
   ensurePostExists("post1").then(() => {
     loadLikes("post1");
     loadComments("post1");
     loadOnlineUsers();
+    loadCommunityPosts();
   });
 </script>
-
 </body>
 </html>
