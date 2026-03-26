@@ -1,1 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile | Boris Research Hub</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="profile.css" />
 
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<nav class="profile-nav">
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="research.html">Research</a></li>
+    <li><a href="resume.html">Resume</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="insights.html">Insights</a></li>
+    <li><a href="messages.html">Messages</a></li>
+  </ul>
+</nav>
+
+<div class="profile-page">
+  <section class="profile-card">
+    <div id="profile-avatar" class="member-avatar xlarge-avatar">MB</div>
+    <div class="profile-main-text">
+      <h1 id="profile-name">Member</h1>
+      <p id="profile-status">Loading profile...</p>
+      <div class="profile-actions">
+        <button id="message-profile-btn" class="primary-btn">Message</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="profile-grid">
+    <div class="info-box">
+      <h3>Institution</h3>
+      <p id="profile-institution">—</p>
+    </div>
+
+    <div class="info-box">
+      <h3>Location</h3>
+      <p id="profile-location">—</p>
+    </div>
+
+    <div class="info-box">
+      <h3>Favorite field</h3>
+      <p id="profile-field">—</p>
+    </div>
+
+    <div class="info-box">
+      <h3>Bio</h3>
+      <p id="profile-bio">—</p>
+    </div>
+  </section>
+
+  <section class="publications-card">
+    <h2>Publications</h2>
+    <div id="user-publications"></div>
+  </section>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
+  authDomain: "boris-research-hub.firebaseapp.com",
+  projectId: "boris-research-hub",
+  storageBucket: "boris-research-hub.firebasestorage.app",
+  messagingSenderId: "71055508172",
+  appId: "1:71055508172:web:72229e3f5ad664eb35b869",
+  measurementId: "G-9Q6SJ96NBS",
+  databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function getInitials(firstName, lastName, fullName) {
+  const f = (firstName || "").trim();
+  const l = (lastName || "").trim();
+  if (f || l) return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
+  const parts = (fullName || "Member").trim().split(" ").filter(Boolean);
+  return (parts.slice(0, 2).map(p => p.charAt(0)).join("") || "MB").toUpperCase();
+}
+
+function renderAvatar(profile) {
+  const el = document.getElementById("profile-avatar");
+  if (profile.photoURL) {
+    el.innerHTML = `<img src="${escapeHtml(profile.photoURL)}" alt="avatar">`;
+    el.style.background = "transparent";
+  } else {
+    el.textContent = getInitials(profile.firstName, profile.lastName, profile.fullName);
+    el.style.background = profile.avatarColor || "#16385d";
+  }
+}
+
+function formatDateTime(timestamp) {
+  if (!timestamp) return "";
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  return date.toLocaleString("fr-FR", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+const params = new URLSearchParams(window.location.search);
+const uid = params.get("uid");
+
+async function loadProfile() {
+  if (!uid) return;
+
+  const userSnap = await db.collection("users").doc(uid).get();
+  if (!userSnap.exists) return;
+
+  const profile = userSnap.data();
+  renderAvatar(profile);
+
+  document.getElementById("profile-name").textContent = profile.fullName || "Member";
+  document.getElementById("profile-status").textContent = profile.institution || "Scientific member";
+  document.getElementById("profile-institution").textContent = profile.institution || "—";
+  document.getElementById("profile-location").textContent = profile.location || "—";
+  document.getElementById("profile-field").textContent = profile.favoriteField || "—";
+  document.getElementById("profile-bio").textContent = profile.bio || "—";
+
+  document.getElementById("message-profile-btn").onclick = () => {
+    window.location.href = `messages.html?user=${uid}`;
+  };
+
+  db.collection("communityPosts")
+    .where("userId", "==", uid)
+    .orderBy("createdAt", "desc")
+    .onSnapshot((snapshot) => {
+      let html = "";
+      snapshot.forEach((doc) => {
+        const p = doc.data();
+        html += `
+          <div class="publication-box">
+            ${p.title ? `<h4>${escapeHtml(p.title)}</h4>` : ""}
+            <p>${escapeHtml(p.text || "")}</p>
+            <span class="pub-time">${escapeHtml(formatDateTime(p.createdAt))}</span>
+          </div>
+        `;
+      });
+      document.getElementById("user-publications").innerHTML = html || "<p>No publication yet.</p>";
+    });
+}
+
+auth.onAuthStateChanged(() => {
+  loadProfile();
+});
+</script>
+</body>
+</html>
