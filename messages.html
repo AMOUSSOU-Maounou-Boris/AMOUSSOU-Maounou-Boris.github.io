@@ -1,1 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Messages | Boris Research Hub</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="messages.css" />
 
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<nav class="msg-nav">
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="research.html">Research</a></li>
+    <li><a href="resume.html">Resume</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="insights.html">Insights</a></li>
+    <li><a href="messages.html" class="active-link">Messages</a></li>
+  </ul>
+
+  <div class="lang-switcher">
+    <button onclick="setLanguage('en')">EN</button>
+    <button onclick="setLanguage('fr')">FR</button>
+    <button onclick="setLanguage('es')">ES</button>
+  </div>
+</nav>
+
+<div class="messages-layout">
+  <aside class="messages-sidebar">
+    <div class="sidebar-top">
+      <div id="current-user-avatar" class="member-avatar large-avatar">MB</div>
+      <div>
+        <h2 data-i18n="messaging">Messaging</h2>
+        <p id="current-user-name">Member</p>
+      </div>
+    </div>
+
+    <input type="text" id="member-search" class="search-input" placeholder="Search a member..." oninput="filterMembers()">
+
+    <div class="tabs">
+      <button class="tab-btn active-tab" onclick="switchTab('all-members', this)" data-i18n="allMembers">All members</button>
+      <button class="tab-btn" onclick="switchTab('friends-list', this)" data-i18n="friends">Friends</button>
+      <button class="tab-btn" onclick="switchTab('invites-list', this)" data-i18n="invitations">Invitations</button>
+      <button class="tab-btn" onclick="switchTab('online-list', this)" data-i18n="online">Online</button>
+    </div>
+
+    <div id="all-members" class="tab-panel"></div>
+    <div id="friends-list" class="tab-panel hidden-panel"></div>
+    <div id="invites-list" class="tab-panel hidden-panel"></div>
+    <div id="online-list" class="tab-panel hidden-panel"></div>
+  </aside>
+
+  <main class="messages-main">
+    <section class="chat-header-card">
+      <div id="chat-user-summary" class="chat-user-summary">
+        <div class="member-avatar">MB</div>
+        <div>
+          <h3 id="chat-title">Select a conversation</h3>
+          <p id="chat-subtitle">Your private messages will appear here.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="chat-body-card">
+      <div id="invitation-banner" class="invitation-banner hidden-banner"></div>
+      <div id="chat-messages" class="chat-messages"></div>
+
+      <div class="chat-composer">
+        <textarea id="message-input" placeholder="Write a private message..."></textarea>
+        <div class="composer-actions">
+          <button class="emoji-btn" onclick="insertEmoji('message-input','😀')">😀</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','👍')">👍</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','❤️')">❤️</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','🔥')">🔥</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','🧪')">🧪</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','💡')">💡</button>
+          <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
+  authDomain: "boris-research-hub.firebaseapp.com",
+  projectId: "boris-research-hub",
+  storageBucket: "boris-research-hub.firebasestorage.app",
+  messagingSenderId: "71055508172",
+  appId: "1:71055508172:web:72229e3f5ad664eb35b869",
+  measurementId: "G-9Q6SJ96NBS",
+  databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const auth = firebase.auth();
+const rtdb = firebase.database();
+
+let currentUserProfile = null;
+let selectedUserId = null;
+let selectedUserProfile = null;
+let currentThreadId = null;
+let currentRelationship = "none";
+let allMembersCache = [];
+let currentLanguage = localStorage.getItem("site_lang") || "en";
+
+const i18n = {
+  en: {
+    messaging: "Messaging",
+    allMembers: "All members",
+    friends: "Friends",
+    invitations: "Invitations",
+    online: "Online"
+  },
+  fr: {
+    messaging: "Messagerie",
+    allMembers: "Tous les membres",
+    friends: "Amis",
+    invitations: "Invitations",
+    online: "En ligne"
+  },
+  es: {
+    messaging: "Mensajería",
+    allMembers: "Todos los miembros",
+    friends: "Amigos",
+    invitations: "Invitaciones",
+    online: "En línea"
+  }
+};
+
+function setLanguage(lang) {
+  currentLanguage = lang;
+  localStorage.setItem("site_lang", lang);
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    if (i18n[lang] && i18n[lang][key]) el.textContent = i18n[lang][key];
+  });
+}
+setLanguage(currentLanguage);
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function getInitials(firstName, lastName, fullName) {
+  const f = (firstName || "").trim();
+  const l = (lastName || "").trim();
+  if (f || l) return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
+  const parts = (fullName || "Member").trim().split(" ").filter(Boolean);
+  return (parts.slice(0, 2).map(p => p.charAt(0)).join("") || "MB").toUpperCase();
+}
+
+function avatarHtml(profile, cls = "") {
+  const photo = profile?.photoURL || "";
+  const color = profile?.avatarColor || "#16385d";
+  const initials = escapeHtml(getInitials(profile?.firstName, profile?.lastName, profile?.fullName));
+  if (photo) return `<div class="member-avatar ${cls}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
+  return `<div class="member-avatar ${cls}" style="background:${escapeHtml(color)}">${initials}</div>`;
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden-panel"));
+  document.getElementById(id).classList.remove("hidden-panel");
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active-tab"));
+  btn.classList.add("active-tab");
+}
+
+function filterMembers() {
+  const q = document.getElementById("member-search").value.trim().toLowerCase();
+  document.querySelectorAll(".member-list-item").forEach(item => {
+    const text = item.dataset.search || "";
+    item.style.display = text.includes(q) ? "flex" : "none";
+  });
+}
+
+function insertEmoji(targetId, emoji) {
+  const input = document.getElementById(targetId);
+  if (!input) return;
+  input.value += emoji;
+  input.focus();
+}
+
+function formatDateTime(timestamp) {
+  if (!timestamp) return "";
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  return date.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function canDeleteMessage(createdAt) {
+  if (!createdAt) return false;
+  const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
+  return (Date.now() - date.getTime()) <= (30 * 60 * 1000);
+}
+
+function threadIdFor(uid1, uid2) {
+  return [uid1, uid2].sort().join("_");
+}
+
+async function getRelationship(me, other) {
+  const docId = threadIdFor(me, other);
+  const ref = await db.collection("relationships").doc(docId).get();
+  if (!ref.exists) return { status: "none" };
+  return ref.data();
+}
+
+async function selectConversation(otherUserId) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  selectedUserId = otherUserId;
+  currentThreadId = threadIdFor(user.uid, otherUserId);
+
+  const profileSnap = await db.collection("users").doc(otherUserId).get();
+  selectedUserProfile = profileSnap.exists ? profileSnap.data() : { fullName: "Member" };
+
+  document.getElementById("chat-title").innerHTML = `<a class="profile-link" href="profile.html?uid=${otherUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a>`;
+  document.getElementById("chat-subtitle").textContent = selectedUserProfile.institution || "Private conversation";
+  document.getElementById("chat-user-summary").innerHTML = `
+    ${avatarHtml(selectedUserProfile)}
+    <div>
+      <h3><a class="profile-link" href="profile.html?uid=${otherUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a></h3>
+      <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
+    </div>
+  `;
+
+  const rel = await getRelationship(user.uid, otherUserId);
+  currentRelationship = rel.status || "none";
+  renderInvitationBanner(rel);
+  loadMessages();
+}
+
+function renderInvitationBanner(rel) {
+  const banner = document.getElementById("invitation-banner");
+  banner.classList.add("hidden-banner");
+  banner.innerHTML = "";
+
+  if (!selectedUserId) return;
+
+  if (rel.status === "friends") return;
+
+  if (rel.status === "pending" && rel.from === auth.currentUser.uid) {
+    banner.classList.remove("hidden-banner");
+    banner.innerHTML = `<strong>Invitation sent.</strong> The first message is waiting for acceptance.`;
+    return;
+  }
+
+  if (rel.status === "pending" && rel.to === auth.currentUser.uid) {
+    banner.classList.remove("hidden-banner");
+    banner.innerHTML = `
+      <strong>Invitation received.</strong>
+      <div class="banner-actions">
+        <button class="small-action-btn" onclick="acceptInvitation()">Accept</button>
+        <button class="small-action-btn danger-action-btn" onclick="declineInvitation()">Decline</button>
+      </div>
+    `;
+  }
+}
+
+async function acceptInvitation() {
+  const user = auth.currentUser;
+  if (!user || !selectedUserId) return;
+  const relId = threadIdFor(user.uid, selectedUserId);
+
+  await db.collection("relationships").doc(relId).set({
+    users: [user.uid, selectedUserId],
+    status: "friends",
+    from: selectedUserId,
+    to: user.uid,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  renderInvitationBanner({ status: "friends" });
+  loadFriends();
+  loadInvitations();
+}
+
+async function declineInvitation() {
+  const user = auth.currentUser;
+  if (!user || !selectedUserId) return;
+  const relId = threadIdFor(user.uid, selectedUserId);
+
+  await db.collection("relationships").doc(relId).delete();
+
+  const threadRef = db.collection("privateThreads").doc(relId);
+  const msgs = await threadRef.collection("messages").get();
+  const batch = db.batch();
+  msgs.forEach(m => batch.delete(m.ref));
+  batch.delete(threadRef);
+  await batch.commit();
+
+  document.getElementById("invitation-banner").classList.add("hidden-banner");
+  document.getElementById("chat-messages").innerHTML = "<p class='empty-text'>Invitation refused.</p>";
+  loadInvitations();
+}
+
+function loadMessages() {
+  if (!currentThreadId) return;
+
+  db.collection("privateThreads").doc(currentThreadId).collection("messages")
+    .orderBy("createdAt", "asc")
+    .onSnapshot(async (snapshot) => {
+      const user = auth.currentUser;
+      const container = document.getElementById("chat-messages");
+      let html = "";
+
+      for (const doc of snapshot.docs) {
+        const m = doc.data();
+        let sender = {};
+        try {
+          const senderDoc = await db.collection("users").doc(m.senderId).get();
+          if (senderDoc.exists) sender = senderDoc.data();
+        } catch (_) {}
+
+        const own = user && user.uid === m.senderId;
+        html += `
+          <div class="msg-bubble ${own ? 'own-msg' : ''}">
+            <div class="msg-head">
+              ${avatarHtml(sender)}
+              <strong><a class="profile-link" href="profile.html?uid=${m.senderId}">${escapeHtml(sender.fullName || "Member")}</a></strong>
+            </div>
+            <div class="msg-text">${escapeHtml(m.text || "")}</div>
+            <div class="msg-foot">
+              <span>${escapeHtml(formatDateTime(m.createdAt))}</span>
+              ${own && canDeleteMessage(m.createdAt) ? `<button class="delete-message-btn" onclick="deleteMessage('${doc.id}')">Delete</button>` : ""}
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html || "<p class='empty-text'>No message yet.</p>";
+      container.scrollTop = container.scrollHeight;
+    });
+}
+
+async function sendMessage() {
+  const user = auth.currentUser;
+  if (!user || !selectedUserId) {
+    alert("Select a member first.");
+    return;
+  }
+
+  const input = document.getElementById("message-input");
+  const text = input.value.trim();
+  if (!text) return;
+
+  const relId = threadIdFor(user.uid, selectedUserId);
+  const rel = await getRelationship(user.uid, selectedUserId);
+
+  if (rel.status === "none") {
+    await db.collection("relationships").doc(relId).set({
+      users: [user.uid, selectedUserId],
+      status: "pending",
+      from: user.uid,
+      to: selectedUserId,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    currentRelationship = "pending";
+    renderInvitationBanner({ status: "pending", from: user.uid, to: selectedUserId });
+  }
+
+  if (rel.status === "pending" && rel.to === user.uid) {
+    alert("Accept the invitation first.");
+    return;
+  }
+
+  await db.collection("privateThreads").doc(relId).set({
+    participants: [user.uid, selectedUserId],
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+
+  await db.collection("privateThreads").doc(relId).collection("messages").add({
+    senderId: user.uid,
+    receiverId: selectedUserId,
+    text,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  input.value = "";
+  loadInvitations();
+  loadFriends();
+}
+
+async function deleteMessage(messageId) {
+  if (!currentThreadId) return;
+  await db.collection("privateThreads").doc(currentThreadId).collection("messages").doc(messageId).delete();
+}
+
+async function loadAllMembers() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  db.collection("users").orderBy("fullName", "asc").onSnapshot((snapshot) => {
+    allMembersCache = [];
+    let html = "";
+
+    snapshot.forEach((doc) => {
+      const p = doc.data();
+      if (doc.id === user.uid) return;
+
+      allMembersCache.push({ id: doc.id, ...p });
+      html += `
+        <div class="member-list-item" data-search="${escapeHtml((p.fullName || "").toLowerCase())} ${escapeHtml((p.institution || "").toLowerCase())}" onclick="selectConversation('${doc.id}')">
+          ${avatarHtml(p)}
+          <div class="member-text">
+            <strong><a class="profile-link" href="profile.html?uid=${doc.id}" onclick="event.stopPropagation()">${escapeHtml(p.fullName || "Member")}</a></strong>
+            <span>${escapeHtml(p.institution || "")}</span>
+          </div>
+        </div>
+      `;
+    });
+
+    document.getElementById("all-members").innerHTML = html || "<p class='empty-text'>No member yet.</p>";
+  });
+}
+
+async function loadFriends() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  db.collection("relationships")
+    .where("users", "array-contains", user.uid)
+    .where("status", "==", "friends")
+    .onSnapshot(async (snapshot) => {
+      let html = "";
+
+      for (const doc of snapshot.docs) {
+        const data = doc.data();
+        const otherId = data.users.find(id => id !== user.uid);
+        const otherSnap = await db.collection("users").doc(otherId).get();
+        const other = otherSnap.exists ? otherSnap.data() : { fullName: "Member" };
+
+        html += `
+          <div class="member-list-item" onclick="selectConversation('${otherId}')">
+            ${avatarHtml(other)}
+            <div class="member-text">
+              <strong><a class="profile-link" href="profile.html?uid=${otherId}" onclick="event.stopPropagation()">${escapeHtml(other.fullName || "Member")}</a></strong>
+              <span>${escapeHtml(other.institution || "")}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById("friends-list").innerHTML = html || "<p class='empty-text'>No friend yet.</p>";
+    });
+}
+
+async function loadInvitations() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  db.collection("relationships")
+    .where("users", "array-contains", user.uid)
+    .where("status", "==", "pending")
+    .onSnapshot(async (snapshot) => {
+      let html = "";
+
+      for (const doc of snapshot.docs) {
+        const data = doc.data();
+        const otherId = data.from === user.uid ? data.to : data.from;
+        const otherSnap = await db.collection("users").doc(otherId).get();
+        const other = otherSnap.exists ? otherSnap.data() : { fullName: "Member" };
+        const label = data.to === user.uid ? "Received" : "Sent";
+
+        html += `
+          <div class="member-list-item" onclick="selectConversation('${otherId}')">
+            ${avatarHtml(other)}
+            <div class="member-text">
+              <strong><a class="profile-link" href="profile.html?uid=${otherId}" onclick="event.stopPropagation()">${escapeHtml(other.fullName || "Member")}</a></strong>
+              <span>${label}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById("invites-list").innerHTML = html || "<p class='empty-text'>No invitation.</p>";
+    });
+}
+
+function loadOnlineMembers() {
+  rtdb.ref("/status").on("value", async (snapshot) => {
+    const me = auth.currentUser;
+    let html = "";
+
+    const items = [];
+    snapshot.forEach(child => items.push({ uid: child.key, ...child.val() }));
+
+    for (const item of items) {
+      if (me && item.uid === me.uid) continue;
+      if (item.state !== "online") continue;
+
+      const snap = await db.collection("users").doc(item.uid).get();
+      const p = snap.exists ? snap.data() : { fullName: "Member" };
+
+      html += `
+        <div class="member-list-item" onclick="selectConversation('${item.uid}')">
+          ${avatarHtml(p)}
+          <div class="member-text">
+            <strong><a class="profile-link" href="profile.html?uid=${item.uid}" onclick="event.stopPropagation()">${escapeHtml(p.fullName || "Member")}</a></strong>
+            <span>Online</span>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById("online-list").innerHTML = html || "<p class='empty-text'>Nobody online.</p>";
+  });
+}
+
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = "insights.html";
+    return;
+  }
+
+  const snap = await db.collection("users").doc(user.uid).get();
+  currentUserProfile = snap.exists ? snap.data() : { fullName: user.displayName || "Member" };
+
+  document.getElementById("current-user-avatar").outerHTML = avatarHtml(currentUserProfile, "large-avatar");
+  document.getElementById("current-user-name").textContent = currentUserProfile.fullName || "Member";
+
+  loadAllMembers();
+  loadFriends();
+  loadInvitations();
+  loadOnlineMembers();
+});
+</script>
+</body>
+</html>
