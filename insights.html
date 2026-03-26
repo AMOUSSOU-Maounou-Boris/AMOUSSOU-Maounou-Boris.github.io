@@ -1,180 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Insights</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insights</title>
+  <link rel="stylesheet" href="style.css">
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 </head>
-
 <body>
 
 <nav>
-<ul>
-<li><a href="index.html">Home</a></li>
-<li><a href="about.html">About</a></li>
-<li><a href="research.html">Research</a></li>
-<li><a href="resume.html">Resume</a></li>
-<li><a href="contact.html">Contact</a></li>
-<li><a href="insights.html">Insights</a></li>
-</ul>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="research.html">Research</a></li>
+    <li><a href="resume.html">Resume</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="insights.html">Insights</a></li>
+  </ul>
 </nav>
 
 <div class="container">
 
-<aside class="sidebar">
-<img src="profile.jpg" class="profile-img">
-<h2>Maounou Boris AMOUSSOU</h2>
-<p>Chemical Engineer<br>Green Chemistry & Environment</p>
+  <aside class="sidebar">
+    <img src="profile.jpg" class="profile-img" alt="Profile photo">
 
-<!-- LOGIN -->
-<button onclick="login()">Login with Google</button>
-<button onclick="logout()">Logout</button>
+    <h2>Maounou Boris AMOUSSOU</h2>
+    <p>Chemical Engineer<br>Green Chemistry &amp; Environment</p>
 
-<p id="user-info"></p>
+    <div class="auth-box">
+      <h3>Member Access</h3>
 
-</aside>
+      <input type="email" id="email" placeholder="Email" class="auth-input">
+      <input type="password" id="password" placeholder="Password" class="auth-input">
 
-<main>
+      <div class="auth-actions">
+        <button class="auth-btn" onclick="signUp()">Sign up</button>
+        <button class="auth-btn" onclick="signIn()">Login</button>
+      </div>
 
-<section class="card post" id="post1">
-<h3>Photocatalysis and Water Treatment</h3>
-<p class="date">March 2026</p>
+      <div class="auth-actions">
+        <button class="auth-btn secondary" onclick="resetPassword()">Reset password</button>
+        <button class="auth-btn secondary" onclick="logout()">Logout</button>
+      </div>
 
-<p>BaTiO₃-based photocatalysts for degradation of pollutants.</p>
+      <p id="user-info" class="user-status">Not connected</p>
+    </div>
+  </aside>
 
-<div class="actions">
-<button onclick="likePost('post1')">👍 Like <span id="likes-post1">0</span></button>
-</div>
+  <main>
 
-<div class="comments">
-<input type="text" id="comment-input-post1" placeholder="Write a comment...">
-<button onclick="addComment('post1')">Send</button>
+    <section class="card post" id="post1">
+      <h3>Scientific Insight</h3>
+      <p class="date">March 2026</p>
 
-<div id="comments-post1"></div>
-</div>
+      <p>
+        Reflections on sustainable chemistry, environmental treatment approaches,
+        and energy-related research perspectives.
+      </p>
 
-</section>
+      <div class="actions">
+        <button class="small-btn" onclick="likePost('post1')">
+          👍 Like <span id="likes-post1">0</span>
+        </button>
+      </div>
 
-</main>
+      <div class="comments-box">
+        <h4>Comments</h4>
+
+        <div class="new-comment">
+          <textarea id="comment-input-post1" placeholder="Write a comment..."></textarea>
+          <button class="small-btn" onclick="addComment('post1')">Send</button>
+        </div>
+
+        <div id="comments-post1"></div>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
+      <div class="socials">
+        <a href="#" target="_blank" rel="noopener noreferrer">Google Scholar</a>
+        <a href="#" target="_blank" rel="noopener noreferrer">ResearchGate</a>
+        <a href="#" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
+      </div>
+    </footer>
+
+  </main>
 </div>
 
 <script>
-/* 🔥 CONFIG */
-const firebaseConfig = {
-  apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
-  authDomain: "boris-research-hub.firebaseapp.com",
-  projectId: "boris-research-hub",
-  storageBucket: "boris-research-hub.firebasestorage.app",
-  messagingSenderId: "71055508172",
-  appId: "1:71055508172:web:72229e3f5ad664eb35b869",
-  measurementId: "G-9Q6SJ96NBS"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
+    authDomain: "boris-research-hub.firebaseapp.com",
+    projectId: "boris-research-hub",
+    storageBucket: "boris-research-hub.firebasestorage.app",
+    messagingSenderId: "71055508172",
+    appId: "1:71055508172:web:72229e3f5ad664eb35b869",
+    measurementId: "G-9Q6SJ96NBS"
+  };
 
-firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
-const auth = firebase.auth();
+  const db = firebase.firestore();
+  const auth = firebase.auth();
 
-/* 🔐 LOGIN */
-function login(){
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider);
-}
+  async function ensurePostExists(postId) {
+    const ref = db.collection("posts").doc(postId);
+    const doc = await ref.get();
 
-/* 🚪 LOGOUT */
-function logout(){
-  auth.signOut();
-}
-
-/* 👤 USER STATE */
-auth.onAuthStateChanged(user=>{
-  if(user){
-    document.getElementById("user-info").innerHTML =
-      `<img src="${user.photoURL}" width="30"> ${user.displayName}`;
-  } else {
-    document.getElementById("user-info").innerText = "Not connected";
+    if (!doc.exists) {
+      await ref.set({
+        title: "Scientific Insight",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        likes: 0
+      });
+    }
   }
-});
 
-/* 👍 LIKE */
-function likePost(postId){
-  const ref = db.collection("posts").doc(postId);
+  function getEmailAndPassword() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    return { email, password };
+  }
 
-  ref.get().then(doc=>{
-    if(doc.exists){
-      let likes = doc.data().likes || 0;
-      ref.update({likes: likes + 1});
+  async function signUp() {
+    const { email, password } = getEmailAndPassword();
+
+    if (!email || !password) {
+      alert("Please enter your email and password.");
+      return;
+    }
+
+    try {
+      await auth.createUserWithEmailAndPassword(email, password);
+      alert("Account created successfully.");
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  async function signIn() {
+    const { email, password } = getEmailAndPassword();
+
+    if (!email || !password) {
+      alert("Please enter your email and password.");
+      return;
+    }
+
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  async function resetPassword() {
+    const email = document.getElementById("email").value.trim();
+
+    if (!email) {
+      alert("Enter your email first.");
+      return;
+    }
+
+    try {
+      await auth.sendPasswordResetEmail(email);
+      alert("Password reset email sent.");
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  function logout() {
+    auth.signOut();
+  }
+
+  auth.onAuthStateChanged((user) => {
+    const el = document.getElementById("user-info");
+
+    if (user) {
+      el.textContent = `Connected as ${user.email}`;
     } else {
-      ref.set({likes: 1});
+      el.textContent = "Not connected";
     }
   });
-}
 
-/* 🔄 LOAD LIKES */
-function loadLikes(postId){
-  db.collection("posts").doc(postId)
-  .onSnapshot(doc=>{
-    if(doc.exists){
-      document.getElementById("likes-"+postId).innerText = doc.data().likes;
-    }
-  });
-}
+  async function likePost(postId) {
+    await ensurePostExists(postId);
+    const ref = db.collection("posts").doc(postId);
 
-/* 💬 COMMENT AVEC USER */
-function addComment(postId){
-  const user = auth.currentUser;
-  const input = document.getElementById("comment-input-"+postId);
-
-  if(!user){
-    alert("Login first !");
-    return;
+    await db.runTransaction(async (tx) => {
+      const doc = await tx.get(ref);
+      const likes = (doc.data().likes || 0) + 1;
+      tx.update(ref, { likes });
+    });
   }
 
-  if(input.value.trim() === "") return;
-
-  db.collection("comments").add({
-    postId: postId,
-    text: input.value,
-    name: user.displayName,
-    photo: user.photoURL,
-    date: new Date()
-  });
-
-  input.value = "";
-}
-
-/* 🔄 LOAD COMMENTS */
-function loadComments(postId){
-  db.collection("comments")
-  .where("postId","==",postId)
-  .orderBy("date")
-  .onSnapshot(snapshot=>{
-    let html = "";
-    snapshot.forEach(doc=>{
-      const c = doc.data();
-
-      html += `
-      <div class="comment">
-        <img src="${c.photo}" width="30">
-        <b>${c.name}</b>
-        <p>${c.text}</p>
-      </div>`;
+  function loadLikes(postId) {
+    db.collection("posts").doc(postId).onSnapshot((doc) => {
+      const likes = doc.exists ? (doc.data().likes || 0) : 0;
+      document.getElementById(`likes-${postId}`).textContent = likes;
     });
+  }
 
-    document.getElementById("comments-"+postId).innerHTML = html;
+  async function addComment(postId) {
+    const user = auth.currentUser;
+    const input = document.getElementById(`comment-input-${postId}`);
+    const text = input.value.trim();
+
+    if (!user) {
+      alert("Please sign in first.");
+      return;
+    }
+
+    if (!text) return;
+
+    await ensurePostExists(postId);
+
+    await db.collection("posts")
+      .doc(postId)
+      .collection("comments")
+      .add({
+        text,
+        userId: user.uid,
+        authorEmail: user.email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+    input.value = "";
+  }
+
+  async function addReply(postId, commentId) {
+    const user = auth.currentUser;
+    const input = document.getElementById(`reply-input-${commentId}`);
+    const text = input.value.trim();
+
+    if (!user) {
+      alert("Please sign in first.");
+      return;
+    }
+
+    if (!text) return;
+
+    await db.collection("posts")
+      .doc(postId)
+      .collection("comments")
+      .doc(commentId)
+      .collection("replies")
+      .add({
+        text,
+        userId: user.uid,
+        authorEmail: user.email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+    input.value = "";
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function loadReplies(postId, commentId) {
+    const repliesContainer = document.getElementById(`replies-${commentId}`);
+
+    db.collection("posts")
+      .doc(postId)
+      .collection("comments")
+      .doc(commentId)
+      .collection("replies")
+      .orderBy("createdAt", "asc")
+      .onSnapshot((snapshot) => {
+        let html = "";
+
+        snapshot.forEach((doc) => {
+          const r = doc.data();
+          html += `
+            <div class="reply">
+              <div class="comment-meta">
+                <strong>${escapeHtml(r.authorEmail || "Member")}</strong>
+              </div>
+              <div class="comment-text">${escapeHtml(r.text || "")}</div>
+            </div>
+          `;
+        });
+
+        repliesContainer.innerHTML = html;
+      });
+  }
+
+  function loadComments(postId) {
+    db.collection("posts")
+      .doc(postId)
+      .collection("comments")
+      .orderBy("createdAt", "asc")
+      .onSnapshot((snapshot) => {
+        let html = "";
+
+        snapshot.forEach((doc) => {
+          const c = doc.data();
+          const commentId = doc.id;
+
+          html += `
+            <div class="comment">
+              <div class="comment-meta">
+                <strong>${escapeHtml(c.authorEmail || "Member")}</strong>
+              </div>
+              <div class="comment-text">${escapeHtml(c.text || "")}</div>
+
+              <div class="reply-box">
+                <input type="text" id="reply-input-${commentId}" placeholder="Reply to this comment...">
+                <button class="small-btn" onclick="addReply('${postId}', '${commentId}')">Reply</button>
+              </div>
+
+              <div id="replies-${commentId}" class="replies"></div>
+            </div>
+          `;
+        });
+
+        const commentsContainer = document.getElementById(`comments-${postId}`);
+        commentsContainer.innerHTML = html;
+
+        snapshot.forEach((doc) => loadReplies(postId, doc.id));
+      });
+  }
+
+  ensurePostExists("post1").then(() => {
+    loadLikes("post1");
+    loadComments("post1");
   });
-}
-
-/* INIT */
-loadLikes("post1");
-loadComments("post1");
-
 </script>
 
 </body>
