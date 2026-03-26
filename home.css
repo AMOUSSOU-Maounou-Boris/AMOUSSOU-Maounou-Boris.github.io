@@ -1,164 +1,247 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home | Boris Research Hub</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="home.css" />
-</head>
-<body class="home-page">
+.home-nav {
+  background: #0b2239;
+  padding: 12px 18px;
+}
 
-  <nav class="top-nav">
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="research.html">Research</a></li>
-      <li><a href="resume.html">Resume</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="insights.html">Insights</a></li>
-    </ul>
-  </nav>
+.home-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
 
-  <div class="home-layout">
-    <aside class="home-sidebar">
-      <img src="profile.jpg" alt="Profile photo" class="home-profile-img">
+.home-nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+}
 
-      <h1 class="home-name">Maounou Boris AMOUSSOU</h1>
-      <p class="home-role">Chemical Engineer</p>
-      <p class="home-role small">Green Chemistry &amp; Environment</p>
+.home-nav a:hover {
+  text-decoration: underline;
+}
 
-      <div class="sidebar-search">
-        <input type="text" id="site-search" placeholder="Search page..." />
-        <button type="button" onclick="searchSite()">Search</button>
-      </div>
-    </aside>
+.home-container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  min-height: calc(100vh - 48px);
+}
 
-    <main class="home-main">
-      <section class="hero-block">
-        <div class="hero-text">
-          <h2>Welcome to my scientific universe</h2>
-          <p>
-            Discover my academic journey, my research activities, my laboratory experience,
-            my scientific communications, and my interests in green chemistry,
-            catalysis, environment, and sustainable energy.
-          </p>
-        </div>
+.home-sidebar {
+  background: linear-gradient(180deg, #123455 0%, #0b2239 100%);
+  color: white;
+  padding: 28px 20px;
+}
 
-        <section class="hero-slider">
-          <div class="slides-wrapper">
-            <div class="slide active">
-              <img src="photo1.jpg" alt="Laboratory photo">
-            </div>
-            <div class="slide">
-              <img src="photo2.jpg" alt="Conference photo">
-            </div>
-            <div class="slide">
-              <img src="photo3.jpg" alt="Research activity photo">
-            </div>
-          </div>
+.home-sidebar h2 {
+  text-align: center;
+  margin: 10px 0 8px;
+  font-size: 24px;
+}
 
-          <button class="slider-btn prev" onclick="changeSlide(-1)">❮</button>
-          <button class="slider-btn next" onclick="changeSlide(1)">❯</button>
+.home-sidebar p {
+  text-align: center;
+  line-height: 1.5;
+  color: #dbe6f2;
+}
 
-          <div class="slider-dots">
-            <span class="dot active" onclick="goToSlide(0)"></span>
-            <span class="dot" onclick="goToSlide(1)"></span>
-            <span class="dot" onclick="goToSlide(2)"></span>
-          </div>
-        </section>
-      </section>
+.profile-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 18px;
+  border: 4px solid rgba(255,255,255,0.2);
+}
 
-      <section class="home-info">
-        <div class="info-card">
-          <h3>Research Focus</h3>
-          <p>
-            My work explores materials chemistry, photocatalysis, electrocatalysis,
-            environmental treatment, and clean energy production strategies.
-          </p>
-        </div>
+.search-box {
+  margin-top: 28px;
+  text-align: center;
+}
 
-        <div class="info-card">
-          <h3>Academic Path</h3>
-          <p>
-            This site presents my scientific training, my academic achievements,
-            my projects, and my future research ambitions.
-          </p>
-        </div>
+.search-box h3 {
+  margin-bottom: 12px;
+  color: white;
+  font-size: 18px;
+}
 
-        <div class="info-card">
-          <h3>Scientific Activities</h3>
-          <p>
-            You will find here information about my conferences, collaborations,
-            laboratory work, and scientific communication.
-          </p>
-        </div>
-      </section>
-    </main>
-  </div>
+.search-input {
+  width: 100%;
+  padding: 11px 12px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  box-sizing: border-box;
+}
 
-  <script>
-    let currentSlide = 0;
-    const slides = document.querySelectorAll(".slide");
-    const dots = document.querySelectorAll(".dot");
-    let autoSlide = null;
+.search-btn {
+  background: white;
+  color: #0b2239;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+}
 
-    function showSlide(index) {
-      if (!slides.length) return;
+.home-main {
+  padding: 26px;
+  background: #eef3f8;
+}
 
-      if (index >= slides.length) {
-        currentSlide = 0;
-      } else if (index < 0) {
-        currentSlide = slides.length - 1;
-      } else {
-        currentSlide = index;
-      }
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 8px 26px rgba(10, 25, 41, 0.08);
+  margin-bottom: 24px;
+}
 
-      slides.forEach((slide, i) => {
-        slide.classList.toggle("active", i === currentSlide);
-      });
+.hero-card h1 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #0b2239;
+  font-size: 34px;
+}
 
-      dots.forEach((dot, i) => {
-        dot.classList.toggle("active", i === currentSlide);
-      });
-    }
+.hero-text {
+  margin: 0;
+  color: #4b5c70;
+  line-height: 1.7;
+  font-size: 17px;
+}
 
-    function changeSlide(step) {
-      showSlide(currentSlide + step);
-      restartAutoSlide();
-    }
+.slider-card h3 {
+  margin-top: 0;
+  margin-bottom: 18px;
+  color: #0b2239;
+  font-size: 26px;
+}
 
-    function goToSlide(index) {
-      showSlide(index);
-      restartAutoSlide();
-    }
+.hero-slider {
+  position: relative;
+  width: 100%;
+}
 
-    function startAutoSlide() {
-      autoSlide = setInterval(() => {
-        showSlide(currentSlide + 1);
-      }, 4000);
-    }
+.slides-wrapper {
+  position: relative;
+  width: 100%;
+  height: 560px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #eef3f8;
+}
 
-    function restartAutoSlide() {
-      clearInterval(autoSlide);
-      startAutoSlide();
-    }
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    function searchSite() {
-      const q = document.getElementById("site-search").value.trim().toLowerCase();
-      if (!q) return;
+.slide.active {
+  opacity: 1;
+  z-index: 1;
+}
 
-      if (q.includes("about")) window.location.href = "about.html";
-      else if (q.includes("research")) window.location.href = "research.html";
-      else if (q.includes("resume") || q.includes("cv")) window.location.href = "resume.html";
-      else if (q.includes("contact")) window.location.href = "contact.html";
-      else if (q.includes("insight")) window.location.href = "insights.html";
-      else if (q.includes("home")) window.location.href = "index.html";
-      else alert("No direct result found.");
-    }
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  display: block;
+  background: #eef3f8;
+}
 
-    showSlide(0);
-    startAutoSlide();
-  </script>
-</body>
-</html>
+/* Boutons du slider */
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(11, 34, 57, 0.72);
+  color: white;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  z-index: 2;
+}
+
+.slider-btn.prev {
+  left: 14px;
+}
+
+.slider-btn.next {
+  right: 14px;
+}
+
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #97a4b3;
+  cursor: pointer;
+}
+
+.dot.active {
+  background: #0b2239;
+}
+
+.home-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.info-card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #0b2239;
+  font-size: 22px;
+}
+
+.info-card p {
+  margin: 0;
+  line-height: 1.7;
+  color: #425468;
+}
+
+@media (max-width: 1100px) {
+  .home-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .home-container {
+    grid-template-columns: 1fr;
+  }
+
+  .home-main {
+    padding: 18px;
+  }
+
+  .slides-wrapper {
+    height: 360px;
+  }
+
+  .hero-card h1 {
+    font-size: 26px;
+  }
+}
