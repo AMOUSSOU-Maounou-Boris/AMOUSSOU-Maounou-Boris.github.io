@@ -34,25 +34,47 @@
     <div class="auth-box">
       <h3>Member Access</h3>
 
-      <input type="email" id="email" placeholder="Email" class="auth-input">
-      <input type="password" id="password" placeholder="Password" class="auth-input">
+      <!-- LOGIN SECTION -->
+      <div class="auth-panel">
+        <input type="email" id="login-email" placeholder="Email" class="auth-input" autocomplete="email">
+        <input type="password" id="login-password" placeholder="Password" class="auth-input" autocomplete="current-password">
 
-      <div class="auth-actions">
-        <button class="auth-btn" onclick="signUp()">Sign up</button>
-        <button class="auth-btn" onclick="signIn()">Login</button>
+        <div class="auth-actions">
+          <button class="auth-btn" onclick="toggleSignup()">Sign up</button>
+          <button class="auth-btn" onclick="signIn()">Login</button>
+        </div>
+
+        <div class="auth-actions">
+          <button class="auth-btn secondary" onclick="resetPassword()">Reset password</button>
+          <button class="auth-btn secondary" onclick="logout()">Logout</button>
+        </div>
+
+        <p id="auth-message" class="auth-message"></p>
+        <p id="user-info" class="user-status">Not connected</p>
       </div>
 
-      <div class="auth-actions">
-        <button class="auth-btn secondary" onclick="resetPassword()">Reset password</button>
-        <button class="auth-btn secondary" onclick="logout()">Logout</button>
-      </div>
+      <!-- SIGNUP SUBSECTION -->
+      <div id="signup-section" class="signup-section hidden-signup">
+        <h4>Create an account</h4>
 
-      <p id="user-info" class="user-status">Not connected</p>
+        <input type="text" id="signup-firstname" placeholder="First name" class="auth-input" autocomplete="given-name">
+        <input type="text" id="signup-lastname" placeholder="Last name" class="auth-input" autocomplete="family-name">
+        <input type="tel" id="signup-phone" placeholder="Phone number" class="auth-input" autocomplete="tel">
+        <input type="email" id="signup-email" placeholder="Email" class="auth-input" autocomplete="email">
+        <input type="password" id="signup-password" placeholder="Password" class="auth-input" autocomplete="new-password">
+        <input type="password" id="signup-password-confirm" placeholder="Confirm password" class="auth-input" autocomplete="new-password">
+
+        <div class="auth-actions">
+          <button class="auth-btn" onclick="signUp()">Create account</button>
+          <button class="auth-btn secondary" onclick="toggleSignup()">Close</button>
+        </div>
+
+        <p id="signup-message" class="auth-message"></p>
+      </div>
     </div>
   </aside>
 
   <main>
-
     <section class="card post" id="post1">
       <h3>Scientific Insight</h3>
       <p class="date">March 2026</p>
@@ -89,7 +111,6 @@
         <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a>
       </div>
     </footer>
-
   </main>
 </div>
 
@@ -109,6 +130,22 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 
+  function setMessage(id, text, isError = false) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.style.color = isError ? "#ffd2d2" : "#d9f6dd";
+  }
+
+  function clearMessage(id) {
+    document.getElementById(id).textContent = "";
+  }
+
+  function toggleSignup() {
+    const box = document.getElementById("signup-section");
+    box.classList.toggle("hidden-signup");
+    clearMessage("signup-message");
+  }
+
   async function ensurePostExists(postId) {
     const ref = db.collection("posts").doc(postId);
     const doc = await ref.get();
@@ -122,56 +159,111 @@
     }
   }
 
-  function getEmailAndPassword() {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    return { email, password };
-  }
-
   async function signUp() {
-    const { email, password } = getEmailAndPassword();
+    const firstName = document.getElementById("signup-firstname").value.trim();
+    const lastName = document.getElementById("signup-lastname").value.trim();
+    const phone = document.getElementById("signup-phone").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
+    const password = document.getElementById("signup-password").value;
+    const confirmPassword = document.getElementById("signup-password-confirm").value;
 
-    if (!email || !password) {
-      alert("Please enter your email and password.");
+    clearMessage("signup-message");
+
+    if (!firstName || !lastName || !phone || !email || !password || !confirmPassword) {
+      setMessage("signup-message", "Please fill in all fields.", true);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setMessage("signup-message", "Passwords do not match.", true);
+      return;
+    }
+
+    if (password.length < 6) {
+      setMessage("signup-message", "Password must contain at least 6 characters.", true);
       return;
     }
 
     try {
-      await auth.createUserWithEmailAndPassword(email, password);
-      alert("Account created successfully.");
+      const cred = await auth.createUserWithEmailAndPassword(email, password);
+
+      await cred.user.updateProfile({
+        displayName: `${firstName} ${lastName}`
+      });
+
+      await db.collection("users").doc(cred.user.uid).set({
+        firstName,
+        lastName,
+        fullName: `${firstName} ${lastName}`,
+        phone,
+        email,
+        uid: cred.user.uid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      setMessage("signup-message", "Account created successfully.");
+      document.getElementById("signup-firstname").value = "";
+      document.getElementById("signup-lastname").value = "";
+      document.getElementById("signup-phone").value = "";
+      document.getElementById("signup-email").value = "";
+      document.getElementById("signup-password").value = "";
+      document.getElementById("signup-password-confirm").value = "";
     } catch (error) {
-      alert(error.message);
+      if (error.code === "auth/email-already-in-use") {
+        setMessage("signup-message", "This email is already in use.", true);
+      } else if (error.code === "auth/invalid-email") {
+        setMessage("signup-message", "Invalid email address.", true);
+      } else if (error.code === "auth/weak-password") {
+        setMessage("signup-message", "Password is too weak.", true);
+      } else {
+        setMessage("signup-message", error.message, true);
+      }
     }
   }
 
   async function signIn() {
-    const { email, password } = getEmailAndPassword();
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-password").value;
+
+    clearMessage("auth-message");
 
     if (!email || !password) {
-      alert("Please enter your email and password.");
+      setMessage("auth-message", "Please enter your email and password.", true);
       return;
     }
 
     try {
       await auth.signInWithEmailAndPassword(email, password);
+      setMessage("auth-message", "Login successful.");
     } catch (error) {
-      alert(error.message);
+      if (
+        error.code === "auth/invalid-login-credentials" ||
+        error.code === "auth/wrong-password" ||
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/invalid-email"
+      ) {
+        setMessage("auth-message", "Email ou mot de passe incorrect.", true);
+      } else {
+        setMessage("auth-message", error.message, true);
+      }
     }
   }
 
   async function resetPassword() {
-    const email = document.getElementById("email").value.trim();
+    const email = document.getElementById("login-email").value.trim();
+
+    clearMessage("auth-message");
 
     if (!email) {
-      alert("Enter your email first.");
+      setMessage("auth-message", "Enter your email first.", true);
       return;
     }
 
     try {
       await auth.sendPasswordResetEmail(email);
-      alert("Password reset email sent.");
+      setMessage("auth-message", "Password reset email sent.");
     } catch (error) {
-      alert(error.message);
+      setMessage("auth-message", error.message, true);
     }
   }
 
@@ -179,11 +271,18 @@
     auth.signOut();
   }
 
-  auth.onAuthStateChanged((user) => {
+  auth.onAuthStateChanged(async (user) => {
     const el = document.getElementById("user-info");
 
     if (user) {
-      el.textContent = `Connected as ${user.email}`;
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      const info = userDoc.exists ? userDoc.data() : null;
+
+      if (info) {
+        el.textContent = `Connected as ${info.fullName} (${info.email})`;
+      } else {
+        el.textContent = `Connected as ${user.email}`;
+      }
     } else {
       el.textContent = "Not connected";
     }
@@ -219,6 +318,9 @@
 
     if (!text) return;
 
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    const userInfo = userDoc.exists ? userDoc.data() : null;
+
     await ensurePostExists(postId);
 
     await db.collection("posts")
@@ -228,6 +330,7 @@
         text,
         userId: user.uid,
         authorEmail: user.email,
+        authorName: userInfo ? userInfo.fullName : (user.displayName || user.email),
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -246,6 +349,9 @@
 
     if (!text) return;
 
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    const userInfo = userDoc.exists ? userDoc.data() : null;
+
     await db.collection("posts")
       .doc(postId)
       .collection("comments")
@@ -255,6 +361,7 @@
         text,
         userId: user.uid,
         authorEmail: user.email,
+        authorName: userInfo ? userInfo.fullName : (user.displayName || user.email),
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -287,7 +394,8 @@
           html += `
             <div class="reply">
               <div class="comment-meta">
-                <strong>${escapeHtml(r.authorEmail || "Member")}</strong>
+                <strong>${escapeHtml(r.authorName || "Member")}</strong>
+                <span class="comment-email">${escapeHtml(r.authorEmail || "")}</span>
               </div>
               <div class="comment-text">${escapeHtml(r.text || "")}</div>
             </div>
@@ -313,7 +421,8 @@
           html += `
             <div class="comment">
               <div class="comment-meta">
-                <strong>${escapeHtml(c.authorEmail || "Member")}</strong>
+                <strong>${escapeHtml(c.authorName || "Member")}</strong>
+                <span class="comment-email">${escapeHtml(c.authorEmail || "")}</span>
               </div>
               <div class="comment-text">${escapeHtml(c.text || "")}</div>
 
