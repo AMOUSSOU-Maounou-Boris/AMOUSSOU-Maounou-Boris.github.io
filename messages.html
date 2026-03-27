@@ -46,15 +46,15 @@
 
     <div class="tabs">
       <button class="tab-btn active-tab" onclick="switchTab('all-members', this)" data-i18n="allMembers">All members</button>
-      <button class="tab-btn" onclick="switchTab('friends-list', this)" data-i18n="friends">Friends</button>
-      <button class="tab-btn" onclick="switchTab('invites-list', this)" data-i18n="invitations">Invitations</button>
+      <button class="tab-btn" onclick="switchTab('inbox-list', this)" data-i18n="inbox">Inbox</button>
       <button class="tab-btn" onclick="switchTab('online-list', this)" data-i18n="online">Online</button>
+      <button class="tab-btn" onclick="switchTab('recent-list', this)" data-i18n="recent">Recent</button>
     </div>
 
     <div id="all-members" class="tab-panel"></div>
-    <div id="friends-list" class="tab-panel hidden-panel"></div>
-    <div id="invites-list" class="tab-panel hidden-panel"></div>
+    <div id="inbox-list" class="tab-panel hidden-panel"></div>
     <div id="online-list" class="tab-panel hidden-panel"></div>
+    <div id="recent-list" class="tab-panel hidden-panel"></div>
   </aside>
 
   <main class="messages-main">
@@ -69,11 +69,12 @@
     </section>
 
     <section class="chat-body-card">
-      <div id="invitation-banner" class="invitation-banner hidden-banner"></div>
+      <div id="chat-status-message" class="chat-status-message"></div>
       <div id="chat-messages" class="chat-messages"></div>
 
       <div class="chat-composer">
         <textarea id="message-input" placeholder="Write a private message..."></textarea>
+
         <div class="composer-actions">
           <button class="emoji-btn" onclick="insertEmoji('message-input','😀')">😀</button>
           <button class="emoji-btn" onclick="insertEmoji('message-input','👍')">👍</button>
@@ -110,30 +111,30 @@ let currentUserProfile = null;
 let selectedUserId = null;
 let selectedUserProfile = null;
 let currentThreadId = null;
-let currentRelationship = "none";
 let currentLanguage = localStorage.getItem("site_lang") || "en";
+let threadUnsubscribe = null;
 
 const i18n = {
   en: {
     messaging: "Messaging",
     allMembers: "All members",
-    friends: "Friends",
-    invitations: "Invitations",
-    online: "Online"
+    inbox: "Inbox",
+    online: "Online",
+    recent: "Recent"
   },
   fr: {
     messaging: "Messagerie",
     allMembers: "Tous les membres",
-    friends: "Amis",
-    invitations: "Invitations",
-    online: "En ligne"
+    inbox: "Boîte de réception",
+    online: "En ligne",
+    recent: "Récentes"
   },
   es: {
     messaging: "Mensajería",
     allMembers: "Todos los miembros",
-    friends: "Amigos",
-    invitations: "Invitaciones",
-    online: "En línea"
+    inbox: "Bandeja",
+    online: "En línea",
+    recent: "Recientes"
   }
 };
 
@@ -218,11 +219,10 @@ function threadIdFor(uid1, uid2) {
   return [uid1, uid2].sort().join("_");
 }
 
-async function getRelationship(me, other) {
-  const docId = threadIdFor(me, other);
-  const ref = await db.collection("relationships").doc(docId).get();
-  if (!ref.exists) return { status: "none" };
-  return ref.data();
+function setChatStatus(text, isError = false) {
+  const box = document.getElementById("chat-status-message");
+  box.textContent = text || "";
+  box.style.color = isError ? "#b00020" : "#0b7a3b";
 }
 
 async function selectConversation(otherUserId) {
@@ -249,80 +249,21 @@ async function selectConversation(otherUserId) {
     </div>
   `;
 
-  const rel = await getRelationship(user.uid, otherUserId);
-  currentRelationship = rel.status || "none";
-  renderInvitationBanner(rel);
+  setChatStatus("");
   loadMessages();
-}
-
-function renderInvitationBanner(rel) {
-  const banner = document.getElementById("invitation-banner");
-  banner.classList.add("hidden-banner");
-  banner.innerHTML = "";
-
-  if (!selectedUserId) return;
-
-  if (rel.status === "friends") return;
-
-  if (rel.status === "pending" && rel.from === auth.currentUser.uid) {
-    banner.classList.remove("hidden-banner");
-    banner.innerHTML = `<strong>Invitation sent.</strong> The first message is waiting for acceptance.`;
-    return;
-  }
-
-  if (rel.status === "pending" && rel.to === auth.currentUser.uid) {
-    banner.classList.remove("hidden-banner");
-    banner.innerHTML = `
-      <strong>Invitation received.</strong>
-      <div class="banner-actions">
-        <button class="small-action-btn" onclick="acceptInvitation()">Accept</button>
-        <button class="small-action-btn danger-action-btn" onclick="declineInvitation()">Decline</button>
-      </div>
-    `;
-  }
-}
-
-async function acceptInvitation() {
-  const user = auth.currentUser;
-  if (!user || !selectedUserId) return;
-
-  const relId = threadIdFor(user.uid, selectedUserId);
-  await db.collection("relationships").doc(relId).set({
-    users: [user.uid, selectedUserId],
-    status: "friends",
-    from: selectedUserId,
-    to: user.uid,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
-
-  renderInvitationBanner({ status: "friends" });
-  loadFriends();
-  loadInvitations();
-}
-
-async function declineInvitation() {
-  const user = auth.currentUser;
-  if (!user || !selectedUserId) return;
-
-  const relId = threadIdFor(user.uid, selectedUserId);
-  await db.collection("relationships").doc(relId).delete();
-
-  const threadRef = db.collection("privateThreads").doc(relId);
-  const msgs = await threadRef.collection("messages").get();
-  const batch = db.batch();
-  msgs.forEach(m => batch.delete(m.ref));
-  batch.delete(threadRef);
-  await batch.commit();
-
-  document.getElementById("invitation-banner").classList.add("hidden-banner");
-  document.getElementById("chat-messages").innerHTML = "<p class='empty-text'>Invitation refused.</p>";
-  loadInvitations();
 }
 
 function loadMessages() {
   if (!currentThreadId) return;
 
-  db.collection("privateThreads").doc(currentThreadId).collection("messages")
+  if (threadUnsubscribe) {
+    threadUnsubscribe();
+    threadUnsubscribe = null;
+  }
+
+  threadUnsubscribe = db.collection("privateThreads")
+    .doc(currentThreadId)
+    .collection("messages")
     .orderBy("createdAt", "asc")
     .onSnapshot(async (snapshot) => {
       const user = auth.currentUser;
@@ -332,7 +273,6 @@ function loadMessages() {
       for (const doc of snapshot.docs) {
         const m = doc.data();
         let sender = {};
-
         try {
           const senderDoc = await db.collection("users").doc(m.senderId).get();
           if (senderDoc.exists) sender = senderDoc.data();
@@ -357,6 +297,9 @@ function loadMessages() {
 
       container.innerHTML = html || "<p class='empty-text'>No message yet.</p>";
       container.scrollTop = container.scrollHeight;
+    }, (error) => {
+      console.error("loadMessages error:", error);
+      setChatStatus("Impossible de charger les messages.", true);
     });
 }
 
@@ -376,47 +319,56 @@ async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
 
-  const relId = threadIdFor(user.uid, selectedUserId);
-  const rel = await getRelationship(user.uid, selectedUserId);
+  const sendBtn = document.querySelector(".send-btn");
+  if (sendBtn) sendBtn.disabled = true;
+  setChatStatus("Sending...");
 
-  if (rel.status === "none") {
-    await db.collection("relationships").doc(relId).set({
-      users: [user.uid, selectedUserId],
-      status: "pending",
-      from: user.uid,
-      to: selectedUserId,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  try {
+    const threadRef = db.collection("privateThreads").doc(currentThreadId);
+
+    await threadRef.set({
+      participants: [user.uid, selectedUserId],
+      participantNames: {
+        [user.uid]: currentUserProfile?.fullName || user.displayName || "Member",
+        [selectedUserId]: selectedUserProfile?.fullName || "Member"
+      },
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastMessage: text,
+      lastSenderId: user.uid
+    }, { merge: true });
+
+    await threadRef.collection("messages").add({
+      senderId: user.uid,
+      receiverId: selectedUserId,
+      text,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    currentRelationship = "pending";
-    renderInvitationBanner({ status: "pending", from: user.uid, to: selectedUserId });
+    input.value = "";
+    setChatStatus("Message sent.");
+    loadInbox();
+    loadRecentThreads();
+  } catch (error) {
+    console.error("sendMessage error:", error);
+    setChatStatus("Impossible d'envoyer le message. Vérifie aussi les règles Firestore.", true);
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
   }
-
-  if (rel.status === "pending" && rel.to === user.uid) {
-    alert("Accept the invitation first.");
-    return;
-  }
-
-  await db.collection("privateThreads").doc(relId).set({
-    participants: [user.uid, selectedUserId],
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
-
-  await db.collection("privateThreads").doc(relId).collection("messages").add({
-    senderId: user.uid,
-    receiverId: selectedUserId,
-    text,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  input.value = "";
-  loadInvitations();
-  loadFriends();
 }
 
 async function deleteMessage(messageId) {
   if (!currentThreadId) return;
-  await db.collection("privateThreads").doc(currentThreadId).collection("messages").doc(messageId).delete();
+
+  try {
+    await db.collection("privateThreads")
+      .doc(currentThreadId)
+      .collection("messages")
+      .doc(messageId)
+      .delete();
+  } catch (error) {
+    console.error("deleteMessage error:", error);
+    setChatStatus("Impossible de supprimer le message.", true);
+  }
 }
 
 async function loadAllMembers() {
@@ -461,92 +413,111 @@ async function loadAllMembers() {
   });
 }
 
-async function loadFriends() {
+async function loadInbox() {
   const user = auth.currentUser;
   if (!user) return;
 
-  db.collection("relationships")
-    .where("users", "array-contains", user.uid)
-    .where("status", "==", "friends")
+  db.collection("privateThreads")
+    .where("participants", "array-contains", user.uid)
     .onSnapshot(async (snapshot) => {
+      const container = document.getElementById("inbox-list");
+      const docs = snapshot.docs.sort((a, b) => {
+        const ta = a.data().updatedAt?.toMillis?.() || 0;
+        const tb = b.data().updatedAt?.toMillis?.() || 0;
+        return tb - ta;
+      });
+
       let html = "";
 
-      for (const doc of snapshot.docs) {
+      for (const doc of docs) {
         const data = doc.data();
-        const otherId = data.users.find(id => id !== user.uid);
-        const otherSnap = await db.collection("users").doc(otherId).get();
-        const other = otherSnap.exists ? otherSnap.data() : { fullName: "Member" };
+        const otherUserId = (data.participants || []).find(id => id !== user.uid);
+        if (!otherUserId) continue;
+
+        let other = {};
+        try {
+          const otherDoc = await db.collection("users").doc(otherUserId).get();
+          if (otherDoc.exists) other = otherDoc.data();
+        } catch (_) {}
 
         html += `
-          <div class="member-list-item" onclick="selectConversation('${otherId}')">
+          <div class="member-list-item" onclick="selectConversation('${otherUserId}')">
             ${avatarHtml(other)}
-
             <div class="member-text">
               <strong>
                 <button type="button"
                         class="member-name-btn"
-                        onclick="event.stopPropagation(); selectConversation('${otherId}')">
+                        onclick="event.stopPropagation(); selectConversation('${otherUserId}')">
                   ${escapeHtml(other.fullName || "Member")}
                 </button>
               </strong>
-              <span>${escapeHtml(other.institution || "")}</span>
+              <span>${escapeHtml(data.lastMessage || "")}</span>
             </div>
-
             <button type="button"
                     class="member-profile-btn"
-                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherId}'">
+                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
               Profile
             </button>
           </div>
         `;
       }
 
-      document.getElementById("friends-list").innerHTML = html || "<p class='empty-text'>No friend yet.</p>";
+      container.innerHTML = html || "<p class='empty-text'>No message received yet.</p>";
+    }, (error) => {
+      console.error("loadInbox error:", error);
     });
 }
 
-async function loadInvitations() {
+async function loadRecentThreads() {
   const user = auth.currentUser;
   if (!user) return;
 
-  db.collection("relationships")
-    .where("users", "array-contains", user.uid)
-    .where("status", "==", "pending")
+  db.collection("privateThreads")
+    .where("participants", "array-contains", user.uid)
     .onSnapshot(async (snapshot) => {
+      const container = document.getElementById("recent-list");
+      const docs = snapshot.docs.sort((a, b) => {
+        const ta = a.data().updatedAt?.toMillis?.() || 0;
+        const tb = b.data().updatedAt?.toMillis?.() || 0;
+        return tb - ta;
+      });
+
       let html = "";
 
-      for (const doc of snapshot.docs) {
+      for (const doc of docs.slice(0, 10)) {
         const data = doc.data();
-        const otherId = data.from === user.uid ? data.to : data.from;
-        const otherSnap = await db.collection("users").doc(otherId).get();
-        const other = otherSnap.exists ? otherSnap.data() : { fullName: "Member" };
-        const label = data.to === user.uid ? "Received" : "Sent";
+        const otherUserId = (data.participants || []).find(id => id !== user.uid);
+        if (!otherUserId) continue;
+
+        let other = {};
+        try {
+          const otherDoc = await db.collection("users").doc(otherUserId).get();
+          if (otherDoc.exists) other = otherDoc.data();
+        } catch (_) {}
 
         html += `
-          <div class="member-list-item" onclick="selectConversation('${otherId}')">
+          <div class="member-list-item" onclick="selectConversation('${otherUserId}')">
             ${avatarHtml(other)}
-
             <div class="member-text">
               <strong>
                 <button type="button"
                         class="member-name-btn"
-                        onclick="event.stopPropagation(); selectConversation('${otherId}')">
+                        onclick="event.stopPropagation(); selectConversation('${otherUserId}')">
                   ${escapeHtml(other.fullName || "Member")}
                 </button>
               </strong>
-              <span>${label}</span>
+              <span>${escapeHtml(data.lastMessage || "")}</span>
             </div>
-
             <button type="button"
                     class="member-profile-btn"
-                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherId}'">
+                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
               Profile
             </button>
           </div>
         `;
       }
 
-      document.getElementById("invites-list").innerHTML = html || "<p class='empty-text'>No invitation.</p>";
+      container.innerHTML = html || "<p class='empty-text'>No recent conversation.</p>";
     });
 }
 
@@ -607,9 +578,9 @@ auth.onAuthStateChanged(async (user) => {
   document.getElementById("current-user-name").textContent = currentUserProfile.fullName || "Member";
 
   loadAllMembers();
-  loadFriends();
-  loadInvitations();
+  loadInbox();
   loadOnlineMembers();
+  loadRecentThreads();
 
   const params = new URLSearchParams(window.location.search);
   const preselectedUser = params.get("user");
