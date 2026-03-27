@@ -458,7 +458,6 @@ function cleanupPresence() {
 function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPresenceDot = false) {
   const searchText = `${(profile?.fullName || "").toLowerCase()} ${(profile?.institution || "").toLowerCase()}`;
   const online = isOnline(uid);
-  const presenceLine = presenceText(uid);
 
   return `
     <div class="member-list-item"
@@ -797,37 +796,35 @@ async function logoutFromMessages() {
 
   if (btn) {
     btn.disabled = true;
-    btn.textContent = "Déconnexion...";
+    btn.textContent = "Logging out...";
   }
 
   setChatStatus("Déconnexion en cours...");
 
   try {
-    stopPresenceHeartbeat();
+    sessionStorage.setItem("afterMessagesLogout", "1");
 
-    if (presenceStatusRef && user) {
-      await presenceStatusRef.set({
+    if (user) {
+      rtdb.ref("/status/" + user.uid).set({
         state: "offline",
         fullName: user.displayName || currentUserProfile?.fullName || "Member",
         last_changed: firebase.database.ServerValue.TIMESTAMP
+      }).catch((error) => {
+        console.error("presence logout error:", error);
       });
     }
-  } catch (error) {
-    console.error("presence logout error:", error);
-  }
 
-  cleanupPresence();
+    cleanupPresence();
 
-  try {
-    sessionStorage.setItem("afterMessagesLogout", "1");
     auth.signOut().catch((error) => {
       console.error("logout error:", error);
     });
+
+    window.location.href = "insights.html";
   } catch (error) {
     console.error("logout launch error:", error);
+    window.location.href = "insights.html";
   }
-
-  window.location.replace("insights.html");
 }
 
 function subscribeUsers() {
@@ -896,9 +893,10 @@ function subscribeStatuses() {
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
     const fromLogout = sessionStorage.getItem("afterMessagesLogout");
+
     if (fromLogout) {
       sessionStorage.removeItem("afterMessagesLogout");
-      window.location.replace("insights.html");
+      window.location.href = "insights.html";
       return;
     }
 
@@ -922,7 +920,7 @@ auth.onAuthStateChanged(async (user) => {
   const params = new URLSearchParams(window.location.search);
   const preselectedUser = params.get("user");
   if (preselectedUser) {
-    setTimeout(() => selectConversation(preselectedUser), 600);
+    setTimeout(() => selectConversation(preselectedUser), 300);
   }
 });
 </script>
