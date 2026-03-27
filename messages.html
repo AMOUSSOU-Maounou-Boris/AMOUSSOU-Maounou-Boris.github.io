@@ -111,7 +111,6 @@ let selectedUserId = null;
 let selectedUserProfile = null;
 let currentThreadId = null;
 let currentRelationship = "none";
-let allMembersCache = [];
 let currentLanguage = localStorage.getItem("site_lang") || "en";
 
 const i18n = {
@@ -169,7 +168,10 @@ function avatarHtml(profile, cls = "") {
   const photo = profile?.photoURL || "";
   const color = profile?.avatarColor || "#16385d";
   const initials = escapeHtml(getInitials(profile?.firstName, profile?.lastName, profile?.fullName));
-  if (photo) return `<div class="member-avatar ${cls}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
+
+  if (photo) {
+    return `<div class="member-avatar ${cls}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
+  }
   return `<div class="member-avatar ${cls}" style="background:${escapeHtml(color)}">${initials}</div>`;
 }
 
@@ -225,7 +227,10 @@ async function getRelationship(me, other) {
 
 async function selectConversation(otherUserId) {
   const user = auth.currentUser;
-  if (!user) return;
+  if (!user) {
+    alert("Please log in first.");
+    return;
+  }
 
   selectedUserId = otherUserId;
   currentThreadId = threadIdFor(user.uid, otherUserId);
@@ -233,12 +238,13 @@ async function selectConversation(otherUserId) {
   const profileSnap = await db.collection("users").doc(otherUserId).get();
   selectedUserProfile = profileSnap.exists ? profileSnap.data() : { fullName: "Member" };
 
-  document.getElementById("chat-title").innerHTML = `<a class="profile-link" href="profile.html?uid=${otherUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a>`;
+  document.getElementById("chat-title").textContent = selectedUserProfile.fullName || "Member";
   document.getElementById("chat-subtitle").textContent = selectedUserProfile.institution || "Private conversation";
+
   document.getElementById("chat-user-summary").innerHTML = `
     ${avatarHtml(selectedUserProfile)}
     <div>
-      <h3><a class="profile-link" href="profile.html?uid=${otherUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a></h3>
+      <h3>${escapeHtml(selectedUserProfile.fullName || "Member")}</h3>
       <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
     </div>
   `;
@@ -279,8 +285,8 @@ function renderInvitationBanner(rel) {
 async function acceptInvitation() {
   const user = auth.currentUser;
   if (!user || !selectedUserId) return;
-  const relId = threadIdFor(user.uid, selectedUserId);
 
+  const relId = threadIdFor(user.uid, selectedUserId);
   await db.collection("relationships").doc(relId).set({
     users: [user.uid, selectedUserId],
     status: "friends",
@@ -297,8 +303,8 @@ async function acceptInvitation() {
 async function declineInvitation() {
   const user = auth.currentUser;
   if (!user || !selectedUserId) return;
-  const relId = threadIdFor(user.uid, selectedUserId);
 
+  const relId = threadIdFor(user.uid, selectedUserId);
   await db.collection("relationships").doc(relId).delete();
 
   const threadRef = db.collection("privateThreads").doc(relId);
@@ -326,17 +332,19 @@ function loadMessages() {
       for (const doc of snapshot.docs) {
         const m = doc.data();
         let sender = {};
+
         try {
           const senderDoc = await db.collection("users").doc(m.senderId).get();
           if (senderDoc.exists) sender = senderDoc.data();
         } catch (_) {}
 
         const own = user && user.uid === m.senderId;
+
         html += `
           <div class="msg-bubble ${own ? 'own-msg' : ''}">
             <div class="msg-head">
               ${avatarHtml(sender)}
-              <strong><a class="profile-link" href="profile.html?uid=${m.senderId}">${escapeHtml(sender.fullName || "Member")}</a></strong>
+              <strong>${escapeHtml(sender.fullName || "Member")}</strong>
             </div>
             <div class="msg-text">${escapeHtml(m.text || "")}</div>
             <div class="msg-foot">
@@ -354,8 +362,13 @@ function loadMessages() {
 
 async function sendMessage() {
   const user = auth.currentUser;
-  if (!user || !selectedUserId) {
-    alert("Select a member first.");
+  if (!user) {
+    alert("Please log in first.");
+    return;
+  }
+
+  if (!selectedUserId) {
+    alert("Please select a member first.");
     return;
   }
 
@@ -374,6 +387,7 @@ async function sendMessage() {
       to: selectedUserId,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+
     currentRelationship = "pending";
     renderInvitationBanner({ status: "pending", from: user.uid, to: selectedUserId });
   }
@@ -410,21 +424,35 @@ async function loadAllMembers() {
   if (!user) return;
 
   db.collection("users").orderBy("fullName", "asc").onSnapshot((snapshot) => {
-    allMembersCache = [];
     let html = "";
 
     snapshot.forEach((doc) => {
       const p = doc.data();
       if (doc.id === user.uid) return;
 
-      allMembersCache.push({ id: doc.id, ...p });
       html += `
-        <div class="member-list-item" data-search="${escapeHtml((p.fullName || "").toLowerCase())} ${escapeHtml((p.institution || "").toLowerCase())}" onclick="selectConversation('${doc.id}')">
+        <div class="member-list-item"
+             data-search="${escapeHtml((p.fullName || "").toLowerCase())} ${escapeHtml((p.institution || "").toLowerCase())}"
+             onclick="selectConversation('${doc.id}')">
+
           ${avatarHtml(p)}
+
           <div class="member-text">
-            <strong><a class="profile-link" href="profile.html?uid=${doc.id}" onclick="event.stopPropagation()">${escapeHtml(p.fullName || "Member")}</a></strong>
+            <strong>
+              <button type="button"
+                      class="member-name-btn"
+                      onclick="event.stopPropagation(); selectConversation('${doc.id}')">
+                ${escapeHtml(p.fullName || "Member")}
+              </button>
+            </strong>
             <span>${escapeHtml(p.institution || "")}</span>
           </div>
+
+          <button type="button"
+                  class="member-profile-btn"
+                  onclick="event.stopPropagation(); window.location.href='profile.html?uid=${doc.id}'">
+            Profile
+          </button>
         </div>
       `;
     });
@@ -452,10 +480,23 @@ async function loadFriends() {
         html += `
           <div class="member-list-item" onclick="selectConversation('${otherId}')">
             ${avatarHtml(other)}
+
             <div class="member-text">
-              <strong><a class="profile-link" href="profile.html?uid=${otherId}" onclick="event.stopPropagation()">${escapeHtml(other.fullName || "Member")}</a></strong>
+              <strong>
+                <button type="button"
+                        class="member-name-btn"
+                        onclick="event.stopPropagation(); selectConversation('${otherId}')">
+                  ${escapeHtml(other.fullName || "Member")}
+                </button>
+              </strong>
               <span>${escapeHtml(other.institution || "")}</span>
             </div>
+
+            <button type="button"
+                    class="member-profile-btn"
+                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherId}'">
+              Profile
+            </button>
           </div>
         `;
       }
@@ -484,10 +525,23 @@ async function loadInvitations() {
         html += `
           <div class="member-list-item" onclick="selectConversation('${otherId}')">
             ${avatarHtml(other)}
+
             <div class="member-text">
-              <strong><a class="profile-link" href="profile.html?uid=${otherId}" onclick="event.stopPropagation()">${escapeHtml(other.fullName || "Member")}</a></strong>
+              <strong>
+                <button type="button"
+                        class="member-name-btn"
+                        onclick="event.stopPropagation(); selectConversation('${otherId}')">
+                  ${escapeHtml(other.fullName || "Member")}
+                </button>
+              </strong>
               <span>${label}</span>
             </div>
+
+            <button type="button"
+                    class="member-profile-btn"
+                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherId}'">
+              Profile
+            </button>
           </div>
         `;
       }
@@ -514,10 +568,23 @@ function loadOnlineMembers() {
       html += `
         <div class="member-list-item" onclick="selectConversation('${item.uid}')">
           ${avatarHtml(p)}
+
           <div class="member-text">
-            <strong><a class="profile-link" href="profile.html?uid=${item.uid}" onclick="event.stopPropagation()">${escapeHtml(p.fullName || "Member")}</a></strong>
+            <strong>
+              <button type="button"
+                      class="member-name-btn"
+                      onclick="event.stopPropagation(); selectConversation('${item.uid}')">
+                ${escapeHtml(p.fullName || "Member")}
+              </button>
+            </strong>
             <span>Online</span>
           </div>
+
+          <button type="button"
+                  class="member-profile-btn"
+                  onclick="event.stopPropagation(); window.location.href='profile.html?uid=${item.uid}'">
+            Profile
+          </button>
         </div>
       `;
     }
@@ -535,14 +602,22 @@ auth.onAuthStateChanged(async (user) => {
   const snap = await db.collection("users").doc(user.uid).get();
   currentUserProfile = snap.exists ? snap.data() : { fullName: user.displayName || "Member" };
 
-  document.getElementById("current-user-avatar").outerHTML = avatarHtml(currentUserProfile, "large-avatar");
+  const avatarContainer = document.getElementById("current-user-avatar");
+  avatarContainer.outerHTML = avatarHtml(currentUserProfile, "large-avatar");
   document.getElementById("current-user-name").textContent = currentUserProfile.fullName || "Member";
 
   loadAllMembers();
   loadFriends();
   loadInvitations();
   loadOnlineMembers();
+
+  const params = new URLSearchParams(window.location.search);
+  const preselectedUser = params.get("user");
+  if (preselectedUser) {
+    selectConversation(preselectedUser);
+  }
 });
 </script>
+
 </body>
 </html>
