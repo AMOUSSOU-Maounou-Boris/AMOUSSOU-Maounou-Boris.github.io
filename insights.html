@@ -1548,30 +1548,39 @@ async function deleteMyAccount() {
 
 async function logout() {
   const user = auth.currentUser;
-  if (!user) {
-    try {
-      await auth.signOut();
-    } catch (_) {}
-    closeAccountModal();
-    return;
-  }
+  const logoutButtons = document.querySelectorAll('[onclick="logout()"]');
+
+  logoutButtons.forEach(btn => {
+    btn.disabled = true;
+    btn.textContent = "Logging out...";
+  });
 
   try {
-    await rtdb.ref("/status/" + user.uid).set({
-      state: "offline",
-      fullName: user.displayName || "Member",
-      last_changed: firebase.database.ServerValue.TIMESTAMP
-    });
-  } catch (_) {}
+    if (user) {
+      await rtdb.ref("/status/" + user.uid).set({
+        state: "offline",
+        fullName: user.displayName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
+  } catch (error) {
+    console.error("presence logout error:", error);
+  }
 
   cleanupPresence();
 
   try {
     await auth.signOut();
     closeAccountModal();
-    setMessage("auth-message", "Logged out.");
+    window.location.href = "insights.html";
   } catch (error) {
+    console.error("logout error:", error);
     setMessage("profile-message", error.message, true);
+
+    logoutButtons.forEach(btn => {
+      btn.disabled = false;
+      btn.textContent = "Logout";
+    });
   }
 }
 
