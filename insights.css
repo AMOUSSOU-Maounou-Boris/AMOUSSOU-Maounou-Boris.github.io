@@ -6,18 +6,21 @@ body {
   background: #0b2239;
   padding: 12px 18px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 18px;
+  position: relative;
 }
 
 .insights-nav ul {
   list-style: none;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
   display: flex;
-  gap: 18px;
+  gap: 28px;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 
 .insights-nav a {
@@ -33,6 +36,10 @@ body {
 .lang-switcher {
   display: flex;
   gap: 8px;
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .lang-switcher button {
@@ -179,6 +186,24 @@ body {
   font-size: 14px;
 }
 
+.auth-extra-actions {
+  margin-top: 4px;
+}
+
+.text-link-btn {
+  background: transparent;
+  border: none;
+  color: #dbe6f2;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 0;
+}
+
+.text-link-btn:hover {
+  color: white;
+}
+
 .hidden-block {
   display: none;
 }
@@ -194,6 +219,10 @@ body {
   text-align: left;
   cursor: pointer;
   font-weight: 600;
+}
+
+.secondary-zone-btn {
+  margin-top: 10px;
 }
 
 .hidden-panel {
@@ -763,6 +792,19 @@ body {
   color: white;
 }
 
+.account-security-box {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid #dce5ef;
+  border-radius: 14px;
+  background: #f8fbff;
+}
+
+.account-security-box h4 {
+  margin-top: 0;
+  color: #0b2239;
+}
+
 @media (max-width: 1100px) {
   .hub-grid {
     grid-template-columns: 1fr 1fr;
@@ -772,7 +814,16 @@ body {
 @media (max-width: 900px) {
   .insights-nav {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .lang-switcher {
+    position: static;
+    transform: none;
+    margin-top: 8px;
   }
 
   .insights-container {
