@@ -64,6 +64,7 @@
         <div>
           <h3 id="chat-title">Select a conversation</h3>
           <p id="chat-subtitle">Your private messages will appear here.</p>
+          <p id="chat-presence" class="chat-presence-line"></p>
         </div>
       </div>
     </section>
@@ -113,6 +114,9 @@ let selectedUserProfile = null;
 let currentThreadId = null;
 let currentLanguage = localStorage.getItem("site_lang") || "en";
 let threadUnsubscribe = null;
+let selectedPresenceUnsubscribe = null;
+let presenceConnectedRef = null;
+let presenceStatusRef = null;
 
 const i18n = {
   en: {
@@ -209,6 +213,17 @@ function formatDateTime(timestamp) {
   });
 }
 
+function formatLastSeen(ms) {
+  if (!ms) return "";
+  const date = new Date(ms);
+  return date.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 function canDeleteMessage(createdAt) {
   if (!createdAt) return false;
   const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
@@ -223,6 +238,69 @@ function setChatStatus(text, isError = false) {
   const box = document.getElementById("chat-status-message");
   box.textContent = text || "";
   box.style.color = isError ? "#b00020" : "#0b7a3b";
+}
+
+function unreadCountFor(data, uid) {
+  if (!data || !data.unreadCountByUser) return 0;
+  return data.unreadCountByUser[uid] || 0;
+}
+
+function setupPresence(user, fullName) {
+  cleanupPresence();
+
+  presenceStatusRef = rtdb.ref("/status/" + user.uid);
+  presenceConnectedRef = rtdb.ref(".info/connected");
+
+  presenceConnectedRef.on("value", (snap) => {
+    if (snap.val() === false) return;
+
+    presenceStatusRef.onDisconnect().set({
+      state: "offline",
+      fullName: fullName || user.displayName || "Member",
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+      presenceStatusRef.set({
+        state: "online",
+        fullName: fullName || user.displayName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      });
+    });
+  });
+}
+
+function cleanupPresence() {
+  try {
+    if (presenceConnectedRef) presenceConnectedRef.off();
+    if (presenceStatusRef) presenceStatusRef.off();
+  } catch (_) {}
+
+  presenceConnectedRef = null;
+  presenceStatusRef = null;
+}
+
+function subscribeSelectedUserPresence(uid) {
+  if (selectedPresenceUnsubscribe) {
+    selectedPresenceUnsubscribe();
+    selectedPresenceUnsubscribe = null;
+  }
+
+  const ref = rtdb.ref("/status/" + uid);
+  const callback = (snapshot) => {
+    const data = snapshot.val();
+    const el = document.getElementById("chat-presence");
+    if (!el) return;
+
+    if (data && data.state === "online") {
+      el.textContent = "En ligne";
+    } else if (data && data.last_changed) {
+      el.textContent = "Déconnecté depuis " + formatLastSeen(data.last_changed);
+    } else {
+      el.textContent = "Déconnecté";
+    }
+  };
+
+  ref.on("value", callback);
+  selectedPresenceUnsubscribe = () => ref.off("value", callback);
 }
 
 async function selectConversation(otherUserId) {
@@ -246,10 +324,14 @@ async function selectConversation(otherUserId) {
     <div>
       <h3>${escapeHtml(selectedUserProfile.fullName || "Member")}</h3>
       <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
+      <p id="chat-presence" class="chat-presence-line"></p>
     </div>
   `;
 
+  subscribeSelectedUserPresence(otherUserId);
+
   setChatStatus("");
+  await markThreadAsRead();
   loadMessages();
 }
 
@@ -334,7 +416,11 @@ async function sendMessage() {
       },
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       lastMessage: text,
-      lastSenderId: user.uid
+      lastSenderId: user.uid,
+      unreadCountByUser: {
+        [user.uid]: 0,
+        [selectedUserId]: firebase.firestore.FieldValue.increment(1)
+      }
     }, { merge: true });
 
     await threadRef.collection("messages").add({
@@ -353,6 +439,21 @@ async function sendMessage() {
     setChatStatus("Impossible d'envoyer le message. Vérifie aussi les règles Firestore.", true);
   } finally {
     if (sendBtn) sendBtn.disabled = false;
+  }
+}
+
+async function markThreadAsRead() {
+  const user = auth.currentUser;
+  if (!user || !currentThreadId) return;
+
+  try {
+    await db.collection("privateThreads").doc(currentThreadId).set({
+      unreadCountByUser: {
+        [user.uid]: 0
+      }
+    }, { merge: true });
+  } catch (error) {
+    console.error("markThreadAsRead error:", error);
   }
 }
 
@@ -421,11 +522,13 @@ async function loadInbox() {
     .where("participants", "array-contains", user.uid)
     .onSnapshot(async (snapshot) => {
       const container = document.getElementById("inbox-list");
-      const docs = snapshot.docs.sort((a, b) => {
-        const ta = a.data().updatedAt?.toMillis?.() || 0;
-        const tb = b.data().updatedAt?.toMillis?.() || 0;
-        return tb - ta;
-      });
+      const docs = snapshot.docs
+        .filter(doc => (doc.data().lastMessage || "").trim() !== "")
+        .sort((a, b) => {
+          const ta = a.data().updatedAt?.toMillis?.() || 0;
+          const tb = b.data().updatedAt?.toMillis?.() || 0;
+          return tb - ta;
+        });
 
       let html = "";
 
@@ -440,6 +543,8 @@ async function loadInbox() {
           if (otherDoc.exists) other = otherDoc.data();
         } catch (_) {}
 
+        const unread = unreadCountFor(data, user.uid);
+
         html += `
           <div class="member-list-item" onclick="selectConversation('${otherUserId}')">
             ${avatarHtml(other)}
@@ -453,6 +558,7 @@ async function loadInbox() {
               </strong>
               <span>${escapeHtml(data.lastMessage || "")}</span>
             </div>
+            ${unread > 0 ? `<span class="new-message-dot"></span>` : ""}
             <button type="button"
                     class="member-profile-btn"
                     onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
@@ -476,11 +582,13 @@ async function loadRecentThreads() {
     .where("participants", "array-contains", user.uid)
     .onSnapshot(async (snapshot) => {
       const container = document.getElementById("recent-list");
-      const docs = snapshot.docs.sort((a, b) => {
-        const ta = a.data().updatedAt?.toMillis?.() || 0;
-        const tb = b.data().updatedAt?.toMillis?.() || 0;
-        return tb - ta;
-      });
+      const docs = snapshot.docs
+        .filter(doc => (doc.data().lastMessage || "").trim() !== "")
+        .sort((a, b) => {
+          const ta = a.data().updatedAt?.toMillis?.() || 0;
+          const tb = b.data().updatedAt?.toMillis?.() || 0;
+          return tb - ta;
+        });
 
       let html = "";
 
@@ -495,6 +603,8 @@ async function loadRecentThreads() {
           if (otherDoc.exists) other = otherDoc.data();
         } catch (_) {}
 
+        const unread = unreadCountFor(data, user.uid);
+
         html += `
           <div class="member-list-item" onclick="selectConversation('${otherUserId}')">
             ${avatarHtml(other)}
@@ -508,6 +618,7 @@ async function loadRecentThreads() {
               </strong>
               <span>${escapeHtml(data.lastMessage || "")}</span>
             </div>
+            ${unread > 0 ? `<span class="new-message-dot"></span>` : ""}
             <button type="button"
                     class="member-profile-btn"
                     onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
@@ -548,8 +659,10 @@ function loadOnlineMembers() {
                 ${escapeHtml(p.fullName || "Member")}
               </button>
             </strong>
-            <span>Online</span>
+            <span>En ligne</span>
           </div>
+
+          <span class="presence-dot"></span>
 
           <button type="button"
                   class="member-profile-btn"
@@ -576,6 +689,8 @@ auth.onAuthStateChanged(async (user) => {
   const avatarContainer = document.getElementById("current-user-avatar");
   avatarContainer.outerHTML = avatarHtml(currentUserProfile, "large-avatar");
   document.getElementById("current-user-name").textContent = currentUserProfile.fullName || "Member";
+
+  setupPresence(user, currentUserProfile.fullName || user.displayName || "Member");
 
   loadAllMembers();
   loadInbox();
