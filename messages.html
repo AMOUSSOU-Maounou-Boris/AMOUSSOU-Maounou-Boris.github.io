@@ -130,6 +130,8 @@ let selectedPresenceRef = null;
 let presenceConnectedRef = null;
 let presenceStatusRef = null;
 
+const ONLINE_GRACE_MS = 5 * 60 * 1000;
+
 const i18n = {
   en: {
     messaging: "Messaging",
@@ -236,6 +238,16 @@ function formatLastSeen(ms) {
   });
 }
 
+function isRecentlyActive(statusData) {
+  if (!statusData) return false;
+  if (statusData.state === "online") return true;
+
+  const lastChanged = Number(statusData.last_changed || 0);
+  if (!lastChanged) return false;
+
+  return (Date.now() - lastChanged) <= ONLINE_GRACE_MS;
+}
+
 function canDeleteMessage(createdAt) {
   if (!createdAt) return false;
   const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
@@ -308,6 +320,8 @@ function subscribeSelectedUserPresence(uid) {
 
     if (data && data.state === "online") {
       el.textContent = "En ligne";
+    } else if (data && isRecentlyActive(data)) {
+      el.textContent = "Actif récemment";
     } else if (data && data.last_changed) {
       el.textContent = "Déconnecté depuis " + formatLastSeen(data.last_changed);
     } else {
@@ -650,12 +664,35 @@ function loadOnlineMembers() {
     const items = [];
     snapshot.forEach(child => items.push({ uid: child.key, ...child.val() }));
 
-    for (const item of items) {
-      if (me && item.uid === me.uid) continue;
-      if (item.state !== "online") continue;
+    const visibleItems = items
+      .filter(item => {
+        if (me && item.uid === me.uid) return false;
+        return isRecentlyActive(item);
+      })
+      .sort((a, b) => {
+        const aOnline = a.state === "online" ? 1 : 0;
+        const bOnline = b.state === "online" ? 1 : 0;
 
-      const snap = await db.collection("users").doc(item.uid).get();
-      const p = snap.exists ? snap.data() : { fullName: "Member" };
+        if (bOnline !== aOnline) return bOnline - aOnline;
+
+        const aTime = Number(a.last_changed || 0);
+        const bTime = Number(b.last_changed || 0);
+        return bTime - aTime;
+      });
+
+    for (const item of visibleItems) {
+      let p = { fullName: item.fullName || "Member" };
+
+      try {
+        const snap = await db.collection("users").doc(item.uid).get();
+        if (snap.exists) {
+          p = snap.data();
+        }
+      } catch (_) {}
+
+      const statusLabel = item.state === "online"
+        ? "En ligne"
+        : `Actif récemment • ${formatLastSeen(item.last_changed)}`;
 
       html += `
         <div class="member-list-item" onclick="selectConversation('${item.uid}')">
@@ -668,7 +705,7 @@ function loadOnlineMembers() {
                 ${escapeHtml(p.fullName || "Member")}
               </button>
             </strong>
-            <span>En ligne</span>
+            <span>${escapeHtml(statusLabel)}</span>
           </div>
           <span class="presence-dot"></span>
           <button type="button"
@@ -693,6 +730,8 @@ async function logoutFromMessages() {
     btn.textContent = "Logging out...";
   }
 
+  setChatStatus("Déconnexion en cours...");
+
   try {
     if (user) {
       await rtdb.ref("/status/" + user.uid).set({
@@ -709,11 +748,13 @@ async function logoutFromMessages() {
   unsubscribeSelectedPresence();
 
   try {
+    sessionStorage.setItem("afterMessagesLogout", "1");
     await auth.signOut();
-    window.location.href = "insights.html";
+    window.location.replace("insights.html");
   } catch (error) {
     console.error("logout error:", error);
-    alert("Déconnexion impossible pour le moment.");
+    setChatStatus("Déconnexion impossible pour le moment.", true);
+
     if (btn) {
       btn.disabled = false;
       btn.textContent = "Logout";
@@ -723,7 +764,11 @@ async function logoutFromMessages() {
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
-    window.location.href = "insights.html";
+    const fromLogout = sessionStorage.getItem("afterMessagesLogout");
+    if (fromLogout) {
+      sessionStorage.removeItem("afterMessagesLogout");
+    }
+    window.location.replace("insights.html");
     return;
   }
 
