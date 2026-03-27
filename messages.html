@@ -35,14 +35,26 @@
 <div class="messages-layout">
   <aside class="messages-sidebar">
     <div class="sidebar-top">
-      <div id="current-user-avatar" class="member-avatar large-avatar">MB</div>
+      <div id="current-user-avatar-wrap">
+        <div class="member-avatar large-avatar">MB</div>
+      </div>
       <div>
         <h2 data-i18n="messaging">Messaging</h2>
         <p id="current-user-name">Member</p>
       </div>
     </div>
 
-    <input type="text" id="member-search" class="search-input" placeholder="Search a member..." oninput="filterMembers()">
+    <div class="sidebar-actions">
+      <button class="sidebar-logout-btn" onclick="logoutFromMessages()">Logout</button>
+    </div>
+
+    <input
+      type="text"
+      id="member-search"
+      class="search-input"
+      placeholder="Search a member..."
+      oninput="filterMembers()"
+    >
 
     <div class="tabs">
       <button class="tab-btn active-tab" onclick="switchTab('all-members', this)" data-i18n="allMembers">All members</button>
@@ -114,7 +126,7 @@ let selectedUserProfile = null;
 let currentThreadId = null;
 let currentLanguage = localStorage.getItem("site_lang") || "en";
 let threadUnsubscribe = null;
-let selectedPresenceUnsubscribe = null;
+let selectedPresenceRef = null;
 let presenceConnectedRef = null;
 let presenceStatusRef = null;
 
@@ -278,14 +290,18 @@ function cleanupPresence() {
   presenceStatusRef = null;
 }
 
-function subscribeSelectedUserPresence(uid) {
-  if (selectedPresenceUnsubscribe) {
-    selectedPresenceUnsubscribe();
-    selectedPresenceUnsubscribe = null;
-  }
+function unsubscribeSelectedPresence() {
+  try {
+    if (selectedPresenceRef) selectedPresenceRef.off();
+  } catch (_) {}
+  selectedPresenceRef = null;
+}
 
-  const ref = rtdb.ref("/status/" + uid);
-  const callback = (snapshot) => {
+function subscribeSelectedUserPresence(uid) {
+  unsubscribeSelectedPresence();
+
+  selectedPresenceRef = rtdb.ref("/status/" + uid);
+  selectedPresenceRef.on("value", (snapshot) => {
     const data = snapshot.val();
     const el = document.getElementById("chat-presence");
     if (!el) return;
@@ -297,10 +313,7 @@ function subscribeSelectedUserPresence(uid) {
     } else {
       el.textContent = "Déconnecté";
     }
-  };
-
-  ref.on("value", callback);
-  selectedPresenceUnsubscribe = () => ref.off("value", callback);
+  });
 }
 
 async function selectConversation(otherUserId) {
@@ -316,13 +329,10 @@ async function selectConversation(otherUserId) {
   const profileSnap = await db.collection("users").doc(otherUserId).get();
   selectedUserProfile = profileSnap.exists ? profileSnap.data() : { fullName: "Member" };
 
-  document.getElementById("chat-title").textContent = selectedUserProfile.fullName || "Member";
-  document.getElementById("chat-subtitle").textContent = selectedUserProfile.institution || "Private conversation";
-
   document.getElementById("chat-user-summary").innerHTML = `
     ${avatarHtml(selectedUserProfile)}
     <div>
-      <h3>${escapeHtml(selectedUserProfile.fullName || "Member")}</h3>
+      <h3><a class="profile-link-dark" href="profile.html?uid=${otherUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a></h3>
       <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
       <p id="chat-presence" class="chat-presence-line"></p>
     </div>
@@ -366,7 +376,7 @@ function loadMessages() {
           <div class="msg-bubble ${own ? 'own-msg' : ''}">
             <div class="msg-head">
               ${avatarHtml(sender)}
-              <strong>${escapeHtml(sender.fullName || "Member")}</strong>
+              <strong><a class="profile-link-dark" href="profile.html?uid=${m.senderId}">${escapeHtml(sender.fullName || "Member")}</a></strong>
             </div>
             <div class="msg-text">${escapeHtml(m.text || "")}</div>
             <div class="msg-foot">
@@ -650,7 +660,6 @@ function loadOnlineMembers() {
       html += `
         <div class="member-list-item" onclick="selectConversation('${item.uid}')">
           ${avatarHtml(p)}
-
           <div class="member-text">
             <strong>
               <button type="button"
@@ -661,9 +670,7 @@ function loadOnlineMembers() {
             </strong>
             <span>En ligne</span>
           </div>
-
           <span class="presence-dot"></span>
-
           <button type="button"
                   class="member-profile-btn"
                   onclick="event.stopPropagation(); window.location.href='profile.html?uid=${item.uid}'">
@@ -677,6 +684,42 @@ function loadOnlineMembers() {
   });
 }
 
+async function logoutFromMessages() {
+  const user = auth.currentUser;
+  const btn = document.querySelector(".sidebar-logout-btn");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Logging out...";
+  }
+
+  try {
+    if (user) {
+      await rtdb.ref("/status/" + user.uid).set({
+        state: "offline",
+        fullName: user.displayName || currentUserProfile?.fullName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
+  } catch (error) {
+    console.error("presence logout error:", error);
+  }
+
+  cleanupPresence();
+  unsubscribeSelectedPresence();
+
+  try {
+    await auth.signOut();
+    window.location.href = "insights.html";
+  } catch (error) {
+    console.error("logout error:", error);
+    alert("Déconnexion impossible pour le moment.");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Logout";
+    }
+  }
+}
+
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
     window.location.href = "insights.html";
@@ -686,8 +729,7 @@ auth.onAuthStateChanged(async (user) => {
   const snap = await db.collection("users").doc(user.uid).get();
   currentUserProfile = snap.exists ? snap.data() : { fullName: user.displayName || "Member" };
 
-  const avatarContainer = document.getElementById("current-user-avatar");
-  avatarContainer.outerHTML = avatarHtml(currentUserProfile, "large-avatar");
+  document.getElementById("current-user-avatar-wrap").innerHTML = avatarHtml(currentUserProfile, "large-avatar");
   document.getElementById("current-user-name").textContent = currentUserProfile.fullName || "Member";
 
   setupPresence(user, currentUserProfile.fullName || user.displayName || "Member");
