@@ -176,6 +176,11 @@ function setLanguage(lang) {
 }
 setLanguage(currentLanguage);
 
+function redirectToInsightsLoginMessage() {
+  sessionStorage.setItem("insightsAuthNotice", "Please log in first to access messages.");
+  window.location.href = "insights.html";
+}
+
 function escapeHtml(value) {
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -347,7 +352,7 @@ function subscribeSelectedUserPresence(uid) {
 async function selectConversation(otherUserId) {
   const user = auth.currentUser;
   if (!user) {
-    window.location.href = "insights.html";
+    redirectToInsightsLoginMessage();
     return;
   }
 
@@ -427,7 +432,7 @@ function loadMessages() {
 async function sendMessage() {
   const user = auth.currentUser;
   if (!user) {
-    window.location.href = "insights.html";
+    redirectToInsightsLoginMessage();
     return;
   }
 
@@ -771,7 +776,7 @@ async function logoutFromMessages() {
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
-    window.location.href = "insights.html";
+    redirectToInsightsLoginMessage();
     return;
   }
 
