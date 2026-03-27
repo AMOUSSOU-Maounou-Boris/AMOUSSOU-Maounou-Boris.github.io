@@ -26,9 +26,9 @@
   </ul>
 
   <div class="lang-switcher">
-    <button onclick="setLanguage('en')">EN</button>
-    <button onclick="setLanguage('fr')">FR</button>
-    <button onclick="setLanguage('es')">ES</button>
+    <button type="button" onclick="setLanguage('en')">EN</button>
+    <button type="button" onclick="setLanguage('fr')">FR</button>
+    <button type="button" onclick="setLanguage('es')">ES</button>
   </div>
 </nav>
 
@@ -128,11 +128,12 @@ let selectedUserProfile = null;
 let currentThreadId = null;
 let currentLanguage = localStorage.getItem("site_lang") || "en";
 let threadUnsubscribe = null;
-let selectedPresenceRef = null;
 let presenceConnectedRef = null;
 let presenceStatusRef = null;
 
-const ONLINE_GRACE_MS = 5 * 60 * 1000;
+let usersCache = {};
+let threadsCache = [];
+let statusCache = {};
 
 const i18n = {
   en: {
@@ -142,7 +143,23 @@ const i18n = {
     online: "Online",
     recent: "Recent",
     logout: "Logout",
-    send: "Send"
+    send: "Send",
+    selectConversation: "Select a conversation",
+    privateMessagesHere: "Your private messages will appear here.",
+    onlineNow: "Online",
+    offlineSince: "Offline since",
+    noMemberYet: "No member yet.",
+    noMessageYet: "No message yet.",
+    noMessageReceived: "No message received yet.",
+    noRecentConversation: "No recent conversation.",
+    nobodyOnline: "Nobody online.",
+    sending: "Sending...",
+    messageSent: "Message sent.",
+    loadError: "Unable to load messages.",
+    sendError: "Unable to send the message.",
+    deleteError: "Unable to delete the message.",
+    chooseMember: "Please select a member first.",
+    loginFirst: "Please log in first."
   },
   fr: {
     messaging: "Messagerie",
@@ -151,7 +168,23 @@ const i18n = {
     online: "En ligne",
     recent: "Récentes",
     logout: "Déconnexion",
-    send: "Envoyer"
+    send: "Envoyer",
+    selectConversation: "Sélectionne une conversation",
+    privateMessagesHere: "Tes messages privés vont apparaître ici.",
+    onlineNow: "En ligne",
+    offlineSince: "Déconnecté depuis",
+    noMemberYet: "Aucun membre pour le moment.",
+    noMessageYet: "Aucun message pour le moment.",
+    noMessageReceived: "Aucun message reçu pour le moment.",
+    noRecentConversation: "Aucune conversation récente.",
+    nobodyOnline: "Personne en ligne.",
+    sending: "Envoi en cours...",
+    messageSent: "Message envoyé.",
+    loadError: "Impossible de charger les messages.",
+    sendError: "Impossible d'envoyer le message.",
+    deleteError: "Impossible de supprimer le message.",
+    chooseMember: "Choisis d'abord un membre.",
+    loginFirst: "Connecte-toi d'abord."
   },
   es: {
     messaging: "Mensajería",
@@ -160,9 +193,29 @@ const i18n = {
     online: "En línea",
     recent: "Recientes",
     logout: "Cerrar sesión",
-    send: "Enviar"
+    send: "Enviar",
+    selectConversation: "Selecciona una conversación",
+    privateMessagesHere: "Tus mensajes privados aparecerán aquí.",
+    onlineNow: "En línea",
+    offlineSince: "Desconectado desde",
+    noMemberYet: "Ningún miembro todavía.",
+    noMessageYet: "Ningún mensaje todavía.",
+    noMessageReceived: "No hay mensajes recibidos todavía.",
+    noRecentConversation: "No hay conversación reciente.",
+    nobodyOnline: "Nadie en línea.",
+    sending: "Enviando...",
+    messageSent: "Mensaje enviado.",
+    loadError: "No se pueden cargar los mensajes.",
+    sendError: "No se puede enviar el mensaje.",
+    deleteError: "No se puede eliminar el mensaje.",
+    chooseMember: "Selecciona primero un miembro.",
+    loginFirst: "Inicia sesión primero."
   }
 };
+
+function t(key) {
+  return (i18n[currentLanguage] && i18n[currentLanguage][key]) || key;
+}
 
 function setLanguage(lang) {
   currentLanguage = lang;
@@ -173,11 +226,15 @@ function setLanguage(lang) {
       el.textContent = i18n[lang][key];
     }
   });
+
+  renderAllPanels();
+  renderChatHeader();
 }
+
 setLanguage(currentLanguage);
 
 function redirectToInsightsLoginMessage() {
-  sessionStorage.setItem("insightsAuthNotice", "Please log in first to access messages.");
+  sessionStorage.setItem("insightsAuthNotice", "login required");
   window.location.href = "insights.html";
 }
 
@@ -206,7 +263,6 @@ function avatarHtml(profile, cls = "") {
   if (photo) {
     return `<div class="member-avatar ${cls}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
   }
-
   return `<div class="member-avatar ${cls}" style="background:${escapeHtml(color)}">${initials}</div>`;
 }
 
@@ -254,24 +310,14 @@ function formatLastSeen(ms) {
   });
 }
 
-function isRecentlyActive(statusData) {
-  if (!statusData) return false;
-  if (statusData.state === "online") return true;
-
-  const lastChanged = Number(statusData.last_changed || 0);
-  if (!lastChanged) return false;
-
-  return (Date.now() - lastChanged) <= ONLINE_GRACE_MS;
+function threadIdFor(uid1, uid2) {
+  return [uid1, uid2].sort().join("_");
 }
 
 function canDeleteMessage(createdAt) {
   if (!createdAt) return false;
   const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
   return (Date.now() - date.getTime()) <= (30 * 60 * 1000);
-}
-
-function threadIdFor(uid1, uid2) {
-  return [uid1, uid2].sort().join("_");
 }
 
 function setChatStatus(text, isError = false) {
@@ -284,6 +330,26 @@ function setChatStatus(text, isError = false) {
 function unreadCountFor(data, uid) {
   if (!data || !data.unreadCountByUser) return 0;
   return data.unreadCountByUser[uid] || 0;
+}
+
+function getStatusFor(uid) {
+  return statusCache[uid] || null;
+}
+
+function isOnline(uid) {
+  const data = getStatusFor(uid);
+  return !!(data && data.state === "online");
+}
+
+function presenceText(uid) {
+  const data = getStatusFor(uid);
+  if (data && data.state === "online") {
+    return t("onlineNow");
+  }
+  if (data && data.last_changed) {
+    return `${t("offlineSince")} ${formatLastSeen(data.last_changed)}`;
+  }
+  return t("offlineSince");
 }
 
 function setupPresence(user, fullName) {
@@ -321,32 +387,190 @@ function cleanupPresence() {
   presenceStatusRef = null;
 }
 
-function unsubscribeSelectedPresence() {
-  try {
-    if (selectedPresenceRef) selectedPresenceRef.off();
-  } catch (_) {}
-  selectedPresenceRef = null;
+function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPresenceDot = false) {
+  const searchText = `${(profile?.fullName || "").toLowerCase()} ${(profile?.institution || "").toLowerCase()}`;
+  const online = isOnline(uid);
+  const presenceLine = presenceText(uid);
+
+  return `
+    <div class="member-list-item"
+         data-search="${escapeHtml(searchText)}"
+         ${clickableToChat ? `onclick="selectConversation('${uid}')"` : ""}>
+
+      ${avatarHtml(profile)}
+
+      <div class="member-text">
+        <div class="member-top-line">
+          <button type="button"
+                  class="member-name-btn"
+                  onclick="event.stopPropagation(); selectConversation('${uid}')">
+            ${escapeHtml(profile?.fullName || "Member")}
+          </button>
+          ${showPresenceDot ? `<span class="presence-chip ${online ? "online-chip" : "offline-chip"}">${escapeHtml(online ? t("onlineNow") : t("offlineSince"))}</span>` : ""}
+        </div>
+
+        ${subtitle ? `<span class="member-subtitle">${escapeHtml(subtitle)}</span>` : ""}
+        <span class="member-presence-text">${escapeHtml(presenceLine)}</span>
+      </div>
+
+      <button type="button"
+              class="member-profile-btn"
+              onclick="event.stopPropagation(); window.location.href='profile.html?uid=${uid}'">
+        Profile
+      </button>
+    </div>
+  `;
 }
 
-function subscribeSelectedUserPresence(uid) {
-  unsubscribeSelectedPresence();
+function renderAllMembers() {
+  const user = auth.currentUser;
+  const container = document.getElementById("all-members");
+  if (!user || !container) return;
 
-  selectedPresenceRef = rtdb.ref("/status/" + uid);
-  selectedPresenceRef.on("value", (snapshot) => {
-    const data = snapshot.val();
-    const el = document.getElementById("chat-presence");
-    if (!el) return;
+  const list = Object.entries(usersCache)
+    .filter(([uid]) => uid !== user.uid)
+    .sort((a, b) => (a[1].fullName || "").localeCompare(b[1].fullName || ""));
 
-    if (data && data.state === "online") {
-      el.textContent = "En ligne";
-    } else if (data && isRecentlyActive(data)) {
-      el.textContent = "Actif récemment";
-    } else if (data && data.last_changed) {
-      el.textContent = "Déconnecté depuis " + formatLastSeen(data.last_changed);
-    } else {
-      el.textContent = "Déconnecté";
-    }
+  let html = "";
+  list.forEach(([uid, profile]) => {
+    html += renderMemberCard(uid, profile, profile.institution || "", true, true);
   });
+
+  container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("noMemberYet"))}</p>`;
+}
+
+function renderInbox() {
+  const user = auth.currentUser;
+  const container = document.getElementById("inbox-list");
+  if (!user || !container) return;
+
+  const docs = threadsCache
+    .filter(doc => (doc.participants || []).includes(user.uid))
+    .filter(doc => (doc.lastMessage || "").trim() !== "")
+    .sort((a, b) => {
+      const ta = a.updatedAt?.toMillis?.() || 0;
+      const tb = b.updatedAt?.toMillis?.() || 0;
+      return tb - ta;
+    });
+
+  let html = "";
+  docs.forEach(data => {
+    const otherUserId = (data.participants || []).find(id => id !== user.uid);
+    if (!otherUserId) return;
+    const profile = usersCache[otherUserId] || { fullName: "Member" };
+    const unread = unreadCountFor(data, user.uid);
+
+    html += `
+      <div class="member-list-item"
+           data-search="${escapeHtml(((profile.fullName || "") + " " + (profile.institution || "")).toLowerCase())}"
+           onclick="selectConversation('${otherUserId}')">
+
+        ${avatarHtml(profile)}
+
+        <div class="member-text">
+          <div class="member-top-line">
+            <button type="button"
+                    class="member-name-btn"
+                    onclick="event.stopPropagation(); selectConversation('${otherUserId}')">
+              ${escapeHtml(profile.fullName || "Member")}
+            </button>
+            ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ""}
+          </div>
+
+          <span class="member-subtitle">${escapeHtml(data.lastMessage || "")}</span>
+          <span class="member-presence-text">${escapeHtml(presenceText(otherUserId))}</span>
+        </div>
+
+        <button type="button"
+                class="member-profile-btn"
+                onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
+          Profile
+        </button>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("noMessageReceived"))}</p>`;
+}
+
+function renderRecentThreads() {
+  const user = auth.currentUser;
+  const container = document.getElementById("recent-list");
+  if (!user || !container) return;
+
+  const docs = threadsCache
+    .filter(doc => (doc.participants || []).includes(user.uid))
+    .filter(doc => (doc.lastMessage || "").trim() !== "")
+    .sort((a, b) => {
+      const ta = a.updatedAt?.toMillis?.() || 0;
+      const tb = b.updatedAt?.toMillis?.() || 0;
+      return tb - ta;
+    })
+    .slice(0, 10);
+
+  let html = "";
+  docs.forEach(data => {
+    const otherUserId = (data.participants || []).find(id => id !== user.uid);
+    if (!otherUserId) return;
+    const profile = usersCache[otherUserId] || { fullName: "Member" };
+
+    html += renderMemberCard(otherUserId, profile, data.lastMessage || "", true, true);
+  });
+
+  container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("noRecentConversation"))}</p>`;
+}
+
+function renderOnlineMembers() {
+  const user = auth.currentUser;
+  const container = document.getElementById("online-list");
+  if (!user || !container) return;
+
+  const list = Object.entries(usersCache)
+    .filter(([uid]) => uid !== user.uid)
+    .filter(([uid]) => isOnline(uid))
+    .sort((a, b) => (a[1].fullName || "").localeCompare(b[1].fullName || ""));
+
+  let html = "";
+  list.forEach(([uid, profile]) => {
+    html += renderMemberCard(uid, profile, profile.institution || "", true, true);
+  });
+
+  container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("nobodyOnline"))}</p>`;
+}
+
+function renderAllPanels() {
+  renderAllMembers();
+  renderInbox();
+  renderOnlineMembers();
+  renderRecentThreads();
+}
+
+function renderChatHeader() {
+  const box = document.getElementById("chat-user-summary");
+  if (!box) return;
+
+  if (!selectedUserId || !selectedUserProfile) {
+    box.innerHTML = `
+      <div class="member-avatar">MB</div>
+      <div>
+        <h3 id="chat-title">${escapeHtml(t("selectConversation"))}</h3>
+        <p id="chat-subtitle">${escapeHtml(t("privateMessagesHere"))}</p>
+        <p id="chat-presence" class="chat-presence-line"></p>
+      </div>
+    `;
+    return;
+  }
+
+  box.innerHTML = `
+    ${avatarHtml(selectedUserProfile)}
+    <div>
+      <h3><a class="profile-link-dark" href="profile.html?uid=${selectedUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a></h3>
+      <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
+      <p id="chat-presence" class="chat-presence-line ${isOnline(selectedUserId) ? "presence-online" : "presence-offline"}">
+        ${escapeHtml(presenceText(selectedUserId))}
+      </p>
+    </div>
+  `;
 }
 
 async function selectConversation(otherUserId) {
@@ -358,21 +582,9 @@ async function selectConversation(otherUserId) {
 
   selectedUserId = otherUserId;
   currentThreadId = threadIdFor(user.uid, otherUserId);
+  selectedUserProfile = usersCache[otherUserId] || { fullName: "Member" };
 
-  const profileSnap = await db.collection("users").doc(otherUserId).get();
-  selectedUserProfile = profileSnap.exists ? profileSnap.data() : { fullName: "Member" };
-
-  document.getElementById("chat-user-summary").innerHTML = `
-    ${avatarHtml(selectedUserProfile)}
-    <div>
-      <h3><a class="profile-link-dark" href="profile.html?uid=${otherUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a></h3>
-      <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
-      <p id="chat-presence" class="chat-presence-line"></p>
-    </div>
-  `;
-
-  subscribeSelectedUserPresence(otherUserId);
-
+  renderChatHeader();
   setChatStatus("");
   await markThreadAsRead();
   loadMessages();
@@ -397,20 +609,17 @@ function loadMessages() {
 
       for (const doc of snapshot.docs) {
         const m = doc.data();
-        let sender = {};
-
-        try {
-          const senderDoc = await db.collection("users").doc(m.senderId).get();
-          if (senderDoc.exists) sender = senderDoc.data();
-        } catch (_) {}
-
+        const sender = usersCache[m.senderId] || {};
         const own = user && user.uid === m.senderId;
 
         html += `
           <div class="msg-bubble ${own ? 'own-msg' : ''}">
             <div class="msg-head">
               ${avatarHtml(sender)}
-              <strong><a class="profile-link-dark" href="profile.html?uid=${m.senderId}">${escapeHtml(sender.fullName || "Member")}</a></strong>
+              <div class="msg-head-text">
+                <strong><a class="profile-link-dark" href="profile.html?uid=${m.senderId}">${escapeHtml(sender.fullName || "Member")}</a></strong>
+                <span class="msg-presence-inline ${isOnline(m.senderId) ? "presence-online" : "presence-offline"}">${escapeHtml(presenceText(m.senderId))}</span>
+              </div>
             </div>
             <div class="msg-text">${escapeHtml(m.text || "")}</div>
             <div class="msg-foot">
@@ -421,11 +630,11 @@ function loadMessages() {
         `;
       }
 
-      container.innerHTML = html || "<p class='empty-text'>No message yet.</p>";
+      container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("noMessageYet"))}</p>`;
       container.scrollTop = container.scrollHeight;
     }, (error) => {
       console.error("loadMessages error:", error);
-      setChatStatus("Impossible de charger les messages.", true);
+      setChatStatus(t("loadError"), true);
     });
 }
 
@@ -437,7 +646,7 @@ async function sendMessage() {
   }
 
   if (!selectedUserId) {
-    alert("Please select a member first.");
+    alert(t("chooseMember"));
     return;
   }
 
@@ -447,7 +656,7 @@ async function sendMessage() {
 
   const sendBtn = document.querySelector(".send-btn");
   if (sendBtn) sendBtn.disabled = true;
-  setChatStatus("Sending...");
+  setChatStatus(t("sending"));
 
   try {
     const threadRef = db.collection("privateThreads").doc(currentThreadId);
@@ -475,12 +684,10 @@ async function sendMessage() {
     });
 
     input.value = "";
-    setChatStatus("Message sent.");
-    loadInbox();
-    loadRecentThreads();
+    setChatStatus(t("messageSent"));
   } catch (error) {
     console.error("sendMessage error:", error);
-    setChatStatus("Impossible d'envoyer le message. Vérifie aussi les règles Firestore.", true);
+    setChatStatus(t("sendError"), true);
   } finally {
     if (sendBtn) sendBtn.disabled = false;
   }
@@ -512,230 +719,8 @@ async function deleteMessage(messageId) {
       .delete();
   } catch (error) {
     console.error("deleteMessage error:", error);
-    setChatStatus("Impossible de supprimer le message.", true);
+    setChatStatus(t("deleteError"), true);
   }
-}
-
-function loadAllMembers() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  db.collection("users").orderBy("fullName", "asc").onSnapshot((snapshot) => {
-    let html = "";
-
-    snapshot.forEach((doc) => {
-      const p = doc.data();
-      if (doc.id === user.uid) return;
-
-      html += `
-        <div class="member-list-item"
-             data-search="${escapeHtml((p.fullName || "").toLowerCase())} ${escapeHtml((p.institution || "").toLowerCase())}"
-             onclick="selectConversation('${doc.id}')">
-
-          ${avatarHtml(p)}
-
-          <div class="member-text">
-            <strong>
-              <button type="button"
-                      class="member-name-btn"
-                      onclick="event.stopPropagation(); selectConversation('${doc.id}')">
-                ${escapeHtml(p.fullName || "Member")}
-              </button>
-            </strong>
-            <span>${escapeHtml(p.institution || "")}</span>
-          </div>
-
-          <button type="button"
-                  class="member-profile-btn"
-                  onclick="event.stopPropagation(); window.location.href='profile.html?uid=${doc.id}'">
-            Profile
-          </button>
-        </div>
-      `;
-    });
-
-    document.getElementById("all-members").innerHTML = html || "<p class='empty-text'>No member yet.</p>";
-  });
-}
-
-function loadInbox() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  db.collection("privateThreads")
-    .where("participants", "array-contains", user.uid)
-    .onSnapshot(async (snapshot) => {
-      const container = document.getElementById("inbox-list");
-      const docs = snapshot.docs
-        .filter(doc => (doc.data().lastMessage || "").trim() !== "")
-        .sort((a, b) => {
-          const ta = a.data().updatedAt?.toMillis?.() || 0;
-          const tb = b.data().updatedAt?.toMillis?.() || 0;
-          return tb - ta;
-        });
-
-      let html = "";
-
-      for (const doc of docs) {
-        const data = doc.data();
-        const otherUserId = (data.participants || []).find(id => id !== user.uid);
-        if (!otherUserId) continue;
-
-        let other = {};
-        try {
-          const otherDoc = await db.collection("users").doc(otherUserId).get();
-          if (otherDoc.exists) other = otherDoc.data();
-        } catch (_) {}
-
-        const unread = unreadCountFor(data, user.uid);
-
-        html += `
-          <div class="member-list-item" onclick="selectConversation('${otherUserId}')">
-            ${avatarHtml(other)}
-            <div class="member-text">
-              <strong>
-                <button type="button"
-                        class="member-name-btn"
-                        onclick="event.stopPropagation(); selectConversation('${otherUserId}')">
-                  ${escapeHtml(other.fullName || "Member")}
-                </button>
-              </strong>
-              <span>${escapeHtml(data.lastMessage || "")}</span>
-            </div>
-            ${unread > 0 ? `<span class="new-message-dot"></span>` : ""}
-            <button type="button"
-                    class="member-profile-btn"
-                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
-              Profile
-            </button>
-          </div>
-        `;
-      }
-
-      container.innerHTML = html || "<p class='empty-text'>No message received yet.</p>";
-    }, (error) => {
-      console.error("loadInbox error:", error);
-    });
-}
-
-function loadRecentThreads() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  db.collection("privateThreads")
-    .where("participants", "array-contains", user.uid)
-    .onSnapshot(async (snapshot) => {
-      const container = document.getElementById("recent-list");
-      const docs = snapshot.docs
-        .filter(doc => (doc.data().lastMessage || "").trim() !== "")
-        .sort((a, b) => {
-          const ta = a.data().updatedAt?.toMillis?.() || 0;
-          const tb = b.data().updatedAt?.toMillis?.() || 0;
-          return tb - ta;
-        });
-
-      let html = "";
-
-      for (const doc of docs.slice(0, 10)) {
-        const data = doc.data();
-        const otherUserId = (data.participants || []).find(id => id !== user.uid);
-        if (!otherUserId) continue;
-
-        let other = {};
-        try {
-          const otherDoc = await db.collection("users").doc(otherUserId).get();
-          if (otherDoc.exists) other = otherDoc.data();
-        } catch (_) {}
-
-        const unread = unreadCountFor(data, user.uid);
-
-        html += `
-          <div class="member-list-item" onclick="selectConversation('${otherUserId}')">
-            ${avatarHtml(other)}
-            <div class="member-text">
-              <strong>
-                <button type="button"
-                        class="member-name-btn"
-                        onclick="event.stopPropagation(); selectConversation('${otherUserId}')">
-                  ${escapeHtml(other.fullName || "Member")}
-                </button>
-              </strong>
-              <span>${escapeHtml(data.lastMessage || "")}</span>
-            </div>
-            ${unread > 0 ? `<span class="new-message-dot"></span>` : ""}
-            <button type="button"
-                    class="member-profile-btn"
-                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
-              Profile
-            </button>
-          </div>
-        `;
-      }
-
-      container.innerHTML = html || "<p class='empty-text'>No recent conversation.</p>";
-    });
-}
-
-function loadOnlineMembers() {
-  rtdb.ref("/status").on("value", async (snapshot) => {
-    const me = auth.currentUser;
-    let html = "";
-
-    const items = [];
-    snapshot.forEach(child => items.push({ uid: child.key, ...child.val() }));
-
-    const visibleItems = items
-      .filter(item => {
-        if (me && item.uid === me.uid) return false;
-        return isRecentlyActive(item);
-      })
-      .sort((a, b) => {
-        const aOnline = a.state === "online" ? 1 : 0;
-        const bOnline = b.state === "online" ? 1 : 0;
-        if (bOnline !== aOnline) return bOnline - aOnline;
-
-        const aTime = Number(a.last_changed || 0);
-        const bTime = Number(b.last_changed || 0);
-        return bTime - aTime;
-      });
-
-    for (const item of visibleItems) {
-      let p = { fullName: item.fullName || "Member" };
-
-      try {
-        const snap = await db.collection("users").doc(item.uid).get();
-        if (snap.exists) p = snap.data();
-      } catch (_) {}
-
-      const statusLabel = item.state === "online"
-        ? "En ligne"
-        : `Actif récemment • ${formatLastSeen(item.last_changed)}`;
-
-      html += `
-        <div class="member-list-item" onclick="selectConversation('${item.uid}')">
-          ${avatarHtml(p)}
-          <div class="member-text">
-            <strong>
-              <button type="button"
-                      class="member-name-btn"
-                      onclick="event.stopPropagation(); selectConversation('${item.uid}')">
-                ${escapeHtml(p.fullName || "Member")}
-              </button>
-            </strong>
-            <span>${escapeHtml(statusLabel)}</span>
-          </div>
-          <span class="presence-dot"></span>
-          <button type="button"
-                  class="member-profile-btn"
-                  onclick="event.stopPropagation(); window.location.href='profile.html?uid=${item.uid}'">
-            Profile
-          </button>
-        </div>
-      `;
-    }
-
-    document.getElementById("online-list").innerHTML = html || "<p class='empty-text'>Nobody online.</p>";
-  });
 }
 
 async function logoutFromMessages() {
@@ -750,7 +735,6 @@ async function logoutFromMessages() {
   setChatStatus("Déconnexion en cours...");
 
   cleanupPresence();
-  unsubscribeSelectedPresence();
 
   try {
     if (user) {
@@ -774,6 +758,58 @@ async function logoutFromMessages() {
   window.location.href = "insights.html";
 }
 
+function subscribeUsers() {
+  db.collection("users").onSnapshot((snapshot) => {
+    const nextUsers = {};
+    snapshot.forEach((doc) => {
+      nextUsers[doc.id] = doc.data();
+    });
+    usersCache = nextUsers;
+
+    if (auth.currentUser) {
+      currentUserProfile = usersCache[auth.currentUser.uid] || currentUserProfile;
+      document.getElementById("current-user-avatar-wrap").innerHTML = avatarHtml(currentUserProfile, "large-avatar");
+      document.getElementById("current-user-name").textContent = currentUserProfile?.fullName || "Member";
+    }
+
+    if (selectedUserId) {
+      selectedUserProfile = usersCache[selectedUserId] || selectedUserProfile;
+      renderChatHeader();
+    }
+
+    renderAllPanels();
+  });
+}
+
+function subscribeThreads() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  db.collection("privateThreads")
+    .where("participants", "array-contains", user.uid)
+    .onSnapshot((snapshot) => {
+      threadsCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderInbox();
+      renderRecentThreads();
+    });
+}
+
+function subscribeStatuses() {
+  rtdb.ref("/status").on("value", (snapshot) => {
+    const nextStatuses = {};
+    snapshot.forEach((child) => {
+      nextStatuses[child.key] = child.val();
+    });
+    statusCache = nextStatuses;
+
+    renderAllMembers();
+    renderOnlineMembers();
+    renderInbox();
+    renderRecentThreads();
+    renderChatHeader();
+  });
+}
+
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
     redirectToInsightsLoginMessage();
@@ -788,15 +824,15 @@ auth.onAuthStateChanged(async (user) => {
 
   setupPresence(user, currentUserProfile.fullName || user.displayName || "Member");
 
-  loadAllMembers();
-  loadInbox();
-  loadOnlineMembers();
-  loadRecentThreads();
+  renderChatHeader();
+  subscribeUsers();
+  subscribeThreads();
+  subscribeStatuses();
 
   const params = new URLSearchParams(window.location.search);
   const preselectedUser = params.get("user");
   if (preselectedUser) {
-    selectConversation(preselectedUser);
+    setTimeout(() => selectConversation(preselectedUser), 350);
   }
 });
 </script>
