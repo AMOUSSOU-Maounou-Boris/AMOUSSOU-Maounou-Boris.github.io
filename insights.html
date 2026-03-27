@@ -426,7 +426,6 @@ function setLanguage(lang) {
     if (i18n[lang] && i18n[lang][key]) el.textContent = i18n[lang][key];
   });
 }
-setLanguage(currentLanguage);
 
 function setMessage(id, text, isError = false) {
   const el = document.getElementById(id);
@@ -434,6 +433,26 @@ function setMessage(id, text, isError = false) {
   el.textContent = text;
   el.style.color = isError ? "#b00020" : "#0b7a3b";
 }
+
+function showMessagesAccessNotice() {
+  const notice = sessionStorage.getItem("insightsAuthNotice");
+  if (!notice) return;
+
+  sessionStorage.removeItem("insightsAuthNotice");
+
+  let msg = "Please log in first to access Messages.";
+
+  if (currentLanguage === "fr") {
+    msg = "Connecte-toi d’abord pour accéder aux messages.";
+  } else if (currentLanguage === "es") {
+    msg = "Inicia sesión primero para acceder a Messages.";
+  }
+
+  setMessage("auth-message", msg, true);
+}
+
+setLanguage(currentLanguage);
+showMessagesAccessNotice();
 
 function escapeHtml(value) {
   return String(value || "")
@@ -1078,7 +1097,8 @@ function buildThreadId(uid1, uid2) {
 async function openPrivateThread(otherUserId, otherUserName) {
   const user = auth.currentUser;
   if (!user) {
-    alert("Please sign in first.");
+    sessionStorage.setItem("insightsAuthNotice", "login required");
+    window.location.href = "insights.html";
     return;
   }
 
