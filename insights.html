@@ -50,11 +50,18 @@
         <button class="auth-btn" onclick="signIn()" data-i18n="login">Login</button>
       </div>
 
+      <div class="auth-extra-actions">
+        <button class="text-link-btn" type="button" onclick="sendResetFromInsightsLogin()" data-i18n="forgotPassword">
+          Forgot password?
+        </button>
+      </div>
+
       <p id="auth-message" class="auth-message"></p>
     </div>
 
     <div id="member-zone" class="hidden-block">
       <button class="subsection-toggle" onclick="openAccountModal()" data-i18n="myAccount">My account</button>
+      <button class="subsection-toggle secondary-zone-btn" onclick="logout()" data-i18n="logout">Logout</button>
     </div>
   </aside>
 
@@ -228,7 +235,6 @@
     <div class="account-tabs">
       <button class="account-tab-btn active-account-tab" onclick="switchAccountTab('account-profile-tab', this)">Profile</button>
       <button class="account-tab-btn" onclick="switchAccountTab('account-inbox-tab', this)">Messaging</button>
-      <button class="account-tab-btn" onclick="switchAccountTab('account-danger-tab', this)">Security</button>
     </div>
 
     <div id="account-profile-tab" class="account-tab-panel">
@@ -298,6 +304,25 @@
         <button class="auth-btn" onclick="saveProfile()" data-i18n="saveProfile">Save profile</button>
       </div>
 
+      <div class="account-security-box">
+        <h4 data-i18n="accountActions">Account actions</h4>
+
+        <div class="auth-actions">
+          <button class="auth-btn secondary" onclick="sendResetForCurrentUser()" data-i18n="resetPassword">Reset password</button>
+          <button class="auth-btn secondary" onclick="logout()" data-i18n="logout">Logout</button>
+        </div>
+
+        <hr class="soft-line">
+
+        <h4 data-i18n="deleteMyAccount">Delete my account</h4>
+        <p class="small-note dark-note" data-i18n="deleteNotice">This deletes your account and your data on this site.</p>
+        <input type="password" id="delete-password" class="auth-input" placeholder="Confirm with your password">
+
+        <div class="auth-actions">
+          <button class="auth-btn danger" onclick="deleteMyAccount()" data-i18n="deleteMyAccount">Delete my account</button>
+        </div>
+      </div>
+
       <p id="profile-message" class="dark-message"></p>
     </div>
 
@@ -315,23 +340,6 @@
         </div>
       </div>
     </div>
-
-    <div id="account-danger-tab" class="account-tab-panel hidden-account-tab">
-      <div class="auth-actions">
-        <button class="auth-btn secondary" onclick="sendResetForCurrentUser()" data-i18n="resetPassword">Reset password</button>
-        <button class="auth-btn secondary" onclick="logout()" data-i18n="logout">Logout</button>
-      </div>
-
-      <hr class="soft-line">
-
-      <h4 data-i18n="deleteMyAccount">Delete my account</h4>
-      <p class="small-note dark-note" data-i18n="deleteNotice">This deletes your account and your data on this site.</p>
-      <input type="password" id="delete-password" class="auth-input" placeholder="Confirm with your password">
-
-      <div class="auth-actions">
-        <button class="auth-btn danger" onclick="deleteMyAccount()" data-i18n="deleteMyAccount">Delete my account</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -347,7 +355,9 @@ const firebaseConfig = {
   databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 const db = firebase.firestore();
 const auth = firebase.auth();
@@ -358,6 +368,7 @@ let presenceStatusRef = null;
 let currentThreadId = null;
 let currentThreadOtherUserId = null;
 let currentLanguage = localStorage.getItem("site_lang") || "en";
+const ONLINE_GRACE_MS = 5 * 60 * 1000;
 
 const i18n = {
   en: {
@@ -373,7 +384,7 @@ const i18n = {
     opportunities:"Opportunities",opportunitiesText:"Discuss seminars, internships, thesis opportunities, mobility programs, and future academic perspectives.",
     communitySpirit:"Community Spirit",communitySpiritText:"Build a respectful and active scientific space where every member can publish, react, comment, and share constructive opinions.",
     like:"Like",comments:"Comments",communityPublications:"Community publications",communityIntro:"Logged-in members can publish. Everyone can read, comment, and share opinions.",
-    publish:"Publish",send:"Send",createAccount:"Create an account",close:"Close"
+    publish:"Publish",send:"Send",createAccount:"Create an account",close:"Close",forgotPassword:"Forgot password?",accountActions:"Account actions"
   },
   fr: {
     "nav.home":"Accueil","nav.about":"À propos","nav.research":"Recherche","nav.resume":"CV","nav.contact":"Contact","nav.insights":"Insights",
@@ -388,7 +399,7 @@ const i18n = {
     opportunities:"Opportunités",opportunitiesText:"Discutez des séminaires, stages, opportunités de thèse, mobilités et perspectives académiques.",
     communitySpirit:"Esprit de communauté",communitySpiritText:"Construisez un espace scientifique respectueux et actif où chaque membre peut publier, réagir et commenter.",
     like:"J’aime",comments:"Commentaires",communityPublications:"Publications de la communauté",communityIntro:"Les membres connectés peuvent publier. Tout le monde peut lire, commenter et donner son avis.",
-    publish:"Publier",send:"Envoyer",createAccount:"Créer un compte",close:"Fermer"
+    publish:"Publier",send:"Envoyer",createAccount:"Créer un compte",close:"Fermer",forgotPassword:"Mot de passe oublié ?",accountActions:"Actions du compte"
   },
   es: {
     "nav.home":"Inicio","nav.about":"Acerca de","nav.research":"Investigación","nav.resume":"CV","nav.contact":"Contacto","nav.insights":"Insights",
@@ -403,7 +414,7 @@ const i18n = {
     opportunities:"Oportunidades",opportunitiesText:"Habla sobre seminarios, prácticas, oportunidades de tesis, movilidad y perspectivas académicas.",
     communitySpirit:"Espíritu comunitario",communitySpiritText:"Construye un espacio científico respetuoso y activo donde cada miembro pueda publicar, reaccionar y comentar.",
     like:"Me gusta",comments:"Comentarios",communityPublications:"Publicaciones de la comunidad",communityIntro:"Los miembros conectados pueden publicar. Todos pueden leer, comentar y dar su opinión.",
-    publish:"Publicar",send:"Enviar",createAccount:"Crear una cuenta",close:"Cerrar"
+    publish:"Publicar",send:"Enviar",createAccount:"Crear una cuenta",close:"Cerrar",forgotPassword:"¿Olvidaste tu contraseña?",accountActions:"Acciones de la cuenta"
   }
 };
 
@@ -455,6 +466,14 @@ function formatPresenceTime(ms) {
     hour: "2-digit",
     minute: "2-digit"
   });
+}
+
+function isRecentlyActive(statusData) {
+  if (!statusData) return false;
+  if (statusData.state === "online") return true;
+  const lastChanged = Number(statusData.last_changed || 0);
+  if (!lastChanged) return false;
+  return (Date.now() - lastChanged) <= ONLINE_GRACE_MS;
 }
 
 function getInitials(firstName, lastName, fullName) {
@@ -713,6 +732,22 @@ async function signIn() {
   }
 }
 
+async function sendResetFromInsightsLogin() {
+  const email = document.getElementById("login-email").value.trim();
+
+  if (!email) {
+    setMessage("auth-message", "Enter your email first.", true);
+    return;
+  }
+
+  try {
+    await auth.sendPasswordResetEmail(email);
+    setMessage("auth-message", "Reset email sent.");
+  } catch (error) {
+    setMessage("auth-message", error.message, true);
+  }
+}
+
 async function saveProfile() {
   const user = auth.currentUser;
   if (!user) {
@@ -836,7 +871,16 @@ function loadOnlineUsers() {
       items.push({ uid: child.key, ...child.val() });
     });
 
-    for (const data of items) {
+    const visibleItems = items
+      .filter(data => isRecentlyActive(data))
+      .sort((a, b) => {
+        const aOnline = a.state === "online" ? 1 : 0;
+        const bOnline = b.state === "online" ? 1 : 0;
+        if (bOnline !== aOnline) return bOnline - aOnline;
+        return Number(b.last_changed || 0) - Number(a.last_changed || 0);
+      });
+
+    for (const data of visibleItems) {
       let profileData = {};
       try {
         const doc = await db.collection("users").doc(data.uid).get();
@@ -853,6 +897,9 @@ function loadOnlineUsers() {
       };
 
       const online = data.state === "online";
+      const statusText = online
+        ? "online"
+        : `active recently • ${formatPresenceTime(data.last_changed)}`;
 
       html += `
         <div class="online-user">
@@ -861,7 +908,7 @@ function loadOnlineUsers() {
             <div class="online-name">
               <a class="profile-link" href="profile.html?uid=${data.uid}">${escapeHtml(mergedProfile.fullName || "Member")}</a>
             </div>
-            <div class="online-time">${online ? "online" : "last seen"} • ${escapeHtml(formatPresenceTime(data.last_changed))}</div>
+            <div class="online-time">${escapeHtml(statusText)}</div>
           </div>
           <div class="inline-actions">
             ${renderMessageButton(data.uid, mergedProfile.fullName || "Member")}
@@ -1583,6 +1630,7 @@ async function logout() {
     });
   }
 }
+
 auth.onAuthStateChanged(async (user) => {
   if (user) {
     toggleMemberZone(true);
