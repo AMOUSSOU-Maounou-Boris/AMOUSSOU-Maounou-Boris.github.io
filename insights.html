@@ -365,10 +365,14 @@ const rtdb = firebase.database();
 
 let presenceConnectedRef = null;
 let presenceStatusRef = null;
+let presenceHeartbeatInterval = null;
 let currentThreadId = null;
 let currentThreadOtherUserId = null;
 let currentLanguage = localStorage.getItem("site_lang") || "en";
-const ONLINE_GRACE_MS = 5 * 60 * 1000;
+let onlineUsersRef = null;
+
+const HEARTBEAT_MS = 20000;
+const ONLINE_FRESH_MS = 70000;
 
 const i18n = {
   en: {
@@ -384,7 +388,8 @@ const i18n = {
     opportunities:"Opportunities",opportunitiesText:"Discuss seminars, internships, thesis opportunities, mobility programs, and future academic perspectives.",
     communitySpirit:"Community Spirit",communitySpiritText:"Build a respectful and active scientific space where every member can publish, react, comment, and share constructive opinions.",
     like:"Like",comments:"Comments",communityPublications:"Community publications",communityIntro:"Logged-in members can publish. Everyone can read, comment, and share opinions.",
-    publish:"Publish",send:"Send",createAccount:"Create an account",close:"Close",forgotPassword:"Forgot password?",accountActions:"Account actions"
+    publish:"Publish",send:"Send",createAccount:"Create an account",close:"Close",forgotPassword:"Forgot password?",accountActions:"Account actions",
+    onlineNow:"online",offlineSince:"last seen",offline:"offline"
   },
   fr: {
     "nav.home":"Accueil","nav.about":"À propos","nav.research":"Recherche","nav.resume":"CV","nav.contact":"Contact","nav.insights":"Insights",
@@ -399,7 +404,8 @@ const i18n = {
     opportunities:"Opportunités",opportunitiesText:"Discutez des séminaires, stages, opportunités de thèse, mobilités et perspectives académiques.",
     communitySpirit:"Esprit de communauté",communitySpiritText:"Construisez un espace scientifique respectueux et actif où chaque membre peut publier, réagir et commenter.",
     like:"J’aime",comments:"Commentaires",communityPublications:"Publications de la communauté",communityIntro:"Les membres connectés peuvent publier. Tout le monde peut lire, commenter et donner son avis.",
-    publish:"Publier",send:"Envoyer",createAccount:"Créer un compte",close:"Fermer",forgotPassword:"Mot de passe oublié ?",accountActions:"Actions du compte"
+    publish:"Publier",send:"Envoyer",createAccount:"Créer un compte",close:"Fermer",forgotPassword:"Mot de passe oublié ?",accountActions:"Actions du compte",
+    onlineNow:"En ligne",offlineSince:"Déconnecté depuis",offline:"Hors ligne"
   },
   es: {
     "nav.home":"Inicio","nav.about":"Acerca de","nav.research":"Investigación","nav.resume":"CV","nav.contact":"Contacto","nav.insights":"Insights",
@@ -414,9 +420,14 @@ const i18n = {
     opportunities:"Oportunidades",opportunitiesText:"Habla sobre seminarios, prácticas, oportunidades de tesis, movilidad y perspectivas académicas.",
     communitySpirit:"Espíritu comunitario",communitySpiritText:"Construye un espacio científico respetuoso y activo donde cada miembro pueda publicar, reaccionar y comentar.",
     like:"Me gusta",comments:"Comentarios",communityPublications:"Publicaciones de la comunidad",communityIntro:"Los miembros conectados pueden publicar. Todos pueden leer, comentar y dar su opinión.",
-    publish:"Publicar",send:"Enviar",createAccount:"Crear una cuenta",close:"Cerrar",forgotPassword:"¿Olvidaste tu contraseña?",accountActions:"Acciones de la cuenta"
+    publish:"Publicar",send:"Enviar",createAccount:"Crear una cuenta",close:"Cerrar",forgotPassword:"¿Olvidaste tu contraseña?",accountActions:"Acciones de la cuenta",
+    onlineNow:"En línea",offlineSince:"Desconectado desde",offline:"Desconectado"
   }
 };
+
+function t(key) {
+  return (i18n[currentLanguage] && i18n[currentLanguage][key]) || key;
+}
 
 function setLanguage(lang) {
   currentLanguage = lang;
@@ -476,8 +487,10 @@ function formatDateTime(timestamp) {
 }
 
 function formatPresenceTime(ms) {
-  if (!ms) return "";
-  const date = new Date(ms);
+  const num = Number(ms || 0);
+  if (!num) return "";
+  const date = new Date(num);
+  if (isNaN(date.getTime())) return "";
   return date.toLocaleString("fr-FR", {
     day: "2-digit",
     month: "2-digit",
@@ -487,12 +500,23 @@ function formatPresenceTime(ms) {
   });
 }
 
-function isRecentlyActive(statusData) {
-  if (!statusData) return false;
-  if (statusData.state === "online") return true;
-  const lastChanged = Number(statusData.last_changed || 0);
+function isStatusOnline(data) {
+  if (!data) return false;
+  const lastChanged = Number(data.last_changed || 0);
   if (!lastChanged) return false;
-  return (Date.now() - lastChanged) <= ONLINE_GRACE_MS;
+  return data.state === "online" && ((Date.now() - lastChanged) <= ONLINE_FRESH_MS);
+}
+
+function statusText(data) {
+  if (!data) return t("offline");
+  if (isStatusOnline(data)) return t("onlineNow");
+
+  const formatted = formatPresenceTime(data.last_changed);
+  if (formatted) {
+    return `${t("offlineSince")} • ${formatted}`;
+  }
+
+  return t("offline");
 }
 
 function getInitials(firstName, lastName, fullName) {
@@ -812,13 +836,7 @@ async function saveProfile() {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    if (presenceStatusRef) {
-      await presenceStatusRef.set({
-        state: "online",
-        fullName,
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      });
-    }
+    await updateMyPresenceOnline(fullName);
 
     document.getElementById("user-info").textContent = `Connected as ${fullName}`;
     updateProfilePreview();
@@ -843,6 +861,37 @@ async function sendResetForCurrentUser() {
   }
 }
 
+function updateMyPresenceOnline(fullName) {
+  if (!presenceStatusRef) return Promise.resolve();
+
+  return presenceStatusRef.set({
+    state: "online",
+    fullName: fullName || auth.currentUser?.displayName || "Member",
+    last_changed: firebase.database.ServerValue.TIMESTAMP
+  });
+}
+
+function startPresenceHeartbeat(fullName) {
+  stopPresenceHeartbeat();
+
+  updateMyPresenceOnline(fullName).catch(err => {
+    console.error("presence first online write error:", err);
+  });
+
+  presenceHeartbeatInterval = setInterval(() => {
+    updateMyPresenceOnline(fullName).catch(err => {
+      console.error("presence heartbeat error:", err);
+    });
+  }, HEARTBEAT_MS);
+}
+
+function stopPresenceHeartbeat() {
+  if (presenceHeartbeatInterval) {
+    clearInterval(presenceHeartbeatInterval);
+    presenceHeartbeatInterval = null;
+  }
+}
+
 function setupPresence(user, fullName) {
   cleanupPresence();
 
@@ -857,23 +906,38 @@ function setupPresence(user, fullName) {
       fullName: fullName || user.displayName || "Member",
       last_changed: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
-      presenceStatusRef.set({
-        state: "online",
-        fullName: fullName || user.displayName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      });
+      startPresenceHeartbeat(fullName || user.displayName || "Member");
     });
   });
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+}
+
+function handleBeforeUnload() {
+  try {
+    if (presenceStatusRef) {
+      presenceStatusRef.set({
+        state: "offline",
+        fullName: auth.currentUser?.displayName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
+  } catch (_) {}
 }
 
 function cleanupPresence() {
   try {
     if (presenceConnectedRef) presenceConnectedRef.off();
     if (presenceStatusRef) presenceStatusRef.off();
+    if (onlineUsersRef) onlineUsersRef.off();
   } catch (_) {}
+
+  stopPresenceHeartbeat();
+  window.removeEventListener("beforeunload", handleBeforeUnload);
 
   presenceConnectedRef = null;
   presenceStatusRef = null;
+  onlineUsersRef = null;
 }
 
 function refreshPresence() {
@@ -881,7 +945,12 @@ function refreshPresence() {
 }
 
 function loadOnlineUsers() {
-  rtdb.ref("/status").on("value", async (snapshot) => {
+  if (onlineUsersRef) {
+    try { onlineUsersRef.off(); } catch (_) {}
+  }
+
+  onlineUsersRef = rtdb.ref("/status");
+  onlineUsersRef.on("value", async (snapshot) => {
     const container = document.getElementById("online-users");
     let html = "";
     const items = [];
@@ -891,13 +960,8 @@ function loadOnlineUsers() {
     });
 
     const visibleItems = items
-      .filter(data => isRecentlyActive(data))
-      .sort((a, b) => {
-        const aOnline = a.state === "online" ? 1 : 0;
-        const bOnline = b.state === "online" ? 1 : 0;
-        if (bOnline !== aOnline) return bOnline - aOnline;
-        return Number(b.last_changed || 0) - Number(a.last_changed || 0);
-      });
+      .filter(data => isStatusOnline(data))
+      .sort((a, b) => Number(b.last_changed || 0) - Number(a.last_changed || 0));
 
     for (const data of visibleItems) {
       let profileData = {};
@@ -915,11 +979,6 @@ function loadOnlineUsers() {
         avatarColor: profileData.avatarColor || "#16385d"
       };
 
-      const online = data.state === "online";
-      const statusText = online
-        ? "online"
-        : `active recently • ${formatPresenceTime(data.last_changed)}`;
-
       html += `
         <div class="online-user">
           ${avatarHtml(mergedProfile)}
@@ -927,7 +986,7 @@ function loadOnlineUsers() {
             <div class="online-name">
               <a class="profile-link" href="profile.html?uid=${data.uid}">${escapeHtml(mergedProfile.fullName || "Member")}</a>
             </div>
-            <div class="online-time">${escapeHtml(statusText)}</div>
+            <div class="online-time">${escapeHtml(statusText(data))}</div>
           </div>
           <div class="inline-actions">
             ${renderMessageButton(data.uid, mergedProfile.fullName || "Member")}
@@ -1623,10 +1682,12 @@ async function logout() {
   });
 
   try {
-    if (user) {
-      await rtdb.ref("/status/" + user.uid).set({
+    stopPresenceHeartbeat();
+
+    if (presenceStatusRef) {
+      await presenceStatusRef.set({
         state: "offline",
-        fullName: user.displayName || "Member",
+        fullName: user?.displayName || "Member",
         last_changed: firebase.database.ServerValue.TIMESTAMP
       });
     }
