@@ -128,12 +128,20 @@ let selectedUserProfile = null;
 let currentThreadId = null;
 let currentLanguage = localStorage.getItem("site_lang") || "en";
 let threadUnsubscribe = null;
+
 let presenceConnectedRef = null;
 let presenceStatusRef = null;
+let presenceHeartbeatInterval = null;
+let usersUnsubscribe = null;
+let threadsUnsubscribe = null;
+let statusesRef = null;
 
 let usersCache = {};
 let threadsCache = [];
 let statusCache = {};
+
+const HEARTBEAT_MS = 20000;
+const ONLINE_FRESH_MS = 70000;
 
 const i18n = {
   en: {
@@ -340,17 +348,24 @@ function getStatusFor(uid) {
 
 function isOnline(uid) {
   const data = getStatusFor(uid);
-  return !!(data && data.state === "online");
+  if (!data) return false;
+
+  const lastChanged = Number(data.last_changed || 0);
+  const freshEnough = lastChanged && ((Date.now() - lastChanged) <= ONLINE_FRESH_MS);
+
+  return data.state === "online" && freshEnough;
 }
 
 function presenceText(uid) {
   const data = getStatusFor(uid);
 
-  if (data && data.state === "online") {
+  if (!data) return t("offline");
+
+  if (isOnline(uid)) {
     return t("onlineNow");
   }
 
-  if (data && data.last_changed) {
+  if (data.last_changed) {
     const formatted = formatLastSeen(data.last_changed);
     if (formatted) {
       return `${t("offlineSince")} ${formatted}`;
@@ -358,6 +373,37 @@ function presenceText(uid) {
   }
 
   return t("offline");
+}
+
+function updateMyPresenceOnline(fullName) {
+  if (!presenceStatusRef) return Promise.resolve();
+
+  return presenceStatusRef.set({
+    state: "online",
+    fullName: fullName || auth.currentUser?.displayName || "Member",
+    last_changed: firebase.database.ServerValue.TIMESTAMP
+  });
+}
+
+function startPresenceHeartbeat(fullName) {
+  stopPresenceHeartbeat();
+
+  updateMyPresenceOnline(fullName).catch(err => {
+    console.error("presence first online write error:", err);
+  });
+
+  presenceHeartbeatInterval = setInterval(() => {
+    updateMyPresenceOnline(fullName).catch(err => {
+      console.error("presence heartbeat error:", err);
+    });
+  }, HEARTBEAT_MS);
+}
+
+function stopPresenceHeartbeat() {
+  if (presenceHeartbeatInterval) {
+    clearInterval(presenceHeartbeatInterval);
+    presenceHeartbeatInterval = null;
+  }
 }
 
 function setupPresence(user, fullName) {
@@ -374,15 +420,25 @@ function setupPresence(user, fullName) {
       fullName: fullName || user.displayName || "Member",
       last_changed: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
-      presenceStatusRef.set({
-        state: "online",
-        fullName: fullName || user.displayName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      });
+      startPresenceHeartbeat(fullName || user.displayName || "Member");
     }).catch((error) => {
       console.error("setupPresence error:", error);
     });
   });
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+}
+
+function handleBeforeUnload() {
+  try {
+    if (presenceStatusRef) {
+      presenceStatusRef.set({
+        state: "offline",
+        fullName: auth.currentUser?.displayName || currentUserProfile?.fullName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
+  } catch (_) {}
 }
 
 function cleanupPresence() {
@@ -390,6 +446,9 @@ function cleanupPresence() {
     if (presenceConnectedRef) presenceConnectedRef.off();
     if (presenceStatusRef) presenceStatusRef.off();
   } catch (_) {}
+
+  stopPresenceHeartbeat();
+  window.removeEventListener("beforeunload", handleBeforeUnload);
 
   presenceConnectedRef = null;
   presenceStatusRef = null;
@@ -610,12 +669,12 @@ function loadMessages() {
     .doc(currentThreadId)
     .collection("messages")
     .orderBy("createdAt", "asc")
-    .onSnapshot(async (snapshot) => {
+    .onSnapshot((snapshot) => {
       const user = auth.currentUser;
       const container = document.getElementById("chat-messages");
       let html = "";
 
-      for (const doc of snapshot.docs) {
+      snapshot.docs.forEach((doc) => {
         const m = doc.data();
         const sender = usersCache[m.senderId] || {};
         const own = user && user.uid === m.senderId;
@@ -636,7 +695,7 @@ function loadMessages() {
             </div>
           </div>
         `;
-      }
+      });
 
       container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("noMessageYet"))}</p>`;
       container.scrollTop = container.scrollHeight;
@@ -742,23 +801,24 @@ async function logoutFromMessages() {
 
   setChatStatus("Déconnexion en cours...");
 
+  try {
+    stopPresenceHeartbeat();
+
+    if (presenceStatusRef) {
+      await presenceStatusRef.set({
+        state: "offline",
+        fullName: user?.displayName || currentUserProfile?.fullName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
+  } catch (error) {
+    console.error("presence logout error:", error);
+  }
+
   cleanupPresence();
 
   try {
-    if (user) {
-      rtdb.ref("/status/" + user.uid).set({
-        state: "offline",
-        fullName: user.displayName || currentUserProfile?.fullName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      }).catch((error) => {
-        console.error("presence logout error:", error);
-      });
-    }
-
-    await Promise.race([
-      auth.signOut(),
-      new Promise((resolve) => setTimeout(resolve, 2500))
-    ]);
+    await auth.signOut();
   } catch (error) {
     console.error("logout error:", error);
   }
@@ -767,7 +827,9 @@ async function logoutFromMessages() {
 }
 
 function subscribeUsers() {
-  db.collection("users").onSnapshot((snapshot) => {
+  if (usersUnsubscribe) usersUnsubscribe();
+
+  usersUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
     const nextUsers = {};
     snapshot.forEach((doc) => {
       nextUsers[doc.id] = doc.data();
@@ -793,7 +855,9 @@ function subscribeThreads() {
   const user = auth.currentUser;
   if (!user) return;
 
-  db.collection("privateThreads")
+  if (threadsUnsubscribe) threadsUnsubscribe();
+
+  threadsUnsubscribe = db.collection("privateThreads")
     .where("participants", "array-contains", user.uid)
     .onSnapshot((snapshot) => {
       threadsCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -803,7 +867,12 @@ function subscribeThreads() {
 }
 
 function subscribeStatuses() {
-  rtdb.ref("/status").on("value", (snapshot) => {
+  if (statusesRef) {
+    try { statusesRef.off(); } catch (_) {}
+  }
+
+  statusesRef = rtdb.ref("/status");
+  statusesRef.on("value", (snapshot) => {
     const nextStatuses = {};
     snapshot.forEach((child) => {
       nextStatuses[child.key] = child.val();
@@ -815,6 +884,8 @@ function subscribeStatuses() {
     renderInbox();
     renderRecentThreads();
     renderChatHeader();
+  }, (error) => {
+    console.error("status subscribe error:", error);
   });
 }
 
@@ -840,7 +911,7 @@ auth.onAuthStateChanged(async (user) => {
   const params = new URLSearchParams(window.location.search);
   const preselectedUser = params.get("user");
   if (preselectedUser) {
-    setTimeout(() => selectConversation(preselectedUser), 350);
+    setTimeout(() => selectConversation(preselectedUser), 600);
   }
 });
 </script>
