@@ -406,6 +406,18 @@ function stopPresenceHeartbeat() {
   }
 }
 
+function handleBeforeUnload() {
+  try {
+    if (presenceStatusRef) {
+      presenceStatusRef.set({
+        state: "offline",
+        fullName: auth.currentUser?.displayName || currentUserProfile?.fullName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
+  } catch (_) {}
+}
+
 function setupPresence(user, fullName) {
   cleanupPresence();
 
@@ -429,22 +441,11 @@ function setupPresence(user, fullName) {
   window.addEventListener("beforeunload", handleBeforeUnload);
 }
 
-function handleBeforeUnload() {
-  try {
-    if (presenceStatusRef) {
-      presenceStatusRef.set({
-        state: "offline",
-        fullName: auth.currentUser?.displayName || currentUserProfile?.fullName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      });
-    }
-  } catch (_) {}
-}
-
 function cleanupPresence() {
   try {
     if (presenceConnectedRef) presenceConnectedRef.off();
     if (presenceStatusRef) presenceStatusRef.off();
+    if (statusesRef) statusesRef.off();
   } catch (_) {}
 
   stopPresenceHeartbeat();
@@ -477,7 +478,7 @@ function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPr
         </div>
 
         ${subtitle ? `<span class="member-subtitle">${escapeHtml(subtitle)}</span>` : ""}
-        <span class="member-presence-text">${escapeHtml(presenceLine)}</span>
+        <span class="member-presence-text">${escapeHtml(presenceText(uid))}</span>
       </div>
 
       <button type="button"
@@ -796,7 +797,7 @@ async function logoutFromMessages() {
 
   if (btn) {
     btn.disabled = true;
-    btn.textContent = "Logging out...";
+    btn.textContent = "Déconnexion...";
   }
 
   setChatStatus("Déconnexion en cours...");
@@ -804,10 +805,10 @@ async function logoutFromMessages() {
   try {
     stopPresenceHeartbeat();
 
-    if (presenceStatusRef) {
+    if (presenceStatusRef && user) {
       await presenceStatusRef.set({
         state: "offline",
-        fullName: user?.displayName || currentUserProfile?.fullName || "Member",
+        fullName: user.displayName || currentUserProfile?.fullName || "Member",
         last_changed: firebase.database.ServerValue.TIMESTAMP
       });
     }
@@ -818,12 +819,15 @@ async function logoutFromMessages() {
   cleanupPresence();
 
   try {
-    await auth.signOut();
+    sessionStorage.setItem("afterMessagesLogout", "1");
+    auth.signOut().catch((error) => {
+      console.error("logout error:", error);
+    });
   } catch (error) {
-    console.error("logout error:", error);
+    console.error("logout launch error:", error);
   }
 
-  window.location.href = "insights.html";
+  window.location.replace("insights.html");
 }
 
 function subscribeUsers() {
@@ -891,6 +895,13 @@ function subscribeStatuses() {
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
+    const fromLogout = sessionStorage.getItem("afterMessagesLogout");
+    if (fromLogout) {
+      sessionStorage.removeItem("afterMessagesLogout");
+      window.location.replace("insights.html");
+      return;
+    }
+
     redirectToInsightsLoginMessage();
     return;
   }
