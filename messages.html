@@ -114,7 +114,9 @@ const firebaseConfig = {
   databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 const db = firebase.firestore();
 const auth = firebase.auth();
@@ -129,6 +131,7 @@ let threadUnsubscribe = null;
 let selectedPresenceRef = null;
 let presenceConnectedRef = null;
 let presenceStatusRef = null;
+let authHandledOnce = false;
 
 const ONLINE_GRACE_MS = 5 * 60 * 1000;
 
@@ -288,6 +291,8 @@ function setupPresence(user, fullName) {
         fullName: fullName || user.displayName || "Member",
         last_changed: firebase.database.ServerValue.TIMESTAMP
       });
+    }).catch((error) => {
+      console.error("setupPresence error:", error);
     });
   });
 }
@@ -732,45 +737,52 @@ async function logoutFromMessages() {
 
   setChatStatus("Déconnexion en cours...");
 
-  try {
-    if (user) {
-      await rtdb.ref("/status/" + user.uid).set({
-        state: "offline",
-        fullName: user.displayName || currentUserProfile?.fullName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      });
-    }
-  } catch (error) {
-    console.error("presence logout error:", error);
-  }
-
   cleanupPresence();
   unsubscribeSelectedPresence();
 
   try {
+    if (user) {
+      rtdb.ref("/status/" + user.uid).set({
+        state: "offline",
+        fullName: user.displayName || currentUserProfile?.fullName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      }).catch((error) => {
+        console.error("presence logout error:", error);
+      });
+    }
+
     sessionStorage.setItem("afterMessagesLogout", "1");
-    await auth.signOut();
-    window.location.replace("insights.html");
+
+    await Promise.race([
+      auth.signOut(),
+      new Promise((resolve) => setTimeout(resolve, 2500))
+    ]);
   } catch (error) {
     console.error("logout error:", error);
-    setChatStatus("Déconnexion impossible pour le moment.", true);
-
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "Logout";
-    }
   }
+
+  window.location.href = "insights.html";
 }
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
+    if (authHandledOnce) {
+      window.location.href = "insights.html";
+      return;
+    }
+
     const fromLogout = sessionStorage.getItem("afterMessagesLogout");
     if (fromLogout) {
       sessionStorage.removeItem("afterMessagesLogout");
+      window.location.href = "insights.html";
+      return;
     }
-    window.location.replace("insights.html");
+
+    window.location.href = "insights.html";
     return;
   }
+
+  authHandledOnce = true;
 
   const snap = await db.collection("users").doc(user.uid).get();
   currentUserProfile = snap.exists ? snap.data() : { fullName: user.displayName || "Member" };
