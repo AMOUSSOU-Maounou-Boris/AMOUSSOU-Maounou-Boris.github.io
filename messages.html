@@ -128,20 +128,19 @@ let selectedUserProfile = null;
 let currentThreadId = null;
 let currentLanguage = localStorage.getItem("site_lang") || "en";
 let threadUnsubscribe = null;
-
-let presenceConnectedRef = null;
-let presenceStatusRef = null;
-let presenceHeartbeatInterval = null;
 let usersUnsubscribe = null;
 let threadsUnsubscribe = null;
 let statusesRef = null;
+let presenceConnectedRef = null;
+let presenceStatusRef = null;
+let heartbeatInterval = null;
 
 let usersCache = {};
 let threadsCache = [];
 let statusCache = {};
 
-const HEARTBEAT_MS = 20000;
-const ONLINE_FRESH_MS = 70000;
+const HEARTBEAT_MS = 25000;
+const ONLINE_FRESH_MS = 90000;
 
 const i18n = {
   en: {
@@ -234,11 +233,9 @@ function setLanguage(lang) {
       el.textContent = i18n[lang][key];
     }
   });
-
   renderAllPanels();
   renderChatHeader();
 }
-
 setLanguage(currentLanguage);
 
 function redirectToInsightsLoginMessage() {
@@ -320,14 +317,14 @@ function formatLastSeen(ms) {
   });
 }
 
-function threadIdFor(uid1, uid2) {
-  return [uid1, uid2].sort().join("_");
-}
-
 function canDeleteMessage(createdAt) {
   if (!createdAt) return false;
   const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
   return (Date.now() - date.getTime()) <= (30 * 60 * 1000);
+}
+
+function threadIdFor(uid1, uid2) {
+  return [uid1, uid2].sort().join("_");
 }
 
 function setChatStatus(text, isError = false) {
@@ -349,33 +346,44 @@ function getStatusFor(uid) {
 function isOnline(uid) {
   const data = getStatusFor(uid);
   if (!data) return false;
-
   const lastChanged = Number(data.last_changed || 0);
-  const freshEnough = lastChanged && ((Date.now() - lastChanged) <= ONLINE_FRESH_MS);
-
-  return data.state === "online" && freshEnough;
+  return data.state === "online" && lastChanged && ((Date.now() - lastChanged) <= ONLINE_FRESH_MS);
 }
 
 function presenceText(uid) {
   const data = getStatusFor(uid);
 
   if (!data) return t("offline");
-
-  if (isOnline(uid)) {
-    return t("onlineNow");
-  }
+  if (isOnline(uid)) return t("onlineNow");
 
   if (data.last_changed) {
     const formatted = formatLastSeen(data.last_changed);
-    if (formatted) {
-      return `${t("offlineSince")} ${formatted}`;
-    }
+    if (formatted) return `${t("offlineSince")} ${formatted}`;
   }
 
   return t("offline");
 }
 
-function updateMyPresenceOnline(fullName) {
+function cleanupRealtimeSubscriptions() {
+  try {
+    if (usersUnsubscribe) usersUnsubscribe();
+    if (threadsUnsubscribe) threadsUnsubscribe();
+    if (statusesRef) statusesRef.off();
+  } catch (_) {}
+
+  usersUnsubscribe = null;
+  threadsUnsubscribe = null;
+  statusesRef = null;
+}
+
+function stopHeartbeat() {
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = null;
+  }
+}
+
+function writeOnlinePresence(fullName) {
   if (!presenceStatusRef) return Promise.resolve();
 
   return presenceStatusRef.set({
@@ -385,37 +393,29 @@ function updateMyPresenceOnline(fullName) {
   });
 }
 
-function startPresenceHeartbeat(fullName) {
-  stopPresenceHeartbeat();
+function startHeartbeat(fullName) {
+  stopHeartbeat();
 
-  updateMyPresenceOnline(fullName).catch(err => {
-    console.error("presence first online write error:", err);
+  writeOnlinePresence(fullName).catch((error) => {
+    console.error("presence write error:", error);
   });
 
-  presenceHeartbeatInterval = setInterval(() => {
-    updateMyPresenceOnline(fullName).catch(err => {
-      console.error("presence heartbeat error:", err);
+  heartbeatInterval = setInterval(() => {
+    writeOnlinePresence(fullName).catch((error) => {
+      console.error("presence heartbeat error:", error);
     });
   }, HEARTBEAT_MS);
 }
 
-function stopPresenceHeartbeat() {
-  if (presenceHeartbeatInterval) {
-    clearInterval(presenceHeartbeatInterval);
-    presenceHeartbeatInterval = null;
-  }
-}
-
-function handleBeforeUnload() {
+function cleanupPresence() {
   try {
-    if (presenceStatusRef) {
-      presenceStatusRef.set({
-        state: "offline",
-        fullName: auth.currentUser?.displayName || currentUserProfile?.fullName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      });
-    }
+    if (presenceConnectedRef) presenceConnectedRef.off();
+    if (presenceStatusRef) presenceStatusRef.off();
   } catch (_) {}
+
+  stopHeartbeat();
+  presenceConnectedRef = null;
+  presenceStatusRef = null;
 }
 
 function setupPresence(user, fullName) {
@@ -432,27 +432,11 @@ function setupPresence(user, fullName) {
       fullName: fullName || user.displayName || "Member",
       last_changed: firebase.database.ServerValue.TIMESTAMP
     }).then(() => {
-      startPresenceHeartbeat(fullName || user.displayName || "Member");
+      startHeartbeat(fullName || user.displayName || "Member");
     }).catch((error) => {
       console.error("setupPresence error:", error);
     });
   });
-
-  window.addEventListener("beforeunload", handleBeforeUnload);
-}
-
-function cleanupPresence() {
-  try {
-    if (presenceConnectedRef) presenceConnectedRef.off();
-    if (presenceStatusRef) presenceStatusRef.off();
-    if (statusesRef) statusesRef.off();
-  } catch (_) {}
-
-  stopPresenceHeartbeat();
-  window.removeEventListener("beforeunload", handleBeforeUnload);
-
-  presenceConnectedRef = null;
-  presenceStatusRef = null;
 }
 
 function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPresenceDot = false) {
@@ -463,7 +447,6 @@ function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPr
     <div class="member-list-item"
          data-search="${escapeHtml(searchText)}"
          ${clickableToChat ? `onclick="selectConversation('${uid}')"` : ""}>
-
       ${avatarHtml(profile)}
 
       <div class="member-text">
@@ -521,9 +504,11 @@ function renderInbox() {
     });
 
   let html = "";
+
   docs.forEach(data => {
     const otherUserId = (data.participants || []).find(id => id !== user.uid);
     if (!otherUserId) return;
+
     const profile = usersCache[otherUserId] || { fullName: "Member" };
     const unread = unreadCountFor(data, user.uid);
 
@@ -531,7 +516,6 @@ function renderInbox() {
       <div class="member-list-item"
            data-search="${escapeHtml(((profile.fullName || "") + " " + (profile.institution || "")).toLowerCase())}"
            onclick="selectConversation('${otherUserId}')">
-
         ${avatarHtml(profile)}
 
         <div class="member-text">
@@ -804,6 +788,8 @@ async function logoutFromMessages() {
   try {
     sessionStorage.setItem("afterMessagesLogout", "1");
 
+    stopHeartbeat();
+
     if (user) {
       rtdb.ref("/status/" + user.uid).set({
         state: "offline",
@@ -815,6 +801,7 @@ async function logoutFromMessages() {
     }
 
     cleanupPresence();
+    cleanupRealtimeSubscriptions();
 
     auth.signOut().catch((error) => {
       console.error("logout error:", error);
@@ -893,7 +880,6 @@ function subscribeStatuses() {
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
     const fromLogout = sessionStorage.getItem("afterMessagesLogout");
-
     if (fromLogout) {
       sessionStorage.removeItem("afterMessagesLogout");
       window.location.href = "insights.html";
