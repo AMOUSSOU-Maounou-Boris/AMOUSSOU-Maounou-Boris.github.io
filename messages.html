@@ -148,6 +148,7 @@ const i18n = {
     privateMessagesHere: "Your private messages will appear here.",
     onlineNow: "Online",
     offlineSince: "Offline since",
+    offline: "Offline",
     noMemberYet: "No member yet.",
     noMessageYet: "No message yet.",
     noMessageReceived: "No message received yet.",
@@ -158,8 +159,7 @@ const i18n = {
     loadError: "Unable to load messages.",
     sendError: "Unable to send the message.",
     deleteError: "Unable to delete the message.",
-    chooseMember: "Please select a member first.",
-    loginFirst: "Please log in first."
+    chooseMember: "Please select a member first."
   },
   fr: {
     messaging: "Messagerie",
@@ -173,6 +173,7 @@ const i18n = {
     privateMessagesHere: "Tes messages privés vont apparaître ici.",
     onlineNow: "En ligne",
     offlineSince: "Déconnecté depuis",
+    offline: "Hors ligne",
     noMemberYet: "Aucun membre pour le moment.",
     noMessageYet: "Aucun message pour le moment.",
     noMessageReceived: "Aucun message reçu pour le moment.",
@@ -183,8 +184,7 @@ const i18n = {
     loadError: "Impossible de charger les messages.",
     sendError: "Impossible d'envoyer le message.",
     deleteError: "Impossible de supprimer le message.",
-    chooseMember: "Choisis d'abord un membre.",
-    loginFirst: "Connecte-toi d'abord."
+    chooseMember: "Choisis d'abord un membre."
   },
   es: {
     messaging: "Mensajería",
@@ -198,6 +198,7 @@ const i18n = {
     privateMessagesHere: "Tus mensajes privados aparecerán aquí.",
     onlineNow: "En línea",
     offlineSince: "Desconectado desde",
+    offline: "Desconectado",
     noMemberYet: "Ningún miembro todavía.",
     noMessageYet: "Ningún mensaje todavía.",
     noMessageReceived: "No hay mensajes recibidos todavía.",
@@ -208,8 +209,7 @@ const i18n = {
     loadError: "No se pueden cargar los mensajes.",
     sendError: "No se puede enviar el mensaje.",
     deleteError: "No se puede eliminar el mensaje.",
-    chooseMember: "Selecciona primero un miembro.",
-    loginFirst: "Inicia sesión primero."
+    chooseMember: "Selecciona primero un miembro."
   }
 };
 
@@ -300,8 +300,10 @@ function formatDateTime(timestamp) {
 }
 
 function formatLastSeen(ms) {
-  if (!ms) return "";
-  const date = new Date(ms);
+  const num = Number(ms || 0);
+  if (!num) return "";
+  const date = new Date(num);
+  if (isNaN(date.getTime())) return "";
   return date.toLocaleString("fr-FR", {
     day: "2-digit",
     month: "2-digit",
@@ -343,13 +345,19 @@ function isOnline(uid) {
 
 function presenceText(uid) {
   const data = getStatusFor(uid);
+
   if (data && data.state === "online") {
     return t("onlineNow");
   }
+
   if (data && data.last_changed) {
-    return `${t("offlineSince")} ${formatLastSeen(data.last_changed)}`;
+    const formatted = formatLastSeen(data.last_changed);
+    if (formatted) {
+      return `${t("offlineSince")} ${formatted}`;
+    }
   }
-  return t("offlineSince");
+
+  return t("offline");
 }
 
 function setupPresence(user, fullName) {
@@ -406,7 +414,7 @@ function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPr
                   onclick="event.stopPropagation(); selectConversation('${uid}')">
             ${escapeHtml(profile?.fullName || "Member")}
           </button>
-          ${showPresenceDot ? `<span class="presence-chip ${online ? "online-chip" : "offline-chip"}">${escapeHtml(online ? t("onlineNow") : t("offlineSince"))}</span>` : ""}
+          ${showPresenceDot ? `<span class="presence-chip ${online ? "online-chip" : "offline-chip"}">${escapeHtml(online ? t("onlineNow") : t("offline"))}</span>` : ""}
         </div>
 
         ${subtitle ? `<span class="member-subtitle">${escapeHtml(subtitle)}</span>` : ""}
