@@ -45,7 +45,7 @@
     </div>
 
     <div class="sidebar-actions">
-      <button class="sidebar-logout-btn" onclick="logoutFromMessages()">Logout</button>
+      <button class="sidebar-logout-btn" onclick="logoutFromMessages()" data-i18n="logout">Logout</button>
     </div>
 
     <input
@@ -95,7 +95,7 @@
           <button class="emoji-btn" onclick="insertEmoji('message-input','🔥')">🔥</button>
           <button class="emoji-btn" onclick="insertEmoji('message-input','🧪')">🧪</button>
           <button class="emoji-btn" onclick="insertEmoji('message-input','💡')">💡</button>
-          <button class="send-btn" onclick="sendMessage()">Send</button>
+          <button class="send-btn" onclick="sendMessage()" data-i18n="send">Send</button>
         </div>
       </div>
     </section>
@@ -131,7 +131,6 @@ let threadUnsubscribe = null;
 let selectedPresenceRef = null;
 let presenceConnectedRef = null;
 let presenceStatusRef = null;
-let authHandledOnce = false;
 
 const ONLINE_GRACE_MS = 5 * 60 * 1000;
 
@@ -141,21 +140,27 @@ const i18n = {
     allMembers: "All members",
     inbox: "Inbox",
     online: "Online",
-    recent: "Recent"
+    recent: "Recent",
+    logout: "Logout",
+    send: "Send"
   },
   fr: {
     messaging: "Messagerie",
     allMembers: "Tous les membres",
     inbox: "Boîte de réception",
     online: "En ligne",
-    recent: "Récentes"
+    recent: "Récentes",
+    logout: "Déconnexion",
+    send: "Envoyer"
   },
   es: {
     messaging: "Mensajería",
     allMembers: "Todos los miembros",
     inbox: "Bandeja",
     online: "En línea",
-    recent: "Recientes"
+    recent: "Recientes",
+    logout: "Cerrar sesión",
+    send: "Enviar"
   }
 };
 
@@ -164,7 +169,9 @@ function setLanguage(lang) {
   localStorage.setItem("site_lang", lang);
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.dataset.i18n;
-    if (i18n[lang] && i18n[lang][key]) el.textContent = i18n[lang][key];
+    if (i18n[lang] && i18n[lang][key]) {
+      el.textContent = i18n[lang][key];
+    }
   });
 }
 setLanguage(currentLanguage);
@@ -194,6 +201,7 @@ function avatarHtml(profile, cls = "") {
   if (photo) {
     return `<div class="member-avatar ${cls}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
   }
+
   return `<div class="member-avatar ${cls}" style="background:${escapeHtml(color)}">${initials}</div>`;
 }
 
@@ -263,6 +271,7 @@ function threadIdFor(uid1, uid2) {
 
 function setChatStatus(text, isError = false) {
   const box = document.getElementById("chat-status-message");
+  if (!box) return;
   box.textContent = text || "";
   box.style.color = isError ? "#b00020" : "#0b7a3b";
 }
@@ -338,7 +347,7 @@ function subscribeSelectedUserPresence(uid) {
 async function selectConversation(otherUserId) {
   const user = auth.currentUser;
   if (!user) {
-    alert("Please log in first.");
+    window.location.href = "insights.html";
     return;
   }
 
@@ -384,6 +393,7 @@ function loadMessages() {
       for (const doc of snapshot.docs) {
         const m = doc.data();
         let sender = {};
+
         try {
           const senderDoc = await db.collection("users").doc(m.senderId).get();
           if (senderDoc.exists) sender = senderDoc.data();
@@ -417,7 +427,7 @@ function loadMessages() {
 async function sendMessage() {
   const user = auth.currentUser;
   if (!user) {
-    alert("Please log in first.");
+    window.location.href = "insights.html";
     return;
   }
 
@@ -501,7 +511,7 @@ async function deleteMessage(messageId) {
   }
 }
 
-async function loadAllMembers() {
+function loadAllMembers() {
   const user = auth.currentUser;
   if (!user) return;
 
@@ -543,7 +553,7 @@ async function loadAllMembers() {
   });
 }
 
-async function loadInbox() {
+function loadInbox() {
   const user = auth.currentUser;
   if (!user) return;
 
@@ -603,7 +613,7 @@ async function loadInbox() {
     });
 }
 
-async function loadRecentThreads() {
+function loadRecentThreads() {
   const user = auth.currentUser;
   if (!user) return;
 
@@ -677,7 +687,6 @@ function loadOnlineMembers() {
       .sort((a, b) => {
         const aOnline = a.state === "online" ? 1 : 0;
         const bOnline = b.state === "online" ? 1 : 0;
-
         if (bOnline !== aOnline) return bOnline - aOnline;
 
         const aTime = Number(a.last_changed || 0);
@@ -690,9 +699,7 @@ function loadOnlineMembers() {
 
       try {
         const snap = await db.collection("users").doc(item.uid).get();
-        if (snap.exists) {
-          p = snap.data();
-        }
+        if (snap.exists) p = snap.data();
       } catch (_) {}
 
       const statusLabel = item.state === "online"
@@ -751,8 +758,6 @@ async function logoutFromMessages() {
       });
     }
 
-    sessionStorage.setItem("afterMessagesLogout", "1");
-
     await Promise.race([
       auth.signOut(),
       new Promise((resolve) => setTimeout(resolve, 2500))
@@ -766,23 +771,9 @@ async function logoutFromMessages() {
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
-    if (authHandledOnce) {
-      window.location.href = "insights.html";
-      return;
-    }
-
-    const fromLogout = sessionStorage.getItem("afterMessagesLogout");
-    if (fromLogout) {
-      sessionStorage.removeItem("afterMessagesLogout");
-      window.location.href = "insights.html";
-      return;
-    }
-
     window.location.href = "insights.html";
     return;
   }
-
-  authHandledOnce = true;
 
   const snap = await db.collection("users").doc(user.uid).get();
   currentUserProfile = snap.exists ? snap.data() : { fullName: user.displayName || "Member" };
