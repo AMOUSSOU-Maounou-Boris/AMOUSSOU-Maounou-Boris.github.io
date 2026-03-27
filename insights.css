@@ -92,6 +92,13 @@ body {
   margin-bottom: 24px;
 }
 
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
 .auth-box {
   margin-top: 24px;
   text-align: center;
@@ -190,6 +197,10 @@ body {
 }
 
 .hidden-panel {
+  display: none;
+}
+
+.hidden-account-tab {
   display: none;
 }
 
@@ -311,8 +322,12 @@ body {
 .online-user {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 14px;
+}
+
+.online-user-content {
+  flex: 1;
 }
 
 .online-name {
@@ -462,22 +477,23 @@ body {
   margin-top: 20px;
 }
 
-.emoji-bar {
+.emoji-panel {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f7f9fc;
+  border: 1px solid #e2eaf2;
 }
 
-.large-emoji-bar {
-  margin-bottom: 14px;
+.hidden-emoji-panel {
+  display: none;
 }
 
-.small-emoji-bar {
-  margin-top: 8px;
-}
-
-.emoji-btn {
+.emoji-btn,
+.emoji-toggle-btn {
   border: 1px solid #d7dde8;
   background: white;
   border-radius: 10px;
@@ -487,7 +503,14 @@ body {
   transition: transform 0.15s ease;
 }
 
-.emoji-btn:hover {
+.emoji-toggle-btn {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0b2239;
+}
+
+.emoji-btn:hover,
+.emoji-toggle-btn:hover {
   transform: translateY(-1px);
 }
 
@@ -532,6 +555,16 @@ body {
   padding: 6px 9px;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.mini-refresh-btn {
+  border: none;
+  background: #eef4fb;
+  color: #0b2239;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 700;
 }
 
 .inline-actions {
@@ -675,10 +708,6 @@ body {
   overflow-y: auto;
 }
 
-.modal-account-panel {
-  padding-top: 10px;
-}
-
 .modal-content h3 {
   margin-top: 0;
   color: #0b2239;
@@ -710,6 +739,28 @@ body {
   display: grid;
   grid-template-columns: 130px 1fr;
   gap: 10px;
+}
+
+.account-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.account-tab-btn {
+  border: none;
+  background: #edf3fa;
+  color: #0b2239;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.active-account-tab {
+  background: #0b2239;
+  color: white;
 }
 
 @media (max-width: 1100px) {
@@ -745,8 +796,10 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .comment-layout {
+  .comment-layout,
+  .online-user {
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .reply {
