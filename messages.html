@@ -2,21 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Messages</title>
-
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="messages.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Messages | Boris Research Hub</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="messages.css" />
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
-
 <body>
 
-<!-- NAV -->
 <nav class="msg-nav">
   <ul>
     <li><a href="index.html">Home</a></li>
@@ -27,46 +24,93 @@
     <li><a href="insights.html">Insights</a></li>
     <li><a href="messages.html" class="active-link">Messages</a></li>
   </ul>
+
+  <div class="lang-switcher">
+    <button onclick="setLanguage('en')">EN</button>
+    <button onclick="setLanguage('fr')">FR</button>
+    <button onclick="setLanguage('es')">ES</button>
+  </div>
 </nav>
 
 <div class="messages-layout">
-
-  <!-- SIDEBAR -->
   <aside class="messages-sidebar">
-    <h2>Messagerie</h2>
-    <p id="current-user-name">...</p>
+    <div class="sidebar-top">
+      <div id="current-user-avatar-wrap">
+        <div class="member-avatar large-avatar">MB</div>
+      </div>
+      <div>
+        <h2 data-i18n="messaging">Messaging</h2>
+        <p id="current-user-name">Member</p>
+      </div>
+    </div>
 
-    <button class="sidebar-logout-btn" onclick="logoutFromMessages()">Logout</button>
+    <div class="sidebar-actions">
+      <button class="sidebar-logout-btn" onclick="logoutFromMessages()">Logout</button>
+    </div>
 
-    <input type="text" id="member-search" placeholder="Search a member..." oninput="filterMembers()"/>
+    <input
+      type="text"
+      id="member-search"
+      class="search-input"
+      placeholder="Search a member..."
+      oninput="filterMembers()"
+    >
 
     <div class="tabs">
-      <button onclick="switchTab('all-members', this)" class="active-tab">Tous les membres</button>
-      <button onclick="switchTab('online-list', this)">En ligne</button>
+      <button class="tab-btn active-tab" onclick="switchTab('all-members', this)" data-i18n="allMembers">All members</button>
+      <button class="tab-btn" onclick="switchTab('inbox-list', this)" data-i18n="inbox">Inbox</button>
+      <button class="tab-btn" onclick="switchTab('online-list', this)" data-i18n="online">Online</button>
+      <button class="tab-btn" onclick="switchTab('recent-list', this)" data-i18n="recent">Recent</button>
     </div>
 
     <div id="all-members" class="tab-panel"></div>
+    <div id="inbox-list" class="tab-panel hidden-panel"></div>
     <div id="online-list" class="tab-panel hidden-panel"></div>
+    <div id="recent-list" class="tab-panel hidden-panel"></div>
   </aside>
 
-  <!-- MAIN -->
   <main class="messages-main">
-    <div id="chat-status-message"></div>
-    <div id="chat-messages"></div>
+    <section class="chat-header-card">
+      <div id="chat-user-summary" class="chat-user-summary">
+        <div class="member-avatar">MB</div>
+        <div>
+          <h3 id="chat-title">Select a conversation</h3>
+          <p id="chat-subtitle">Your private messages will appear here.</p>
+          <p id="chat-presence" class="chat-presence-line"></p>
+        </div>
+      </div>
+    </section>
 
-    <textarea id="message-input"></textarea>
-    <button onclick="sendMessage()">Send</button>
+    <section class="chat-body-card">
+      <div id="chat-status-message" class="chat-status-message"></div>
+      <div id="chat-messages" class="chat-messages"></div>
+
+      <div class="chat-composer">
+        <textarea id="message-input" placeholder="Write a private message..."></textarea>
+
+        <div class="composer-actions">
+          <button class="emoji-btn" onclick="insertEmoji('message-input','😀')">😀</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','👍')">👍</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','❤️')">❤️</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','🔥')">🔥</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','🧪')">🧪</button>
+          <button class="emoji-btn" onclick="insertEmoji('message-input','💡')">💡</button>
+          <button class="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </section>
   </main>
-
 </div>
 
 <script>
-
-// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
   authDomain: "boris-research-hub.firebaseapp.com",
   projectId: "boris-research-hub",
+  storageBucket: "boris-research-hub.firebasestorage.app",
+  messagingSenderId: "71055508172",
+  appId: "1:71055508172:web:72229e3f5ad664eb35b869",
+  measurementId: "G-9Q6SJ96NBS",
   databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com"
 };
 
@@ -76,182 +120,677 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 const rtdb = firebase.database();
 
-const ONLINE_GRACE_MS = 5 * 60 * 1000;
-
 let currentUserProfile = null;
 let selectedUserId = null;
+let selectedUserProfile = null;
+let currentThreadId = null;
+let currentLanguage = localStorage.getItem("site_lang") || "en";
+let threadUnsubscribe = null;
+let selectedPresenceRef = null;
+let presenceConnectedRef = null;
+let presenceStatusRef = null;
 
-// ==========================
-// 🔥 UTIL
-// ==========================
+const ONLINE_GRACE_MS = 5 * 60 * 1000;
 
-function escapeHtml(value){
+const i18n = {
+  en: {
+    messaging: "Messaging",
+    allMembers: "All members",
+    inbox: "Inbox",
+    online: "Online",
+    recent: "Recent"
+  },
+  fr: {
+    messaging: "Messagerie",
+    allMembers: "Tous les membres",
+    inbox: "Boîte de réception",
+    online: "En ligne",
+    recent: "Récentes"
+  },
+  es: {
+    messaging: "Mensajería",
+    allMembers: "Todos los miembros",
+    inbox: "Bandeja",
+    online: "En línea",
+    recent: "Recientes"
+  }
+};
+
+function setLanguage(lang) {
+  currentLanguage = lang;
+  localStorage.setItem("site_lang", lang);
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    if (i18n[lang] && i18n[lang][key]) el.textContent = i18n[lang][key];
+  });
+}
+setLanguage(currentLanguage);
+
+function escapeHtml(value) {
   return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-function formatLastSeen(ms){
-  if(!ms) return "";
-  return new Date(ms).toLocaleString("fr-FR");
+function getInitials(firstName, lastName, fullName) {
+  const f = (firstName || "").trim();
+  const l = (lastName || "").trim();
+  if (f || l) return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
+  const parts = (fullName || "Member").trim().split(" ").filter(Boolean);
+  return (parts.slice(0, 2).map(p => p.charAt(0)).join("") || "MB").toUpperCase();
 }
 
-function isRecentlyActive(data){
-  if(!data) return false;
-  if(data.state === "online") return true;
+function avatarHtml(profile, cls = "") {
+  const photo = profile?.photoURL || "";
+  const color = profile?.avatarColor || "#16385d";
+  const initials = escapeHtml(getInitials(profile?.firstName, profile?.lastName, profile?.fullName));
 
-  const t = Number(data.last_changed || 0);
-  return (Date.now() - t) <= ONLINE_GRACE_MS;
+  if (photo) {
+    return `<div class="member-avatar ${cls}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
+  }
+  return `<div class="member-avatar ${cls}" style="background:${escapeHtml(color)}">${initials}</div>`;
 }
 
-// ==========================
-// 🔥 LOGOUT (FIXED)
-// ==========================
+function switchTab(id, btn) {
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden-panel"));
+  document.getElementById(id).classList.remove("hidden-panel");
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active-tab"));
+  btn.classList.add("active-tab");
+}
 
-async function logoutFromMessages(){
+function filterMembers() {
+  const q = document.getElementById("member-search").value.trim().toLowerCase();
+  document.querySelectorAll(".member-list-item").forEach(item => {
+    const text = item.dataset.search || "";
+    item.style.display = text.includes(q) ? "flex" : "none";
+  });
+}
+
+function insertEmoji(targetId, emoji) {
+  const input = document.getElementById(targetId);
+  if (!input) return;
+  input.value += emoji;
+  input.focus();
+}
+
+function formatDateTime(timestamp) {
+  if (!timestamp) return "";
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  return date.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function formatLastSeen(ms) {
+  if (!ms) return "";
+  const date = new Date(ms);
+  return date.toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function isRecentlyActive(statusData) {
+  if (!statusData) return false;
+  if (statusData.state === "online") return true;
+
+  const lastChanged = Number(statusData.last_changed || 0);
+  if (!lastChanged) return false;
+
+  return (Date.now() - lastChanged) <= ONLINE_GRACE_MS;
+}
+
+function canDeleteMessage(createdAt) {
+  if (!createdAt) return false;
+  const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
+  return (Date.now() - date.getTime()) <= (30 * 60 * 1000);
+}
+
+function threadIdFor(uid1, uid2) {
+  return [uid1, uid2].sort().join("_");
+}
+
+function setChatStatus(text, isError = false) {
+  const box = document.getElementById("chat-status-message");
+  box.textContent = text || "";
+  box.style.color = isError ? "#b00020" : "#0b7a3b";
+}
+
+function unreadCountFor(data, uid) {
+  if (!data || !data.unreadCountByUser) return 0;
+  return data.unreadCountByUser[uid] || 0;
+}
+
+function setupPresence(user, fullName) {
+  cleanupPresence();
+
+  presenceStatusRef = rtdb.ref("/status/" + user.uid);
+  presenceConnectedRef = rtdb.ref(".info/connected");
+
+  presenceConnectedRef.on("value", (snap) => {
+    if (snap.val() === false) return;
+
+    presenceStatusRef.onDisconnect().set({
+      state: "offline",
+      fullName: fullName || user.displayName || "Member",
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+      presenceStatusRef.set({
+        state: "online",
+        fullName: fullName || user.displayName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      });
+    });
+  });
+}
+
+function cleanupPresence() {
+  try {
+    if (presenceConnectedRef) presenceConnectedRef.off();
+    if (presenceStatusRef) presenceStatusRef.off();
+  } catch (_) {}
+
+  presenceConnectedRef = null;
+  presenceStatusRef = null;
+}
+
+function unsubscribeSelectedPresence() {
+  try {
+    if (selectedPresenceRef) selectedPresenceRef.off();
+  } catch (_) {}
+  selectedPresenceRef = null;
+}
+
+function subscribeSelectedUserPresence(uid) {
+  unsubscribeSelectedPresence();
+
+  selectedPresenceRef = rtdb.ref("/status/" + uid);
+  selectedPresenceRef.on("value", (snapshot) => {
+    const data = snapshot.val();
+    const el = document.getElementById("chat-presence");
+    if (!el) return;
+
+    if (data && data.state === "online") {
+      el.textContent = "En ligne";
+    } else if (data && isRecentlyActive(data)) {
+      el.textContent = "Actif récemment";
+    } else if (data && data.last_changed) {
+      el.textContent = "Déconnecté depuis " + formatLastSeen(data.last_changed);
+    } else {
+      el.textContent = "Déconnecté";
+    }
+  });
+}
+
+async function selectConversation(otherUserId) {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Please log in first.");
+    return;
+  }
+
+  selectedUserId = otherUserId;
+  currentThreadId = threadIdFor(user.uid, otherUserId);
+
+  const profileSnap = await db.collection("users").doc(otherUserId).get();
+  selectedUserProfile = profileSnap.exists ? profileSnap.data() : { fullName: "Member" };
+
+  document.getElementById("chat-user-summary").innerHTML = `
+    ${avatarHtml(selectedUserProfile)}
+    <div>
+      <h3><a class="profile-link-dark" href="profile.html?uid=${otherUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a></h3>
+      <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
+      <p id="chat-presence" class="chat-presence-line"></p>
+    </div>
+  `;
+
+  subscribeSelectedUserPresence(otherUserId);
+
+  setChatStatus("");
+  await markThreadAsRead();
+  loadMessages();
+}
+
+function loadMessages() {
+  if (!currentThreadId) return;
+
+  if (threadUnsubscribe) {
+    threadUnsubscribe();
+    threadUnsubscribe = null;
+  }
+
+  threadUnsubscribe = db.collection("privateThreads")
+    .doc(currentThreadId)
+    .collection("messages")
+    .orderBy("createdAt", "asc")
+    .onSnapshot(async (snapshot) => {
+      const user = auth.currentUser;
+      const container = document.getElementById("chat-messages");
+      let html = "";
+
+      for (const doc of snapshot.docs) {
+        const m = doc.data();
+        let sender = {};
+        try {
+          const senderDoc = await db.collection("users").doc(m.senderId).get();
+          if (senderDoc.exists) sender = senderDoc.data();
+        } catch (_) {}
+
+        const own = user && user.uid === m.senderId;
+
+        html += `
+          <div class="msg-bubble ${own ? 'own-msg' : ''}">
+            <div class="msg-head">
+              ${avatarHtml(sender)}
+              <strong><a class="profile-link-dark" href="profile.html?uid=${m.senderId}">${escapeHtml(sender.fullName || "Member")}</a></strong>
+            </div>
+            <div class="msg-text">${escapeHtml(m.text || "")}</div>
+            <div class="msg-foot">
+              <span>${escapeHtml(formatDateTime(m.createdAt))}</span>
+              ${own && canDeleteMessage(m.createdAt) ? `<button class="delete-message-btn" onclick="deleteMessage('${doc.id}')">Delete</button>` : ""}
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html || "<p class='empty-text'>No message yet.</p>";
+      container.scrollTop = container.scrollHeight;
+    }, (error) => {
+      console.error("loadMessages error:", error);
+      setChatStatus("Impossible de charger les messages.", true);
+    });
+}
+
+async function sendMessage() {
+  const user = auth.currentUser;
+  if (!user) {
+    alert("Please log in first.");
+    return;
+  }
+
+  if (!selectedUserId) {
+    alert("Please select a member first.");
+    return;
+  }
+
+  const input = document.getElementById("message-input");
+  const text = input.value.trim();
+  if (!text) return;
+
+  const sendBtn = document.querySelector(".send-btn");
+  if (sendBtn) sendBtn.disabled = true;
+  setChatStatus("Sending...");
+
+  try {
+    const threadRef = db.collection("privateThreads").doc(currentThreadId);
+
+    await threadRef.set({
+      participants: [user.uid, selectedUserId],
+      participantNames: {
+        [user.uid]: currentUserProfile?.fullName || user.displayName || "Member",
+        [selectedUserId]: selectedUserProfile?.fullName || "Member"
+      },
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastMessage: text,
+      lastSenderId: user.uid,
+      unreadCountByUser: {
+        [user.uid]: 0,
+        [selectedUserId]: firebase.firestore.FieldValue.increment(1)
+      }
+    }, { merge: true });
+
+    await threadRef.collection("messages").add({
+      senderId: user.uid,
+      receiverId: selectedUserId,
+      text,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    input.value = "";
+    setChatStatus("Message sent.");
+    loadInbox();
+    loadRecentThreads();
+  } catch (error) {
+    console.error("sendMessage error:", error);
+    setChatStatus("Impossible d'envoyer le message. Vérifie aussi les règles Firestore.", true);
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+  }
+}
+
+async function markThreadAsRead() {
+  const user = auth.currentUser;
+  if (!user || !currentThreadId) return;
+
+  try {
+    await db.collection("privateThreads").doc(currentThreadId).set({
+      unreadCountByUser: {
+        [user.uid]: 0
+      }
+    }, { merge: true });
+  } catch (error) {
+    console.error("markThreadAsRead error:", error);
+  }
+}
+
+async function deleteMessage(messageId) {
+  if (!currentThreadId) return;
+
+  try {
+    await db.collection("privateThreads")
+      .doc(currentThreadId)
+      .collection("messages")
+      .doc(messageId)
+      .delete();
+  } catch (error) {
+    console.error("deleteMessage error:", error);
+    setChatStatus("Impossible de supprimer le message.", true);
+  }
+}
+
+async function loadAllMembers() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  db.collection("users").orderBy("fullName", "asc").onSnapshot((snapshot) => {
+    let html = "";
+
+    snapshot.forEach((doc) => {
+      const p = doc.data();
+      if (doc.id === user.uid) return;
+
+      html += `
+        <div class="member-list-item"
+             data-search="${escapeHtml((p.fullName || "").toLowerCase())} ${escapeHtml((p.institution || "").toLowerCase())}"
+             onclick="selectConversation('${doc.id}')">
+
+          ${avatarHtml(p)}
+
+          <div class="member-text">
+            <strong>
+              <button type="button"
+                      class="member-name-btn"
+                      onclick="event.stopPropagation(); selectConversation('${doc.id}')">
+                ${escapeHtml(p.fullName || "Member")}
+              </button>
+            </strong>
+            <span>${escapeHtml(p.institution || "")}</span>
+          </div>
+
+          <button type="button"
+                  class="member-profile-btn"
+                  onclick="event.stopPropagation(); window.location.href='profile.html?uid=${doc.id}'">
+            Profile
+          </button>
+        </div>
+      `;
+    });
+
+    document.getElementById("all-members").innerHTML = html || "<p class='empty-text'>No member yet.</p>";
+  });
+}
+
+async function loadInbox() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  db.collection("privateThreads")
+    .where("participants", "array-contains", user.uid)
+    .onSnapshot(async (snapshot) => {
+      const container = document.getElementById("inbox-list");
+      const docs = snapshot.docs
+        .filter(doc => (doc.data().lastMessage || "").trim() !== "")
+        .sort((a, b) => {
+          const ta = a.data().updatedAt?.toMillis?.() || 0;
+          const tb = b.data().updatedAt?.toMillis?.() || 0;
+          return tb - ta;
+        });
+
+      let html = "";
+
+      for (const doc of docs) {
+        const data = doc.data();
+        const otherUserId = (data.participants || []).find(id => id !== user.uid);
+        if (!otherUserId) continue;
+
+        let other = {};
+        try {
+          const otherDoc = await db.collection("users").doc(otherUserId).get();
+          if (otherDoc.exists) other = otherDoc.data();
+        } catch (_) {}
+
+        const unread = unreadCountFor(data, user.uid);
+
+        html += `
+          <div class="member-list-item" onclick="selectConversation('${otherUserId}')">
+            ${avatarHtml(other)}
+            <div class="member-text">
+              <strong>
+                <button type="button"
+                        class="member-name-btn"
+                        onclick="event.stopPropagation(); selectConversation('${otherUserId}')">
+                  ${escapeHtml(other.fullName || "Member")}
+                </button>
+              </strong>
+              <span>${escapeHtml(data.lastMessage || "")}</span>
+            </div>
+            ${unread > 0 ? `<span class="new-message-dot"></span>` : ""}
+            <button type="button"
+                    class="member-profile-btn"
+                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
+              Profile
+            </button>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html || "<p class='empty-text'>No message received yet.</p>";
+    }, (error) => {
+      console.error("loadInbox error:", error);
+    });
+}
+
+async function loadRecentThreads() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  db.collection("privateThreads")
+    .where("participants", "array-contains", user.uid)
+    .onSnapshot(async (snapshot) => {
+      const container = document.getElementById("recent-list");
+      const docs = snapshot.docs
+        .filter(doc => (doc.data().lastMessage || "").trim() !== "")
+        .sort((a, b) => {
+          const ta = a.data().updatedAt?.toMillis?.() || 0;
+          const tb = b.data().updatedAt?.toMillis?.() || 0;
+          return tb - ta;
+        });
+
+      let html = "";
+
+      for (const doc of docs.slice(0, 10)) {
+        const data = doc.data();
+        const otherUserId = (data.participants || []).find(id => id !== user.uid);
+        if (!otherUserId) continue;
+
+        let other = {};
+        try {
+          const otherDoc = await db.collection("users").doc(otherUserId).get();
+          if (otherDoc.exists) other = otherDoc.data();
+        } catch (_) {}
+
+        const unread = unreadCountFor(data, user.uid);
+
+        html += `
+          <div class="member-list-item" onclick="selectConversation('${otherUserId}')">
+            ${avatarHtml(other)}
+            <div class="member-text">
+              <strong>
+                <button type="button"
+                        class="member-name-btn"
+                        onclick="event.stopPropagation(); selectConversation('${otherUserId}')">
+                  ${escapeHtml(other.fullName || "Member")}
+                </button>
+              </strong>
+              <span>${escapeHtml(data.lastMessage || "")}</span>
+            </div>
+            ${unread > 0 ? `<span class="new-message-dot"></span>` : ""}
+            <button type="button"
+                    class="member-profile-btn"
+                    onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
+              Profile
+            </button>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html || "<p class='empty-text'>No recent conversation.</p>";
+    });
+}
+
+function loadOnlineMembers() {
+  rtdb.ref("/status").on("value", async (snapshot) => {
+    const me = auth.currentUser;
+    let html = "";
+
+    const items = [];
+    snapshot.forEach(child => items.push({ uid: child.key, ...child.val() }));
+
+    const visibleItems = items
+      .filter(item => {
+        if (me && item.uid === me.uid) return false;
+        return isRecentlyActive(item);
+      })
+      .sort((a, b) => {
+        const aOnline = a.state === "online" ? 1 : 0;
+        const bOnline = b.state === "online" ? 1 : 0;
+
+        if (bOnline !== aOnline) return bOnline - aOnline;
+
+        const aTime = Number(a.last_changed || 0);
+        const bTime = Number(b.last_changed || 0);
+        return bTime - aTime;
+      });
+
+    for (const item of visibleItems) {
+      let p = { fullName: item.fullName || "Member" };
+
+      try {
+        const snap = await db.collection("users").doc(item.uid).get();
+        if (snap.exists) {
+          p = snap.data();
+        }
+      } catch (_) {}
+
+      const statusLabel = item.state === "online"
+        ? "En ligne"
+        : `Actif récemment • ${formatLastSeen(item.last_changed)}`;
+
+      html += `
+        <div class="member-list-item" onclick="selectConversation('${item.uid}')">
+          ${avatarHtml(p)}
+          <div class="member-text">
+            <strong>
+              <button type="button"
+                      class="member-name-btn"
+                      onclick="event.stopPropagation(); selectConversation('${item.uid}')">
+                ${escapeHtml(p.fullName || "Member")}
+              </button>
+            </strong>
+            <span>${escapeHtml(statusLabel)}</span>
+          </div>
+          <span class="presence-dot"></span>
+          <button type="button"
+                  class="member-profile-btn"
+                  onclick="event.stopPropagation(); window.location.href='profile.html?uid=${item.uid}'">
+            Profile
+          </button>
+        </div>
+      `;
+    }
+
+    document.getElementById("online-list").innerHTML = html || "<p class='empty-text'>Nobody online.</p>";
+  });
+}
+
+async function logoutFromMessages() {
   const user = auth.currentUser;
   const btn = document.querySelector(".sidebar-logout-btn");
 
-  if(btn){
+  if (btn) {
     btn.disabled = true;
     btn.textContent = "Logging out...";
   }
 
-  try{
-    if(user){
-      rtdb.ref("/status/" + user.uid).set({
-        state:"offline",
+  setChatStatus("Déconnexion en cours...");
+
+  try {
+    if (user) {
+      await rtdb.ref("/status/" + user.uid).set({
+        state: "offline",
+        fullName: user.displayName || currentUserProfile?.fullName || "Member",
         last_changed: firebase.database.ServerValue.TIMESTAMP
       });
     }
-
-    await Promise.race([
-      auth.signOut(),
-      new Promise(res => setTimeout(res,2000))
-    ]);
-
-  }catch(e){
-    console.log(e);
+  } catch (error) {
+    console.error("presence logout error:", error);
   }
 
-  // 🔥 REDIRECTION FORCÉE
-  window.location.href = "insights.html";
+  cleanupPresence();
+  unsubscribeSelectedPresence();
+
+  try {
+    sessionStorage.setItem("afterMessagesLogout", "1");
+    await auth.signOut();
+    window.location.replace("insights.html");
+  } catch (error) {
+    console.error("logout error:", error);
+    setChatStatus("Déconnexion impossible pour le moment.", true);
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Logout";
+    }
+  }
 }
 
-// ==========================
-// 🔥 ONLINE USERS (5 min)
-// ==========================
-
-function loadOnlineMembers(){
-  rtdb.ref("/status").on("value", async (snapshot)=>{
-    let html = "";
-    const me = auth.currentUser;
-
-    snapshot.forEach(child=>{
-      const data = child.val();
-      const uid = child.key;
-
-      if(me && uid === me.uid) return;
-      if(!isRecentlyActive(data)) return;
-
-      const label = data.state === "online"
-        ? "En ligne"
-        : "Actif récemment";
-
-      html += `
-        <div class="member-list-item">
-          <strong>${escapeHtml(data.fullName || "Member")}</strong>
-          <span>${label}</span>
-        </div>
-      `;
-    });
-
-    document.getElementById("online-list").innerHTML =
-      html || "Nobody online";
-  });
-}
-
-// ==========================
-// 🔥 MEMBERS
-// ==========================
-
-function loadAllMembers(){
-  db.collection("users").onSnapshot((snap)=>{
-    let html="";
-
-    snap.forEach(doc=>{
-      const p = doc.data();
-      html += `
-        <div class="member-list-item" onclick="selectConversation('${doc.id}')">
-          ${escapeHtml(p.fullName)}
-        </div>
-      `;
-    });
-
-    document.getElementById("all-members").innerHTML = html;
-  });
-}
-
-// ==========================
-// 🔥 CHAT
-// ==========================
-
-function selectConversation(uid){
-  selectedUserId = uid;
-}
-
-async function sendMessage(){
-  const user = auth.currentUser;
-  const text = document.getElementById("message-input").value.trim();
-
-  if(!user || !text || !selectedUserId) return;
-
-  await db.collection("messages").add({
-    senderId:user.uid,
-    receiverId:selectedUserId,
-    text,
-    createdAt:firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  document.getElementById("message-input").value="";
-}
-
-// ==========================
-// 🔥 AUTH
-// ==========================
-
-auth.onAuthStateChanged(async(user)=>{
-  if(!user){
-    window.location.href="insights.html";
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    const fromLogout = sessionStorage.getItem("afterMessagesLogout");
+    if (fromLogout) {
+      sessionStorage.removeItem("afterMessagesLogout");
+    }
+    window.location.replace("insights.html");
     return;
   }
 
   const snap = await db.collection("users").doc(user.uid).get();
-  currentUserProfile = snap.data();
+  currentUserProfile = snap.exists ? snap.data() : { fullName: user.displayName || "Member" };
 
-  document.getElementById("current-user-name").textContent =
-    currentUserProfile?.fullName || "Member";
+  document.getElementById("current-user-avatar-wrap").innerHTML = avatarHtml(currentUserProfile, "large-avatar");
+  document.getElementById("current-user-name").textContent = currentUserProfile.fullName || "Member";
 
-  // presence
-  const ref = rtdb.ref("/status/"+user.uid);
-
-  rtdb.ref(".info/connected").on("value",(snap)=>{
-    if(snap.val()===false) return;
-
-    ref.onDisconnect().set({
-      state:"offline",
-      last_changed:firebase.database.ServerValue.TIMESTAMP
-    });
-
-    ref.set({
-      state:"online",
-      fullName: currentUserProfile?.fullName || "Member",
-      last_changed:firebase.database.ServerValue.TIMESTAMP
-    });
-  });
+  setupPresence(user, currentUserProfile.fullName || user.displayName || "Member");
 
   loadAllMembers();
+  loadInbox();
   loadOnlineMembers();
-});
+  loadRecentThreads();
 
+  const params = new URLSearchParams(window.location.search);
+  const preselectedUser = params.get("user");
+  if (preselectedUser) {
+    selectConversation(preselectedUser);
+  }
+});
 </script>
 
 </body>
