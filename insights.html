@@ -60,7 +60,10 @@
 
   <main class="insights-main">
     <section class="card">
-      <h3 data-i18n="onlineMembers">Online members</h3>
+      <div class="section-head">
+        <h3 data-i18n="onlineMembers">Online members</h3>
+        <button class="mini-refresh-btn" onclick="refreshPresence()">↻</button>
+      </div>
       <div id="online-users"></div>
     </section>
 
@@ -118,9 +121,12 @@
       </div>
 
       <div class="comments-box">
-        <h4 data-i18n="comments">Comments</h4>
+        <div class="section-head">
+          <h4 data-i18n="comments">Comments</h4>
+          <button class="emoji-toggle-btn" onclick="toggleEmojiPanel('emoji-panel-post1')">😊 Stickers</button>
+        </div>
 
-        <div class="emoji-bar large-emoji-bar">
+        <div id="emoji-panel-post1" class="emoji-panel hidden-emoji-panel">
           <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😀')">😀</button>
           <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😄')">😄</button>
           <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😍')">😍</button>
@@ -157,13 +163,20 @@
         <input type="text" id="community-title" class="text-input" placeholder="Title">
         <textarea id="community-text" placeholder="Write your publication..."></textarea>
 
-        <div class="emoji-bar">
+        <div class="section-head">
+          <div></div>
+          <button class="emoji-toggle-btn" onclick="toggleEmojiPanel('emoji-panel-community')">😊 Stickers</button>
+        </div>
+
+        <div id="emoji-panel-community" class="emoji-panel hidden-emoji-panel">
           <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🧪')">🧪</button>
           <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🔬')">🔬</button>
           <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🌍')">🌍</button>
           <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','💡')">💡</button>
           <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','✨')">✨</button>
           <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','👏')">👏</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🔥')">🔥</button>
+          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','❤️')">❤️</button>
         </div>
 
         <button class="small-btn" onclick="publishCommunityPost()" data-i18n="publish">Publish</button>
@@ -212,7 +225,13 @@
   <div class="modal-content large-modal-content">
     <button class="modal-close" onclick="closeAccountModal()">×</button>
 
-    <div id="my-account-panel" class="modal-account-panel">
+    <div class="account-tabs">
+      <button class="account-tab-btn active-account-tab" onclick="switchAccountTab('account-profile-tab', this)">Profile</button>
+      <button class="account-tab-btn" onclick="switchAccountTab('account-inbox-tab', this)">Messaging</button>
+      <button class="account-tab-btn" onclick="switchAccountTab('account-danger-tab', this)">Security</button>
+    </div>
+
+    <div id="account-profile-tab" class="account-tab-panel">
       <div class="profile-preview-card">
         <div id="profile-avatar-preview" class="member-avatar large-avatar">MB</div>
         <div class="profile-preview-text">
@@ -277,12 +296,12 @@
 
       <div class="auth-actions">
         <button class="auth-btn" onclick="saveProfile()" data-i18n="saveProfile">Save profile</button>
-        <button class="auth-btn secondary" onclick="sendResetForCurrentUser()" data-i18n="resetPassword">Reset password</button>
-        <button class="auth-btn secondary" onclick="logout()" data-i18n="logout">Logout</button>
       </div>
 
-      <hr class="soft-line">
+      <p id="profile-message" class="dark-message"></p>
+    </div>
 
+    <div id="account-inbox-tab" class="account-tab-panel hidden-account-tab">
       <h4 data-i18n="privateInbox">Private inbox</h4>
       <div id="inbox-list" class="inbox-list"></div>
 
@@ -295,6 +314,13 @@
           <button class="small-btn" onclick="sendPrivateMessageToCurrentThread()" data-i18n="send">Send</button>
         </div>
       </div>
+    </div>
+
+    <div id="account-danger-tab" class="account-tab-panel hidden-account-tab">
+      <div class="auth-actions">
+        <button class="auth-btn secondary" onclick="sendResetForCurrentUser()" data-i18n="resetPassword">Reset password</button>
+        <button class="auth-btn secondary" onclick="logout()" data-i18n="logout">Logout</button>
+      </div>
 
       <hr class="soft-line">
 
@@ -305,8 +331,6 @@
       <div class="auth-actions">
         <button class="auth-btn danger" onclick="deleteMyAccount()" data-i18n="deleteMyAccount">Delete my account</button>
       </div>
-
-      <p id="profile-message" class="dark-message"></p>
     </div>
   </div>
 </div>
@@ -388,9 +412,7 @@ function setLanguage(lang) {
   localStorage.setItem("site_lang", lang);
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const key = el.getAttribute("data-i18n");
-    if (i18n[lang] && i18n[lang][key]) {
-      el.textContent = i18n[lang][key];
-    }
+    if (i18n[lang] && i18n[lang][key]) el.textContent = i18n[lang][key];
   });
 }
 setLanguage(currentLanguage);
@@ -439,7 +461,6 @@ function getInitials(firstName, lastName, fullName) {
   const f = (firstName || "").trim();
   const l = (lastName || "").trim();
   if (f || l) return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
-
   const parts = (fullName || "Member").trim().split(" ").filter(Boolean);
   return (parts.slice(0, 2).map(p => p.charAt(0)).join("") || "MB").toUpperCase();
 }
@@ -452,7 +473,6 @@ function avatarHtml(profile, sizeClass = "") {
   if (photo) {
     return `<div class="member-avatar ${sizeClass}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
   }
-
   return `<div class="member-avatar ${sizeClass}" style="background:${escapeHtml(color)}">${initials}</div>`;
 }
 
@@ -462,6 +482,12 @@ function insertEmoji(targetId, emoji) {
   input.value += emoji;
   input.focus();
   updateProfilePreview();
+}
+
+function toggleEmojiPanel(id) {
+  const panel = document.getElementById(id);
+  if (!panel) return;
+  panel.classList.toggle("hidden-emoji-panel");
 }
 
 function openSignupModal() {
@@ -482,10 +508,16 @@ function closeAccountModal() {
   document.getElementById("account-modal").classList.add("hidden-modal");
 }
 
+function switchAccountTab(id, btn) {
+  document.querySelectorAll(".account-tab-panel").forEach(panel => panel.classList.add("hidden-account-tab"));
+  document.getElementById(id).classList.remove("hidden-account-tab");
+  document.querySelectorAll(".account-tab-btn").forEach(b => b.classList.remove("active-account-tab"));
+  btn.classList.add("active-account-tab");
+}
+
 window.addEventListener("click", (e) => {
   const signupModal = document.getElementById("signup-modal");
   const accountModal = document.getElementById("account-modal");
-
   if (e.target === signupModal) closeSignupModal();
   if (e.target === accountModal) closeAccountModal();
 });
@@ -533,7 +565,6 @@ function updateProfilePreview() {
 async function ensurePostExists(postId) {
   const ref = db.collection("posts").doc(postId);
   const snap = await ref.get();
-
   if (!snap.exists) {
     await ref.set({
       title: "Scientific Insight",
@@ -586,9 +617,7 @@ async function ensureUserProfile(user, extras = {}) {
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  if (!snap.exists) {
-    payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-  }
+  if (!snap.exists) payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
 
   await userRef.set(payload, { merge: true });
   const fresh = await userRef.get();
@@ -627,12 +656,10 @@ async function signUp() {
     setMessage("signup-message", "Please fill in the required fields.", true);
     return;
   }
-
   if (password !== confirm) {
     setMessage("signup-message", "Passwords do not match.", true);
     return;
   }
-
   if (password.length < 6) {
     setMessage("signup-message", "Password must contain at least 6 characters.", true);
     return;
@@ -712,7 +739,6 @@ async function saveProfile() {
   const fullName = `${firstName} ${lastName}`.trim();
 
   try {
-    await user.reload();
     await user.updateProfile({ displayName: fullName });
 
     await db.collection("users").doc(user.uid).set({
@@ -796,6 +822,10 @@ function cleanupPresence() {
   presenceStatusRef = null;
 }
 
+function refreshPresence() {
+  loadOnlineUsers();
+}
+
 function loadOnlineUsers() {
   rtdb.ref("/status").on("value", async (snapshot) => {
     const container = document.getElementById("online-users");
@@ -827,11 +857,14 @@ function loadOnlineUsers() {
       html += `
         <div class="online-user">
           ${avatarHtml(mergedProfile)}
-          <div>
+          <div class="online-user-content">
             <div class="online-name">
               <a class="profile-link" href="profile.html?uid=${data.uid}">${escapeHtml(mergedProfile.fullName || "Member")}</a>
             </div>
             <div class="online-time">${online ? "online" : "last seen"} • ${escapeHtml(formatPresenceTime(data.last_changed))}</div>
+          </div>
+          <div class="inline-actions">
+            ${renderMessageButton(data.uid, mergedProfile.fullName || "Member")}
           </div>
         </div>
       `;
@@ -851,8 +884,12 @@ async function toggleLike(targetType, targetId, commentId = null) {
   let itemRef;
   if (targetType === "post") {
     itemRef = db.collection("posts").doc(targetId);
-  } else {
+  } else if (targetType === "comment") {
     itemRef = db.collection("posts").doc(targetId).collection("comments").doc(commentId);
+  } else if (targetType === "community") {
+    itemRef = db.collection("communityPosts").doc(targetId);
+  } else {
+    return;
   }
 
   const likeRef = itemRef.collection("likes").doc(user.uid);
@@ -889,7 +926,6 @@ async function addComment(postId) {
   }
 
   const text = document.getElementById(`comment-input-${postId}`).value.trim();
-
   if (!text) {
     alert("Write a comment first.");
     return;
@@ -926,7 +962,6 @@ async function addReply(postId, commentId) {
 
   const input = document.getElementById(`reply-input-${commentId}`);
   const text = input.value.trim();
-
   if (!text) return;
 
   const userSnap = await db.collection("users").doc(user.uid).get();
@@ -959,8 +994,7 @@ async function deleteComment(postId, commentId) {
   const snap = await ref.get();
   if (!snap.exists) return;
 
-  const data = snap.data();
-  if (data.userId !== user.uid) {
+  if (snap.data().userId !== user.uid) {
     alert("You can only delete your own comment.");
     return;
   }
@@ -996,7 +1030,10 @@ function buildThreadId(uid1, uid2) {
 
 async function openPrivateThread(otherUserId, otherUserName) {
   const user = auth.currentUser;
-  if (!user) return;
+  if (!user) {
+    alert("Please sign in first.");
+    return;
+  }
 
   currentThreadId = buildThreadId(user.uid, otherUserId);
   currentThreadOtherUserId = otherUserId;
@@ -1012,6 +1049,7 @@ async function openPrivateThread(otherUserId, otherUserName) {
 
   loadThreadMessages(currentThreadId);
   openAccountModal();
+  switchAccountTab('account-inbox-tab', document.querySelectorAll('.account-tab-btn')[1]);
 }
 
 function loadThreadMessages(threadId) {
@@ -1138,6 +1176,7 @@ async function publishCommunityPost() {
       avatarColor: profile.avatarColor || "#16385d",
       title,
       text,
+      likesCount: 0,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
@@ -1158,7 +1197,6 @@ async function addCommunityComment(postId) {
 
   const input = document.getElementById(`community-comment-input-${postId}`);
   const text = input.value.trim();
-
   if (!text) return;
 
   try {
@@ -1176,6 +1214,7 @@ async function addCommunityComment(postId) {
         lastName: profile.lastName || "",
         photoURL: profile.photoURL || "",
         avatarColor: profile.avatarColor || "#16385d",
+        likesCount: 0,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
@@ -1193,15 +1232,16 @@ async function deleteCommunityPost(postId) {
   const snap = await ref.get();
   if (!snap.exists) return;
 
-  const data = snap.data();
-  if (data.userId !== user.uid) {
+  if (snap.data().userId !== user.uid) {
     alert("You can only delete your own publication.");
     return;
   }
 
   const commentsSnap = await ref.collection("comments").get();
+  const likesSnap = await ref.collection("likes").get();
   const batch = db.batch();
   commentsSnap.forEach(c => batch.delete(c.ref));
+  likesSnap.forEach(l => batch.delete(l.ref));
   batch.delete(ref);
   await batch.commit();
 }
@@ -1226,6 +1266,14 @@ function renderMessageButton(userId, userName) {
   const me = auth.currentUser;
   if (!me || me.uid === userId) return "";
   return `<button class="message-btn" onclick="openPrivateThread('${userId}','${escapeHtml(userName)}')">💬</button>`;
+}
+
+function renderCommunityLikeButton(postId, count) {
+  return `
+    <button class="small-btn mini-btn" onclick="toggleLike('community','${postId}')">
+      👍 Like ${count || 0}
+    </button>
+  `;
 }
 
 function loadReplies(postId, commentId) {
@@ -1306,15 +1354,6 @@ function loadComments(postId) {
                   <button class="small-btn mini-btn" onclick="toggleLike('comment','${postId}','${doc.id}')">
                     👍 Like ${c.likesCount || 0}
                   </button>
-                </div>
-
-                <div class="emoji-bar small-emoji-bar">
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','👍')">👍</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','👏')">👏</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','🔥')">🔥</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','❤️')">❤️</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','🧪')">🧪</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('reply-input-${doc.id}','🔬')">🔬</button>
                 </div>
 
                 <div class="reply-box">
@@ -1406,13 +1445,8 @@ function loadCommunityPosts() {
                 ${p.title ? `<h4 class="community-title">${escapeHtml(p.title)}</h4>` : ""}
                 <div class="comment-text">${escapeHtml(p.text || "")}</div>
 
-                <div class="emoji-bar small-emoji-bar">
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','👏')">👏</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','🔥')">🔥</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','❤️')">❤️</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','🧪')">🧪</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','🔬')">🔬</button>
-                  <button type="button" class="emoji-btn" onclick="insertEmoji('community-comment-input-${doc.id}','💡')">💡</button>
+                <div class="actions">
+                  ${renderCommunityLikeButton(doc.id, p.likesCount || 0)}
                 </div>
 
                 <div class="reply-box">
@@ -1440,7 +1474,6 @@ async function deleteMyAccount() {
     setMessage("profile-message", "No connected user found.", true);
     return;
   }
-
   if (!password) {
     setMessage("profile-message", "Enter your password to confirm.", true);
     return;
@@ -1449,7 +1482,6 @@ async function deleteMyAccount() {
   try {
     const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
     await user.reauthenticateWithCredential(credential);
-
     const uid = user.uid;
 
     await rtdb.ref("/status/" + uid).remove();
@@ -1471,10 +1503,7 @@ async function deleteMyAccount() {
     const allCommentsSnap = await db.collection("posts").doc("post1").collection("comments").get();
     for (const c of allCommentsSnap.docs) {
       const repliesSnap = await c.ref.collection("replies").where("userId", "==", uid).get();
-      for (const r of repliesSnap.docs) {
-        await r.ref.delete();
-      }
-
+      for (const r of repliesSnap.docs) await r.ref.delete();
       const likeSnap = await c.ref.collection("likes").doc(uid).get();
       if (likeSnap.exists) await likeSnap.ref.delete();
     }
@@ -1482,8 +1511,10 @@ async function deleteMyAccount() {
     const communitySnap = await db.collection("communityPosts").where("userId", "==", uid).get();
     for (const p of communitySnap.docs) {
       const postComments = await p.ref.collection("comments").get();
+      const likes = await p.ref.collection("likes").get();
       const batch = db.batch();
       postComments.forEach(pc => batch.delete(pc.ref));
+      likes.forEach(l => batch.delete(l.ref));
       batch.delete(p.ref);
       await batch.commit();
     }
@@ -1491,9 +1522,9 @@ async function deleteMyAccount() {
     const allCommunityPosts = await db.collection("communityPosts").get();
     for (const postDoc of allCommunityPosts.docs) {
       const myComments = await postDoc.ref.collection("comments").where("userId", "==", uid).get();
-      for (const c of myComments.docs) {
-        await c.ref.delete();
-      }
+      for (const c of myComments.docs) await c.ref.delete();
+      const likeSnap = await postDoc.ref.collection("likes").doc(uid).get();
+      if (likeSnap.exists) await likeSnap.ref.delete();
     }
 
     const threads = await db.collection("privateThreads").where("participants", "array-contains", uid).get();
@@ -1506,6 +1537,7 @@ async function deleteMyAccount() {
     }
 
     await db.collection("users").doc(uid).delete();
+    await auth.signOut();
     await user.delete();
 
     alert("Your account and your site data have been deleted.");
@@ -1516,9 +1548,11 @@ async function deleteMyAccount() {
 
 async function logout() {
   const user = auth.currentUser;
-
   if (!user) {
-    await auth.signOut();
+    try {
+      await auth.signOut();
+    } catch (_) {}
+    closeAccountModal();
     return;
   }
 
@@ -1530,8 +1564,9 @@ async function logout() {
     });
   } catch (_) {}
 
+  cleanupPresence();
+
   try {
-    cleanupPresence();
     await auth.signOut();
     closeAccountModal();
     setMessage("auth-message", "Logged out.");
@@ -1556,6 +1591,9 @@ auth.onAuthStateChanged(async (user) => {
     cleanupPresence();
     document.getElementById("user-info").textContent = "";
     document.getElementById("presence-self").textContent = "";
+    document.getElementById("inbox-list").innerHTML = "";
+    document.getElementById("thread-messages").innerHTML = "";
+    document.getElementById("message-thread").classList.add("hidden-thread");
   }
 
   loadComments("post1");
@@ -1570,12 +1608,7 @@ ensurePostExists("post1").then(() => {
 });
 
 document.addEventListener("input", (e) => {
-  if (
-    e.target.id === "profile-firstname" ||
-    e.target.id === "profile-lastname" ||
-    e.target.id === "profile-photo-url" ||
-    e.target.id === "profile-institution"
-  ) {
+  if (["profile-firstname","profile-lastname","profile-photo-url","profile-institution"].includes(e.target.id)) {
     updateProfilePreview();
   }
 });
