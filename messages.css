@@ -350,3 +350,33 @@ body {
 .member-profile-btn:hover {
   background: rgba(255,255,255,0.22);
 }
+.chat-presence-line {
+  margin-top: 4px;
+  color: #5d6978;
+  font-size: 13px;
+}
+
+.presence-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #27c93f;
+  display: inline-block;
+  min-width: 10px;
+}
+
+.new-message-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #27c93f;
+  display: inline-block;
+  min-width: 11px;
+  box-shadow: 0 0 0 3px rgba(39, 201, 63, 0.15);
+}
+
+.chat-status-message {
+  margin-bottom: 10px;
+  font-size: 14px;
+  min-height: 20px;
+}
