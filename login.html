@@ -1,179 +1,70 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Connexion | Boris Research Hub</title>
+<title>Login</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0a66c2, #0f2027);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.login-box {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  width: 330px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-  text-align: center;
-}
-
-h2 { margin-bottom: 20px; }
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background: #0a66c2;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-button:hover { background: #084a94; }
-
-.error-msg {
-  background: #fff0f0;
-  color: #cc0000;
-  padding: 8px;
-  border-radius: 6px;
-  margin-top: 10px;
-  display: none;
-  animation: shake 0.4s;
-}
-
-@keyframes shake {
-  0% { transform: translateX(0);}
-  25% { transform: translateX(-5px);}
-  50% { transform: translateX(5px);}
-  75% { transform: translateX(-5px);}
-  100% { transform: translateX(0);}
-}
-
-.success-dot {
-  width: 12px;
-  height: 12px;
-  background: #00ff66;
-  border-radius: 50%;
-  margin: 10px auto;
-  display: none;
+.green-dot{
+  width:12px;
+  height:12px;
+  background:green;
+  border-radius:50%;
+  margin:10px auto;
+  display:none;
   animation: blink 1s infinite;
 }
-
-@keyframes blink {
-  0% {opacity:1;}
-  50% {opacity:0.3;}
-  100% {opacity:1;}
-}
-
-.small-link {
-  margin-top: 10px;
-  display: block;
-  font-size: 13px;
-  color: #0a66c2;
-  cursor: pointer;
+@keyframes blink{
+  50%{opacity:0.3;}
 }
 </style>
-</head>
 
+</head>
 <body>
 
-<div class="login-box">
-  <h2>Connexion</h2>
+<h2>Login</h2>
 
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Mot de passe">
+<input type="email" id="email" placeholder="Email"><br><br>
+<input type="password" id="password" placeholder="Password"><br><br>
 
-  <button onclick="login()">Se connecter</button>
+<button onclick="login()">Login</button>
 
-  <div class="error-msg" id="errorMsg"></div>
-  <div class="success-dot" id="successDot"></div>
+<p><a href="#">Mot de passe oublié ?</a></p>
 
-  <span class="small-link" onclick="goSignup()">Créer un compte</span>
-  <span class="small-link" onclick="goReset()">Mot de passe oublié ?</span>
-</div>
+<div id="connectedDot" class="green-dot"></div>
 
-<!-- 🔥 FIREBASE -->
+<p id="msg"></p>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-/* 🔴 REMPLACE PAR TA CONFIG */
-const firebaseConfig = {
-  apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
-  authDomain: "boris-research-hub.firebaseapp.com",
-  projectId: "boris-research-hub",
-  storageBucket: "boris-research-hub.firebasestorage.app",
-  messagingSenderId: "71055508172",
-  appId: "1:71055508172:web:72229e3f5ad664eb35b869",
-  measurementId: "G-9Q6SJ96NBS",
-  databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com"
-};
+const firebaseConfig = { apiKey:"AIzaSy...", authDomain:"...", databaseURL:"...", projectId:"...", storageBucket:"..." };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-window.login = function() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const error = document.getElementById("errorMsg");
+window.login = async function(){
+  try{
+    const userCred = await signInWithEmailAndPassword(auth, email.value, password.value);
 
-  if (!email || !password) {
-    error.innerText = "Veuillez remplir tous les champs.";
-    error.style.display = "block";
-    return;
+    if(!userCred.user.emailVerified){
+      msg.innerText = "Verify your email first";
+      return;
+    }
+
+    connectedDot.style.display = "block";
+
+    setTimeout(()=>{
+      window.location.href="insights.html";
+    },1000);
+
+  }catch(e){
+    msg.style.color="#ff9800";
+    msg.innerText="Login failed";
+    msg.animate([{transform:"translateX(-5px)"},{transform:"translateX(5px)"}],{duration:200,iterations:3});
   }
-
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-
-      // 🔥 stockage local pour ton site
-      localStorage.setItem("user", JSON.stringify({
-        email: user.email,
-        uid: user.uid
-      }));
-
-      localStorage.setItem("lastActivity", Date.now());
-
-      error.style.display = "none";
-
-      // 🟢 point vert
-      const dot = document.getElementById("successDot");
-      dot.style.display = "block";
-
-      setTimeout(() => {
-        window.location.href = "insights.html";
-      }, 1000);
-    })
-    .catch((err) => {
-      error.innerText = "Email ou mot de passe incorrect.";
-      error.style.display = "block";
-    });
-}
-
-window.goSignup = function() {
-  window.location.href = "signup.html";
-}
-
-window.goReset = function() {
-  window.location.href = "insights.html";
 }
 </script>
 
