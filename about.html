@@ -4,78 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About | Boris Research Hub</title>
-  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="about.css" />
-
   <style>
-    .login-btn,
-    .nav-account-btn,
-    .nav-logout-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 8px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-    }
-
-    .login-btn {
-      background: #0a66c2;
-      color: white !important;
-    }
-
-    .login-btn:hover {
-      background: #084a94;
-    }
-
-    .nav-account-btn {
-      background: #e8f1fb;
-      color: #0b2239 !important;
-    }
-
-    .nav-account-btn:hover {
-      background: #d6e8fa;
-    }
-
-    .nav-logout-btn {
-      background: #f7dede;
-      color: #8a1f1f !important;
-    }
-
-    .nav-logout-btn:hover {
-      background: #efcaca;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      background: #00ff66;
-      border-radius: 50%;
-      display: inline-block;
-      box-shadow: 0 0 8px #00ff66;
-      animation: blink 1.2s infinite;
-      flex-shrink: 0;
-    }
-
-    .auth-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0.3; }
-      100% { opacity: 1; }
-    }
+    .login-btn,.nav-account-btn,.nav-logout-btn{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;font-weight:700;text-decoration:none;cursor:pointer;border:none}
+    .login-btn{background:#0a66c2;color:#fff!important}
+    .nav-account-btn{background:#e8f1fb;color:#0b2239!important}
+    .nav-logout-btn{background:#f7dede;color:#8a1f1f!important}
+    .status-dot{width:10px;height:10px;background:#00ff66;border-radius:50%;display:inline-block;box-shadow:0 0 8px #00ff66;animation:blink 1.2s infinite}
+    .auth-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    @keyframes blink{0%{opacity:1}50%{opacity:.3}100%{opacity:1}}
   </style>
 </head>
 <body>
-
   <nav class="about-nav">
     <ul id="nav-menu">
       <li><a href="index.html">Home</a></li>
@@ -91,19 +31,12 @@
   <div class="about-container">
     <aside class="about-sidebar">
       <div class="profile-avatar">MBA</div>
-
       <h2>Maounou Boris AMOUSSOU</h2>
-      <p>
-        Chemical Engineer<br>
-        Green Chemistry &amp; Environment
-      </p>
+      <p>Chemical Engineer<br>Green Chemistry &amp; Environment</p>
 
       <div class="sidebar-card">
         <h3>Profile</h3>
-        <p>
-          Master’s student in chemistry with a strong interest in sustainable
-          development, catalysis, environmental processes, and clean energy systems.
-        </p>
+        <p>Master’s student in chemistry with a strong interest in sustainable development, catalysis, environmental processes, and clean energy systems.</p>
       </div>
 
       <div class="sidebar-card">
@@ -122,137 +55,63 @@
       <section class="about-card hero-card">
         <span class="section-label">About Me</span>
         <h1>Academic identity and scientific direction</h1>
-        <p>
-          I am a Chemical Engineer specialized in Green Chemistry, Catalysis, and Environmental
-          Processes, currently completing a Master's degree at the University of Poitiers, France.
-        </p>
+        <p>I am a Chemical Engineer specialized in Green Chemistry, Catalysis, and Environmental Processes, currently completing a Master's degree at the University of Poitiers, France.</p>
       </section>
 
       <section class="about-grid">
         <div class="about-card">
           <h3>Academic journey</h3>
-          <p>
-            My academic path has been strongly oriented toward sustainable development, energy
-            transition, and innovative solutions for environmental challenges.
-          </p>
+          <p>My academic path has been strongly oriented toward sustainable development, energy transition, and innovative solutions for environmental challenges.</p>
         </div>
 
         <div class="about-card">
           <h3>Research experience</h3>
-          <p>
-            I gained international research experience in Montreal, Canada, where I worked on
-            advanced electrochemical and photocatalytic approaches for sustainable energy production.
-          </p>
+          <p>I gained international research experience in Montreal, Canada, where I worked on advanced electrochemical and photocatalytic approaches for sustainable energy production.</p>
         </div>
 
         <div class="about-card">
           <h3>Scientific interests</h3>
-          <p>
-            I am particularly interested in developing efficient and environmentally friendly
-            technologies for future energy systems.
-          </p>
+          <p>I am particularly interested in developing efficient and environmentally friendly technologies for future energy systems.</p>
         </div>
 
         <div class="about-card">
           <h3>Core values</h3>
-          <p>
-            I value scientific rigor, curiosity, collaboration, and the design of practical
-            solutions for environmental and societal needs.
-          </p>
+          <p>I value scientific rigor, curiosity, collaboration, and the design of practical solutions for environmental and societal needs.</p>
         </div>
       </section>
 
       <section class="about-card">
         <h3>Professional vision</h3>
-        <p>
-          My objective is to contribute to scientific research and technological innovation in the
-          fields of green chemistry, energy conversion, and environmental remediation, while building
-          strong international collaborations and impactful academic work.
-        </p>
+        <p>My objective is to contribute to scientific research and technological innovation in the fields of green chemistry, energy conversion, and environmental remediation, while building strong international collaborations and impactful academic work.</p>
       </section>
-
-      <footer class="about-footer">
-        © 2026 Maounou Boris AMOUSSOU — All rights reserved
-      </footer>
     </main>
   </div>
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import {
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    import {
-      ref,
-      get
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const authSection = document.getElementById("auth-section");
 
-    async function renderNavbarForUser(user) {
-      try {
-        const snap = await get(ref(db, "users/" + user.uid));
-        const profile = snap.exists() ? snap.val() : null;
-        const name = profile?.displayName || user.displayName || user.email?.split("@")[0] || "Mon compte";
-
-        authSection.innerHTML = `
-          <div class="auth-actions">
-            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
-            <a href="profile.html" class="nav-account-btn">
-              👤 ${name}
-              <span class="status-dot"></span>
-            </a>
-            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
-          </div>
-        `;
-
-        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
-          try {
-            await signOut(auth);
-            window.location.href = "about.html";
-          } catch (error) {
-            console.error("Logout error:", error);
-            alert("Impossible de se déconnecter.");
-          }
-        });
-      } catch (error) {
-        console.error("Navbar profile load error:", error);
-
-        authSection.innerHTML = `
-          <div class="auth-actions">
-            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
-            <a href="profile.html" class="nav-account-btn">
-              👤 Mon compte
-              <span class="status-dot"></span>
-            </a>
-            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
-          </div>
-        `;
-
-        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
-          try {
-            await signOut(auth);
-            window.location.href = "about.html";
-          } catch (err) {
-            console.error(err);
-          }
-        });
-      }
-    }
-
-    function renderNavbarGuest() {
-      authSection.innerHTML = `
-        <a href="login.html" class="login-btn">Login</a>
-      `;
-    }
-
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        await renderNavbarForUser(user);
+        const snap = await get(ref(db, "users/" + user.uid));
+        const profile = snap.exists() ? snap.val() : null;
+        const name = profile?.displayName || user.displayName || "Mon compte";
+        authSection.innerHTML = `
+          <div class="auth-actions">
+            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
+            <a href="profile.html" class="nav-account-btn">👤 ${name}<span class="status-dot"></span></a>
+            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
+          </div>
+        `;
+        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
+          await signOut(auth);
+          window.location.href = "about.html";
+        });
       } else {
-        renderNavbarGuest();
+        authSection.innerHTML = `<a href="login.html" class="login-btn">Login</a>`;
       }
     });
   </script>
