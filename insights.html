@@ -597,7 +597,7 @@ function showIdleLogoutNotice() {
   const notice = sessionStorage.getItem("idleLogoutNotice");
   if (!notice) return;
   sessionStorage.removeItem("idleLogoutNotice");
-  setMessage("auth-message", "Session expired after 5 minutes of inactivity. Please log in again.", true);
+  setMessage("auth-message", "Your ession expired. Please log in again.", true);
 }
 
 setLanguage(currentLanguage);
