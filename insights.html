@@ -467,8 +467,6 @@ const rtdb = firebase.database();
 let presenceConnectedRef = null;
 let presenceStatusRef = null;
 let presenceHeartbeatInterval = null;
-let currentThreadId = null;
-let currentThreadOtherUserId = null;
 let currentLanguage = localStorage.getItem("site_lang") || "en";
 let onlineUsersRef = null;
 
@@ -479,7 +477,7 @@ let currentUserLikeWatchers = {};
 const HEARTBEAT_MS = 20000;
 const ONLINE_FRESH_MS = 70000;
 const GEO_TIMEOUT_MS = 4500;
-const AUTO_LOGOUT_MS = 5 * 60 * 1000;
+const AUTO_LOGOUT_MS = 10 * 60 * 1000;
 
 const allowedDirectDomains = ["gmail.com", "yahoo.com", "yahoo.fr"];
 const blockedDisposableDomains = [
@@ -597,7 +595,7 @@ function showIdleLogoutNotice() {
   const notice = sessionStorage.getItem("idleLogoutNotice");
   if (!notice) return;
   sessionStorage.removeItem("idleLogoutNotice");
-  setMessage("auth-message", "Your ession expired. Please log in again.", true);
+  setMessage("auth-message", "Session expired after 10 minutes of inactivity. Please log in again.", true);
 }
 
 setLanguage(currentLanguage);
@@ -1514,14 +1512,15 @@ async function openPrivateThread(otherUserId, otherUserName) {
 
   registerUserActivity();
 
-  currentThreadId = buildThreadId(user.uid, otherUserId);
-  currentThreadOtherUserId = otherUserId;
+  const currentThreadId = buildThreadId(user.uid, otherUserId);
 
   const threadRef = db.collection("privateThreads").doc(currentThreadId);
   await threadRef.set({
     participants: [user.uid, otherUserId],
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   }, { merge: true });
+
+  window.location.href = `messages.html?user=${encodeURIComponent(otherUserId)}`;
 }
 
 async function publishCommunityPost() {
@@ -1824,7 +1823,6 @@ function loadComments(postId) {
 
       snapshot.forEach((doc) => {
         const pathArray = ["comments", doc.id];
-        const pathKey = encodePath(pathArray);
         watchLikeButtonState(`like-btn-comment-${doc.id}`, "comment", postId, doc.id);
         subscribeRepliesRecursive(postId, pathArray, `replies-root-${doc.id}`, 1);
       });
@@ -2037,35 +2035,6 @@ async function deleteMyAccount() {
   }
 }
 
-async function logout() {
-  const user = auth.currentUser;
-
-  try {
-    stopPresenceHeartbeat();
-
-    if (presenceStatusRef) {
-      await presenceStatusRef.set({
-        state: "offline",
-        fullName: user?.displayName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      });
-    }
-  } catch (error) {
-    console.error("presence logout error:", error);
-  }
-
-  cleanupPresence();
-
-  try {
-    await auth.signOut();
-    closeAccountModal();
-    window.location.href = "insights.html";
-  } catch (error) {
-    console.error("logout error:", error);
-    setMessage("profile-message", "Logout failed.", true);
-  }
-}
-
 function updateMyPresenceOnline(fullName) {
   if (!presenceStatusRef) return Promise.resolve();
 
@@ -2145,10 +2114,6 @@ function cleanupPresence() {
   onlineUsersRef = null;
 }
 
-function refreshPresence() {
-  loadOnlineUsers();
-}
-
 function loadOnlineUsers() {
   if (onlineUsersRef) {
     try { onlineUsersRef.off(); } catch (_) {}
@@ -2200,7 +2165,7 @@ function loadOnlineUsers() {
       `;
     }
 
-    container.innerHTML = html || "<p class='no-online'>No member activity yet.</p>";
+    container.innerHTML = html || "<p class='no-online'>Login to see active members.</p>";
   });
 }
 
@@ -2218,6 +2183,7 @@ auth.onAuthStateChanged(async (user) => {
       showConnectionBadge(false);
       document.getElementById("user-info").textContent = "";
       document.getElementById("presence-self").textContent = "";
+      document.getElementById("online-users").innerHTML = "<p class='no-online'>Login to see active members.</p>";
       setMessage("auth-message", "Please verify your email address before accessing the member area.", true);
       loadComments("post1");
       loadCommunityPosts();
@@ -2236,6 +2202,7 @@ auth.onAuthStateChanged(async (user) => {
     document.getElementById("presence-self").textContent = "● You are online";
 
     setupPresence(user, profile.fullName || user.displayName || "Member");
+    loadOnlineUsers();
 
     setTimeout(() => {
       const authMsg = document.getElementById("auth-message");
@@ -2252,16 +2219,10 @@ auth.onAuthStateChanged(async (user) => {
     uninstallActivityWatchers();
     document.getElementById("user-info").textContent = "";
     document.getElementById("presence-self").textContent = "";
+    document.getElementById("online-users").innerHTML = "<p class='no-online'>Login to see active members.</p>";
   }
 
   loadComments("post1");
-  loadCommunityPosts();
-});
-
-ensurePostExists("post1").then(() => {
-  loadLikes("post1");
-  loadComments("post1");
-  loadOnlineUsers();
   loadCommunityPosts();
 });
 
@@ -2270,6 +2231,12 @@ document.addEventListener("input", (e) => {
     updateProfilePreview();
   }
   registerUserActivity();
+});
+
+ensurePostExists("post1").then(() => {
+  loadLikes("post1");
+  loadComments("post1");
+  loadCommunityPosts();
 });
 </script>
 
