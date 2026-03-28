@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Messages | Boris Research Hub</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="messages.css">
+  <link rel="stylesheet" href="messages.css" />
 </head>
 <body>
   <header class="topbar">
@@ -33,12 +32,7 @@
 
       <button class="logout-btn" id="logoutBtn">Déconnexion</button>
 
-      <input
-        type="text"
-        id="memberSearch"
-        class="search-input"
-        placeholder="Rechercher un membre..."
-      >
+      <input type="text" id="memberSearch" class="search-input" placeholder="Rechercher un membre...">
 
       <div class="tabs">
         <button class="tab-btn active" data-tab="all">Tous</button>
@@ -51,21 +45,18 @@
     <main class="main">
       <section class="chat-header">
         <div class="avatar" id="chatAvatar">MB</div>
-
         <div class="chat-header-main">
           <div>
             <h3 id="chatTitle">Sélectionne une conversation</h3>
             <p id="chatSubtitle">Tes messages privés vont apparaître ici.</p>
             <p id="chatPresence"></p>
           </div>
-
           <button class="chat-options-btn" id="chatOptionsBtn" style="display:none;">Options</button>
         </div>
       </section>
 
       <section class="chat-box">
         <div class="chat-status-bar" id="chatStatusBar"></div>
-
         <div class="chat-messages" id="chatMessages">
           <div class="empty-state">Aucune conversation sélectionnée.</div>
         </div>
@@ -110,13 +101,7 @@
 
       <div class="forward-preview-box" id="forwardPreview"></div>
 
-      <input
-        type="text"
-        id="forwardSearch"
-        class="search-input"
-        placeholder="Rechercher un membre..."
-      >
-
+      <input type="text" id="forwardSearch" class="search-input" placeholder="Rechercher un membre...">
       <div class="forward-members" id="forwardMembers"></div>
 
       <div class="modal-actions">
@@ -127,28 +112,14 @@
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import {
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    import {
-      ref,
-      set,
-      update,
-      get,
-      push,
-      remove,
-      onValue,
-      onDisconnect
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, set, update, get, push, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const myAvatar = document.getElementById("myAvatar");
     const myName = document.getElementById("myName");
     const logoutBtn = document.getElementById("logoutBtn");
     const memberSearch = document.getElementById("memberSearch");
     const membersList = document.getElementById("membersList");
-
     const chatTitle = document.getElementById("chatTitle");
     const chatSubtitle = document.getElementById("chatSubtitle");
     const chatPresence = document.getElementById("chatPresence");
@@ -158,13 +129,11 @@
     const messageInput = document.getElementById("messageInput");
     const sendBtn = document.getElementById("sendBtn");
     const replyPreviewMount = document.getElementById("replyPreviewMount");
-
     const optionsModal = document.getElementById("optionsModal");
     const closeOptionsModal = document.getElementById("closeOptionsModal");
     const cancelOptionsBtn = document.getElementById("cancelOptionsBtn");
     const optionsModalName = document.getElementById("optionsModalName");
     const blockToggleBtn = document.getElementById("blockToggleBtn");
-
     const forwardModal = document.getElementById("forwardModal");
     const closeForwardModalBtn = document.getElementById("closeForwardModal");
     const cancelForwardBtn = document.getElementById("cancelForwardBtn");
@@ -178,7 +147,6 @@
     let selectedUserProfile = null;
     let currentChatId = null;
     let currentTab = "all";
-
     let usersCache = {};
     let presenceCache = {};
     let blockedUsersCache = {};
@@ -201,20 +169,13 @@
     function avatarMarkup(profile) {
       const photo = profile?.photoURL || "";
       const label = initials(profile?.displayName || "", profile?.email || "");
-      if (photo) {
-        return `<img src="${escapeHtml(photo)}" alt="avatar">`;
-      }
-      return escapeHtml(label);
+      return photo ? `<img src="${escapeHtml(photo)}" alt="avatar">` : escapeHtml(label);
     }
 
     function formatDate(ts) {
       if (!ts) return "";
       return new Date(ts).toLocaleString("fr-FR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
+        day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
       });
     }
 
@@ -256,16 +217,13 @@
       const payload = {
         uid: user.uid,
         email: user.email || "",
-        displayName: user.displayName || localStorage.getItem("displayName") || user.email?.split("@")[0] || "Utilisateur",
+        displayName: user.displayName || user.email?.split("@")[0] || "Utilisateur",
         photoURL: snap.exists() ? (snap.val().photoURL || "") : "",
         bio: snap.exists() ? (snap.val().bio || "") : "",
         updatedAt: Date.now()
       };
 
-      if (!snap.exists()) {
-        payload.createdAt = Date.now();
-      }
-
+      if (!snap.exists()) payload.createdAt = Date.now();
       await update(userRef, payload);
       return payload;
     }
@@ -315,9 +273,7 @@
     }
 
     function clearReplyHighlight() {
-      document.querySelectorAll(".message-card").forEach(el => {
-        el.classList.remove("message-selected");
-      });
+      document.querySelectorAll(".message-card").forEach(el => el.classList.remove("message-selected"));
     }
 
     function highlightReplySource() {
@@ -328,9 +284,7 @@
     }
 
     function closeAllMenus() {
-      document.querySelectorAll(".message-menu").forEach(menu => {
-        menu.classList.remove("open");
-      });
+      document.querySelectorAll(".message-menu").forEach(menu => menu.classList.remove("open"));
     }
 
     function renderChatHeader() {
@@ -348,9 +302,7 @@
       chatAvatar.innerHTML = avatarMarkup(selectedUserProfile);
       chatTitle.textContent = selectedUserProfile.displayName || "Membre";
       chatSubtitle.textContent = selectedUserProfile.bio || selectedUserProfile.email || "Conversation privée";
-      chatPresence.textContent = isBlocked(selectedUserId)
-        ? "Tu as bloqué cet utilisateur"
-        : presenceText(selectedUserId);
+      chatPresence.textContent = isBlocked(selectedUserId) ? "Tu as bloqué cet utilisateur" : presenceText(selectedUserId);
       chatOptionsBtn.style.display = "inline-flex";
     }
 
@@ -370,12 +322,9 @@
       if (!currentUser) return;
 
       const q = memberSearch.value.trim().toLowerCase();
-
       let list = Object.values(usersCache).filter(u => u.uid !== currentUser.uid);
 
-      if (currentTab === "online") {
-        list = list.filter(u => isOnline(u.uid));
-      }
+      if (currentTab === "online") list = list.filter(u => isOnline(u.uid));
 
       list = list.filter(u => {
         const txt = `${u.displayName || ""} ${u.email || ""} ${u.bio || ""}`.toLowerCase();
@@ -428,9 +377,7 @@
       if (!selectedUserId || !selectedUserProfile) return;
       optionsModal.classList.add("open");
       optionsModalName.textContent = selectedUserProfile.displayName || "Membre";
-      blockToggleBtn.textContent = isBlocked(selectedUserId)
-        ? "Débloquer cet utilisateur"
-        : "Bloquer cet utilisateur";
+      blockToggleBtn.textContent = isBlocked(selectedUserId) ? "Débloquer cet utilisateur" : "Bloquer cet utilisateur";
     }
 
     function closeOptionsModalFn() {
@@ -440,7 +387,7 @@
     async function toggleBlockSelectedUser() {
       if (!currentUser || !selectedUserId) return;
 
-      const blockRef = ref(db, "users/" + currentUser.uid + "/blockedUsers/" + selectedUserId);
+      const blockRef = ref(db, "blockedUsers/" + currentUser.uid + "/" + selectedUserId);
 
       try {
         if (isBlocked(selectedUserId)) {
@@ -456,7 +403,6 @@
         }
         closeOptionsModalFn();
       } catch (error) {
-        console.error(error);
         setStatus("Impossible de modifier le blocage.", true);
       }
     }
@@ -524,14 +470,12 @@
         closeForwardModalFn();
         setStatus("Message transféré.");
       } catch (error) {
-        console.error(error);
         setStatus("Impossible de transférer le message.", true);
       }
     }
 
     async function selectConversation(uid) {
       if (!currentUser) return;
-
       selectedUserId = uid;
       selectedUserProfile = usersCache[uid] || null;
       currentChatId = makeChatId(currentUser.uid, uid);
@@ -628,13 +572,9 @@
 
     function listenMessages() {
       if (!currentChatId) return;
-
       onValue(ref(db, "privateMessages/" + currentChatId), (snap) => {
         renderMessages(snap.val());
-      }, (error) => {
-        console.error(error);
-        setStatus("Impossible de charger les messages.", true);
-      });
+      }, () => setStatus("Impossible de charger les messages.", true));
     }
 
     async function sendMessage() {
@@ -653,16 +593,12 @@
 
       try {
         sendBtn.disabled = true;
-
         const msgRef = push(ref(db, "privateMessages/" + currentChatId));
         await set(msgRef, {
           senderId: currentUser.uid,
           receiverId: selectedUserId,
           text,
-          replyTo: replyTarget ? {
-            messageId: replyTarget.id || "",
-            text: replyTarget.text || ""
-          } : null,
+          replyTo: replyTarget ? { messageId: replyTarget.id || "", text: replyTarget.text || "" } : null,
           createdAt: Date.now()
         });
 
@@ -672,7 +608,6 @@
         clearReplyHighlight();
         setStatus("");
       } catch (error) {
-        console.error(error);
         setStatus("Impossible d’envoyer le message.", true);
       } finally {
         sendBtn.disabled = false;
@@ -684,7 +619,6 @@
       try {
         await remove(ref(db, "privateMessages/" + currentChatId + "/" + messageId));
       } catch (error) {
-        console.error(error);
         setStatus("Impossible de supprimer le message.", true);
       }
     }
@@ -697,9 +631,7 @@
             lastSeen: Date.now(),
             displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur"
           });
-        } catch (error) {
-          console.error(error);
-        }
+        } catch (_) {}
       }
 
       await signOut(auth);
@@ -726,7 +658,6 @@
       });
 
       sendBtn.addEventListener("click", sendMessage);
-
       messageInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
@@ -739,7 +670,6 @@
       closeOptionsModal.addEventListener("click", closeOptionsModalFn);
       cancelOptionsBtn.addEventListener("click", closeOptionsModalFn);
       blockToggleBtn.addEventListener("click", toggleBlockSelectedUser);
-
       closeForwardModalBtn.addEventListener("click", closeForwardModalFn);
       cancelForwardBtn.addEventListener("click", closeForwardModalFn);
       forwardSearch.addEventListener("input", renderForwardMembers);
@@ -782,7 +712,7 @@
     function subscribeBlockedUsers() {
       if (!currentUser) return;
 
-      onValue(ref(db, "users/" + currentUser.uid + "/blockedUsers"), (snap) => {
+      onValue(ref(db, "blockedUsers/" + currentUser.uid), (snap) => {
         blockedUsersCache = snap.val() || {};
         renderMembers();
         renderChatHeader();
@@ -798,7 +728,6 @@
 
       currentUser = user;
       currentUserProfile = await ensureMyProfile(user);
-
       myAvatar.innerHTML = avatarMarkup(currentUserProfile);
       myName.textContent = currentUserProfile.displayName || "Utilisateur";
 
@@ -813,9 +742,7 @@
 
       const params = new URLSearchParams(window.location.search);
       const preselected = params.get("user");
-      if (preselected) {
-        setTimeout(() => selectConversation(preselected), 300);
-      }
+      if (preselected) setTimeout(() => selectConversation(preselected), 300);
     });
   </script>
 </body>
