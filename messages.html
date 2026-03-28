@@ -11,6 +11,315 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <style>
+    .chat-header-main {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .header-action-btn {
+      border: none;
+      background: #eef4fb;
+      color: #0b2239;
+      border-radius: 12px;
+      padding: 9px 14px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .header-action-btn:hover {
+      background: #ddeaf8;
+    }
+
+    .blocked-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(255, 196, 0, 0.18);
+      color: #ffe8a3;
+    }
+
+    .msg-foot-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .transfer-message-btn,
+    .reply-message-btn {
+      border: none;
+      background: #dbe9f8;
+      color: #0b2239;
+      border-radius: 10px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .transfer-message-btn:hover,
+    .reply-message-btn:hover {
+      background: #cfe0f3;
+    }
+
+    .selected-reply-source {
+      outline: 2px solid #8bb7ea;
+      box-shadow: 0 0 0 4px rgba(139, 183, 234, 0.18);
+    }
+
+    .reply-preview-box {
+      background: #eef5fc;
+      border: 1px solid #d8e5f4;
+      border-left: 4px solid #0b2239;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .reply-preview-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .reply-preview-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0b2239;
+    }
+
+    .clear-reply-btn {
+      border: none;
+      background: #f3d6d6;
+      color: #7a1f1f;
+      border-radius: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .clear-reply-btn:hover {
+      background: #ebc3c3;
+    }
+
+    .reply-preview-text {
+      font-size: 13px;
+      color: #33485f;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .quoted-reply-box {
+      background: #eef4fb;
+      border-left: 4px solid #0b2239;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .quoted-reply-name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0b2239;
+      margin-bottom: 3px;
+    }
+
+    .quoted-reply-text {
+      font-size: 12px;
+      color: #4f6276;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .msg-system-error {
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: #fdecea;
+      color: #b00020;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .msg-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 14px;
+    }
+
+    .hidden-msg-modal {
+      display: none;
+    }
+
+    .msg-modal-content {
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      padding: 24px;
+      position: relative;
+      width: min(520px, 96%);
+    }
+
+    .small-msg-modal {
+      width: min(420px, 96%);
+    }
+
+    .large-msg-modal {
+      width: min(700px, 96%);
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    .msg-modal-close {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      border: none;
+      background: transparent;
+      font-size: 28px;
+      cursor: pointer;
+      color: #0b2239;
+    }
+
+    .msg-modal-content h3 {
+      margin-top: 0;
+      color: #0b2239;
+    }
+
+    .msg-modal-note {
+      color: #5e6d7d;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .msg-modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .modal-main-btn {
+      border: none;
+      background: #0b2239;
+      color: white;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .modal-secondary-btn {
+      border: none;
+      background: #eef4fb;
+      color: #0b2239;
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .forward-preview-box {
+      background: #f6f9fc;
+      border: 1px solid #dde6f0;
+      border-radius: 14px;
+      padding: 12px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+      color: #102133;
+      margin-bottom: 14px;
+    }
+
+    .forward-members-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .forward-member-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #f7f9fc;
+      border: 1px solid #e2eaf2;
+      border-radius: 16px;
+      padding: 10px;
+    }
+
+    .forward-member-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .forward-member-text strong {
+      display: block;
+      color: #0b2239;
+    }
+
+    .forward-member-text span {
+      display: block;
+      color: #66788a;
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .small-forward-btn {
+      padding: 8px 12px;
+    }
+
+    .dark-empty-text {
+      color: #5f6f81;
+      background: #f3f7fb;
+    }
+
+    @media (max-width: 760px) {
+      .chat-header-main {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .msg-foot {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .msg-foot-actions {
+        width: 100%;
+      }
+
+      .forward-member-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .small-forward-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -86,6 +395,8 @@
       <div id="chat-messages" class="chat-messages"></div>
 
       <div class="chat-composer">
+        <div id="reply-preview-mount"></div>
+
         <textarea id="message-input" placeholder="Write a private message..."></textarea>
 
         <div class="composer-actions">
@@ -102,7 +413,6 @@
   </main>
 </div>
 
-<!-- ACTIONS MODAL -->
 <div id="actions-modal" class="msg-modal hidden-msg-modal">
   <div class="msg-modal-content small-msg-modal">
     <button class="msg-modal-close" onclick="closeActionsModal()">×</button>
@@ -116,7 +426,6 @@
   </div>
 </div>
 
-<!-- FORWARD MODAL -->
 <div id="forward-modal" class="msg-modal hidden-msg-modal">
   <div class="msg-modal-content large-msg-modal">
     <button class="msg-modal-close" onclick="closeForwardModal()">×</button>
@@ -128,7 +437,7 @@
     <input
       type="text"
       id="forward-search"
-      class="search-input forward-search-input"
+      class="search-input"
       placeholder="Search a member..."
       oninput="renderForwardMembers()"
     >
@@ -181,6 +490,8 @@ let threadsCache = [];
 let statusCache = {};
 let blockedUsersCache = {};
 let forwardPayload = null;
+let replyTargetMessage = null;
+let lastSendBlockedError = false;
 
 const HEARTBEAT_MS = 25000;
 const ONLINE_FRESH_MS = 90000;
@@ -621,6 +932,57 @@ async function forwardMessageToUser(targetUid) {
   }
 }
 
+function openReplyToMessage(messageId, senderName, text) {
+  replyTargetMessage = {
+    id: messageId,
+    senderName: senderName || "Member",
+    text: text || ""
+  };
+
+  renderReplyComposerBar();
+  highlightReplySourceMessage();
+  document.getElementById("message-input").focus();
+}
+
+function clearReplyTarget() {
+  replyTargetMessage = null;
+  renderReplyComposerBar();
+  clearReplySourceHighlight();
+}
+
+function renderReplyComposerBar() {
+  const mount = document.getElementById("reply-preview-mount");
+  if (!mount) return;
+
+  if (!replyTargetMessage) {
+    mount.innerHTML = "";
+    return;
+  }
+
+  mount.innerHTML = `
+    <div class="reply-preview-box">
+      <div class="reply-preview-head">
+        <span class="reply-preview-title">Replying to ${escapeHtml(replyTargetMessage.senderName)}</span>
+        <button class="clear-reply-btn" onclick="clearReplyTarget()">Cancel</button>
+      </div>
+      <div class="reply-preview-text">${escapeHtml(replyTargetMessage.text)}</div>
+    </div>
+  `;
+}
+
+function clearReplySourceHighlight() {
+  document.querySelectorAll(".msg-bubble").forEach(el => {
+    el.classList.remove("selected-reply-source");
+  });
+}
+
+function highlightReplySourceMessage() {
+  clearReplySourceHighlight();
+  if (!replyTargetMessage) return;
+  const el = document.getElementById("msg-" + replyTargetMessage.id);
+  if (el) el.classList.add("selected-reply-source");
+}
+
 function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPresenceDot = false) {
   const searchText = `${(profile?.fullName || "").toLowerCase()} ${(profile?.institution || "").toLowerCase()}`;
   const online = isOnline(uid);
@@ -842,6 +1204,8 @@ async function selectConversation(otherUserId) {
   selectedUserId = otherUserId;
   currentThreadId = threadIdFor(user.uid, otherUserId);
   selectedUserProfile = usersCache[otherUserId] || { fullName: "Member" };
+  lastSendBlockedError = false;
+  clearReplyTarget();
 
   renderChatHeader();
   updateComposerState();
@@ -875,8 +1239,12 @@ function loadMessages() {
         const encodedText = encodeURIComponent(m.text || "");
         const encodedSenderName = encodeURIComponent(sender.fullName || "Member");
 
+        const replyName = escapeHtml(m.replyTo?.senderName || "");
+        const replyText = escapeHtml(m.replyTo?.text || "");
+        const hasReply = !!(m.replyTo && m.replyTo.text);
+
         html += `
-          <div class="msg-bubble ${own ? 'own-msg' : ''}">
+          <div class="msg-bubble ${own ? 'own-msg' : ''}" id="msg-${doc.id}">
             <div class="msg-head">
               ${avatarHtml(sender)}
               <div class="msg-head-text">
@@ -885,11 +1253,19 @@ function loadMessages() {
               </div>
             </div>
 
+            ${hasReply ? `
+              <div class="quoted-reply-box">
+                <div class="quoted-reply-name">Reply to ${replyName}</div>
+                <div class="quoted-reply-text">${replyText}</div>
+              </div>
+            ` : ""}
+
             <div class="msg-text">${escapeHtml(m.text || "")}</div>
 
             <div class="msg-foot">
               <span>${escapeHtml(formatDateTime(m.createdAt))}</span>
               <div class="msg-foot-actions">
+                <button class="reply-message-btn" onclick="openReplyToMessage('${doc.id}', '${escapeHtml(sender.fullName || "Member").replace(/'/g, "\\'")}', '${escapeHtml((m.text || "").replace(/\n/g, " ")).replace(/'/g, "\\'")}')">Reply</button>
                 <button class="transfer-message-btn" onclick="openForwardModal('${encodedText}','${encodedSenderName}')">Transfer</button>
                 ${own && canDeleteMessage(m.createdAt) ? `<button class="delete-message-btn" onclick="deleteMessage('${doc.id}')">Delete</button>` : ""}
               </div>
@@ -898,8 +1274,19 @@ function loadMessages() {
         `;
       });
 
-      container.innerHTML = html || `<p class="empty-text dark-empty-text">${escapeHtml(t("noMessageYet"))}</p>`;
+      let finalHtml = html || `<p class="empty-text dark-empty-text">${escapeHtml(t("noMessageYet"))}</p>`;
+
+      if (lastSendBlockedError) {
+        finalHtml += `
+          <div class="msg-system-error">
+            Message impossible : l’un d’entre vous a bloqué l’autre
+          </div>
+        `;
+      }
+
+      container.innerHTML = finalHtml;
       container.scrollTop = container.scrollHeight;
+      highlightReplySourceMessage();
     }, (error) => {
       console.error("loadMessages error:", error);
       setChatStatus(t("loadError"), true);
@@ -919,7 +1306,9 @@ async function sendMessage() {
   }
 
   if (isBlocked(selectedUserId)) {
-    setChatStatus("Impossible d’écrire à un utilisateur que tu as bloqué.", true);
+    lastSendBlockedError = true;
+    setChatStatus("");
+    loadMessages();
     return;
   }
 
@@ -929,7 +1318,7 @@ async function sendMessage() {
 
   const sendBtn = document.querySelector(".send-btn");
   if (sendBtn) sendBtn.disabled = true;
-  setChatStatus(t("sending"));
+  setChatStatus("");
 
   try {
     const threadRef = db.collection("privateThreads").doc(currentThreadId);
@@ -953,16 +1342,24 @@ async function sendMessage() {
       senderId: user.uid,
       receiverId: selectedUserId,
       text,
+      replyTo: replyTargetMessage ? {
+        messageId: replyTargetMessage.id || "",
+        senderName: replyTargetMessage.senderName || "Member",
+        text: replyTargetMessage.text || ""
+      } : null,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     input.value = "";
-    setChatStatus(t("messageSent"));
+    lastSendBlockedError = false;
+    clearReplyTarget();
   } catch (error) {
     console.error("sendMessage error:", error);
 
     if (String(error.message || "").toLowerCase().includes("missing or insufficient permissions")) {
-      setChatStatus("Message impossible : l’un de vous a bloqué l’autre.", true);
+      lastSendBlockedError = true;
+      setChatStatus("");
+      loadMessages();
     } else {
       setChatStatus(t("sendError"), true);
     }
@@ -1110,6 +1507,7 @@ function subscribeBlockedUsers() {
       }
 
       renderForwardMembers();
+      loadMessages();
     }, (error) => {
       console.error("subscribeBlockedUsers error:", error);
     });
@@ -1168,6 +1566,7 @@ auth.onAuthStateChanged(async (user) => {
   setupPresence(user, currentUserProfile.fullName || user.displayName || "Member");
 
   renderChatHeader();
+  renderReplyComposerBar();
   subscribeUsers();
   subscribeThreads();
   subscribeBlockedUsers();
