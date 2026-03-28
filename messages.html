@@ -905,6 +905,7 @@ function loadMessages() {
     });
 }
 
+<script>
 async function sendMessage() {
   const user = auth.currentUser;
   if (!user) {
@@ -918,7 +919,7 @@ async function sendMessage() {
   }
 
   if (isBlocked(selectedUserId)) {
-    setChatStatus("Impossible d’écrire à un utilisateur bloqué.", true);
+    setChatStatus("Impossible d’écrire à un utilisateur que tu as bloqué.", true);
     return;
   }
 
@@ -959,12 +960,18 @@ async function sendMessage() {
     setChatStatus(t("messageSent"));
   } catch (error) {
     console.error("sendMessage error:", error);
-    setChatStatus(t("sendError"), true);
+
+    if (String(error.message || "").toLowerCase().includes("missing or insufficient permissions")) {
+      setChatStatus("Message impossible : l’un de vous a bloqué l’autre.", true);
+    } else {
+      setChatStatus(t("sendError"), true);
+    }
   } finally {
     updateComposerState();
+    if (sendBtn) sendBtn.disabled = false;
   }
 }
-
+</script>
 async function markThreadAsRead() {
   const user = auth.currentUser;
   if (!user || !currentThreadId) return;
