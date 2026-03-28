@@ -71,22 +71,9 @@
 
   <script type="module">
     import { auth, db, storage } from "./firebase-config.js";
-    import {
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    import {
-      ref,
-      get,
-      update,
-      onValue
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    import {
-      ref as storageRef,
-      uploadBytes,
-      getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const bigAvatar = document.getElementById("bigAvatar");
     const changeAvatarBtn = document.getElementById("changeAvatarBtn");
@@ -101,7 +88,6 @@
     const profileMsg = document.getElementById("profileMsg");
     const bioText = document.getElementById("bioText");
     const editorBlock = document.getElementById("editorBlock");
-    const messageBtn = document.getElementById("messageBtn");
     const userPosts = document.getElementById("userPosts");
 
     const params = new URLSearchParams(window.location.search);
@@ -136,11 +122,8 @@
     }
 
     function showAvatar(photoURL, name, email) {
-      if (photoURL) {
-        bigAvatar.innerHTML = `<img src="${photoURL}" alt="avatar">`;
-      } else {
-        bigAvatar.textContent = initials(name, email);
-      }
+      if (photoURL) bigAvatar.innerHTML = `<img src="${photoURL}" alt="avatar">`;
+      else bigAvatar.textContent = initials(name, email);
     }
 
     function showMsg(text, ok = false) {
@@ -152,8 +135,6 @@
       const snap = await get(ref(db, "users/" + uid));
       if (!snap.exists()) {
         profileName.textContent = "Profil introuvable";
-        profileEmail.textContent = "";
-        bioText.textContent = "Cet utilisateur n'existe pas.";
         editorBlock.style.display = "none";
         return;
       }
@@ -169,10 +150,6 @@
       changeAvatarBtn.style.display = isMine ? "inline-flex" : "none";
       nameInput.value = viewedUser.displayName || "";
       bioInput.value = viewedUser.bio || "";
-
-      if (!isMine) {
-        messageBtn.href = "messages.html";
-      }
     }
 
     function listenPresence(uid) {
@@ -183,9 +160,7 @@
           statusText.textContent = "En ligne";
         } else {
           statusDot.classList.remove("online");
-          statusText.textContent = data.lastSeen
-            ? "Dernière activité : " + formatDate(data.lastSeen)
-            : "Hors ligne";
+          statusText.textContent = data.lastSeen ? "Dernière activité : " + formatDate(data.lastSeen) : "Hors ligne";
         }
       });
     }
@@ -217,7 +192,6 @@
 
     saveProfileBtn.addEventListener("click", async () => {
       if (!currentUser || currentUser.uid !== viewedUid) return;
-
       const newName = nameInput.value.trim();
       const newBio = bioInput.value.trim();
 
@@ -232,16 +206,13 @@
           bio: newBio,
           updatedAt: Date.now()
         });
-
         showMsg("Profil mis à jour avec succès.", true);
       } catch (error) {
-        showMsg("Erreur : " + error.message);
+        showMsg("Erreur de mise à jour.");
       }
     });
 
-    changeAvatarBtn.addEventListener("click", () => {
-      avatarInput.click();
-    });
+    changeAvatarBtn.addEventListener("click", () => avatarInput.click());
 
     avatarInput.addEventListener("change", async () => {
       if (!currentUser || currentUser.uid !== viewedUid) return;
@@ -261,7 +232,7 @@
         showAvatar(url, nameInput.value, currentUser.email);
         showMsg("Photo de profil mise à jour.", true);
       } catch (error) {
-        showMsg("Erreur lors de l'envoi de l'image : " + error.message);
+        showMsg("Erreur lors de l’envoi de la photo.");
       }
     });
 
