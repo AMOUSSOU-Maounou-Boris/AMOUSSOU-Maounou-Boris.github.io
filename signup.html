@@ -16,7 +16,7 @@
     }
     .card {
       width: 100%;
-      max-width: 460px;
+      max-width: 500px;
       background: #fff;
       border-radius: 22px;
       padding: 28px;
@@ -32,9 +32,7 @@
       margin-bottom: 22px;
       line-height: 1.5;
     }
-    .field {
-      margin-bottom: 14px;
-    }
+    .field { margin-bottom: 14px; }
     .field label {
       display: block;
       margin-bottom: 6px;
@@ -61,33 +59,31 @@
       cursor: pointer;
       margin-top: 8px;
     }
-    .info {
+    .msg {
+      margin-top: 14px;
+      min-height: 22px;
+      font-size: 14px;
+      text-align: center;
+      color: #b42318;
+    }
+    .msg.success { color: #15803d; }
+    .links {
+      text-align: center;
       margin-top: 16px;
       color: #4e6278;
       font-size: 14px;
-      text-align: center;
     }
-    .info a {
+    .links a {
       color: #0c3d73;
-      font-weight: 700;
       text-decoration: none;
-    }
-    .msg {
-      margin-top: 14px;
-      font-size: 14px;
-      min-height: 20px;
-      color: #c0392b;
-      text-align: center;
-    }
-    .success {
-      color: #14854b;
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Créer un compte</h1>
-    <p class="sub">Crée ton espace privé pour rejoindre ton mini réseau social familial et académique.</p>
+    <p class="sub">Crée ton compte pour rejoindre l’espace privé famille / proches / étudiants.</p>
 
     <div class="field">
       <label for="displayName">Nom complet</label>
@@ -101,7 +97,7 @@
 
     <div class="field">
       <label for="password">Mot de passe</label>
-      <input type="password" id="password" placeholder="Choisis un mot de passe">
+      <input type="password" id="password" placeholder="Au moins 6 caractères">
     </div>
 
     <div class="field">
@@ -113,14 +109,17 @@
 
     <div class="msg" id="messageBox"></div>
 
-    <p class="info">Tu as déjà un compte ? <a href="login.html">Se connecter</a></p>
+    <div class="links">
+      Tu as déjà un compte ? <a href="login.html">Se connecter</a>
+    </div>
   </div>
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import {
       createUserWithEmailAndPassword,
-      updateProfile
+      updateProfile,
+      sendEmailVerification
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       ref,
@@ -165,6 +164,7 @@
         const user = cred.user;
 
         await updateProfile(user, { displayName: name });
+        await sendEmailVerification(user);
 
         await set(ref(db, "users/" + user.uid), {
           uid: user.uid,
@@ -172,26 +172,19 @@
           email: mail,
           photoURL: "",
           bio: "",
-          role: "member",
           createdAt: Date.now(),
           updatedAt: Date.now()
         });
 
-        localStorage.setItem("displayName", name);
-
-        showMessage("Compte créé avec succès. Redirection...", true);
-
+        showMessage("Compte créé. Vérifie ton e-mail avant de te connecter.", true);
         setTimeout(() => {
-          window.location.href = "insights.html";
-        }, 1200);
-
+          window.location.href = "login.html";
+        }, 1800);
       } catch (error) {
         if (error.code === "auth/email-already-in-use") {
           showMessage("Cette adresse e-mail est déjà utilisée.");
-        } else if (error.code === "auth/invalid-email") {
-          showMessage("Adresse e-mail invalide.");
         } else {
-          showMessage("Erreur : " + error.message);
+          showMessage("Impossible de créer le compte.");
         }
       }
     });
