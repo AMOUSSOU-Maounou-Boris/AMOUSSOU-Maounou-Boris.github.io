@@ -1,2244 +1,370 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Insights</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Insights - Réseau social</title>
   <link rel="stylesheet" href="insights.css" />
-
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-
-  <style>
-    .soft-status-message {
-      display: inline-block;
-      max-width: 100%;
-      padding: 7px 11px;
-      border-radius: 10px;
-      margin-top: 8px;
-      font-weight: 700;
-      line-height: 1.35;
-      transition: all 0.25s ease;
-      min-height: 18px;
-      font-size: 13px;
-    }
-
-    .soft-status-message.soft-success {
-      background: #edf8f1;
-      color: #146c43;
-      border: 1px solid #c9ead6;
-    }
-
-    .soft-status-message.soft-error {
-      background: #fff4d9;
-      color: #7a5600;
-      border: 1px solid #f2d38a;
-      animation: softShake 0.36s ease-in-out;
-    }
-
-    @keyframes softShake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-4px); }
-      50% { transform: translateX(4px); }
-      75% { transform: translateX(-3px); }
-      100% { transform: translateX(0); }
-    }
-
-    .welcome-join-card {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #f6fbff, #eef6ff);
-      border: 1px solid #d7e8fb;
-      margin-bottom: 18px;
-    }
-
-    .welcome-join-emoji {
-      font-size: 30px;
-      line-height: 1;
-    }
-
-    .welcome-join-text h3 {
-      margin: 0 0 4px 0;
-      color: #16385d;
-      font-size: 18px;
-    }
-
-    .welcome-join-text p {
-      margin: 0;
-      color: #46627f;
-      line-height: 1.5;
-    }
-
-    .readonly-lock {
-      background: #f4f7fb;
-      color: #58708b;
-      cursor: not-allowed;
-    }
-
-    .connection-badge-wrap {
-      display: flex;
-      justify-content: center;
-      margin-top: 10px;
-    }
-
-    .connection-badge {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: #edf9f1;
-      color: #11683d;
-      font-size: 13px;
-      font-weight: 800;
-      border: 1px solid #ccead7;
-      width: fit-content;
-    }
-
-    .connection-badge.show-badge {
-      display: inline-flex;
-    }
-
-    .connection-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #20c15a;
-      box-shadow: 0 0 0 4px rgba(32, 193, 90, 0.18);
-      animation: pulseDot 1.6s infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes pulseDot {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(32, 193, 90, 0.25); }
-      70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(32, 193, 90, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(32, 193, 90, 0); }
-    }
-
-    .like-active {
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
-      transform: translateY(-1px);
-    }
-
-    .small-like-row {
-      margin-top: 8px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .nested-replies {
-      margin-top: 10px;
-      margin-left: 18px;
-      border-left: 2px solid #d9e3ef;
-      padding-left: 10px;
-    }
-
-    .save-loading {
-      opacity: 0.8;
-      pointer-events: none;
-    }
-  </style>
 </head>
 <body>
+  <header class="topbar">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="research.html">Research</a>
+      <a href="cv.html">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html" class="active">Insights</a>
+      <a href="messages.html">Messages</a>
+      <a href="profile.html">Mon compte</a>
+    </nav>
+  </header>
 
-<nav class="insights-nav">
-  <ul>
-    <li><a href="index.html" data-i18n="nav.home">Home</a></li>
-    <li><a href="about.html" data-i18n="nav.about">About</a></li>
-    <li><a href="research.html" data-i18n="nav.research">Research</a></li>
-    <li><a href="resume.html" data-i18n="nav.resume">Resume</a></li>
-    <li><a href="contact.html" data-i18n="nav.contact">Contact</a></li>
-    <li><a href="insights.html" data-i18n="nav.insights">Insights</a></li>
-    <li><a href="messages.html">Messages</a></li>
-  </ul>
-
-  <div class="lang-switcher">
-    <button type="button" onclick="setLanguage('en')">EN</button>
-    <button type="button" onclick="setLanguage('fr')">FR</button>
-    <button type="button" onclick="setLanguage('es')">ES</button>
-  </div>
-</nav>
-
-<div class="insights-container">
-  <aside class="insights-sidebar">
-    <img src="profile.jpg" class="profile-img" alt="Profile photo">
-
-    <h2>Maounou Boris AMOUSSOU</h2>
-    <p>Chemical Engineer<br>Green Chemistry &amp; Environment</p>
-
-    <div class="auth-box">
-      <h3 data-i18n="memberAccess">Member Access</h3>
-
-      <input type="email" id="login-email" placeholder="Email" class="auth-input" autocomplete="email">
-      <input type="password" id="login-password" placeholder="Password" class="auth-input" autocomplete="current-password">
-
-      <div class="auth-actions">
-        <button class="auth-btn" onclick="openSignupModal()" data-i18n="signup">Sign up</button>
-        <button class="auth-btn" onclick="signIn()" data-i18n="login">Login</button>
+  <main class="page">
+    <aside class="left-panel">
+      <div class="profile-box">
+        <div class="avatar" id="meAvatar">MB</div>
+        <h2 id="meName">Chargement...</h2>
+        <p id="meBio">Bienvenue sur ton espace social privé.</p>
+        <a class="panel-btn" href="profile.html">Voir mon profil</a>
+        <a class="panel-btn alt" href="messages.html">Messagerie</a>
       </div>
+    </aside>
 
-      <div class="auth-extra-actions">
-        <button class="text-link-btn" type="button" onclick="sendResetFromInsightsLogin()" data-i18n="forgotPassword">
-          Forgot password?
-        </button>
-      </div>
+    <section class="feed-section">
+      <div class="composer-card">
+        <h2>Créer une publication</h2>
+        <textarea id="postText" placeholder="Écris quelque chose à partager..."></textarea>
 
-      <div class="connection-badge-wrap">
-        <div id="connection-badge" class="connection-badge">
-          <span class="connection-dot"></span>
-          <span>Connected</span>
+        <div class="composer-actions">
+          <input type="file" id="postImageInput" accept="image/*" />
+          <button class="primary-btn" id="publishBtn">Publier</button>
         </div>
+
+        <div id="composerPreview"></div>
+        <div class="small-msg" id="publishMsg"></div>
       </div>
 
-      <p id="auth-message" class="auth-message soft-status-message"></p>
-    </div>
-
-    <div id="member-zone" class="hidden-block">
-      <button class="subsection-toggle" onclick="openAccountModal()" data-i18n="myAccount">My account</button>
-    </div>
-  </aside>
-
-  <main class="insights-main">
-    <section class="card">
-      <div class="welcome-join-card">
-        <div class="welcome-join-emoji">🎓✨</div>
-        <div class="welcome-join-text">
-          <h3>Create your member space</h3>
-          <p>Join the academic community, publish your ideas, comment, interact with others and grow your scientific network 🚀📚</p>
-        </div>
-      </div>
-      <div id="online-users"></div>
+      <div id="feed"></div>
     </section>
-
-    <section class="card academic-hub-card">
-      <button class="hub-toggle" onclick="toggleSection('academic-hub-panel')" data-i18n="academicHub">Academic Hub</button>
-
-      <div id="academic-hub-panel" class="hub-panel">
-        <div class="hub-grid">
-          <div class="hub-box">
-            <h4 data-i18n="collaboration">Collaboration</h4>
-            <p data-i18n="collaborationText">Explore research partnerships, interdisciplinary exchange, student projects, and scientific networking opportunities.</p>
-          </div>
-
-          <div class="hub-box">
-            <h4 data-i18n="communications">Communications</h4>
-            <p data-i18n="communicationsText">Share scientific announcements, conference updates, presentation ideas, and research news with the community.</p>
-          </div>
-
-          <div class="hub-box">
-            <h4 data-i18n="labActivity">Lab Activity</h4>
-            <p data-i18n="labActivityText">Highlight laboratory observations, experimental progress, research routines, and technical reflections from ongoing work.</p>
-          </div>
-
-          <div class="hub-box">
-            <h4 data-i18n="scientificInterests">Scientific Interests</h4>
-            <p data-i18n="scientificInterestsText">Green chemistry, catalysis, environmental treatment, materials science, electrochemistry, and sustainable energy transitions.</p>
-          </div>
-
-          <div class="hub-box">
-            <h4 data-i18n="opportunities">Opportunities</h4>
-            <p data-i18n="opportunitiesText">Discuss seminars, internships, thesis opportunities, mobility programs, and future academic perspectives.</p>
-          </div>
-
-          <div class="hub-box">
-            <h4 data-i18n="communitySpirit">Community Spirit</h4>
-            <p data-i18n="communitySpiritText">Build a respectful and active scientific space where every member can publish, react, comment, and share constructive opinions.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card post" id="post1">
-      <h3>Scientific Insight</h3>
-      <p class="date">March 2026</p>
-
-      <p>
-        ✍️ Reflections on sustainable chemistry, environmental treatment approaches,
-        and energy-related research perspectives ✍️.
-      </p>
-
-      <div class="actions">
-        <button class="small-btn" onclick="toggleLike('post','post1')" id="like-btn-post-post1">
-          👍 <span data-i18n="like">Like</span> <span id="likes-post1">0</span>
-        </button>
-      </div>
-
-      <div class="comments-box">
-        <div class="section-head">
-          <h4 data-i18n="comments">Comments</h4>
-          <button class="emoji-toggle-btn" onclick="toggleEmojiPanel('emoji-panel-post1')">😊 Stickers</button>
-        </div>
-
-        <div id="emoji-panel-post1" class="emoji-panel hidden-emoji-panel">
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😀')">😀</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😄')">😄</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','😍')">😍</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','👏')">👏</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🔥')">🔥</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🎉')">🎉</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','❤️')">❤️</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','👍')">👍</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🙏')">🙏</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🧪')">🧪</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🔬')">🔬</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','🌍')">🌍</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','⚗️')">⚗️</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','💡')">💡</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('comment-input-post1','⭐')">⭐</button>
-        </div>
-
-        <div class="new-comment">
-          <textarea id="comment-input-post1" placeholder="Write a comment..."></textarea>
-          <button class="small-btn" onclick="addComment('post1')">Commenter</button>
-        </div>
-
-        <div id="comments-post1"></div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h3 data-i18n="communityPublications">Community publications</h3>
-      <p class="small-note dark-note" data-i18n="communityIntro">
-        Logged-in members can publish. Everyone can read, comment, and share opinions.
-      </p>
-
-      <div class="new-comment">
-        <input type="text" id="community-title" class="text-input" placeholder="Title">
-        <textarea id="community-text" placeholder="Write your publication..."></textarea>
-
-        <div class="section-head">
-          <div></div>
-          <button class="emoji-toggle-btn" onclick="toggleEmojiPanel('emoji-panel-community')">😊 Stickers</button>
-        </div>
-
-        <div id="emoji-panel-community" class="emoji-panel hidden-emoji-panel">
-          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🧪')">🧪</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🔬')">🔬</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🌍')">🌍</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','💡')">💡</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','✨')">✨</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','👏')">👏</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','🔥')">🔥</button>
-          <button type="button" class="emoji-btn" onclick="insertEmoji('community-text','❤️')">❤️</button>
-        </div>
-
-        <button class="small-btn" onclick="publishCommunityPost()" data-i18n="publish">Publish</button>
-        <p id="community-message" class="dark-message soft-status-message"></p>
-      </div>
-
-      <div id="community-posts"></div>
-    </section>
-
-    <footer class="page-footer">
-      <p>© 2026 Maounou Boris AMOUSSOU — All rights reserved</p>
-      <div class="socials">
-        <a href="#">Google Scholar</a>
-        <a href="#">ResearchGate</a>
-        <a href="#">LinkedIn</a>
-        <a href="#">Facebook</a>
-      </div>
-    </footer>
   </main>
-</div>
 
-<!-- SIGNUP MODAL -->
-<div id="signup-modal" class="modal hidden-modal">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeSignupModal()">×</button>
-    <h3 data-i18n="createAccount">Create an account</h3>
+  <script type="module">
+    import { auth, db, storage } from "./firebase-config.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    <input type="text" id="signup-firstname" placeholder="First name" class="auth-input" autocomplete="given-name">
-    <input type="text" id="signup-lastname" placeholder="Last name" class="auth-input" autocomplete="family-name">
-    <input type="email" id="signup-email" placeholder="Email" class="auth-input" autocomplete="email">
-    <input type="password" id="signup-password" placeholder="Password" class="auth-input" autocomplete="new-password">
-    <input type="password" id="signup-password-confirm" placeholder="Confirm password" class="auth-input" autocomplete="new-password">
+    import {
+      ref,
+      get,
+      set,
+      update,
+      push,
+      remove,
+      onValue
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    <div class="auth-actions">
-      <button class="auth-btn" onclick="signUp()" data-i18n="createAccount">Create account</button>
-      <button class="auth-btn secondary" onclick="closeSignupModal()" data-i18n="close">Close</button>
-    </div>
+    import {
+      ref as storageRef,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-    <p id="signup-message" class="modal-message soft-status-message"></p>
-  </div>
-</div>
+    const meAvatar = document.getElementById("meAvatar");
+    const meName = document.getElementById("meName");
+    const meBio = document.getElementById("meBio");
 
-<!-- ACCOUNT MODAL -->
-<div id="account-modal" class="modal hidden-modal">
-  <div class="modal-content large-modal-content">
-    <button class="modal-close" onclick="closeAccountModal()">×</button>
+    const postText = document.getElementById("postText");
+    const postImageInput = document.getElementById("postImageInput");
+    const publishBtn = document.getElementById("publishBtn");
+    const composerPreview = document.getElementById("composerPreview");
+    const publishMsg = document.getElementById("publishMsg");
+    const feed = document.getElementById("feed");
 
-    <div id="account-profile-tab" class="account-tab-panel">
-      <div class="profile-preview-card">
-        <div id="profile-avatar-preview" class="member-avatar large-avatar">MB</div>
-        <div class="profile-preview-text">
-          <h4 id="profile-preview-name">Member profile</h4>
-          <p id="profile-preview-role">Scientific member space</p>
-        </div>
-      </div>
+    let currentUser = null;
+    let usersMap = {};
+    let likesMap = {};
+    let commentsMap = {};
 
-      <p id="user-info" class="dark-message"></p>
-      <p id="presence-self" class="dark-message"></p>
-
-      <label class="field-label" data-i18n="firstName">First name</label>
-      <input type="text" id="profile-firstname" class="auth-input" placeholder="First name">
-
-      <label class="field-label" data-i18n="lastName">Last name</label>
-      <input type="text" id="profile-lastname" class="auth-input" placeholder="Last name">
-
-      <label class="field-label">Country</label>
-      <input type="text" id="profile-country" class="auth-input readonly-lock" placeholder="Country" readonly>
-
-      <label class="field-label" data-i18n="location">City</label>
-      <input type="text" id="profile-location" class="auth-input" placeholder="City">
-
-      <label class="field-label" data-i18n="emailAddress">Email address</label>
-      <input type="email" id="profile-email" class="auth-input readonly-input" readonly>
-
-      <label class="field-label" data-i18n="profilePhotoUrl">Profile photo URL</label>
-      <input type="text" id="profile-photo-url" class="auth-input" placeholder="Paste an image URL">
-
-      <label class="field-label" data-i18n="shortBio">Short bio</label>
-      <textarea id="profile-bio" class="profile-textarea" placeholder="Write a short academic bio..."></textarea>
-
-      <label class="field-label" data-i18n="institution">Institution</label>
-      <input type="text" id="profile-institution" class="auth-input" placeholder="Institution / University / Lab">
-
-      <label class="field-label" data-i18n="favoriteField">Favorite field</label>
-      <input type="text" id="profile-field" class="auth-input" placeholder="Green chemistry, catalysis, materials...">
-
-      <label class="field-label" data-i18n="avatarColor">Avatar color</label>
-      <div class="color-row">
-        <button type="button" class="color-dot color-1 active-color" data-color="#16385d" onclick="setAvatarColor('#16385d', this)"></button>
-        <button type="button" class="color-dot color-2" data-color="#6c2bd9" onclick="setAvatarColor('#6c2bd9', this)"></button>
-        <button type="button" class="color-dot color-3" data-color="#0f766e" onclick="setAvatarColor('#0f766e', this)"></button>
-        <button type="button" class="color-dot color-4" data-color="#b45309" onclick="setAvatarColor('#b45309', this)"></button>
-        <button type="button" class="color-dot color-5" data-color="#be123c" onclick="setAvatarColor('#be123c', this)"></button>
-      </div>
-      <input type="hidden" id="profile-avatar-color" value="#16385d">
-
-      <div class="auth-actions">
-        <button class="auth-btn" id="save-profile-btn" onclick="saveProfile()" data-i18n="saveProfile">Save profile</button>
-      </div>
-
-      <hr class="soft-line">
-
-      <h4 data-i18n="deleteMyAccount">Delete my account</h4>
-      <p class="small-note dark-note" data-i18n="deleteNotice">This deletes your account and your data on this site.</p>
-      <input type="password" id="delete-password" class="auth-input" placeholder="Confirm with your password">
-
-      <div class="auth-actions">
-        <button class="auth-btn danger" onclick="deleteMyAccount()" data-i18n="deleteMyAccount">Delete my account</button>
-      </div>
-
-      <p id="profile-message" class="dark-message soft-status-message"></p>
-    </div>
-  </div>
-</div>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
-  authDomain: "boris-research-hub.firebaseapp.com",
-  projectId: "boris-research-hub",
-  storageBucket: "boris-research-hub.firebasestorage.app",
-  messagingSenderId: "71055508172",
-  appId: "1:71055508172:web:72229e3f5ad664eb35b869",
-  measurementId: "G-9Q6SJ96NBS",
-  databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
-const auth = firebase.auth();
-const rtdb = firebase.database();
-
-let presenceConnectedRef = null;
-let presenceStatusRef = null;
-let presenceHeartbeatInterval = null;
-let currentLanguage = localStorage.getItem("site_lang") || "en";
-let onlineUsersRef = null;
-
-let autoLogoutTimer = null;
-let replyListenersMap = {};
-let currentUserLikeWatchers = {};
-
-const HEARTBEAT_MS = 20000;
-const ONLINE_FRESH_MS = 70000;
-const GEO_TIMEOUT_MS = 4500;
-const AUTO_LOGOUT_MS = 10 * 60 * 1000;
-
-const allowedDirectDomains = ["gmail.com", "yahoo.com", "yahoo.fr"];
-const blockedDisposableDomains = [
-  "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com",
-  "temp-mail.org", "yopmail.com", "sharklasers.com", "dispostable.com",
-  "throwawaymail.com", "fakeinbox.com", "maildrop.cc", "trashmail.com",
-  "getnada.com", "mintemail.com"
-];
-const blockedPublicDomains = [
-  "hotmail.com", "outlook.com", "live.com", "icloud.com", "proton.me",
-  "protonmail.com", "aol.com", "gmx.com", "mail.com", "yandex.com", "zoho.com"
-];
-
-const i18n = {
-  en: {
-    "nav.home":"Home","nav.about":"About","nav.research":"Research","nav.resume":"Resume","nav.contact":"Contact","nav.insights":"Insights",
-    memberAccess:"Member Access",signup:"Sign up",login:"Login",myAccount:"My account",firstName:"First name",lastName:"Last name",
-    phoneNumber:"Phone number",emailAddress:"Email address",profilePhotoUrl:"Profile photo URL",shortBio:"Short bio",institution:"Institution",
-    location:"Location",favoriteField:"Favorite field",avatarColor:"Avatar color",saveProfile:"Save profile",resetPassword:"Reset password",
-    logout:"Logout",privateInbox:"Private inbox",deleteMyAccount:"Delete my account",deleteNotice:"This deletes your account and your data on this site.",
-    onlineMembers:"Online members",academicHub:"Academic Hub",collaboration:"Collaboration",collaborationText:"Explore research partnerships, interdisciplinary exchange, student projects, and scientific networking opportunities.",
-    communications:"Communications",communicationsText:"Share scientific announcements, conference updates, presentation ideas, and research news with the community.",
-    labActivity:"Lab Activity",labActivityText:"Highlight laboratory observations, experimental progress, research routines, and technical reflections from ongoing work.",
-    scientificInterests:"Scientific Interests",scientificInterestsText:"Green chemistry, catalysis, environmental treatment, materials science, electrochemistry, and sustainable energy transitions.",
-    opportunities:"Opportunities",opportunitiesText:"Discuss seminars, internships, thesis opportunities, mobility programs, and future academic perspectives.",
-    communitySpirit:"Community Spirit",communitySpiritText:"Build a respectful and active scientific space where every member can publish, react, comment, and share constructive opinions.",
-    like:"Like",comments:"Comments",communityPublications:"Community publications",communityIntro:"Logged-in members can publish. Everyone can read, comment, and share opinions.",
-    publish:"Publish",send:"Send",createAccount:"Create an account",close:"Close",forgotPassword:"Forgot password?",accountActions:"Account actions",
-    onlineNow:"online",offlineSince:"last seen",offline:"offline"
-  },
-  fr: {
-    "nav.home":"Accueil","nav.about":"À propos","nav.research":"Recherche","nav.resume":"CV","nav.contact":"Contact","nav.insights":"Insights",
-    memberAccess:"Accès membre",signup:"S'inscrire",login:"Connexion",myAccount:"Mon compte",firstName:"Prénom",lastName:"Nom",
-    phoneNumber:"Numéro",emailAddress:"Adresse email",profilePhotoUrl:"URL photo de profil",shortBio:"Courte bio",institution:"Institution",
-    location:"Localisation",favoriteField:"Domaine favori",avatarColor:"Couleur de l’avatar",saveProfile:"Enregistrer le profil",resetPassword:"Réinitialiser le mot de passe",
-    logout:"Déconnexion",privateInbox:"Boîte privée",deleteMyAccount:"Supprimer mon compte",deleteNotice:"Cela supprime votre compte et vos données du site.",
-    onlineMembers:"Membres en ligne",academicHub:"Espace académique",collaboration:"Collaboration",collaborationText:"Explorez les partenariats de recherche, les échanges interdisciplinaires, les projets étudiants et le réseautage scientifique.",
-    communications:"Communications",communicationsText:"Partagez des annonces scientifiques, actualités de conférences, idées de présentation et nouvelles de recherche.",
-    labActivity:"Activité de laboratoire",labActivityText:"Mettez en avant les observations de laboratoire, l’avancement expérimental, les routines de recherche et les réflexions techniques.",
-    scientificInterests:"Intérêts scientifiques",scientificInterestsText:"Chimie verte, catalyse, traitement environnemental, science des matériaux, électrochimie et transitions énergétiques durables.",
-    opportunities:"Opportunités",opportunitiesText:"Discutez des séminaires, stages, opportunités de thèse, mobilités et perspectives académiques.",
-    communitySpirit:"Esprit de communauté",communitySpiritText:"Construisez un espace scientifique respectueux et actif où chaque membre peut publier, réagir et commenter.",
-    like:"J’aime",comments:"Commentaires",communityPublications:"Publications de la communauté",communityIntro:"Les membres connectés peuvent publier. Tout le monde peut lire, commenter et donner son avis.",
-    publish:"Publier",send:"Envoyer",createAccount:"Créer un compte",close:"Fermer",forgotPassword:"Mot de passe oublié ?",accountActions:"Actions du compte",
-    onlineNow:"En ligne",offlineSince:"Déconnecté depuis",offline:"Hors ligne"
-  },
-  es: {
-    "nav.home":"Inicio","nav.about":"Acerca de","nav.research":"Investigación","nav.resume":"CV","nav.contact":"Contacto","nav.insights":"Insights",
-    memberAccess:"Acceso miembro",signup:"Registrarse",login:"Iniciar sesión",myAccount:"Mi cuenta",firstName:"Nombre",lastName:"Apellido",
-    phoneNumber:"Número",emailAddress:"Correo electrónico",profilePhotoUrl:"URL de foto de perfil",shortBio:"Biografía corta",institution:"Institución",
-    location:"Ubicación",favoriteField:"Campo favorito",avatarColor:"Color del avatar",saveProfile:"Guardar perfil",resetPassword:"Restablecer contraseña",
-    logout:"Cerrar sesión",privateInbox:"Bandeja privada",deleteMyAccount:"Eliminar mi cuenta",deleteNotice:"Esto elimina tu cuenta y tus datos del sitio.",
-    onlineMembers:"Miembros en línea",academicHub:"Espacio académico",collaboration:"Colaboración",collaborationText:"Explora asociaciones de investigación, intercambio interdisciplinario, proyectos estudiantiles y redes científicas.",
-    communications:"Comunicaciones",communicationsText:"Comparte anuncios científicos, novedades de conferencias, ideas de presentaciones y noticias de investigación.",
-    labActivity:"Actividad de laboratorio",labActivityText:"Destaca observaciones de laboratorio, progreso experimental, rutinas de investigación y reflexiones técnicas.",
-    scientificInterests:"Intereses científicos",scientificInterestsText:"Química verde, catálisis, tratamiento ambiental, ciencia de materiales, electroquímica y transiciones energéticas sostenibles.",
-    opportunities:"Oportunidades",opportunitiesText:"Habla sobre seminarios, prácticas, oportunidades de tesis, movilidad y perspectivas académicas.",
-    communitySpirit:"Espíritu comunitario",communitySpiritText:"Construye un espacio científico respetuoso y activo donde cada miembro pueda publicar, reaccionar y comentar.",
-    like:"Me gusta",comments:"Comentarios",communityPublications:"Publicaciones de la comunidad",communityIntro:"Los miembros conectados pueden publicar. Todos pueden leer, comentar y dar su opinión.",
-    publish:"Publicar",send:"Enviar",createAccount:"Crear una cuenta",close:"Cerrar",forgotPassword:"¿Olvidaste tu contraseña?",accountActions:"Acciones de la cuenta",
-    onlineNow:"En línea",offlineSince:"Desconectado desde",offline:"Desconectado"
-  }
-};
-
-function t(key) {
-  return (i18n[currentLanguage] && i18n[currentLanguage][key]) || key;
-}
-
-function setLanguage(lang) {
-  currentLanguage = lang;
-  localStorage.setItem("site_lang", lang);
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    if (i18n[lang] && i18n[lang][key]) el.textContent = i18n[lang][key];
-  });
-}
-
-function setMessage(id, text, isError = false) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = text;
-  el.classList.remove("soft-success", "soft-error");
-  if (!text) return;
-  el.classList.add(isError ? "soft-error" : "soft-success");
-}
-
-function clearMessageLater(id, delay = 1800) {
-  setTimeout(() => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = "";
-    el.classList.remove("soft-success", "soft-error");
-  }, delay);
-}
-
-function showConnectionBadge(show) {
-  const badge = document.getElementById("connection-badge");
-  if (!badge) return;
-  badge.classList.toggle("show-badge", !!show);
-}
-
-function showMessagesAccessNotice() {
-  const notice = sessionStorage.getItem("insightsAuthNotice");
-  if (!notice) return;
-  sessionStorage.removeItem("insightsAuthNotice");
-
-  let msg = "Please log in first to access Messages.";
-  if (currentLanguage === "fr") msg = "Connecte-toi d’abord pour accéder aux messages.";
-  else if (currentLanguage === "es") msg = "Inicia sesión primero para acceder a Messages.";
-
-  setMessage("auth-message", msg, true);
-}
-
-function showIdleLogoutNotice() {
-  const notice = sessionStorage.getItem("idleLogoutNotice");
-  if (!notice) return;
-  sessionStorage.removeItem("idleLogoutNotice");
-  setMessage("auth-message", "Session expired after 10 minutes of inactivity. Please log in again.", true);
-}
-
-setLanguage(currentLanguage);
-showMessagesAccessNotice();
-showIdleLogoutNotice();
-
-function escapeHtml(value) {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function normalizeForCompare(value) {
-  return String(value || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
-}
-
-function isValidNamePart(value) {
-  const v = String(value || "").trim();
-  return /^[A-Za-zÀ-ÿ' -]{2,40}$/.test(v);
-}
-
-function isInstitutionalEmailDomain(domain) {
-  const d = String(domain || "").toLowerCase().trim();
-  if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(d)) return false;
-  if (allowedDirectDomains.includes(d)) return true;
-  if (blockedDisposableDomains.includes(d)) return false;
-  if (blockedPublicDomains.includes(d)) return false;
-  return true;
-}
-
-function isEmailDomainAllowed(email) {
-  const parts = String(email || "").toLowerCase().trim().split("@");
-  if (parts.length !== 2) return false;
-  const domain = parts[1];
-  return isInstitutionalEmailDomain(domain);
-}
-
-function emailContainsUserName(email, firstName, lastName) {
-  const localPart = normalizeForCompare(String(email || "").split("@")[0] || "");
-  const first = normalizeForCompare(firstName);
-  const last = normalizeForCompare(lastName);
-
-  const firstOk = first.length >= 2 && localPart.includes(first);
-  const lastOk = last.length >= 2 && localPart.includes(last);
-
-  return firstOk || lastOk;
-}
-
-function validateStrongPassword(password) {
-  const value = String(password || "");
-  const checks = {
-    length: value.length >= 8,
-    upper: /[A-Z]/.test(value),
-    lower: /[a-z]/.test(value),
-    digit: /\d/.test(value),
-    special: /[^A-Za-z0-9]/.test(value)
-  };
-  return {
-    valid: checks.length && checks.upper && checks.lower && checks.digit && checks.special,
-    checks
-  };
-}
-
-async function fetchWithTimeout(url, options = {}, timeoutMs = GEO_TIMEOUT_MS) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-      cache: "no-store"
-    });
-    return response;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-async function detectVisitorGeoData(email = "") {
-  const fallbackCountry = getCountryFromEmail(email);
-  let result = {
-    country: fallbackCountry || "Non précisé",
-    city: ""
-  };
-
-  try {
-    const res = await fetchWithTimeout("https://ipapi.co/json/");
-    if (res.ok) {
-      const data = await res.json();
-      const country = (data && (data.country_name || data.country || "")).trim();
-      const city = (data && (data.city || "")).trim();
-
-      if (country) result.country = country;
-      if (city) result.city = city;
-
-      if (result.country || result.city) return result;
+    function escapeHtml(text = "") {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
     }
-  } catch (_) {}
 
-  return result;
-}
+    function initials(name = "", email = "") {
+      const source = (name || email || "U").trim();
+      const parts = source.split(" ").filter(Boolean);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return source.slice(0, 2).toUpperCase();
+    }
 
-function getCountryFromEmail(email) {
-  const e = String(email || "").toLowerCase().trim();
-  const domain = e.split("@")[1] || "";
-  if (domain.endsWith(".fr")) return "France";
-  if (domain.endsWith(".bj")) return "Bénin";
-  if (domain.endsWith(".ca")) return "Canada";
-  if (domain.endsWith(".es")) return "Espagne";
-  if (domain.endsWith(".de")) return "Allemagne";
-  if (domain.endsWith(".it")) return "Italie";
-  if (domain.endsWith(".uk")) return "Royaume-Uni";
-  if (domain.endsWith(".sn")) return "Sénégal";
-  if (domain.endsWith(".ci")) return "Côte d’Ivoire";
-  if (domain.endsWith(".ma")) return "Maroc";
-  if (domain === "gmail.com" || domain === "yahoo.com" || domain === "yahoo.fr") return "Non précisé";
-  return "Non précisé";
-}
-
-function getPhonePrefixFromCountry(country) {
-  const c = String(country || "").toLowerCase();
-  if (c.includes("france")) return "+33";
-  if (c.includes("bénin") || c.includes("benin")) return "+229";
-  if (c.includes("canada")) return "+1";
-  if (c.includes("espagne")) return "+34";
-  if (c.includes("allemagne")) return "+49";
-  if (c.includes("italie")) return "+39";
-  if (c.includes("royaume")) return "+44";
-  if (c.includes("sénégal") || c.includes("senegal")) return "+221";
-  if (c.includes("côte d’ivoire") || c.includes("cote d'ivoire")) return "+225";
-  if (c.includes("maroc")) return "+212";
-  return "+33";
-}
-
-function formatDateTime(timestamp) {
-  if (!timestamp) return "";
-  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-  return date.toLocaleString("fr-FR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-function formatPresenceTime(ms) {
-  const num = Number(ms || 0);
-  if (!num) return "";
-  const date = new Date(num);
-  if (isNaN(date.getTime())) return "";
-  return date.toLocaleString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-function isStatusOnline(data) {
-  if (!data) return false;
-  const lastChanged = Number(data.last_changed || 0);
-  if (!lastChanged) return false;
-  return data.state === "online" && ((Date.now() - lastChanged) <= ONLINE_FRESH_MS);
-}
-
-function statusText(data) {
-  if (!data) return t("offline");
-  if (isStatusOnline(data)) return t("onlineNow");
-
-  const formatted = formatPresenceTime(data.last_changed);
-  if (formatted) {
-    return `${t("offlineSince")} • ${formatted}`;
-  }
-
-  return t("offline");
-}
-
-function getInitials(firstName, lastName, fullName) {
-  const f = (firstName || "").trim();
-  const l = (lastName || "").trim();
-  if (f || l) return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
-  const parts = (fullName || "Member").trim().split(" ").filter(Boolean);
-  return (parts.slice(0, 2).map(p => p.charAt(0)).join("") || "MB").toUpperCase();
-}
-
-function avatarHtml(profile, sizeClass = "") {
-  const photo = profile?.photoURL || "";
-  const color = profile?.avatarColor || "#16385d";
-  const initials = escapeHtml(getInitials(profile?.firstName, profile?.lastName, profile?.fullName));
-
-  if (photo) {
-    return `<div class="member-avatar ${sizeClass}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
-  }
-  return `<div class="member-avatar ${sizeClass}" style="background:${escapeHtml(color)}">${initials}</div>`;
-}
-
-function insertEmoji(targetId, emoji) {
-  const input = document.getElementById(targetId);
-  if (!input) return;
-  input.value += emoji;
-  input.focus();
-  updateProfilePreview();
-  registerUserActivity();
-}
-
-function toggleEmojiPanel(id) {
-  const panel = document.getElementById(id);
-  if (!panel) return;
-  panel.classList.toggle("hidden-emoji-panel");
-  registerUserActivity();
-}
-
-function openSignupModal() {
-  document.getElementById("signup-modal").classList.remove("hidden-modal");
-  setMessage("signup-message", "");
-}
-
-function closeSignupModal() {
-  document.getElementById("signup-modal").classList.add("hidden-modal");
-  setMessage("signup-message", "");
-}
-
-function openAccountModal() {
-  document.getElementById("account-modal").classList.remove("hidden-modal");
-}
-
-function closeAccountModal() {
-  document.getElementById("account-modal").classList.add("hidden-modal");
-}
-
-window.addEventListener("click", (e) => {
-  const signupModal = document.getElementById("signup-modal");
-  const accountModal = document.getElementById("account-modal");
-  if (e.target === signupModal) closeSignupModal();
-  if (e.target === accountModal) closeAccountModal();
-});
-
-function toggleSection(id) {
-  const el = document.getElementById(id);
-  if (el) el.classList.toggle("hidden-panel");
-  registerUserActivity();
-}
-
-function toggleMemberZone(show) {
-  document.getElementById("member-zone").classList.toggle("hidden-block", !show);
-}
-
-function setAvatarColor(color, btn) {
-  document.getElementById("profile-avatar-color").value = color;
-  document.querySelectorAll(".color-dot").forEach(dot => dot.classList.remove("active-color"));
-  btn.classList.add("active-color");
-  updateProfilePreview();
-  registerUserActivity();
-}
-
-function updateProfilePreview() {
-  const firstName = document.getElementById("profile-firstname")?.value.trim() || "";
-  const lastName = document.getElementById("profile-lastname")?.value.trim() || "";
-  const photoURL = document.getElementById("profile-photo-url")?.value.trim() || "";
-  const institution = document.getElementById("profile-institution")?.value.trim() || "Scientific member space";
-  const color = document.getElementById("profile-avatar-color")?.value || "#16385d";
-
-  const fullName = `${firstName} ${lastName}`.trim() || "Member profile";
-  document.getElementById("profile-preview-name").textContent = fullName;
-  document.getElementById("profile-preview-role").textContent = institution;
-
-  const preview = document.getElementById("profile-avatar-preview");
-  if (!preview) return;
-
-  if (photoURL) {
-    preview.innerHTML = `<img src="${photoURL}" alt="avatar">`;
-    preview.style.background = "transparent";
-  } else {
-    preview.innerHTML = "";
-    preview.textContent = getInitials(firstName, lastName, fullName);
-    preview.style.background = color;
-  }
-}
-
-function startAutoLogoutTimer() {
-  stopAutoLogoutTimer();
-  autoLogoutTimer = setTimeout(() => {
-    forceIdleLogout();
-  }, AUTO_LOGOUT_MS);
-}
-
-function stopAutoLogoutTimer() {
-  if (autoLogoutTimer) {
-    clearTimeout(autoLogoutTimer);
-    autoLogoutTimer = null;
-  }
-}
-
-function registerUserActivity() {
-  if (!auth.currentUser) return;
-  startAutoLogoutTimer();
-}
-
-async function forceIdleLogout() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  sessionStorage.setItem("idleLogoutNotice", "1");
-  showConnectionBadge(false);
-  stopAutoLogoutTimer();
-
-  try {
-    stopPresenceHeartbeat();
-    if (presenceStatusRef) {
-      await presenceStatusRef.set({
-        state: "offline",
-        fullName: user?.displayName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
+    function formatDate(ts) {
+      if (!ts) return "";
+      return new Date(ts).toLocaleString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
       });
     }
-  } catch (_) {}
 
-  cleanupPresence();
-
-  try {
-    await auth.signOut();
-  } catch (_) {}
-
-  closeAccountModal();
-  window.location.href = "insights.html";
-}
-
-function installActivityWatchers() {
-  const watchedEvents = ["click", "keydown", "scroll", "touchstart"];
-  watchedEvents.forEach(evt => {
-    document.addEventListener(evt, registerUserActivity, { passive: true });
-  });
-}
-
-function uninstallActivityWatchers() {
-  const watchedEvents = ["click", "keydown", "scroll", "touchstart"];
-  watchedEvents.forEach(evt => {
-    document.removeEventListener(evt, registerUserActivity, { passive: true });
-  });
-}
-
-function encodePath(pathArray) {
-  return encodeURIComponent(JSON.stringify(pathArray || []));
-}
-
-function decodePath(pathKey) {
-  try {
-    return JSON.parse(decodeURIComponent(pathKey));
-  } catch (_) {
-    return [];
-  }
-}
-
-function getPostNodeRef(postId, pathArray) {
-  if (!Array.isArray(pathArray) || pathArray.length < 2) return null;
-
-  let ref = db.collection("posts").doc(postId);
-  if (pathArray[0] !== "comments") return null;
-
-  ref = ref.collection("comments").doc(pathArray[1]);
-
-  for (let i = 2; i < pathArray.length; i += 2) {
-    const collectionName = pathArray[i];
-    const docId = pathArray[i + 1];
-    ref = ref.collection(collectionName).doc(docId);
-  }
-
-  return ref;
-}
-
-function getPostRepliesCollectionRef(postId, pathArray) {
-  const nodeRef = getPostNodeRef(postId, pathArray);
-  if (!nodeRef) return null;
-  return nodeRef.collection("replies");
-}
-
-function itemRefForLike(targetType, targetId, commentId = null, replyId = null) {
-  if (targetType === "post") {
-    return db.collection("posts").doc(targetId);
-  }
-  if (targetType === "comment") {
-    return db.collection("posts").doc(targetId).collection("comments").doc(commentId);
-  }
-  if (targetType === "community") {
-    return db.collection("communityPosts").doc(targetId);
-  }
-  if (targetType === "communityComment") {
-    return db.collection("communityPosts").doc(targetId).collection("comments").doc(commentId);
-  }
-  if (targetType === "postNode") {
-    return getPostNodeRef(targetId, decodePath(commentId));
-  }
-  return null;
-}
-
-function unwatchLikeButtonState(buttonId) {
-  if (currentUserLikeWatchers[buttonId]) {
-    try { currentUserLikeWatchers[buttonId](); } catch (_) {}
-    delete currentUserLikeWatchers[buttonId];
-  }
-}
-
-function watchLikeButtonState(buttonId, targetType, targetId, commentId = null, replyId = null) {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const itemRef = itemRefForLike(targetType, targetId, commentId, replyId);
-  if (!itemRef) return;
-
-  unwatchLikeButtonState(buttonId);
-
-  currentUserLikeWatchers[buttonId] = itemRef.collection("likes").doc(user.uid).onSnapshot((snap) => {
-    const btn = document.getElementById(buttonId);
-    if (!btn) return;
-    btn.classList.toggle("like-active", snap.exists);
-  });
-}
-
-function renderLikeButtonHTML(buttonId, label, count, onClickJs) {
-  return `
-    <button class="small-btn mini-btn" id="${buttonId}" onclick="${onClickJs}">
-      👍 ${label} ${count || 0}
-    </button>
-  `;
-}
-
-async function ensurePostExists(postId) {
-  const ref = db.collection("posts").doc(postId);
-  const snap = await ref.get();
-  if (!snap.exists) {
-    await ref.set({
-      title: "Scientific Insight",
-      likesCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  }
-}
-
-async function ensureUserProfile(user, extras = {}) {
-  const userRef = db.collection("users").doc(user.uid);
-  const snap = await userRef.get();
-
-  let firstName = extras.firstName || "";
-  let lastName = extras.lastName || "";
-
-  if (!firstName && !lastName && user.displayName) {
-    const parts = user.displayName.trim().split(" ");
-    firstName = parts[0] || "";
-    lastName = parts.slice(1).join(" ") || "";
-  }
-
-  const existingData = snap.exists ? snap.data() : {};
-  let derivedCountry = extras.country || existingData.country || "";
-  let derivedCity = extras.location || existingData.location || "";
-
-  if (!snap.exists || !derivedCountry || derivedCountry === "Non précisé") {
-    try {
-      const geo = await detectVisitorGeoData(user.email || "");
-      if (!derivedCountry || derivedCountry === "Non précisé") {
-        derivedCountry = geo.country || getCountryFromEmail(user.email || "");
-      }
-      if (!derivedCity) {
-        derivedCity = geo.city || "";
-      }
-    } catch (_) {
-      if (!derivedCountry) derivedCountry = getCountryFromEmail(user.email || "");
-    }
-  }
-
-  derivedCountry = derivedCountry || getCountryFromEmail(user.email || "") || "Non précisé";
-
-  const finalFirstName = firstName || existingData.firstName || "";
-  const finalLastName = lastName || existingData.lastName || "";
-  const finalPhone = extras.phone || existingData.phone || "";
-  const finalPhonePrefix = extras.phonePrefix || existingData.phonePrefix || getPhonePrefixFromCountry(derivedCountry);
-  const finalBio = extras.bio || existingData.bio || "";
-  const finalInstitution = extras.institution || existingData.institution || "";
-  const finalLocation = derivedCity || "";
-  const finalField = extras.favoriteField || existingData.favoriteField || "";
-  const finalPhotoURL = extras.photoURL || existingData.photoURL || "";
-  const finalAvatarColor = extras.avatarColor || existingData.avatarColor || "#16385d";
-  const finalFullName = `${finalFirstName} ${finalLastName}`.trim() || user.displayName || "Member";
-
-  const payload = {
-    uid: user.uid,
-    firstName: finalFirstName,
-    lastName: finalLastName,
-    fullName: finalFullName,
-    phone: finalPhone,
-    phonePrefix: finalPhonePrefix,
-    email: user.email || "",
-    emailVerified: !!user.emailVerified,
-    bio: finalBio,
-    institution: finalInstitution,
-    country: derivedCountry,
-    location: finalLocation,
-    favoriteField: finalField,
-    photoURL: finalPhotoURL,
-    avatarColor: finalAvatarColor,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  if (!snap.exists) payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-
-  await userRef.set(payload, { merge: true });
-  const fresh = await userRef.get();
-  return fresh.data();
-}
-
-function fillProfile(profile, user) {
-  document.getElementById("profile-firstname").value = profile?.firstName || "";
-  document.getElementById("profile-lastname").value = profile?.lastName || "";
-  document.getElementById("profile-country").value = profile?.country || getCountryFromEmail(user?.email || "");
-  document.getElementById("profile-location").value = profile?.location || "";
-  document.getElementById("profile-email").value = user?.email || "";
-  document.getElementById("profile-photo-url").value = profile?.photoURL || "";
-  document.getElementById("profile-bio").value = profile?.bio || "";
-  document.getElementById("profile-institution").value = profile?.institution || "";
-  document.getElementById("profile-field").value = profile?.favoriteField || "";
-  document.getElementById("profile-avatar-color").value = profile?.avatarColor || "#16385d";
-
-  document.querySelectorAll(".color-dot").forEach(dot => {
-    dot.classList.toggle("active-color", dot.dataset.color === (profile?.avatarColor || "#16385d"));
-  });
-
-  updateProfilePreview();
-}
-
-async function signUp() {
-  const firstName = document.getElementById("signup-firstname").value.trim();
-  const lastName = document.getElementById("signup-lastname").value.trim();
-  const email = document.getElementById("signup-email").value.trim().toLowerCase();
-  const password = document.getElementById("signup-password").value;
-  const confirm = document.getElementById("signup-password-confirm").value;
-
-  if (!firstName || !lastName || !email || !password || !confirm) {
-    setMessage("signup-message", "Please fill in all required fields.", true);
-    return;
-  }
-
-  if (!isValidNamePart(firstName) || !isValidNamePart(lastName)) {
-    setMessage("signup-message", "First name and last name must contain only real letters, spaces, apostrophes or hyphens.", true);
-    return;
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    setMessage("signup-message", "Invalid email format.", true);
-    return;
-  }
-
-  if (!isEmailDomainAllowed(email)) {
-    setMessage("signup-message", "Only Gmail, Yahoo, or institutional/professional email addresses are accepted.", true);
-    return;
-  }
-
-  if (!emailContainsUserName(email, firstName, lastName)) {
-    setMessage("signup-message", "For security, your email must contain at least your first name or your last name.", true);
-    return;
-  }
-
-  if (password !== confirm) {
-    setMessage("signup-message", "Passwords do not match.", true);
-    return;
-  }
-
-  const passwordCheck = validateStrongPassword(password);
-  if (!passwordCheck.valid) {
-    setMessage("signup-message", "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character.", true);
-    return;
-  }
-
-  try {
-    const geo = await detectVisitorGeoData(email);
-    const country = geo.country || getCountryFromEmail(email);
-    const city = geo.city || "";
-    const cred = await auth.createUserWithEmailAndPassword(email, password);
-    const fullName = `${firstName} ${lastName}`.trim();
-
-    await cred.user.updateProfile({ displayName: fullName });
-
-    await db.collection("users").doc(cred.user.uid).set({
-      uid: cred.user.uid,
-      firstName,
-      lastName,
-      fullName,
-      phone: "",
-      phonePrefix: getPhonePrefixFromCountry(country),
-      email,
-      emailVerified: false,
-      bio: "",
-      institution: "",
-      country: country || "Non précisé",
-      location: city,
-      favoriteField: "",
-      photoURL: "",
-      avatarColor: "#16385d",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    await cred.user.sendEmailVerification({
-      url: window.location.origin + window.location.pathname,
-      handleCodeInApp: false
-    });
-
-    await auth.signOut();
-
-    closeSignupModal();
-    setMessage("auth-message", "Account created. A verification email has been sent. Please verify your email before logging in.");
-    clearMessageLater("auth-message", 3500);
-  } catch (error) {
-    setMessage("signup-message", error.message, true);
-  }
-}
-
-async function signIn() {
-  const email = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value;
-
-  showConnectionBadge(false);
-
-  if (!email || !password) {
-    setMessage("auth-message", "Enter your email and password.", true);
-    return;
-  }
-
-  try {
-    const cred = await auth.signInWithEmailAndPassword(email, password);
-    await cred.user.reload();
-
-    if (!cred.user.emailVerified) {
-      await auth.signOut();
-      showConnectionBadge(false);
-      setMessage("auth-message", "Your email address is not verified yet. Please check your inbox and verify your account first.", true);
-      return;
+    function showPublishMsg(text, ok = false) {
+      publishMsg.textContent = text;
+      publishMsg.style.color = ok ? "#14854b" : "#c0392b";
     }
 
-    await db.collection("users").doc(cred.user.uid).set({
-      emailVerified: true,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+    function renderMyBox(userData) {
+      meName.textContent = userData.displayName || "Utilisateur";
+      meBio.textContent = userData.bio || "Bienvenue sur ton espace social privé.";
 
-    setMessage("auth-message", "Login successful.");
-  } catch (error) {
-    showConnectionBadge(false);
-    setMessage("auth-message", "Connection failed. Check your email, password, or verify that your email is active and correct.", true);
-  }
-}
+      if (userData.photoURL) {
+        meAvatar.innerHTML = `<img src="${userData.photoURL}" alt="avatar">`;
+      } else {
+        meAvatar.textContent = initials(userData.displayName, userData.email);
+      }
+    }
 
-async function sendResetFromInsightsLogin() {
-  const email = document.getElementById("login-email").value.trim();
+    async function ensureUserRecord(user) {
+      const userRef = ref(db, "users/" + user.uid);
+      const snap = await get(userRef);
 
-  if (!email) {
-    setMessage("auth-message", "Enter your email first.", true);
-    return;
-  }
-
-  try {
-    await auth.sendPasswordResetEmail(email);
-    setMessage("auth-message", "Reset email sent.");
-    clearMessageLater("auth-message", 2600);
-  } catch (error) {
-    setMessage("auth-message", "Unable to send reset email. Please check the email address.", true);
-  }
-}
-
-async function saveProfile() {
-  const user = auth.currentUser;
-  if (!user) {
-    setMessage("profile-message", "Please log in again.", true);
-    return;
-  }
-
-  const firstName = document.getElementById("profile-firstname").value.trim();
-  const lastName = document.getElementById("profile-lastname").value.trim();
-  const country = document.getElementById("profile-country").value.trim();
-  const photoURL = document.getElementById("profile-photo-url").value.trim();
-  const bio = document.getElementById("profile-bio").value.trim();
-  const institution = document.getElementById("profile-institution").value.trim();
-  const location = document.getElementById("profile-location").value.trim();
-  const favoriteField = document.getElementById("profile-field").value.trim();
-  const avatarColor = document.getElementById("profile-avatar-color").value.trim() || "#16385d";
-
-  if (!firstName || !lastName) {
-    setMessage("profile-message", "First name and last name are required.", true);
-    return;
-  }
-
-  if (!isValidNamePart(firstName) || !isValidNamePart(lastName)) {
-    setMessage("profile-message", "Use only valid letters for first name and last name.", true);
-    return;
-  }
-
-  const fullName = `${firstName} ${lastName}`.trim();
-  closeAccountModal();
-
-  (async () => {
-    try {
-      await user.updateProfile({ displayName: fullName });
-
-      await db.collection("users").doc(user.uid).set({
+      const payload = {
         uid: user.uid,
-        firstName,
-        lastName,
-        fullName,
         email: user.email || "",
-        emailVerified: !!user.emailVerified,
-        photoURL,
-        bio,
-        institution,
-        country: country || getCountryFromEmail(user.email || "") || "Non précisé",
-        location,
-        favoriteField,
-        avatarColor,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-
-      await updateMyPresenceOnline(fullName);
-      document.getElementById("user-info").textContent = `Connected as ${fullName}`;
-      updateProfilePreview();
-    } catch (error) {
-      setMessage("auth-message", "Unable to save the profile. Please open My account and try again.", true);
-    }
-  })();
-}
-
-async function toggleLike(targetType, targetId, commentId = null, replyId = null) {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Please sign in first.");
-    return;
-  }
-
-  registerUserActivity();
-
-  const itemRef = itemRefForLike(targetType, targetId, commentId, replyId);
-  if (!itemRef) return;
-
-  const likeRef = itemRef.collection("likes").doc(user.uid);
-
-  await db.runTransaction(async (tx) => {
-    const likeSnap = await tx.get(likeRef);
-    const itemSnap = await tx.get(itemRef);
-    const currentCount = itemSnap.exists ? (itemSnap.data().likesCount || 0) : 0;
-
-    if (likeSnap.exists) {
-      tx.delete(likeRef);
-      tx.set(itemRef, { likesCount: Math.max(0, currentCount - 1) }, { merge: true });
-    } else {
-      tx.set(likeRef, {
-        userId: user.uid,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      tx.set(itemRef, { likesCount: currentCount + 1 }, { merge: true });
-    }
-  });
-}
-
-function loadLikes(postId) {
-  db.collection("posts").doc(postId).onSnapshot((snap) => {
-    const el = document.getElementById(`likes-${postId}`);
-    if (el) el.textContent = snap.exists ? (snap.data().likesCount || 0) : 0;
-  });
-
-  watchLikeButtonState(`like-btn-post-${postId}`, "post", postId);
-}
-
-async function addComment(postId) {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Please sign in first.");
-    return;
-  }
-
-  registerUserActivity();
-
-  const text = document.getElementById(`comment-input-${postId}`).value.trim();
-  if (!text) {
-    alert("Write a comment first.");
-    return;
-  }
-
-  try {
-    const userSnap = await db.collection("users").doc(user.uid).get();
-    const userInfo = userSnap.data() || {};
-
-    await db.collection("posts").doc(postId).collection("comments").add({
-      text,
-      userId: user.uid,
-      authorName: userInfo.fullName || user.displayName || "Member",
-      firstName: userInfo.firstName || "",
-      lastName: userInfo.lastName || "",
-      photoURL: userInfo.photoURL || "",
-      avatarColor: userInfo.avatarColor || "#16385d",
-      likesCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    document.getElementById(`comment-input-${postId}`).value = "";
-  } catch (error) {
-    alert(error.message);
-  }
-}
-
-async function addReplyToNode(postId, pathKey) {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Please sign in first.");
-    return;
-  }
-
-  registerUserActivity();
-
-  const input = document.getElementById(`reply-input-${pathKey}`);
-  if (!input) return;
-
-  const text = input.value.trim();
-  if (!text) return;
-
-  const parentPath = decodePath(pathKey);
-  const repliesRef = getPostRepliesCollectionRef(postId, parentPath);
-  if (!repliesRef) return;
-
-  const userSnap = await db.collection("users").doc(user.uid).get();
-  const userInfo = userSnap.data() || {};
-
-  await repliesRef.add({
-    text,
-    userId: user.uid,
-    authorName: userInfo.fullName || user.displayName || "Member",
-    firstName: userInfo.firstName || "",
-    lastName: userInfo.lastName || "",
-    photoURL: userInfo.photoURL || "",
-    avatarColor: userInfo.avatarColor || "#16385d",
-    likesCount: 0,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  input.value = "";
-}
-
-async function deleteComment(postId, commentId) {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  registerUserActivity();
-
-  const ref = db.collection("posts").doc(postId).collection("comments").doc(commentId);
-  const snap = await ref.get();
-  if (!snap.exists) return;
-
-  if (snap.data().userId !== user.uid) {
-    alert("You can only delete your own comment.");
-    return;
-  }
-
-  await deletePostNodeRecursively(ref);
-}
-
-async function deletePostNodeRecursively(docRef) {
-  const repliesSnap = await docRef.collection("replies").get();
-  for (const replyDoc of repliesSnap.docs) {
-    await deletePostNodeRecursively(replyDoc.ref);
-  }
-
-  const likesSnap = await docRef.collection("likes").get();
-  const batch = db.batch();
-  likesSnap.forEach(l => batch.delete(l.ref));
-  batch.delete(docRef);
-  await batch.commit();
-}
-
-async function deletePostNodeByPath(postId, pathKey) {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  registerUserActivity();
-
-  const pathArray = decodePath(pathKey);
-  const ref = getPostNodeRef(postId, pathArray);
-  if (!ref) return;
-
-  const snap = await ref.get();
-  if (!snap.exists) return;
-
-  if (snap.data().userId !== user.uid) {
-    alert("You can only delete your own reply.");
-    return;
-  }
-
-  await deletePostNodeRecursively(ref);
-}
-
-function buildThreadId(uid1, uid2) {
-  return [uid1, uid2].sort().join("_");
-}
-
-async function openPrivateThread(otherUserId, otherUserName) {
-  const user = auth.currentUser;
-  if (!user) {
-    sessionStorage.setItem("insightsAuthNotice", "login required");
-    window.location.href = "insights.html";
-    return;
-  }
-
-  registerUserActivity();
-
-  const currentThreadId = buildThreadId(user.uid, otherUserId);
-
-  const threadRef = db.collection("privateThreads").doc(currentThreadId);
-  await threadRef.set({
-    participants: [user.uid, otherUserId],
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
-
-  window.location.href = `messages.html?user=${encodeURIComponent(otherUserId)}`;
-}
-
-async function publishCommunityPost() {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Please sign in first.");
-    return;
-  }
-
-  registerUserActivity();
-
-  const title = document.getElementById("community-title").value.trim();
-  const text = document.getElementById("community-text").value.trim();
-
-  if (!title && !text) {
-    setMessage("community-message", "Add a title or text.", true);
-    return;
-  }
-
-  try {
-    const userSnap = await db.collection("users").doc(user.uid).get();
-    const profile = userSnap.data() || {};
-
-    await db.collection("communityPosts").add({
-      userId: user.uid,
-      authorName: profile.fullName || user.displayName || "Member",
-      firstName: profile.firstName || "",
-      lastName: profile.lastName || "",
-      photoURL: profile.photoURL || "",
-      avatarColor: profile.avatarColor || "#16385d",
-      title,
-      text,
-      likesCount: 0,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    document.getElementById("community-title").value = "";
-    document.getElementById("community-text").value = "";
-    setMessage("community-message", "Publication posted successfully.");
-    clearMessageLater("community-message", 2200);
-  } catch (error) {
-    setMessage("community-message", "Unable to publish this post.", true);
-  }
-}
-
-async function addCommunityComment(postId) {
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Please sign in first.");
-    return;
-  }
-
-  registerUserActivity();
-
-  const input = document.getElementById(`community-comment-input-${postId}`);
-  const text = input.value.trim();
-  if (!text) return;
-
-  try {
-    const userSnap = await db.collection("users").doc(user.uid).get();
-    const profile = userSnap.data() || {};
-
-    await db.collection("communityPosts")
-      .doc(postId)
-      .collection("comments")
-      .add({
-        text,
-        userId: user.uid,
-        authorName: profile.fullName || user.displayName || "Member",
-        firstName: profile.firstName || "",
-        lastName: profile.lastName || "",
-        photoURL: profile.photoURL || "",
-        avatarColor: profile.avatarColor || "#16385d",
-        likesCount: 0,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-    input.value = "";
-  } catch (error) {
-    alert(error.message);
-  }
-}
-
-async function deleteCommunityPost(postId) {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  registerUserActivity();
-
-  const ref = db.collection("communityPosts").doc(postId);
-  const snap = await ref.get();
-  if (!snap.exists) return;
-
-  if (snap.data().userId !== user.uid) {
-    alert("You can only delete your own publication.");
-    return;
-  }
-
-  const commentsSnap = await ref.collection("comments").get();
-  const likesSnap = await ref.collection("likes").get();
-  const batch = db.batch();
-
-  for (const commentDoc of commentsSnap.docs) {
-    const commentLikes = await commentDoc.ref.collection("likes").get();
-    commentLikes.forEach(l => batch.delete(l.ref));
-    batch.delete(commentDoc.ref);
-  }
-
-  likesSnap.forEach(l => batch.delete(l.ref));
-  batch.delete(ref);
-  await batch.commit();
-}
-
-async function deleteCommunityComment(postId, commentId) {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  registerUserActivity();
-
-  const ref = db.collection("communityPosts").doc(postId).collection("comments").doc(commentId);
-  const snap = await ref.get();
-  if (!snap.exists) return;
-
-  if (snap.data().userId !== user.uid) {
-    alert("You can only delete your own comment.");
-    return;
-  }
-
-  const likes = await ref.collection("likes").get();
-  const batch = db.batch();
-  likes.forEach(l => batch.delete(l.ref));
-  batch.delete(ref);
-  await batch.commit();
-}
-
-function renderMessageButton(userId, userName) {
-  const me = auth.currentUser;
-  if (!me || me.uid === userId) return "";
-  return `<button class="message-btn" onclick="openPrivateThread('${userId}','${escapeHtml(userName)}')">💬</button>`;
-}
-
-function clearReplyListeners() {
-  Object.keys(replyListenersMap).forEach(key => {
-    try {
-      replyListenersMap[key]();
-    } catch (_) {}
-  });
-  replyListenersMap = {};
-}
-
-function cleanupRemovedLikeWatchers() {
-  Object.keys(currentUserLikeWatchers).forEach(buttonId => {
-    if (!document.getElementById(buttonId)) {
-      unwatchLikeButtonState(buttonId);
-    }
-  });
-}
-
-function renderPostNodeHTML(postId, docId, data, pathArray, depth = 1) {
-  const currentUser = auth.currentUser;
-  const canDelete = currentUser && currentUser.uid === data.userId;
-  const pathKey = encodePath(pathArray);
-  const likeBtnId = `like-btn-node-${normalizeForCompare(pathKey + docId)}`;
-  const childContainerId = `replies-${normalizeForCompare(pathKey + docId + "child")}`;
-
-  return `
-    <div class="reply">
-      <div class="comment-layout">
-        ${avatarHtml(data)}
-        <div class="comment-content">
-          <div class="comment-header-line">
-            <div class="comment-meta">
-              <strong><a class="profile-link" href="profile.html?uid=${data.userId}">${escapeHtml(data.authorName || "Member")}</a></strong>
-              <span class="comment-time">${escapeHtml(formatDateTime(data.createdAt))}</span>
-            </div>
-            <div class="inline-actions">
-              ${renderMessageButton(data.userId, data.authorName || "Member")}
-              ${canDelete ? `<button class="delete-btn" onclick="deletePostNodeByPath('${postId}','${pathKey}')">Delete</button>` : ""}
-            </div>
-          </div>
-
-          <div class="comment-text">${escapeHtml(data.text || "")}</div>
-
-          <div class="small-like-row">
-            ${renderLikeButtonHTML(
-              likeBtnId,
-              "Like",
-              data.likesCount || 0,
-              `toggleLike('postNode','${postId}','${pathKey}')`
-            )}
-          </div>
-
-          <div class="reply-box">
-            <input type="text" id="reply-input-${pathKey}" placeholder="Reply to this comment...">
-            <button class="small-btn" onclick="addReplyToNode('${postId}','${pathKey}')">Commenter</button>
-          </div>
-
-          <div id="${childContainerId}" class="nested-replies"></div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function subscribeRepliesRecursive(postId, parentPathArray, containerId, depth = 1) {
-  const repliesRef = getPostRepliesCollectionRef(postId, parentPathArray);
-  if (!repliesRef) return;
-
-  if (replyListenersMap[containerId]) {
-    try { replyListenersMap[containerId](); } catch (_) {}
-  }
-
-  replyListenersMap[containerId] = repliesRef.orderBy("createdAt", "asc").onSnapshot((snapshot) => {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    let html = "";
-    const nextNodes = [];
-
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      const pathArray = [...parentPathArray, "replies", doc.id];
-      nextNodes.push({ id: doc.id, data, pathArray });
-      html += renderPostNodeHTML(postId, doc.id, data, pathArray, depth);
-    });
-
-    container.innerHTML = html;
-
-    nextNodes.forEach((node) => {
-      const pathKey = encodePath(node.pathArray);
-      const childContainerId = `replies-${normalizeForCompare(pathKey + node.id + "child")}`;
-      const likeBtnId = `like-btn-node-${normalizeForCompare(pathKey + node.id)}`;
-      watchLikeButtonState(likeBtnId, "postNode", postId, pathKey);
-      subscribeRepliesRecursive(postId, node.pathArray, childContainerId, depth + 1);
-    });
-
-    cleanupRemovedLikeWatchers();
-  });
-}
-
-function loadComments(postId) {
-  db.collection("posts")
-    .doc(postId)
-    .collection("comments")
-    .orderBy("createdAt", "asc")
-    .onSnapshot((snapshot) => {
-      clearReplyListeners();
-
-      const currentUser = auth.currentUser;
-      let html = "";
-
-      snapshot.forEach((doc) => {
-        const c = doc.data();
-        const canDelete = currentUser && c.userId === currentUser.uid;
-        const likeBtnId = `like-btn-comment-${doc.id}`;
-        const childContainerId = `replies-root-${doc.id}`;
-        const pathArray = ["comments", doc.id];
-        const pathKey = encodePath(pathArray);
-
-        html += `
-          <div class="comment">
-            <div class="comment-layout">
-              ${avatarHtml(c, "comment-avatar")}
-              <div class="comment-content">
-                <div class="comment-header-line">
-                  <div class="comment-meta">
-                    <strong><a class="profile-link" href="profile.html?uid=${c.userId}">${escapeHtml(c.authorName || "Member")}</a></strong>
-                    <span class="comment-time">${escapeHtml(formatDateTime(c.createdAt))}</span>
-                  </div>
-                  <div class="inline-actions">
-                    ${renderMessageButton(c.userId, c.authorName || "Member")}
-                    ${canDelete ? `<button class="delete-btn" onclick="deleteComment('${postId}','${doc.id}')">Delete</button>` : ""}
-                  </div>
-                </div>
-
-                <div class="comment-text">${escapeHtml(c.text || "")}</div>
-
-                <div class="small-like-row">
-                  ${renderLikeButtonHTML(
-                    likeBtnId,
-                    "Like",
-                    c.likesCount || 0,
-                    `toggleLike('comment','${postId}','${doc.id}')`
-                  )}
-                </div>
-
-                <div class="reply-box">
-                  <input type="text" id="reply-input-${pathKey}" placeholder="Reply to this comment...">
-                  <button class="small-btn" onclick="addReplyToNode('${postId}','${pathKey}')">Commenter</button>
-                </div>
-
-                <div id="${childContainerId}" class="nested-replies"></div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-
-      document.getElementById(`comments-${postId}`).innerHTML = html;
-
-      snapshot.forEach((doc) => {
-        const pathArray = ["comments", doc.id];
-        watchLikeButtonState(`like-btn-comment-${doc.id}`, "comment", postId, doc.id);
-        subscribeRepliesRecursive(postId, pathArray, `replies-root-${doc.id}`, 1);
-      });
-
-      cleanupRemovedLikeWatchers();
-    });
-}
-
-function loadCommunityComments(postId) {
-  const container = document.getElementById(`community-comments-${postId}`);
-  if (!container) return;
-
-  db.collection("communityPosts")
-    .doc(postId)
-    .collection("comments")
-    .orderBy("createdAt", "asc")
-    .onSnapshot((snapshot) => {
-      const currentUser = auth.currentUser;
-      let html = "";
-
-      snapshot.forEach((doc) => {
-        const c = doc.data();
-        const canDelete = currentUser && currentUser.uid === c.userId;
-        const likeBtnId = `like-btn-community-comment-${doc.id}`;
-
-        html += `
-          <div class="reply">
-            <div class="comment-layout">
-              ${avatarHtml(c)}
-              <div class="comment-content">
-                <div class="comment-header-line">
-                  <div class="comment-meta">
-                    <strong><a class="profile-link" href="profile.html?uid=${c.userId}">${escapeHtml(c.authorName || "Member")}</a></strong>
-                    <span class="comment-time">${escapeHtml(formatDateTime(c.createdAt))}</span>
-                  </div>
-                  <div class="inline-actions">
-                    ${renderMessageButton(c.userId, c.authorName || "Member")}
-                    ${canDelete ? `<button class="delete-btn" onclick="deleteCommunityComment('${postId}','${doc.id}')">Delete</button>` : ""}
-                  </div>
-                </div>
-                <div class="comment-text">${escapeHtml(c.text || "")}</div>
-                <div class="small-like-row">
-                  ${renderLikeButtonHTML(
-                    likeBtnId,
-                    "Like",
-                    c.likesCount || 0,
-                    `toggleLike('communityComment','${postId}','${doc.id}')`
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-
-      container.innerHTML = html || "<p class='dark-note'>No comments yet.</p>";
-
-      snapshot.forEach((doc) => {
-        watchLikeButtonState(`like-btn-community-comment-${doc.id}`, "communityComment", postId, doc.id);
-      });
-
-      cleanupRemovedLikeWatchers();
-    });
-}
-
-function loadCommunityPosts() {
-  db.collection("communityPosts")
-    .orderBy("createdAt", "desc")
-    .onSnapshot((snapshot) => {
-      const currentUser = auth.currentUser;
-      let html = "";
-
-      snapshot.forEach((doc) => {
-        const p = doc.data();
-        const canDelete = currentUser && currentUser.uid === p.userId;
-        const likeBtnId = `like-btn-community-${doc.id}`;
-
-        html += `
-          <div class="comment community-post-card">
-            <div class="comment-layout">
-              ${avatarHtml(p, "comment-avatar")}
-              <div class="comment-content">
-                <div class="comment-header-line">
-                  <div class="comment-meta">
-                    <strong><a class="profile-link" href="profile.html?uid=${p.userId}">${escapeHtml(p.authorName || "Member")}</a></strong>
-                    <span class="comment-time">${escapeHtml(formatDateTime(p.createdAt))}</span>
-                  </div>
-                  <div class="inline-actions">
-                    ${renderMessageButton(p.userId, p.authorName || "Member")}
-                    ${canDelete ? `<button class="delete-btn" onclick="deleteCommunityPost('${doc.id}')">Delete</button>` : ""}
-                  </div>
-                </div>
-
-                ${p.title ? `<h4 class="community-title">${escapeHtml(p.title)}</h4>` : ""}
-                <div class="comment-text">${escapeHtml(p.text || "")}</div>
-
-                <div class="small-like-row">
-                  ${renderLikeButtonHTML(
-                    likeBtnId,
-                    "Like",
-                    p.likesCount || 0,
-                    `toggleLike('community','${doc.id}')`
-                  )}
-                </div>
-
-                <div class="reply-box">
-                  <input type="text" id="community-comment-input-${doc.id}" placeholder="Give your opinion or comment...">
-                  <button class="small-btn" onclick="addCommunityComment('${doc.id}')">Commenter</button>
-                </div>
-
-                <div id="community-comments-${doc.id}" class="replies"></div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-
-      document.getElementById("community-posts").innerHTML = html || "<p class='dark-note'>No publication yet.</p>";
-
-      snapshot.forEach((doc) => {
-        watchLikeButtonState(`like-btn-community-${doc.id}`, "community", doc.id);
-        loadCommunityComments(doc.id);
-      });
-
-      cleanupRemovedLikeWatchers();
-    });
-}
-
-async function deleteMyAccount() {
-  const user = auth.currentUser;
-  const password = document.getElementById("delete-password").value;
-
-  if (!user || !user.email) {
-    setMessage("profile-message", "No connected user found.", true);
-    return;
-  }
-  if (!password) {
-    setMessage("profile-message", "Enter your password to confirm.", true);
-    return;
-  }
-
-  try {
-    const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
-    await user.reauthenticateWithCredential(credential);
-    const uid = user.uid;
-
-    await rtdb.ref("/status/" + uid).remove();
-
-    const commentsSnap = await db.collection("posts").doc("post1").collection("comments").where("userId", "==", uid).get();
-    for (const docSnap of commentsSnap.docs) {
-      await deletePostNodeRecursively(docSnap.ref);
-    }
-
-    const postLikeSnap = await db.collection("posts").doc("post1").collection("likes").doc(uid).get();
-    if (postLikeSnap.exists) await postLikeSnap.ref.delete();
-
-    const allCommentsSnap = await db.collection("posts").doc("post1").collection("comments").get();
-    for (const c of allCommentsSnap.docs) {
-      const likeSnap = await c.ref.collection("likes").doc(uid).get();
-      if (likeSnap.exists) await likeSnap.ref.delete();
-    }
-
-    const communitySnap = await db.collection("communityPosts").where("userId", "==", uid).get();
-    for (const p of communitySnap.docs) {
-      const postComments = await p.ref.collection("comments").get();
-      const likes = await p.ref.collection("likes").get();
-      const batch = db.batch();
-
-      for (const pc of postComments.docs) {
-        const cLikes = await pc.ref.collection("likes").get();
-        cLikes.forEach(l => batch.delete(l.ref));
-        batch.delete(pc.ref);
-      }
-
-      likes.forEach(l => batch.delete(l.ref));
-      batch.delete(p.ref);
-      await batch.commit();
-    }
-
-    const allCommunityPosts = await db.collection("communityPosts").get();
-    for (const postDoc of allCommunityPosts.docs) {
-      const myComments = await postDoc.ref.collection("comments").where("userId", "==", uid).get();
-      for (const c of myComments.docs) {
-        const cLikes = await c.ref.collection("likes").get();
-        const batch = db.batch();
-        cLikes.forEach(l => batch.delete(l.ref));
-        batch.delete(c.ref);
-        await batch.commit();
-      }
-      const likeSnap = await postDoc.ref.collection("likes").doc(uid).get();
-      if (likeSnap.exists) await likeSnap.ref.delete();
-    }
-
-    const threads = await db.collection("privateThreads").where("participants", "array-contains", uid).get();
-    for (const t of threads.docs) {
-      const msgs = await t.ref.collection("messages").get();
-      const batch = db.batch();
-      msgs.forEach(m => batch.delete(m.ref));
-      batch.delete(t.ref);
-      await batch.commit();
-    }
-
-    await db.collection("users").doc(uid).delete();
-    await auth.signOut();
-    await user.delete();
-
-    alert("Your account and your site data have been deleted.");
-  } catch (error) {
-    setMessage("profile-message", "Unable to delete the account. Check your password.", true);
-  }
-}
-
-function updateMyPresenceOnline(fullName) {
-  if (!presenceStatusRef) return Promise.resolve();
-
-  return presenceStatusRef.set({
-    state: "online",
-    fullName: fullName || auth.currentUser?.displayName || "Member",
-    last_changed: firebase.database.ServerValue.TIMESTAMP
-  });
-}
-
-function startPresenceHeartbeat(fullName) {
-  stopPresenceHeartbeat();
-
-  updateMyPresenceOnline(fullName).catch(err => {
-    console.error("presence first online write error:", err);
-  });
-
-  presenceHeartbeatInterval = setInterval(() => {
-    updateMyPresenceOnline(fullName).catch(err => {
-      console.error("presence heartbeat error:", err);
-    });
-  }, HEARTBEAT_MS);
-}
-
-function stopPresenceHeartbeat() {
-  if (presenceHeartbeatInterval) {
-    clearInterval(presenceHeartbeatInterval);
-    presenceHeartbeatInterval = null;
-  }
-}
-
-function setupPresence(user, fullName) {
-  cleanupPresence();
-
-  presenceStatusRef = rtdb.ref("/status/" + user.uid);
-  presenceConnectedRef = rtdb.ref(".info/connected");
-
-  presenceConnectedRef.on("value", (snap) => {
-    if (snap.val() === false) return;
-
-    presenceStatusRef.onDisconnect().set({
-      state: "offline",
-      fullName: fullName || user.displayName || "Member",
-      last_changed: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => {
-      startPresenceHeartbeat(fullName || user.displayName || "Member");
-    });
-  });
-
-  window.addEventListener("beforeunload", handleBeforeUnload);
-}
-
-function handleBeforeUnload() {
-  try {
-    if (presenceStatusRef) {
-      presenceStatusRef.set({
-        state: "offline",
-        fullName: auth.currentUser?.displayName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      });
-    }
-  } catch (_) {}
-}
-
-function cleanupPresence() {
-  try {
-    if (presenceConnectedRef) presenceConnectedRef.off();
-    if (presenceStatusRef) presenceStatusRef.off();
-    if (onlineUsersRef) onlineUsersRef.off();
-  } catch (_) {}
-
-  stopPresenceHeartbeat();
-  window.removeEventListener("beforeunload", handleBeforeUnload);
-
-  presenceConnectedRef = null;
-  presenceStatusRef = null;
-  onlineUsersRef = null;
-}
-
-function loadOnlineUsers() {
-  if (onlineUsersRef) {
-    try { onlineUsersRef.off(); } catch (_) {}
-  }
-
-  onlineUsersRef = rtdb.ref("/status");
-  onlineUsersRef.on("value", async (snapshot) => {
-    const container = document.getElementById("online-users");
-    let html = "";
-    const items = [];
-
-    snapshot.forEach((child) => {
-      items.push({ uid: child.key, ...child.val() });
-    });
-
-    const visibleItems = items
-      .filter(data => isStatusOnline(data))
-      .sort((a, b) => Number(b.last_changed || 0) - Number(a.last_changed || 0));
-
-    for (const data of visibleItems) {
-      let profileData = {};
-      try {
-        const doc = await db.collection("users").doc(data.uid).get();
-        if (doc.exists) profileData = doc.data();
-      } catch (_) {}
-
-      const mergedProfile = {
-        uid: data.uid,
-        fullName: profileData.fullName || data.fullName || "Member",
-        firstName: profileData.firstName || "",
-        lastName: profileData.lastName || "",
-        photoURL: profileData.photoURL || "",
-        avatarColor: profileData.avatarColor || "#16385d"
+        displayName: user.displayName || user.email?.split("@")[0] || "Utilisateur",
+        photoURL: snap.exists() ? (snap.val().photoURL || "") : "",
+        bio: snap.exists() ? (snap.val().bio || "") : "",
+        updatedAt: Date.now()
       };
 
-      html += `
-        <div class="online-user">
-          ${avatarHtml(mergedProfile)}
-          <div class="online-user-content">
-            <div class="online-name">
-              <a class="profile-link" href="profile.html?uid=${data.uid}">${escapeHtml(mergedProfile.fullName || "Member")}</a>
-            </div>
-            <div class="online-time">${escapeHtml(statusText(data))}</div>
-          </div>
-          <div class="inline-actions">
-            ${renderMessageButton(data.uid, mergedProfile.fullName || "Member")}
-          </div>
-        </div>
-      `;
-    }
-
-    container.innerHTML = html || "<p class='no-online'>Login to see active members.</p>";
-  });
-}
-
-auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    try {
-      await user.reload();
-    } catch (_) {}
-
-    if (!user.emailVerified) {
-      try { await auth.signOut(); } catch (_) {}
-      toggleMemberZone(false);
-      cleanupPresence();
-      stopAutoLogoutTimer();
-      showConnectionBadge(false);
-      document.getElementById("user-info").textContent = "";
-      document.getElementById("presence-self").textContent = "";
-      document.getElementById("online-users").innerHTML = "<p class='no-online'>Login to see active members.</p>";
-      setMessage("auth-message", "Please verify your email address before accessing the member area.", true);
-      loadComments("post1");
-      loadCommunityPosts();
-      return;
-    }
-
-    toggleMemberZone(true);
-    showConnectionBadge(true);
-    startAutoLogoutTimer();
-    installActivityWatchers();
-
-    const profile = await ensureUserProfile(user);
-
-    fillProfile(profile, user);
-    document.getElementById("user-info").textContent = `Connected as ${profile.fullName || user.displayName || "Member"}`;
-    document.getElementById("presence-self").textContent = "● You are online";
-
-    setupPresence(user, profile.fullName || user.displayName || "Member");
-    loadOnlineUsers();
-
-    setTimeout(() => {
-      const authMsg = document.getElementById("auth-message");
-      if (authMsg && authMsg.classList.contains("soft-success")) {
-        authMsg.textContent = "";
-        authMsg.classList.remove("soft-success", "soft-error");
+      if (!snap.exists()) {
+        payload.createdAt = Date.now();
       }
-    }, 500);
-  } else {
-    toggleMemberZone(false);
-    showConnectionBadge(false);
-    cleanupPresence();
-    stopAutoLogoutTimer();
-    uninstallActivityWatchers();
-    document.getElementById("user-info").textContent = "";
-    document.getElementById("presence-self").textContent = "";
-    document.getElementById("online-users").innerHTML = "<p class='no-online'>Login to see active members.</p>";
-  }
 
-  loadComments("post1");
-  loadCommunityPosts();
-});
+      await update(userRef, payload);
+      return payload;
+    }
 
-document.addEventListener("input", (e) => {
-  if (["profile-firstname","profile-lastname","profile-photo-url","profile-institution"].includes(e.target.id)) {
-    updateProfilePreview();
-  }
-  registerUserActivity();
-});
+    postImageInput.addEventListener("change", () => {
+      const file = postImageInput.files[0];
+      if (!file) {
+        composerPreview.innerHTML = "";
+        return;
+      }
 
-ensurePostExists("post1").then(() => {
-  loadLikes("post1");
-  loadComments("post1");
-  loadCommunityPosts();
-});
-</script>
+      const reader = new FileReader();
+      reader.onload = () => {
+        composerPreview.innerHTML = `<img src="${reader.result}" class="preview-image" alt="preview">`;
+      };
+      reader.readAsDataURL(file);
+    });
 
+    async function createPost() {
+      if (!currentUser) return;
+
+      const text = postText.value.trim();
+      const imageFile = postImageInput.files[0];
+
+      if (!text && !imageFile) {
+        showPublishMsg("Écris un texte ou choisis une image.");
+        return;
+      }
+
+      try {
+        publishBtn.disabled = true;
+        showPublishMsg("Publication en cours...", true);
+
+        let imageUrl = "";
+
+        if (imageFile) {
+          const imgRef = storageRef(
+            storage,
+            `postImages/${currentUser.uid}/post_${Date.now()}_${imageFile.name}`
+          );
+          await uploadBytes(imgRef, imageFile);
+          imageUrl = await getDownloadURL(imgRef);
+        }
+
+        const postRef = push(ref(db, "posts"));
+        await set(postRef, {
+          authorId: currentUser.uid,
+          text,
+          imageUrl,
+          createdAt: Date.now()
+        });
+
+        postText.value = "";
+        postImageInput.value = "";
+        composerPreview.innerHTML = "";
+        showPublishMsg("Publication ajoutée avec succès.", true);
+      } catch (error) {
+        showPublishMsg("Erreur : " + error.message);
+      } finally {
+        publishBtn.disabled = false;
+      }
+    }
+
+    async function toggleLike(postId) {
+      if (!currentUser) return;
+      const likeRef = ref(db, `likes/${postId}/${currentUser.uid}`);
+      const snap = await get(likeRef);
+
+      if (snap.exists()) {
+        await remove(likeRef);
+      } else {
+        await set(likeRef, true);
+      }
+    }
+
+    async function addComment(postId) {
+      if (!currentUser) return;
+
+      const input = document.getElementById(`comment-input-${postId}`);
+      const text = input.value.trim();
+      if (!text) return;
+
+      const commentRef = push(ref(db, `comments/${postId}`));
+      await set(commentRef, {
+        authorId: currentUser.uid,
+        text,
+        createdAt: Date.now()
+      });
+
+      input.value = "";
+    }
+
+    async function deletePost(postId, authorId) {
+      if (!currentUser || currentUser.uid !== authorId) return;
+      await remove(ref(db, "posts/" + postId));
+      await remove(ref(db, "comments/" + postId));
+      await remove(ref(db, "likes/" + postId));
+    }
+
+    function renderFeed(postsData) {
+      const posts = Object.entries(postsData || {})
+        .map(([id, value]) => ({ id, ...value }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      if (!posts.length) {
+        feed.innerHTML = `<div class="empty-feed">Aucune publication pour le moment.</div>`;
+        return;
+      }
+
+      feed.innerHTML = posts.map(post => {
+        const author = usersMap[post.authorId] || {};
+        const authorName = author.displayName || "Utilisateur";
+        const authorPhoto = author.photoURL || "";
+        const likeCount = likesMap[post.id] ? Object.keys(likesMap[post.id]).length : 0;
+        const likedByMe = !!(likesMap[post.id] && likesMap[post.id][currentUser.uid]);
+        const comments = commentsMap[post.id]
+          ? Object.entries(commentsMap[post.id])
+              .map(([id, val]) => ({ id, ...val }))
+              .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+          : [];
+
+        return `
+          <article class="post-card">
+            <div class="post-head">
+              <a href="profile.html?uid=${encodeURIComponent(post.authorId)}" class="author-block">
+                <div class="avatar small-avatar">
+                  ${authorPhoto ? `<img src="${authorPhoto}" alt="avatar">` : initials(authorName, author.email)}
+                </div>
+                <div>
+                  <strong>${escapeHtml(authorName)}</strong>
+                  <div class="date-line">${escapeHtml(formatDate(post.createdAt))}</div>
+                </div>
+              </a>
+
+              ${currentUser.uid === post.authorId ? `
+                <button class="danger-btn" data-delete-post="${post.id}" data-author-id="${post.authorId}">
+                  Supprimer
+                </button>
+              ` : ""}
+            </div>
+
+            ${post.text ? `<p class="post-text">${escapeHtml(post.text)}</p>` : ""}
+            ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="post image">` : ""}
+
+            <div class="post-actions">
+              <button class="react-btn ${likedByMe ? "liked" : ""}" data-like-post="${post.id}">
+                ❤️ J'aime (${likeCount})
+              </button>
+            </div>
+
+            <div class="comments-box">
+              <div class="comment-list">
+                ${comments.length ? comments.map(comment => {
+                  const cu = usersMap[comment.authorId] || {};
+                  return `
+                    <div class="comment-item">
+                      <strong>${escapeHtml(cu.displayName || "Utilisateur")}</strong>
+                      <span>${escapeHtml(comment.text || "")}</span>
+                      <small>${escapeHtml(formatDate(comment.createdAt))}</small>
+                    </div>
+                  `;
+                }).join("") : `<div class="no-comment">Aucun commentaire.</div>`}
+              </div>
+
+              <div class="comment-form">
+                <input id="comment-input-${post.id}" type="text" placeholder="Écrire un commentaire...">
+                <button data-comment-post="${post.id}">Publier</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-like-post]").forEach(btn => {
+        btn.addEventListener("click", () => toggleLike(btn.dataset.likePost));
+      });
+
+      document.querySelectorAll("[data-comment-post]").forEach(btn => {
+        btn.addEventListener("click", () => addComment(btn.dataset.commentPost));
+      });
+
+      document.querySelectorAll("[data-delete-post]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          deletePost(btn.dataset.deletePost, btn.dataset.authorId);
+        });
+      });
+    }
+
+    publishBtn.addEventListener("click", createPost);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+      const myData = await ensureUserRecord(user);
+      renderMyBox(myData);
+
+      onValue(ref(db, "users"), (snap) => {
+        usersMap = snap.val() || {};
+        onValue(ref(db, "posts"), (postsSnap) => {
+          renderFeed(postsSnap.val() || {});
+        });
+      });
+
+      onValue(ref(db, "likes"), (snap) => {
+        likesMap = snap.val() || {};
+        get(ref(db, "posts")).then(postsSnap => {
+          renderFeed(postsSnap.val() || {});
+        });
+      });
+
+      onValue(ref(db, "comments"), (snap) => {
+        commentsMap = snap.val() || {};
+        get(ref(db, "posts")).then(postsSnap => {
+          renderFeed(postsSnap.val() || {});
+        });
+      });
+    });
+  </script>
 </body>
 </html>
