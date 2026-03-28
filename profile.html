@@ -1,69 +1,283 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>My Profile</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profil</title>
+  <link rel="stylesheet" href="profile.css" />
 </head>
 <body>
+  <header class="topbar">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="research.html">Research</a>
+      <a href="cv.html">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html">Insights</a>
+      <a href="messages.html">Messages</a>
+      <a href="profile.html" class="active">Mon compte</a>
+    </nav>
+  </header>
 
-<h2>My Profile</h2>
+  <main class="profile-page">
+    <section class="profile-card">
+      <div class="profile-left">
+        <div class="big-avatar" id="bigAvatar">MB</div>
+        <input type="file" id="avatarInput" accept="image/*" class="hidden" />
+        <button class="secondary-btn" id="changeAvatarBtn">Changer la photo</button>
+      </div>
 
-<input type="text" id="name" placeholder="Name"><br><br>
-<input type="text" id="city" placeholder="City"><br><br>
+      <div class="profile-right">
+        <div class="profile-top">
+          <div>
+            <h1 id="profileName">Chargement...</h1>
+            <p id="profileEmail">...</p>
+            <div class="status-line">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="statusText">Chargement...</span>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <a class="secondary-btn" id="messageBtn" href="messages.html">Message</a>
+          </div>
+        </div>
 
-<input type="file" id="photo"><br><br>
+        <div class="editor-block" id="editorBlock">
+          <label for="nameInput">Nom affiché</label>
+          <input type="text" id="nameInput" placeholder="Ton nom" />
 
-<button onclick="saveProfile()">Save</button>
+          <label for="bioInput">Bio</label>
+          <textarea id="bioInput" rows="5" placeholder="Présente-toi en quelques lignes..."></textarea>
 
-<p id="msg"></p>
+          <button class="primary-btn" id="saveProfileBtn">Enregistrer le profil</button>
+          <div class="info-text" id="profileMsg"></div>
+        </div>
 
-<img id="profileImg" width="120">
+        <div class="bio-block">
+          <h3>À propos</h3>
+          <p id="bioText">Aucune bio pour le moment.</p>
+        </div>
+      </div>
+    </section>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    <section class="posts-section">
+      <div class="section-head">
+        <h2>Publications</h2>
+      </div>
+      <div id="userPosts" class="posts-grid"></div>
+    </section>
+  </main>
 
-const firebaseConfig = { apiKey:"AIzaSy...", authDomain:"...", databaseURL:"...", projectId:"...", storageBucket:"..." };
+  <script type="module">
+    import { auth, db, storage } from "./firebase-config.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-const storage = getStorage(app);
+    import {
+      ref,
+      get,
+      update,
+      onValue
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-window.saveProfile = async function(){
-  const user = auth.currentUser;
+    import {
+      ref as storageRef,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-  if(!user){
-    alert("Not connected");
-    return;
-  }
+    const bigAvatar = document.getElementById("bigAvatar");
+    const changeAvatarBtn = document.getElementById("changeAvatarBtn");
+    const avatarInput = document.getElementById("avatarInput");
+    const profileName = document.getElementById("profileName");
+    const profileEmail = document.getElementById("profileEmail");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+    const nameInput = document.getElementById("nameInput");
+    const bioInput = document.getElementById("bioInput");
+    const saveProfileBtn = document.getElementById("saveProfileBtn");
+    const profileMsg = document.getElementById("profileMsg");
+    const bioText = document.getElementById("bioText");
+    const editorBlock = document.getElementById("editorBlock");
+    const messageBtn = document.getElementById("messageBtn");
+    const userPosts = document.getElementById("userPosts");
 
-  const file = photo.files[0];
-  let photoURL = "";
+    const params = new URLSearchParams(window.location.search);
+    const requestedUid = params.get("uid");
 
-  if(file){
-    const storageRef = sRef(storage, "users/"+user.uid+"/profile/photo.jpg");
-    await uploadBytes(storageRef, file);
-    photoURL = await getDownloadURL(storageRef);
-  }
+    let currentUser = null;
+    let viewedUid = null;
+    let viewedUser = null;
 
-  await set(ref(db,"users/"+user.uid),{
-    name: name.value,
-    city: city.value,
-    country: "Auto", 
-    photo: photoURL
-  });
+    function initials(name = "", email = "") {
+      const s = (name || email || "U").trim();
+      const parts = s.split(" ").filter(Boolean);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return s.slice(0, 2).toUpperCase();
+    }
 
-  msg.innerText="Saved ✔️";
+    function escapeHtml(text = "") {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
 
-  setTimeout(()=>{
-    window.location.href="insights.html";
-  },800);
-}
-</script>
+    function formatDate(ts) {
+      if (!ts) return "";
+      return new Date(ts).toLocaleString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
 
+    function showAvatar(photoURL, name, email) {
+      if (photoURL) {
+        bigAvatar.innerHTML = `<img src="${photoURL}" alt="avatar">`;
+      } else {
+        bigAvatar.textContent = initials(name, email);
+      }
+    }
+
+    function showMsg(text, ok = false) {
+      profileMsg.textContent = text;
+      profileMsg.style.color = ok ? "#12824b" : "#c0392b";
+    }
+
+    async function loadUserProfile(uid) {
+      const snap = await get(ref(db, "users/" + uid));
+      if (!snap.exists()) {
+        profileName.textContent = "Profil introuvable";
+        profileEmail.textContent = "";
+        bioText.textContent = "Cet utilisateur n'existe pas.";
+        editorBlock.style.display = "none";
+        return;
+      }
+
+      viewedUser = snap.val();
+      profileName.textContent = viewedUser.displayName || "Sans nom";
+      profileEmail.textContent = viewedUser.email || "";
+      bioText.textContent = viewedUser.bio || "Aucune bio pour le moment.";
+      showAvatar(viewedUser.photoURL, viewedUser.displayName, viewedUser.email);
+
+      const isMine = currentUser && currentUser.uid === uid;
+      editorBlock.style.display = isMine ? "block" : "none";
+      changeAvatarBtn.style.display = isMine ? "inline-flex" : "none";
+      nameInput.value = viewedUser.displayName || "";
+      bioInput.value = viewedUser.bio || "";
+
+      if (!isMine) {
+        messageBtn.href = "messages.html";
+      }
+    }
+
+    function listenPresence(uid) {
+      onValue(ref(db, "presence/" + uid), (snap) => {
+        const data = snap.val() || {};
+        if (data.online) {
+          statusDot.classList.add("online");
+          statusText.textContent = "En ligne";
+        } else {
+          statusDot.classList.remove("online");
+          statusText.textContent = data.lastSeen
+            ? "Dernière activité : " + formatDate(data.lastSeen)
+            : "Hors ligne";
+        }
+      });
+    }
+
+    function loadUserPosts(uid) {
+      onValue(ref(db, "posts"), (snap) => {
+        const data = snap.val() || {};
+        const posts = Object.entries(data)
+          .map(([id, val]) => ({ id, ...val }))
+          .filter(post => post.authorId === uid)
+          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        if (!posts.length) {
+          userPosts.innerHTML = `<div class="empty-card">Aucune publication pour le moment.</div>`;
+          return;
+        }
+
+        userPosts.innerHTML = posts.map(post => `
+          <article class="post-preview">
+            ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-preview-img" alt="post image">` : ""}
+            <div class="post-preview-body">
+              <p>${escapeHtml(post.text || "")}</p>
+              <small>${escapeHtml(formatDate(post.createdAt))}</small>
+            </div>
+          </article>
+        `).join("");
+      });
+    }
+
+    saveProfileBtn.addEventListener("click", async () => {
+      if (!currentUser || currentUser.uid !== viewedUid) return;
+
+      const newName = nameInput.value.trim();
+      const newBio = bioInput.value.trim();
+
+      if (!newName) {
+        showMsg("Le nom affiché est obligatoire.");
+        return;
+      }
+
+      try {
+        await update(ref(db, "users/" + currentUser.uid), {
+          displayName: newName,
+          bio: newBio,
+          updatedAt: Date.now()
+        });
+
+        showMsg("Profil mis à jour avec succès.", true);
+      } catch (error) {
+        showMsg("Erreur : " + error.message);
+      }
+    });
+
+    changeAvatarBtn.addEventListener("click", () => {
+      avatarInput.click();
+    });
+
+    avatarInput.addEventListener("change", async () => {
+      if (!currentUser || currentUser.uid !== viewedUid) return;
+      const file = avatarInput.files[0];
+      if (!file) return;
+
+      try {
+        const fileRef = storageRef(storage, `profilePictures/${currentUser.uid}/avatar_${Date.now()}_${file.name}`);
+        await uploadBytes(fileRef, file);
+        const url = await getDownloadURL(fileRef);
+
+        await update(ref(db, "users/" + currentUser.uid), {
+          photoURL: url,
+          updatedAt: Date.now()
+        });
+
+        showAvatar(url, nameInput.value, currentUser.email);
+        showMsg("Photo de profil mise à jour.", true);
+      } catch (error) {
+        showMsg("Erreur lors de l'envoi de l'image : " + error.message);
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+      viewedUid = requestedUid || user.uid;
+
+      await loadUserProfile(viewedUid);
+      listenPresence(viewedUid);
+      loadUserPosts(viewedUid);
+    });
+  </script>
 </body>
 </html>
