@@ -51,30 +51,13 @@
 
   <script type="module">
     import { auth, db, storage } from "./firebase-config.js";
-    import {
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    import {
-      ref,
-      get,
-      set,
-      update,
-      push,
-      remove,
-      onValue
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    import {
-      ref as storageRef,
-      uploadBytes,
-      getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, get, set, update, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const meAvatar = document.getElementById("meAvatar");
     const meName = document.getElementById("meName");
     const meBio = document.getElementById("meBio");
-
     const postText = document.getElementById("postText");
     const postImageInput = document.getElementById("postImageInput");
     const publishBtn = document.getElementById("publishBtn");
@@ -140,10 +123,7 @@
         updatedAt: Date.now()
       };
 
-      if (!snap.exists()) {
-        payload.createdAt = Date.now();
-      }
-
+      if (!snap.exists()) payload.createdAt = Date.now();
       await update(userRef, payload);
       return payload;
     }
@@ -154,7 +134,6 @@
         composerPreview.innerHTML = "";
         return;
       }
-
       const reader = new FileReader();
       reader.onload = () => {
         composerPreview.innerHTML = `<img src="${reader.result}" class="preview-image" alt="preview">`;
@@ -175,15 +154,10 @@
 
       try {
         publishBtn.disabled = true;
-        showPublishMsg("Publication en cours...", true);
-
         let imageUrl = "";
 
         if (imageFile) {
-          const imgRef = storageRef(
-            storage,
-            `postImages/${currentUser.uid}/post_${Date.now()}_${imageFile.name}`
-          );
+          const imgRef = storageRef(storage, `postImages/${currentUser.uid}/post_${Date.now()}_${imageFile.name}`);
           await uploadBytes(imgRef, imageFile);
           imageUrl = await getDownloadURL(imgRef);
         }
@@ -201,7 +175,7 @@
         composerPreview.innerHTML = "";
         showPublishMsg("Publication ajoutée avec succès.", true);
       } catch (error) {
-        showPublishMsg("Erreur : " + error.message);
+        showPublishMsg("Erreur lors de la publication.");
       } finally {
         publishBtn.disabled = false;
       }
@@ -211,17 +185,12 @@
       if (!currentUser) return;
       const likeRef = ref(db, `likes/${postId}/${currentUser.uid}`);
       const snap = await get(likeRef);
-
-      if (snap.exists()) {
-        await remove(likeRef);
-      } else {
-        await set(likeRef, true);
-      }
+      if (snap.exists()) await remove(likeRef);
+      else await set(likeRef, true);
     }
 
     async function addComment(postId) {
       if (!currentUser) return;
-
       const input = document.getElementById(`comment-input-${postId}`);
       const text = input.value.trim();
       if (!text) return;
@@ -260,9 +229,7 @@
         const likeCount = likesMap[post.id] ? Object.keys(likesMap[post.id]).length : 0;
         const likedByMe = !!(likesMap[post.id] && likesMap[post.id][currentUser.uid]);
         const comments = commentsMap[post.id]
-          ? Object.entries(commentsMap[post.id])
-              .map(([id, val]) => ({ id, ...val }))
-              .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+          ? Object.entries(commentsMap[post.id]).map(([id, val]) => ({ id, ...val })).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
           : [];
 
         return `
@@ -278,20 +245,14 @@
                 </div>
               </a>
 
-              ${currentUser.uid === post.authorId ? `
-                <button class="danger-btn" data-delete-post="${post.id}" data-author-id="${post.authorId}">
-                  Supprimer
-                </button>
-              ` : ""}
+              ${currentUser.uid === post.authorId ? `<button class="danger-btn" data-delete-post="${post.id}" data-author-id="${post.authorId}">Supprimer</button>` : ""}
             </div>
 
             ${post.text ? `<p class="post-text">${escapeHtml(post.text)}</p>` : ""}
             ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="post image">` : ""}
 
             <div class="post-actions">
-              <button class="react-btn ${likedByMe ? "liked" : ""}" data-like-post="${post.id}">
-                ❤️ J'aime (${likeCount})
-              </button>
+              <button class="react-btn ${likedByMe ? "liked" : ""}" data-like-post="${post.id}">❤️ J'aime (${likeCount})</button>
             </div>
 
             <div class="comments-box">
@@ -326,9 +287,7 @@
       });
 
       document.querySelectorAll("[data-delete-post]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          deletePost(btn.dataset.deletePost, btn.dataset.authorId);
-        });
+        btn.addEventListener("click", () => deletePost(btn.dataset.deletePost, btn.dataset.authorId));
       });
     }
 
@@ -353,16 +312,12 @@
 
       onValue(ref(db, "likes"), (snap) => {
         likesMap = snap.val() || {};
-        get(ref(db, "posts")).then(postsSnap => {
-          renderFeed(postsSnap.val() || {});
-        });
+        get(ref(db, "posts")).then(postsSnap => renderFeed(postsSnap.val() || {}));
       });
 
       onValue(ref(db, "comments"), (snap) => {
         commentsMap = snap.val() || {};
-        get(ref(db, "posts")).then(postsSnap => {
-          renderFeed(postsSnap.val() || {});
-        });
+        get(ref(db, "posts")).then(postsSnap => renderFeed(postsSnap.val() || {}));
       });
     });
   </script>
