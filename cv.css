@@ -1,0 +1,165 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #dfe4e7;
+  color: #0b2239;
+}
+
+.cv-nav {
+  background: #07294d;
+  padding: 14px 24px;
+}
+
+.cv-nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+.cv-nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.cv-nav a.active-link {
+  border-bottom: 2px solid white;
+  padding-bottom: 2px;
+}
+
+.login-btn,
+.nav-account-btn,
+.nav-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+}
+
+.login-btn {
+  background: #0a66c2;
+  color: white !important;
+}
+
+.login-btn:hover {
+  background: #084a94;
+}
+
+.nav-account-btn {
+  background: #e8f1fb;
+  color: #0b2239 !important;
+}
+
+.nav-account-btn:hover {
+  background: #d6e8fa;
+}
+
+.nav-logout-btn {
+  background: #f7dede;
+  color: #8a1f1f !important;
+}
+
+.nav-logout-btn:hover {
+  background: #efcaca;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  background: #00ff66;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px #00ff66;
+  animation: blink 1.2s infinite;
+  flex-shrink: 0;
+}
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.cv-container {
+  max-width: 1450px;
+  margin: 32px auto;
+  padding: 0 24px 40px;
+}
+
+.cv-card {
+  background: #f7f7f7;
+  border-radius: 14px;
+  padding: 28px 18px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+}
+
+.cv-card h1 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 20px;
+  color: #000;
+}
+
+.cv-card p {
+  line-height: 1.8;
+  margin: 0 0 12px;
+  color: #111;
+}
+
+.cv-card ul {
+  margin: 14px 0 18px 18px;
+  padding-left: 12px;
+}
+
+.cv-card li {
+  margin-bottom: 6px;
+  color: #111;
+}
+
+.cv-btn {
+  display: inline-block;
+  background: #07294d;
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 10px;
+  transition: 0.18s ease;
+}
+
+.cv-btn:hover {
+  background: #0b3a69;
+}
+
+@media (max-width: 768px) {
+  .cv-nav ul {
+    gap: 16px;
+  }
+
+  .cv-container {
+    padding: 0 14px 30px;
+  }
+
+  .cv-card {
+    padding: 22px 14px;
+  }
+}
