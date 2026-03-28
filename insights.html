@@ -14,19 +14,22 @@
 
   <style>
     .soft-status-message {
-      padding: 10px 14px;
-      border-radius: 12px;
-      margin-top: 10px;
+      display: inline-block;
+      max-width: 100%;
+      padding: 7px 11px;
+      border-radius: 10px;
+      margin-top: 8px;
       font-weight: 700;
-      line-height: 1.45;
+      line-height: 1.35;
       transition: all 0.25s ease;
-      min-height: 22px;
+      min-height: 18px;
+      font-size: 13px;
     }
 
     .soft-status-message.soft-success {
-      background: #e9f8ef;
-      color: #0b7a3b;
-      border: 1px solid #b7e4c7;
+      background: #edf8f1;
+      color: #146c43;
+      border: 1px solid #c9ead6;
     }
 
     .soft-status-message.soft-error {
@@ -78,9 +81,51 @@
       cursor: not-allowed;
     }
 
-    .save-loading {
-      opacity: 0.8;
-      pointer-events: none;
+    .connection-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0 2px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #edf9f1;
+      color: #11683d;
+      font-size: 13px;
+      font-weight: 800;
+      border: 1px solid #ccead7;
+      width: fit-content;
+    }
+
+    .connection-badge.show-badge {
+      display: inline-flex;
+    }
+
+    .connection-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #20c15a;
+      box-shadow: 0 0 0 4px rgba(32, 193, 90, 0.18);
+      animation: pulseDot 1.6s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulseDot {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(32, 193, 90, 0.25); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(32, 193, 90, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(32, 193, 90, 0); }
+    }
+
+    .like-active {
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+    }
+
+    .small-like-row {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
     }
   </style>
 </head>
@@ -110,6 +155,11 @@
 
     <h2>Maounou Boris AMOUSSOU</h2>
     <p>Chemical Engineer<br>Green Chemistry &amp; Environment</p>
+
+    <div id="connection-badge" class="connection-badge">
+      <span class="connection-dot"></span>
+      <span>Connected</span>
+    </div>
 
     <div class="auth-box">
       <h3 data-i18n="memberAccess">Member Access</h3>
@@ -510,6 +560,21 @@ function setMessage(id, text, isError = false) {
   el.classList.add(isError ? "soft-error" : "soft-success");
 }
 
+function clearMessageLater(id, delay = 1800) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = "";
+    el.classList.remove("soft-success", "soft-error");
+  }, delay);
+}
+
+function showConnectionBadge(show) {
+  const badge = document.getElementById("connection-badge");
+  if (!badge) return;
+  badge.classList.toggle("show-badge", !!show);
+}
+
 function showMessagesAccessNotice() {
   const notice = sessionStorage.getItem("insightsAuthNotice");
   if (!notice) return;
@@ -630,31 +695,6 @@ async function detectVisitorGeoData(email = "") {
     }
   } catch (_) {}
 
-  try {
-    const res = await fetchWithTimeout("https://api.country.is/");
-    if (res.ok) {
-      const data = await res.json();
-      const code = String(data && data.country || "").toUpperCase();
-      const countryMap = {
-        FR: "France",
-        BJ: "Bénin",
-        CA: "Canada",
-        ES: "Espagne",
-        DE: "Allemagne",
-        IT: "Italie",
-        GB: "Royaume-Uni",
-        UK: "Royaume-Uni",
-        SN: "Sénégal",
-        CI: "Côte d’Ivoire",
-        MA: "Maroc",
-        US: "États-Unis",
-        BE: "Belgique",
-        CH: "Suisse"
-      };
-      if (countryMap[code]) result.country = countryMap[code];
-    }
-  } catch (_) {}
-
   return result;
 }
 
@@ -687,9 +727,6 @@ function getPhonePrefixFromCountry(country) {
   if (c.includes("sénégal") || c.includes("senegal")) return "+221";
   if (c.includes("côte d’ivoire") || c.includes("cote d'ivoire")) return "+225";
   if (c.includes("maroc")) return "+212";
-  if (c.includes("belgique")) return "+32";
-  if (c.includes("suisse")) return "+41";
-  if (c.includes("états-unis") || c.includes("etats-unis") || c.includes("united states")) return "+1";
   return "+33";
 }
 
@@ -1026,6 +1063,7 @@ async function signUp() {
 
     closeSignupModal();
     setMessage("auth-message", "Account created. A verification email has been sent. Please verify your email before logging in.");
+    clearMessageLater("auth-message", 3500);
   } catch (error) {
     setMessage("signup-message", error.message, true);
   }
@@ -1072,6 +1110,7 @@ async function sendResetFromInsightsLogin() {
   try {
     await auth.sendPasswordResetEmail(email);
     setMessage("auth-message", "Reset email sent.");
+    clearMessageLater("auth-message", 2600);
   } catch (error) {
     setMessage("auth-message", "Unable to send reset email. Please check the email address.", true);
   }
@@ -1084,7 +1123,6 @@ async function saveProfile() {
     return;
   }
 
-  const saveBtn = document.getElementById("save-profile-btn");
   const firstName = document.getElementById("profile-firstname").value.trim();
   const lastName = document.getElementById("profile-lastname").value.trim();
   const country = document.getElementById("profile-country").value.trim();
@@ -1107,223 +1145,66 @@ async function saveProfile() {
 
   const fullName = `${firstName} ${lastName}`.trim();
 
-  try {
-    if (saveBtn) {
-      saveBtn.disabled = true;
-      saveBtn.textContent = "Saving...";
-      saveBtn.classList.add("save-loading");
+  closeAccountModal();
+
+  (async () => {
+    try {
+      await user.updateProfile({ displayName: fullName });
+
+      await db.collection("users").doc(user.uid).set({
+        uid: user.uid,
+        firstName,
+        lastName,
+        fullName,
+        email: user.email || "",
+        emailVerified: !!user.emailVerified,
+        photoURL,
+        bio,
+        institution,
+        country: country || getCountryFromEmail(user.email || "") || "Non précisé",
+        location,
+        favoriteField,
+        avatarColor,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      await updateMyPresenceOnline(fullName);
+      document.getElementById("user-info").textContent = `Connected as ${fullName}`;
+      updateProfilePreview();
+    } catch (error) {
+      setMessage("auth-message", "Unable to save the profile. Please open My account and try again.", true);
     }
+  })();
+}
 
-    await user.updateProfile({ displayName: fullName });
-
-    await db.collection("users").doc(user.uid).set({
-      uid: user.uid,
-      firstName,
-      lastName,
-      fullName,
-      email: user.email || "",
-      emailVerified: !!user.emailVerified,
-      photoURL,
-      bio,
-      institution,
-      country: country || getCountryFromEmail(user.email || "") || "Non précisé",
-      location,
-      favoriteField,
-      avatarColor,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
-    await updateMyPresenceOnline(fullName);
-
-    document.getElementById("user-info").textContent = `Connected as ${fullName}`;
-    updateProfilePreview();
-    setMessage("profile-message", "Profile saved successfully.");
-
-    setTimeout(() => {
-      closeAccountModal();
-      setMessage("profile-message", "");
-    }, 900);
-  } catch (error) {
-    setMessage("profile-message", "Unable to save the profile. Please try again.", true);
-  } finally {
-    if (saveBtn) {
-      saveBtn.disabled = false;
-      saveBtn.textContent = "Save profile";
-      saveBtn.classList.remove("save-loading");
-    }
+function itemRefForLike(targetType, targetId, commentId = null, replyId = null) {
+  if (targetType === "post") {
+    return db.collection("posts").doc(targetId);
   }
-}
-
-async function sendResetForCurrentUser() {
-  const user = auth.currentUser;
-  if (!user || !user.email) {
-    setMessage("profile-message", "No connected user found.", true);
-    return;
+  if (targetType === "comment") {
+    return db.collection("posts").doc(targetId).collection("comments").doc(commentId);
   }
-
-  try {
-    await auth.sendPasswordResetEmail(user.email);
-    setMessage("profile-message", "Reset email sent.");
-  } catch (error) {
-    setMessage("profile-message", error.message, true);
+  if (targetType === "reply") {
+    return db.collection("posts").doc(targetId).collection("comments").doc(commentId).collection("replies").doc(replyId);
   }
-}
-
-function updateMyPresenceOnline(fullName) {
-  if (!presenceStatusRef) return Promise.resolve();
-
-  return presenceStatusRef.set({
-    state: "online",
-    fullName: fullName || auth.currentUser?.displayName || "Member",
-    last_changed: firebase.database.ServerValue.TIMESTAMP
-  });
-}
-
-function startPresenceHeartbeat(fullName) {
-  stopPresenceHeartbeat();
-
-  updateMyPresenceOnline(fullName).catch(err => {
-    console.error("presence first online write error:", err);
-  });
-
-  presenceHeartbeatInterval = setInterval(() => {
-    updateMyPresenceOnline(fullName).catch(err => {
-      console.error("presence heartbeat error:", err);
-    });
-  }, HEARTBEAT_MS);
-}
-
-function stopPresenceHeartbeat() {
-  if (presenceHeartbeatInterval) {
-    clearInterval(presenceHeartbeatInterval);
-    presenceHeartbeatInterval = null;
+  if (targetType === "community") {
+    return db.collection("communityPosts").doc(targetId);
   }
-}
-
-function setupPresence(user, fullName) {
-  cleanupPresence();
-
-  presenceStatusRef = rtdb.ref("/status/" + user.uid);
-  presenceConnectedRef = rtdb.ref(".info/connected");
-
-  presenceConnectedRef.on("value", (snap) => {
-    if (snap.val() === false) return;
-
-    presenceStatusRef.onDisconnect().set({
-      state: "offline",
-      fullName: fullName || user.displayName || "Member",
-      last_changed: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => {
-      startPresenceHeartbeat(fullName || user.displayName || "Member");
-    });
-  });
-
-  window.addEventListener("beforeunload", handleBeforeUnload);
-}
-
-function handleBeforeUnload() {
-  try {
-    if (presenceStatusRef) {
-      presenceStatusRef.set({
-        state: "offline",
-        fullName: auth.currentUser?.displayName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      });
-    }
-  } catch (_) {}
-}
-
-function cleanupPresence() {
-  try {
-    if (presenceConnectedRef) presenceConnectedRef.off();
-    if (presenceStatusRef) presenceStatusRef.off();
-    if (onlineUsersRef) onlineUsersRef.off();
-  } catch (_) {}
-
-  stopPresenceHeartbeat();
-  window.removeEventListener("beforeunload", handleBeforeUnload);
-
-  presenceConnectedRef = null;
-  presenceStatusRef = null;
-  onlineUsersRef = null;
-}
-
-function refreshPresence() {
-  loadOnlineUsers();
-}
-
-function loadOnlineUsers() {
-  if (onlineUsersRef) {
-    try { onlineUsersRef.off(); } catch (_) {}
+  if (targetType === "communityComment") {
+    return db.collection("communityPosts").doc(targetId).collection("comments").doc(commentId);
   }
-
-  onlineUsersRef = rtdb.ref("/status");
-  onlineUsersRef.on("value", async (snapshot) => {
-    const container = document.getElementById("online-users");
-    let html = "";
-    const items = [];
-
-    snapshot.forEach((child) => {
-      items.push({ uid: child.key, ...child.val() });
-    });
-
-    const visibleItems = items
-      .filter(data => isStatusOnline(data))
-      .sort((a, b) => Number(b.last_changed || 0) - Number(a.last_changed || 0));
-
-    for (const data of visibleItems) {
-      let profileData = {};
-      try {
-        const doc = await db.collection("users").doc(data.uid).get();
-        if (doc.exists) profileData = doc.data();
-      } catch (_) {}
-
-      const mergedProfile = {
-        uid: data.uid,
-        fullName: profileData.fullName || data.fullName || "Member",
-        firstName: profileData.firstName || "",
-        lastName: profileData.lastName || "",
-        photoURL: profileData.photoURL || "",
-        avatarColor: profileData.avatarColor || "#16385d"
-      };
-
-      html += `
-        <div class="online-user">
-          ${avatarHtml(mergedProfile)}
-          <div class="online-user-content">
-            <div class="online-name">
-              <a class="profile-link" href="profile.html?uid=${data.uid}">${escapeHtml(mergedProfile.fullName || "Member")}</a>
-            </div>
-            <div class="online-time">${escapeHtml(statusText(data))}</div>
-          </div>
-          <div class="inline-actions">
-            ${renderMessageButton(data.uid, mergedProfile.fullName || "Member")}
-          </div>
-        </div>
-      `;
-    }
-
-    container.innerHTML = html || "<p class='no-online'>No member activity yet.</p>";
-  });
+  return null;
 }
 
-async function toggleLike(targetType, targetId, commentId = null) {
+async function toggleLike(targetType, targetId, commentId = null, replyId = null) {
   const user = auth.currentUser;
   if (!user) {
     alert("Please sign in first.");
     return;
   }
 
-  let itemRef;
-  if (targetType === "post") {
-    itemRef = db.collection("posts").doc(targetId);
-  } else if (targetType === "comment") {
-    itemRef = db.collection("posts").doc(targetId).collection("comments").doc(commentId);
-  } else if (targetType === "community") {
-    itemRef = db.collection("communityPosts").doc(targetId);
-  } else {
-    return;
-  }
+  const itemRef = itemRefForLike(targetType, targetId, commentId, replyId);
+  if (!itemRef) return;
 
   const likeRef = itemRef.collection("likes").doc(user.uid);
 
@@ -1345,10 +1226,35 @@ async function toggleLike(targetType, targetId, commentId = null) {
   });
 }
 
+function watchLikeButtonState(buttonId, targetType, targetId, commentId = null, replyId = null) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const itemRef = itemRefForLike(targetType, targetId, commentId, replyId);
+  if (!itemRef) return;
+
+  itemRef.collection("likes").doc(user.uid).onSnapshot((snap) => {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    btn.classList.toggle("like-active", snap.exists);
+  });
+}
+
+function renderLikeButtonHTML(buttonId, label, count, onClickJs) {
+  return `
+    <button class="small-btn mini-btn" id="${buttonId}" onclick="${onClickJs}">
+      👍 ${label} ${count || 0}
+    </button>
+  `;
+}
+
 function loadLikes(postId) {
   db.collection("posts").doc(postId).onSnapshot((snap) => {
-    document.getElementById(`likes-${postId}`).textContent = snap.exists ? (snap.data().likesCount || 0) : 0;
+    const el = document.getElementById(`likes-${postId}`);
+    if (el) el.textContent = snap.exists ? (snap.data().likesCount || 0) : 0;
   });
+
+  watchLikeButtonState(`like-btn-post-${postId}`, "post", postId);
 }
 
 async function addComment(postId) {
@@ -1413,6 +1319,7 @@ async function addReply(postId, commentId) {
       lastName: userInfo.lastName || "",
       photoURL: userInfo.photoURL || "",
       avatarColor: userInfo.avatarColor || "#16385d",
+      likesCount: 0,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
@@ -1435,7 +1342,13 @@ async function deleteComment(postId, commentId) {
   const replies = await ref.collection("replies").get();
   const likes = await ref.collection("likes").get();
   const batch = db.batch();
-  replies.forEach(r => batch.delete(r.ref));
+
+  for (const replyDoc of replies.docs) {
+    const replyLikes = await replyDoc.ref.collection("likes").get();
+    replyLikes.forEach(l => batch.delete(l.ref));
+    batch.delete(replyDoc.ref);
+  }
+
   likes.forEach(l => batch.delete(l.ref));
   batch.delete(ref);
   await batch.commit();
@@ -1454,7 +1367,11 @@ async function deleteReply(postId, commentId, replyId) {
     return;
   }
 
-  await ref.delete();
+  const likes = await ref.collection("likes").get();
+  const batch = db.batch();
+  likes.forEach(l => batch.delete(l.ref));
+  batch.delete(ref);
+  await batch.commit();
 }
 
 function buildThreadId(uid1, uid2) {
@@ -1617,6 +1534,7 @@ async function publishCommunityPost() {
     document.getElementById("community-title").value = "";
     document.getElementById("community-text").value = "";
     setMessage("community-message", "Publication posted successfully.");
+    clearMessageLater("community-message", 2200);
   } catch (error) {
     setMessage("community-message", "Unable to publish this post.", true);
   }
@@ -1674,7 +1592,13 @@ async function deleteCommunityPost(postId) {
   const commentsSnap = await ref.collection("comments").get();
   const likesSnap = await ref.collection("likes").get();
   const batch = db.batch();
-  commentsSnap.forEach(c => batch.delete(c.ref));
+
+  for (const commentDoc of commentsSnap.docs) {
+    const commentLikes = await commentDoc.ref.collection("likes").get();
+    commentLikes.forEach(l => batch.delete(l.ref));
+    batch.delete(commentDoc.ref);
+  }
+
   likesSnap.forEach(l => batch.delete(l.ref));
   batch.delete(ref);
   await batch.commit();
@@ -1693,21 +1617,17 @@ async function deleteCommunityComment(postId, commentId) {
     return;
   }
 
-  await ref.delete();
+  const likes = await ref.collection("likes").get();
+  const batch = db.batch();
+  likes.forEach(l => batch.delete(l.ref));
+  batch.delete(ref);
+  await batch.commit();
 }
 
 function renderMessageButton(userId, userName) {
   const me = auth.currentUser;
   if (!me || me.uid === userId) return "";
   return `<button class="message-btn" onclick="openPrivateThread('${userId}','${escapeHtml(userName)}')">💬</button>`;
-}
-
-function renderCommunityLikeButton(postId, count) {
-  return `
-    <button class="small-btn mini-btn" onclick="toggleLike('community','${postId}')">
-      👍 Like ${count || 0}
-    </button>
-  `;
 }
 
 function loadReplies(postId, commentId) {
@@ -1726,6 +1646,7 @@ function loadReplies(postId, commentId) {
       snapshot.forEach((doc) => {
         const r = doc.data();
         const canDelete = currentUser && r.userId === currentUser.uid;
+        const likeBtnId = `like-btn-reply-${doc.id}`;
 
         html += `
           <div class="reply">
@@ -1743,6 +1664,14 @@ function loadReplies(postId, commentId) {
                   </div>
                 </div>
                 <div class="comment-text">${escapeHtml(r.text || "")}</div>
+                <div class="small-like-row">
+                  ${renderLikeButtonHTML(
+                    likeBtnId,
+                    "Like",
+                    r.likesCount || 0,
+                    `toggleLike('reply','${postId}','${commentId}','${doc.id}')`
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1750,6 +1679,10 @@ function loadReplies(postId, commentId) {
       });
 
       container.innerHTML = html;
+
+      snapshot.forEach((doc) => {
+        watchLikeButtonState(`like-btn-reply-${doc.id}`, "reply", postId, commentId, doc.id);
+      });
     });
 }
 
@@ -1765,6 +1698,7 @@ function loadComments(postId) {
       snapshot.forEach((doc) => {
         const c = doc.data();
         const canDelete = currentUser && c.userId === currentUser.uid;
+        const likeBtnId = `like-btn-comment-${doc.id}`;
 
         html += `
           <div class="comment">
@@ -1784,10 +1718,13 @@ function loadComments(postId) {
 
                 <div class="comment-text">${escapeHtml(c.text || "")}</div>
 
-                <div class="actions">
-                  <button class="small-btn mini-btn" onclick="toggleLike('comment','${postId}','${doc.id}')">
-                    👍 Like ${c.likesCount || 0}
-                  </button>
+                <div class="small-like-row">
+                  ${renderLikeButtonHTML(
+                    likeBtnId,
+                    "Like",
+                    c.likesCount || 0,
+                    `toggleLike('comment','${postId}','${doc.id}')`
+                  )}
                 </div>
 
                 <div class="reply-box">
@@ -1803,7 +1740,11 @@ function loadComments(postId) {
       });
 
       document.getElementById(`comments-${postId}`).innerHTML = html;
-      snapshot.forEach((doc) => loadReplies(postId, doc.id));
+
+      snapshot.forEach((doc) => {
+        watchLikeButtonState(`like-btn-comment-${doc.id}`, "comment", postId, doc.id);
+        loadReplies(postId, doc.id);
+      });
     });
 }
 
@@ -1822,6 +1763,7 @@ function loadCommunityComments(postId) {
       snapshot.forEach((doc) => {
         const c = doc.data();
         const canDelete = currentUser && currentUser.uid === c.userId;
+        const likeBtnId = `like-btn-community-comment-${doc.id}`;
 
         html += `
           <div class="reply">
@@ -1839,6 +1781,14 @@ function loadCommunityComments(postId) {
                   </div>
                 </div>
                 <div class="comment-text">${escapeHtml(c.text || "")}</div>
+                <div class="small-like-row">
+                  ${renderLikeButtonHTML(
+                    likeBtnId,
+                    "Like",
+                    c.likesCount || 0,
+                    `toggleLike('communityComment','${postId}','${doc.id}')`
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1846,6 +1796,10 @@ function loadCommunityComments(postId) {
       });
 
       container.innerHTML = html || "<p class='dark-note'>No comments yet.</p>";
+
+      snapshot.forEach((doc) => {
+        watchLikeButtonState(`like-btn-community-comment-${doc.id}`, "communityComment", postId, doc.id);
+      });
     });
 }
 
@@ -1859,6 +1813,7 @@ function loadCommunityPosts() {
       snapshot.forEach((doc) => {
         const p = doc.data();
         const canDelete = currentUser && currentUser.uid === p.userId;
+        const likeBtnId = `like-btn-community-${doc.id}`;
 
         html += `
           <div class="comment community-post-card">
@@ -1879,8 +1834,13 @@ function loadCommunityPosts() {
                 ${p.title ? `<h4 class="community-title">${escapeHtml(p.title)}</h4>` : ""}
                 <div class="comment-text">${escapeHtml(p.text || "")}</div>
 
-                <div class="actions">
-                  ${renderCommunityLikeButton(doc.id, p.likesCount || 0)}
+                <div class="small-like-row">
+                  ${renderLikeButtonHTML(
+                    likeBtnId,
+                    "Like",
+                    p.likesCount || 0,
+                    `toggleLike('community','${doc.id}')`
+                  )}
                 </div>
 
                 <div class="reply-box">
@@ -1896,7 +1856,11 @@ function loadCommunityPosts() {
       });
 
       document.getElementById("community-posts").innerHTML = html || "<p class='dark-note'>No publication yet.</p>";
-      snapshot.forEach((doc) => loadCommunityComments(doc.id));
+
+      snapshot.forEach((doc) => {
+        watchLikeButtonState(`like-btn-community-${doc.id}`, "community", doc.id);
+        loadCommunityComments(doc.id);
+      });
     });
 }
 
@@ -1925,7 +1889,13 @@ async function deleteMyAccount() {
       const repliesSnap = await docSnap.ref.collection("replies").get();
       const likesSnap = await docSnap.ref.collection("likes").get();
       const batchReplies = db.batch();
-      repliesSnap.forEach(r => batchReplies.delete(r.ref));
+
+      for (const replyDoc of repliesSnap.docs) {
+        const replyLikes = await replyDoc.ref.collection("likes").get();
+        replyLikes.forEach(l => batchReplies.delete(l.ref));
+        batchReplies.delete(replyDoc.ref);
+      }
+
       likesSnap.forEach(l => batchReplies.delete(l.ref));
       await batchReplies.commit();
       await docSnap.ref.delete();
@@ -1937,7 +1907,13 @@ async function deleteMyAccount() {
     const allCommentsSnap = await db.collection("posts").doc("post1").collection("comments").get();
     for (const c of allCommentsSnap.docs) {
       const repliesSnap = await c.ref.collection("replies").where("userId", "==", uid).get();
-      for (const r of repliesSnap.docs) await r.ref.delete();
+      for (const r of repliesSnap.docs) {
+        const rLikes = await r.ref.collection("likes").get();
+        const batch = db.batch();
+        rLikes.forEach(l => batch.delete(l.ref));
+        batch.delete(r.ref);
+        await batch.commit();
+      }
       const likeSnap = await c.ref.collection("likes").doc(uid).get();
       if (likeSnap.exists) await likeSnap.ref.delete();
     }
@@ -1947,7 +1923,13 @@ async function deleteMyAccount() {
       const postComments = await p.ref.collection("comments").get();
       const likes = await p.ref.collection("likes").get();
       const batch = db.batch();
-      postComments.forEach(pc => batch.delete(pc.ref));
+
+      for (const pc of postComments.docs) {
+        const cLikes = await pc.ref.collection("likes").get();
+        cLikes.forEach(l => batch.delete(l.ref));
+        batch.delete(pc.ref);
+      }
+
       likes.forEach(l => batch.delete(l.ref));
       batch.delete(p.ref);
       await batch.commit();
@@ -1956,7 +1938,13 @@ async function deleteMyAccount() {
     const allCommunityPosts = await db.collection("communityPosts").get();
     for (const postDoc of allCommunityPosts.docs) {
       const myComments = await postDoc.ref.collection("comments").where("userId", "==", uid).get();
-      for (const c of myComments.docs) await c.ref.delete();
+      for (const c of myComments.docs) {
+        const cLikes = await c.ref.collection("likes").get();
+        const batch = db.batch();
+        cLikes.forEach(l => batch.delete(l.ref));
+        batch.delete(c.ref);
+        await batch.commit();
+      }
       const likeSnap = await postDoc.ref.collection("likes").doc(uid).get();
       if (likeSnap.exists) await likeSnap.ref.delete();
     }
@@ -1982,12 +1970,6 @@ async function deleteMyAccount() {
 
 async function logout() {
   const user = auth.currentUser;
-  const logoutButtons = document.querySelectorAll('[onclick="logout()"]');
-
-  logoutButtons.forEach(btn => {
-    btn.disabled = true;
-    btn.textContent = "Logging out...";
-  });
 
   try {
     stopPresenceHeartbeat();
@@ -2012,12 +1994,145 @@ async function logout() {
   } catch (error) {
     console.error("logout error:", error);
     setMessage("profile-message", "Logout failed.", true);
-
-    logoutButtons.forEach(btn => {
-      btn.disabled = false;
-      btn.textContent = "Logout";
-    });
   }
+}
+
+function updateMyPresenceOnline(fullName) {
+  if (!presenceStatusRef) return Promise.resolve();
+
+  return presenceStatusRef.set({
+    state: "online",
+    fullName: fullName || auth.currentUser?.displayName || "Member",
+    last_changed: firebase.database.ServerValue.TIMESTAMP
+  });
+}
+
+function startPresenceHeartbeat(fullName) {
+  stopPresenceHeartbeat();
+
+  updateMyPresenceOnline(fullName).catch(err => {
+    console.error("presence first online write error:", err);
+  });
+
+  presenceHeartbeatInterval = setInterval(() => {
+    updateMyPresenceOnline(fullName).catch(err => {
+      console.error("presence heartbeat error:", err);
+    });
+  }, HEARTBEAT_MS);
+}
+
+function stopPresenceHeartbeat() {
+  if (presenceHeartbeatInterval) {
+    clearInterval(presenceHeartbeatInterval);
+    presenceHeartbeatInterval = null;
+  }
+}
+
+function setupPresence(user, fullName) {
+  cleanupPresence();
+
+  presenceStatusRef = rtdb.ref("/status/" + user.uid);
+  presenceConnectedRef = rtdb.ref(".info/connected");
+
+  presenceConnectedRef.on("value", (snap) => {
+    if (snap.val() === false) return;
+
+    presenceStatusRef.onDisconnect().set({
+      state: "offline",
+      fullName: fullName || user.displayName || "Member",
+      last_changed: firebase.database.ServerValue.TIMESTAMP
+    }).then(() => {
+      startPresenceHeartbeat(fullName || user.displayName || "Member");
+    });
+  });
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+}
+
+function handleBeforeUnload() {
+  try {
+    if (presenceStatusRef) {
+      presenceStatusRef.set({
+        state: "offline",
+        fullName: auth.currentUser?.displayName || "Member",
+        last_changed: firebase.database.ServerValue.TIMESTAMP
+      });
+    }
+  } catch (_) {}
+}
+
+function cleanupPresence() {
+  try {
+    if (presenceConnectedRef) presenceConnectedRef.off();
+    if (presenceStatusRef) presenceStatusRef.off();
+    if (onlineUsersRef) onlineUsersRef.off();
+  } catch (_) {}
+
+  stopPresenceHeartbeat();
+  window.removeEventListener("beforeunload", handleBeforeUnload);
+
+  presenceConnectedRef = null;
+  presenceStatusRef = null;
+  onlineUsersRef = null;
+}
+
+function refreshPresence() {
+  loadOnlineUsers();
+}
+
+function loadOnlineUsers() {
+  if (onlineUsersRef) {
+    try { onlineUsersRef.off(); } catch (_) {}
+  }
+
+  onlineUsersRef = rtdb.ref("/status");
+  onlineUsersRef.on("value", async (snapshot) => {
+    const container = document.getElementById("online-users");
+    let html = "";
+    const items = [];
+
+    snapshot.forEach((child) => {
+      items.push({ uid: child.key, ...child.val() });
+    });
+
+    const visibleItems = items
+      .filter(data => isStatusOnline(data))
+      .sort((a, b) => Number(b.last_changed || 0) - Number(a.last_changed || 0));
+
+    for (const data of visibleItems) {
+      let profileData = {};
+      try {
+        const doc = await db.collection("users").doc(data.uid).get();
+        if (doc.exists) profileData = doc.data();
+      } catch (_) {}
+
+      const mergedProfile = {
+        uid: data.uid,
+        fullName: profileData.fullName || data.fullName || "Member",
+        firstName: profileData.firstName || "",
+        lastName: profileData.lastName || "",
+        photoURL: profileData.photoURL || "",
+        avatarColor: profileData.avatarColor || "#16385d"
+      };
+
+      html += `
+        <div class="online-user">
+          ${avatarHtml(mergedProfile)}
+          <div class="online-user-content">
+            <div class="online-name">
+              <a class="profile-link" href="profile.html?uid=${data.uid}">${escapeHtml(mergedProfile.fullName || "Member")}</a>
+            </div>
+            <div class="online-time">${escapeHtml(statusText(data))}</div>
+          </div>
+          <div class="inline-actions">
+            ${renderMessageButton(data.uid, mergedProfile.fullName || "Member")}
+          </div>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html || "<p class='no-online'>No member activity yet.</p>";
+  });
 }
 
 auth.onAuthStateChanged(async (user) => {
@@ -2030,6 +2145,7 @@ auth.onAuthStateChanged(async (user) => {
       try { await auth.signOut(); } catch (_) {}
       toggleMemberZone(false);
       cleanupPresence();
+      showConnectionBadge(false);
       document.getElementById("user-info").textContent = "";
       document.getElementById("presence-self").textContent = "";
       document.getElementById("inbox-list").innerHTML = "";
@@ -2042,6 +2158,8 @@ auth.onAuthStateChanged(async (user) => {
     }
 
     toggleMemberZone(true);
+    showConnectionBadge(true);
+
     const profile = await ensureUserProfile(user);
 
     fillProfile(profile, user);
@@ -2050,8 +2168,17 @@ auth.onAuthStateChanged(async (user) => {
 
     setupPresence(user, profile.fullName || user.displayName || "Member");
     loadInbox();
+
+    setTimeout(() => {
+      const authMsg = document.getElementById("auth-message");
+      if (authMsg && authMsg.classList.contains("soft-success")) {
+        authMsg.textContent = "";
+        authMsg.classList.remove("soft-success", "soft-error");
+      }
+    }, 900);
   } else {
     toggleMemberZone(false);
+    showConnectionBadge(false);
     cleanupPresence();
     document.getElementById("user-info").textContent = "";
     document.getElementById("presence-self").textContent = "";
