@@ -11,6 +11,78 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <style>
+    .soft-status-message {
+      padding: 10px 14px;
+      border-radius: 12px;
+      margin-top: 10px;
+      font-weight: 700;
+      line-height: 1.45;
+      transition: all 0.25s ease;
+      min-height: 22px;
+    }
+
+    .soft-status-message.soft-success {
+      background: #e9f8ef;
+      color: #0b7a3b;
+      border: 1px solid #b7e4c7;
+    }
+
+    .soft-status-message.soft-error {
+      background: #fff4d9;
+      color: #7a5600;
+      border: 1px solid #f2d38a;
+      animation: softShake 0.36s ease-in-out;
+    }
+
+    @keyframes softShake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-3px); }
+      100% { transform: translateX(0); }
+    }
+
+    .welcome-join-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f6fbff, #eef6ff);
+      border: 1px solid #d7e8fb;
+      margin-bottom: 18px;
+    }
+
+    .welcome-join-emoji {
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .welcome-join-text h3 {
+      margin: 0 0 4px 0;
+      color: #16385d;
+      font-size: 18px;
+    }
+
+    .welcome-join-text p {
+      margin: 0;
+      color: #46627f;
+      line-height: 1.5;
+    }
+
+    .readonly-lock {
+      background: #f4f7fb;
+      color: #58708b;
+      cursor: not-allowed;
+    }
+
+    .save-loading {
+      opacity: 0.8;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
 
@@ -56,7 +128,7 @@
         </button>
       </div>
 
-      <p id="auth-message" class="auth-message"></p>
+      <p id="auth-message" class="auth-message soft-status-message"></p>
     </div>
 
     <div id="member-zone" class="hidden-block">
@@ -66,9 +138,12 @@
 
   <main class="insights-main">
     <section class="card">
-      <div class="section-head">
-        <h3 data-i18n="onlineMembers">Online members</h3>
-        <button class="mini-refresh-btn" onclick="refreshPresence()">↻</button>
+      <div class="welcome-join-card">
+        <div class="welcome-join-emoji">🎓✨</div>
+        <div class="welcome-join-text">
+          <h3>Create your member space</h3>
+          <p>Join the academic community, publish your ideas, comment, interact with others and grow your scientific network 🚀📚</p>
+        </div>
       </div>
       <div id="online-users"></div>
     </section>
@@ -186,7 +261,7 @@
         </div>
 
         <button class="small-btn" onclick="publishCommunityPost()" data-i18n="publish">Publish</button>
-        <p id="community-message" class="dark-message"></p>
+        <p id="community-message" class="dark-message soft-status-message"></p>
       </div>
 
       <div id="community-posts"></div>
@@ -221,7 +296,7 @@
       <button class="auth-btn secondary" onclick="closeSignupModal()" data-i18n="close">Close</button>
     </div>
 
-    <p id="signup-message" class="modal-message"></p>
+    <p id="signup-message" class="modal-message soft-status-message"></p>
   </div>
 </div>
 
@@ -253,22 +328,11 @@
       <label class="field-label" data-i18n="lastName">Last name</label>
       <input type="text" id="profile-lastname" class="auth-input" placeholder="Last name">
 
-      <label class="field-label" data-i18n="phoneNumber">Phone number</label>
-      <div class="phone-row">
-        <select id="profile-phone-prefix" class="phone-prefix">
-          <option value="+33">🇫🇷 +33</option>
-          <option value="+229">🇧🇯 +229</option>
-          <option value="+1">🇨🇦 +1</option>
-          <option value="+34">🇪🇸 +34</option>
-          <option value="+49">🇩🇪 +49</option>
-          <option value="+39">🇮🇹 +39</option>
-          <option value="+44">🇬🇧 +44</option>
-          <option value="+221">🇸🇳 +221</option>
-          <option value="+225">🇨🇮 +225</option>
-          <option value="+212">🇲🇦 +212</option>
-        </select>
-        <input type="tel" id="profile-phone" class="auth-input" placeholder="Phone number">
-      </div>
+      <label class="field-label">Country</label>
+      <input type="text" id="profile-country" class="auth-input readonly-lock" placeholder="Country" readonly>
+
+      <label class="field-label" data-i18n="location">City</label>
+      <input type="text" id="profile-location" class="auth-input" placeholder="City">
 
       <label class="field-label" data-i18n="emailAddress">Email address</label>
       <input type="email" id="profile-email" class="auth-input readonly-input" readonly>
@@ -281,9 +345,6 @@
 
       <label class="field-label" data-i18n="institution">Institution</label>
       <input type="text" id="profile-institution" class="auth-input" placeholder="Institution / University / Lab">
-
-      <label class="field-label" data-i18n="location">Location</label>
-      <input type="text" id="profile-location" class="auth-input" placeholder="City / Country">
 
       <label class="field-label" data-i18n="favoriteField">Favorite field</label>
       <input type="text" id="profile-field" class="auth-input" placeholder="Green chemistry, catalysis, materials...">
@@ -299,29 +360,20 @@
       <input type="hidden" id="profile-avatar-color" value="#16385d">
 
       <div class="auth-actions">
-        <button class="auth-btn" onclick="saveProfile()" data-i18n="saveProfile">Save profile</button>
+        <button class="auth-btn" id="save-profile-btn" onclick="saveProfile()" data-i18n="saveProfile">Save profile</button>
       </div>
 
-      <div class="account-security-box">
-        <h4 data-i18n="accountActions">Account actions</h4>
+      <hr class="soft-line">
 
-        <div class="auth-actions">
-          <button class="auth-btn secondary" onclick="sendResetForCurrentUser()" data-i18n="resetPassword">Reset password</button>
-          <button class="auth-btn secondary" onclick="logout()" data-i18n="logout">Logout</button>
-        </div>
+      <h4 data-i18n="deleteMyAccount">Delete my account</h4>
+      <p class="small-note dark-note" data-i18n="deleteNotice">This deletes your account and your data on this site.</p>
+      <input type="password" id="delete-password" class="auth-input" placeholder="Confirm with your password">
 
-        <hr class="soft-line">
-
-        <h4 data-i18n="deleteMyAccount">Delete my account</h4>
-        <p class="small-note dark-note" data-i18n="deleteNotice">This deletes your account and your data on this site.</p>
-        <input type="password" id="delete-password" class="auth-input" placeholder="Confirm with your password">
-
-        <div class="auth-actions">
-          <button class="auth-btn danger" onclick="deleteMyAccount()" data-i18n="deleteMyAccount">Delete my account</button>
-        </div>
+      <div class="auth-actions">
+        <button class="auth-btn danger" onclick="deleteMyAccount()" data-i18n="deleteMyAccount">Delete my account</button>
       </div>
 
-      <p id="profile-message" class="dark-message"></p>
+      <p id="profile-message" class="dark-message soft-status-message"></p>
     </div>
 
     <div id="account-inbox-tab" class="account-tab-panel hidden-account-tab">
@@ -371,6 +423,7 @@ let onlineUsersRef = null;
 
 const HEARTBEAT_MS = 20000;
 const ONLINE_FRESH_MS = 70000;
+const GEO_TIMEOUT_MS = 4500;
 
 const allowedDirectDomains = ["gmail.com", "yahoo.com", "yahoo.fr"];
 const blockedDisposableDomains = [
@@ -452,7 +505,9 @@ function setMessage(id, text, isError = false) {
   const el = document.getElementById(id);
   if (!el) return;
   el.textContent = text;
-  el.style.color = isError ? "#b00020" : "#0b7a3b";
+  el.classList.remove("soft-success", "soft-error");
+  if (!text) return;
+  el.classList.add(isError ? "soft-error" : "soft-success");
 }
 
 function showMessagesAccessNotice() {
@@ -537,6 +592,105 @@ function validateStrongPassword(password) {
     valid: checks.length && checks.upper && checks.lower && checks.digit && checks.special,
     checks
   };
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = GEO_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      cache: "no-store"
+    });
+    return response;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function detectVisitorGeoData(email = "") {
+  const fallbackCountry = getCountryFromEmail(email);
+  let result = {
+    country: fallbackCountry || "Non précisé",
+    city: ""
+  };
+
+  try {
+    const res = await fetchWithTimeout("https://ipapi.co/json/");
+    if (res.ok) {
+      const data = await res.json();
+      const country = (data && (data.country_name || data.country || "")).trim();
+      const city = (data && (data.city || "")).trim();
+
+      if (country) result.country = country;
+      if (city) result.city = city;
+
+      if (result.country || result.city) return result;
+    }
+  } catch (_) {}
+
+  try {
+    const res = await fetchWithTimeout("https://api.country.is/");
+    if (res.ok) {
+      const data = await res.json();
+      const code = String(data && data.country || "").toUpperCase();
+      const countryMap = {
+        FR: "France",
+        BJ: "Bénin",
+        CA: "Canada",
+        ES: "Espagne",
+        DE: "Allemagne",
+        IT: "Italie",
+        GB: "Royaume-Uni",
+        UK: "Royaume-Uni",
+        SN: "Sénégal",
+        CI: "Côte d’Ivoire",
+        MA: "Maroc",
+        US: "États-Unis",
+        BE: "Belgique",
+        CH: "Suisse"
+      };
+      if (countryMap[code]) result.country = countryMap[code];
+    }
+  } catch (_) {}
+
+  return result;
+}
+
+function getCountryFromEmail(email) {
+  const e = String(email || "").toLowerCase().trim();
+  const domain = e.split("@")[1] || "";
+  if (domain.endsWith(".fr")) return "France";
+  if (domain.endsWith(".bj")) return "Bénin";
+  if (domain.endsWith(".ca")) return "Canada";
+  if (domain.endsWith(".es")) return "Espagne";
+  if (domain.endsWith(".de")) return "Allemagne";
+  if (domain.endsWith(".it")) return "Italie";
+  if (domain.endsWith(".uk")) return "Royaume-Uni";
+  if (domain.endsWith(".sn")) return "Sénégal";
+  if (domain.endsWith(".ci")) return "Côte d’Ivoire";
+  if (domain.endsWith(".ma")) return "Maroc";
+  if (domain === "gmail.com" || domain === "yahoo.com" || domain === "yahoo.fr") return "Non précisé";
+  return "Non précisé";
+}
+
+function getPhonePrefixFromCountry(country) {
+  const c = String(country || "").toLowerCase();
+  if (c.includes("france")) return "+33";
+  if (c.includes("bénin") || c.includes("benin")) return "+229";
+  if (c.includes("canada")) return "+1";
+  if (c.includes("espagne")) return "+34";
+  if (c.includes("allemagne")) return "+49";
+  if (c.includes("italie")) return "+39";
+  if (c.includes("royaume")) return "+44";
+  if (c.includes("sénégal") || c.includes("senegal")) return "+221";
+  if (c.includes("côte d’ivoire") || c.includes("cote d'ivoire")) return "+225";
+  if (c.includes("maroc")) return "+212";
+  if (c.includes("belgique")) return "+32";
+  if (c.includes("suisse")) return "+41";
+  if (c.includes("états-unis") || c.includes("etats-unis") || c.includes("united states")) return "+1";
+  return "+33";
 }
 
 function formatDateTime(timestamp) {
@@ -715,13 +869,32 @@ async function ensureUserProfile(user, extras = {}) {
   }
 
   const existingData = snap.exists ? snap.data() : {};
+  let derivedCountry = extras.country || existingData.country || "";
+  let derivedCity = extras.location || existingData.location || "";
+
+  if (!snap.exists || !derivedCountry || derivedCountry === "Non précisé") {
+    try {
+      const geo = await detectVisitorGeoData(user.email || "");
+      if (!derivedCountry || derivedCountry === "Non précisé") {
+        derivedCountry = geo.country || getCountryFromEmail(user.email || "");
+      }
+      if (!derivedCity) {
+        derivedCity = geo.city || "";
+      }
+    } catch (_) {
+      if (!derivedCountry) derivedCountry = getCountryFromEmail(user.email || "");
+    }
+  }
+
+  derivedCountry = derivedCountry || getCountryFromEmail(user.email || "") || "Non précisé";
+
   const finalFirstName = firstName || existingData.firstName || "";
   const finalLastName = lastName || existingData.lastName || "";
   const finalPhone = extras.phone || existingData.phone || "";
-  const finalPhonePrefix = extras.phonePrefix || existingData.phonePrefix || "+33";
+  const finalPhonePrefix = extras.phonePrefix || existingData.phonePrefix || getPhonePrefixFromCountry(derivedCountry);
   const finalBio = extras.bio || existingData.bio || "";
   const finalInstitution = extras.institution || existingData.institution || "";
-  const finalLocation = extras.location || existingData.location || "";
+  const finalLocation = derivedCity || "";
   const finalField = extras.favoriteField || existingData.favoriteField || "";
   const finalPhotoURL = extras.photoURL || existingData.photoURL || "";
   const finalAvatarColor = extras.avatarColor || existingData.avatarColor || "#16385d";
@@ -738,6 +911,7 @@ async function ensureUserProfile(user, extras = {}) {
     emailVerified: !!user.emailVerified,
     bio: finalBio,
     institution: finalInstitution,
+    country: derivedCountry,
     location: finalLocation,
     favoriteField: finalField,
     photoURL: finalPhotoURL,
@@ -755,13 +929,12 @@ async function ensureUserProfile(user, extras = {}) {
 function fillProfile(profile, user) {
   document.getElementById("profile-firstname").value = profile?.firstName || "";
   document.getElementById("profile-lastname").value = profile?.lastName || "";
-  document.getElementById("profile-phone").value = profile?.phone || "";
-  document.getElementById("profile-phone-prefix").value = profile?.phonePrefix || "+33";
+  document.getElementById("profile-country").value = profile?.country || getCountryFromEmail(user?.email || "");
+  document.getElementById("profile-location").value = profile?.location || "";
   document.getElementById("profile-email").value = user?.email || "";
   document.getElementById("profile-photo-url").value = profile?.photoURL || "";
   document.getElementById("profile-bio").value = profile?.bio || "";
   document.getElementById("profile-institution").value = profile?.institution || "";
-  document.getElementById("profile-location").value = profile?.location || "";
   document.getElementById("profile-field").value = profile?.favoriteField || "";
   document.getElementById("profile-avatar-color").value = profile?.avatarColor || "#16385d";
 
@@ -816,6 +989,9 @@ async function signUp() {
   }
 
   try {
+    const geo = await detectVisitorGeoData(email);
+    const country = geo.country || getCountryFromEmail(email);
+    const city = geo.city || "";
     const cred = await auth.createUserWithEmailAndPassword(email, password);
     const fullName = `${firstName} ${lastName}`.trim();
 
@@ -827,12 +1003,13 @@ async function signUp() {
       lastName,
       fullName,
       phone: "",
-      phonePrefix: "+33",
+      phonePrefix: getPhonePrefixFromCountry(country),
       email,
       emailVerified: false,
       bio: "",
       institution: "",
-      location: "",
+      country: country || "Non précisé",
+      location: city,
       favoriteField: "",
       photoURL: "",
       avatarColor: "#16385d",
@@ -880,7 +1057,7 @@ async function signIn() {
 
     setMessage("auth-message", "Login successful.");
   } catch (error) {
-    setMessage("auth-message", "Email or password incorrect.", true);
+    setMessage("auth-message", "Connection failed. Check your email, password, or verify that your email is active and correct.", true);
   }
 }
 
@@ -896,7 +1073,7 @@ async function sendResetFromInsightsLogin() {
     await auth.sendPasswordResetEmail(email);
     setMessage("auth-message", "Reset email sent.");
   } catch (error) {
-    setMessage("auth-message", error.message, true);
+    setMessage("auth-message", "Unable to send reset email. Please check the email address.", true);
   }
 }
 
@@ -907,10 +1084,10 @@ async function saveProfile() {
     return;
   }
 
+  const saveBtn = document.getElementById("save-profile-btn");
   const firstName = document.getElementById("profile-firstname").value.trim();
   const lastName = document.getElementById("profile-lastname").value.trim();
-  const phone = document.getElementById("profile-phone").value.trim();
-  const phonePrefix = document.getElementById("profile-phone-prefix").value;
+  const country = document.getElementById("profile-country").value.trim();
   const photoURL = document.getElementById("profile-photo-url").value.trim();
   const bio = document.getElementById("profile-bio").value.trim();
   const institution = document.getElementById("profile-institution").value.trim();
@@ -931,6 +1108,12 @@ async function saveProfile() {
   const fullName = `${firstName} ${lastName}`.trim();
 
   try {
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = "Saving...";
+      saveBtn.classList.add("save-loading");
+    }
+
     await user.updateProfile({ displayName: fullName });
 
     await db.collection("users").doc(user.uid).set({
@@ -938,13 +1121,12 @@ async function saveProfile() {
       firstName,
       lastName,
       fullName,
-      phone,
-      phonePrefix,
       email: user.email || "",
       emailVerified: !!user.emailVerified,
       photoURL,
       bio,
       institution,
+      country: country || getCountryFromEmail(user.email || "") || "Non précisé",
       location,
       favoriteField,
       avatarColor,
@@ -956,8 +1138,19 @@ async function saveProfile() {
     document.getElementById("user-info").textContent = `Connected as ${fullName}`;
     updateProfilePreview();
     setMessage("profile-message", "Profile saved successfully.");
+
+    setTimeout(() => {
+      closeAccountModal();
+      setMessage("profile-message", "");
+    }, 900);
   } catch (error) {
-    setMessage("profile-message", error.message, true);
+    setMessage("profile-message", "Unable to save the profile. Please try again.", true);
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save profile";
+      saveBtn.classList.remove("save-loading");
+    }
   }
 }
 
@@ -1425,7 +1618,7 @@ async function publishCommunityPost() {
     document.getElementById("community-text").value = "";
     setMessage("community-message", "Publication posted successfully.");
   } catch (error) {
-    setMessage("community-message", error.message, true);
+    setMessage("community-message", "Unable to publish this post.", true);
   }
 }
 
@@ -1783,7 +1976,7 @@ async function deleteMyAccount() {
 
     alert("Your account and your site data have been deleted.");
   } catch (error) {
-    setMessage("profile-message", error.message, true);
+    setMessage("profile-message", "Unable to delete the account. Check your password.", true);
   }
 }
 
@@ -1818,7 +2011,7 @@ async function logout() {
     window.location.href = "insights.html";
   } catch (error) {
     console.error("logout error:", error);
-    setMessage("profile-message", error.message, true);
+    setMessage("profile-message", "Logout failed.", true);
 
     logoutButtons.forEach(btn => {
       btn.disabled = false;
