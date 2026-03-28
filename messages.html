@@ -166,6 +166,7 @@ let selectedUserId = null;
 let selectedUserProfile = null;
 let currentThreadId = null;
 let currentLanguage = localStorage.getItem("site_lang") || "en";
+
 let threadUnsubscribe = null;
 let usersUnsubscribe = null;
 let threadsUnsubscribe = null;
@@ -814,6 +815,23 @@ function renderChatHeader() {
   `;
 }
 
+function updateComposerState() {
+  const input = document.getElementById("message-input");
+  const sendBtn = document.querySelector(".send-btn");
+
+  if (!input || !sendBtn) return;
+
+  if (selectedUserId && isBlocked(selectedUserId)) {
+    input.disabled = true;
+    sendBtn.disabled = true;
+    input.placeholder = "You blocked this user. Unblock to write again.";
+  } else {
+    input.disabled = false;
+    sendBtn.disabled = false;
+    input.placeholder = "Write a private message...";
+  }
+}
+
 async function selectConversation(otherUserId) {
   const user = auth.currentUser;
   if (!user) {
@@ -830,23 +848,6 @@ async function selectConversation(otherUserId) {
   setChatStatus("");
   await markThreadAsRead();
   loadMessages();
-}
-
-function updateComposerState() {
-  const input = document.getElementById("message-input");
-  const sendBtn = document.querySelector(".send-btn");
-
-  if (!input || !sendBtn) return;
-
-  if (selectedUserId && isBlocked(selectedUserId)) {
-    input.disabled = true;
-    sendBtn.disabled = true;
-    input.placeholder = "You blocked this user. Unblock to write again.";
-  } else {
-    input.disabled = false;
-    sendBtn.disabled = false;
-    input.placeholder = "Write a private message...";
-  }
 }
 
 function loadMessages() {
@@ -905,7 +906,6 @@ function loadMessages() {
     });
 }
 
-<script>
 async function sendMessage() {
   const user = auth.currentUser;
   if (!user) {
@@ -971,7 +971,7 @@ async function sendMessage() {
     if (sendBtn) sendBtn.disabled = false;
   }
 }
-</script>
+
 async function markThreadAsRead() {
   const user = auth.currentUser;
   if (!user || !currentThreadId) return;
