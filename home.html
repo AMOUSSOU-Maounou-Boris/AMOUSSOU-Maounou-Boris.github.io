@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home | Boris Research Hub</title>
+  <link rel="stylesheet" href="home.css" />
+  <style>
+    .login-btn,
+    .nav-account-btn,
+    .nav-logout-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    .login-btn {
+      background: #0a66c2;
+      color: white !important;
+    }
+    .nav-account-btn {
+      background: #e8f1fb;
+      color: #0b2239 !important;
+    }
+    .nav-logout-btn {
+      background: #f7dede;
+      color: #8a1f1f !important;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: #00ff66;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px #00ff66;
+      animation: blink 1.2s infinite;
+    }
+    .auth-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    @keyframes blink {
+      0% {opacity: 1;}
+      50% {opacity: 0.3;}
+      100% {opacity: 1;}
+    }
+  </style>
+</head>
+<body>
+  <nav class="home-nav">
+    <ul id="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="research.html">Research</a></li>
+      <li><a href="cv.html">Resume</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="insights.html">Insights</a></li>
+      <li id="auth-section"></li>
+    </ul>
+  </nav>
+
+  <div class="home-container">
+    <aside class="home-sidebar">
+      <img src="profile.jpg" class="profile-img" alt="Profile photo">
+      <h2>Maounou Boris AMOUSSOU</h2>
+      <p>Chemical Engineer<br>Green Chemistry &amp; Environment</p>
+
+      <div class="search-box">
+        <h3>Quick Search</h3>
+        <input type="text" id="site-search" placeholder="Search page..." class="search-input">
+        <button class="search-btn" id="searchBtn">Search</button>
+      </div>
+    </aside>
+
+    <main class="home-main">
+      <section class="card hero-card">
+        <h1>Welcome to my scientific world</h1>
+        <p class="hero-text">
+          Explore my academic path, laboratory experience, scientific activities,
+          conferences, collaborations, and research interests in green chemistry,
+          catalysis, environment, and sustainable energy.
+        </p>
+      </section>
+
+      <section class="card slider-card">
+        <h3>Highlights</h3>
+
+        <div class="hero-slider">
+          <div class="slides-wrapper">
+            <div class="slide active"><img src="stage1.jpg" alt="stage 1"></div>
+            <div class="slide"><img src="stage2.jpg" alt="stage 2"></div>
+            <div class="slide"><img src="stage3.jpg" alt="stage 3"></div>
+          </div>
+
+          <button class="slider-btn prev" id="prevSlideBtn">❮</button>
+          <button class="slider-btn next" id="nextSlideBtn">❯</button>
+
+          <div class="slider-dots">
+            <span class="dot active" data-slide="0"></span>
+            <span class="dot" data-slide="1"></span>
+            <span class="dot" data-slide="2"></span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".slide");
+    const dots = document.querySelectorAll(".dot");
+    const authSection = document.getElementById("auth-section");
+
+    function showSlide(index) {
+      if (index >= slides.length) currentSlide = 0;
+      else if (index < 0) currentSlide = slides.length - 1;
+      else currentSlide = index;
+
+      slides.forEach((slide, i) => slide.classList.toggle("active", i === currentSlide));
+      dots.forEach((dot, i) => dot.classList.toggle("active", i === currentSlide));
+    }
+
+    document.getElementById("prevSlideBtn").addEventListener("click", () => showSlide(currentSlide - 1));
+    document.getElementById("nextSlideBtn").addEventListener("click", () => showSlide(currentSlide + 1));
+    dots.forEach(dot => dot.addEventListener("click", () => showSlide(Number(dot.dataset.slide))));
+    setInterval(() => showSlide(currentSlide + 1), 4000);
+
+    function searchSite() {
+      const q = document.getElementById("site-search").value.trim().toLowerCase();
+      if (!q) return;
+      if (q.includes("about")) window.location.href = "about.html";
+      else if (q.includes("research")) window.location.href = "research.html";
+      else if (q.includes("resume") || q.includes("cv")) window.location.href = "cv.html";
+      else if (q.includes("contact")) window.location.href = "contact.html";
+      else if (q.includes("insight")) window.location.href = "insights.html";
+      else if (q.includes("message")) window.location.href = "messages.html";
+      else if (q.includes("profile") || q.includes("compte")) window.location.href = "profile.html";
+      else alert("No direct result found.");
+    }
+
+    document.getElementById("searchBtn").addEventListener("click", searchSite);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const snap = await get(ref(db, "users/" + user.uid));
+        const profile = snap.exists() ? snap.val() : null;
+        const name = profile?.displayName || user.displayName || "Mon compte";
+
+        authSection.innerHTML = `
+          <div class="auth-actions">
+            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
+            <a href="profile.html" class="nav-account-btn">👤 ${name}<span class="status-dot"></span></a>
+            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
+          </div>
+        `;
+
+        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
+          await signOut(auth);
+          window.location.href = "index.html";
+        });
+      } else {
+        authSection.innerHTML = `<a href="login.html" class="login-btn">Login</a>`;
+      }
+    });
+  </script>
+</body>
+</html>
