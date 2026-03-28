@@ -52,35 +52,6 @@
       color: #ffe8a3;
     }
 
-    .msg-foot-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .transfer-message-btn,
-    .reply-message-btn {
-      border: none;
-      background: #dbe9f8;
-      color: #0b2239;
-      border-radius: 10px;
-      padding: 6px 10px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .transfer-message-btn:hover,
-    .reply-message-btn:hover {
-      background: #cfe0f3;
-    }
-
-    .selected-reply-source {
-      outline: 2px solid #8bb7ea;
-      box-shadow: 0 0 0 4px rgba(139, 183, 234, 0.18);
-    }
-
     .reply-preview-box {
       background: #eef5fc;
       border: 1px solid #d8e5f4;
@@ -134,18 +105,16 @@
       margin-bottom: 8px;
     }
 
-    .quoted-reply-name {
-      font-size: 12px;
-      font-weight: 800;
-      color: #0b2239;
-      margin-bottom: 3px;
-    }
-
     .quoted-reply-text {
       font-size: 12px;
       color: #4f6276;
       white-space: pre-wrap;
       word-break: break-word;
+    }
+
+    .selected-reply-source {
+      outline: 2px solid #8bb7ea;
+      box-shadow: 0 0 0 4px rgba(139, 183, 234, 0.18);
     }
 
     .msg-system-error {
@@ -157,6 +126,76 @@
       text-align: center;
       font-size: 13px;
       font-weight: 700;
+    }
+
+    .msg-foot-actions {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .message-menu-btn {
+      border: none;
+      background: #eef4fb;
+      color: #0b2239;
+      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .message-menu-btn:hover {
+      background: #ddeaf8;
+    }
+
+    .message-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      min-width: 150px;
+      background: #ffffff;
+      border: 1px solid #dce6f1;
+      border-radius: 14px;
+      box-shadow: 0 16px 32px rgba(10, 25, 41, 0.14);
+      padding: 8px;
+      z-index: 40;
+      display: none;
+    }
+
+    .message-menu.open {
+      display: block;
+    }
+
+    .message-menu-item {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: #0b2239;
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .message-menu-item:hover {
+      background: #eef4fb;
+    }
+
+    .message-menu-item.delete-item {
+      color: #8a1f1f;
+      background: #fff7f7;
+    }
+
+    .message-menu-item.delete-item:hover {
+      background: #f9e2e2;
     }
 
     .msg-modal {
@@ -306,10 +345,6 @@
         align-items: flex-start;
       }
 
-      .msg-foot-actions {
-        width: 100%;
-      }
-
       .forward-member-item {
         flex-direction: column;
         align-items: flex-start;
@@ -317,6 +352,11 @@
 
       .small-forward-btn {
         width: 100%;
+      }
+
+      .message-menu {
+        right: auto;
+        left: 0;
       }
     }
   </style>
@@ -900,7 +940,7 @@ async function forwardMessageToUser(targetUid) {
     const threadId = threadIdFor(user.uid, targetUid);
     const threadRef = db.collection("privateThreads").doc(threadId);
 
-    const forwardedText = `Transferred message from ${forwardPayload.senderName}:\n${forwardPayload.text}`;
+    const forwardedText = `Transferred message:\n${forwardPayload.text}`;
 
     await threadRef.set({
       participants: [user.uid, targetUid],
@@ -932,15 +972,15 @@ async function forwardMessageToUser(targetUid) {
   }
 }
 
-function openReplyToMessage(messageId, senderName, text) {
+function openReplyToMessage(messageId, text) {
   replyTargetMessage = {
     id: messageId,
-    senderName: senderName || "Member",
     text: text || ""
   };
 
   renderReplyComposerBar();
   highlightReplySourceMessage();
+  closeAllMessageMenus();
   document.getElementById("message-input").focus();
 }
 
@@ -962,7 +1002,7 @@ function renderReplyComposerBar() {
   mount.innerHTML = `
     <div class="reply-preview-box">
       <div class="reply-preview-head">
-        <span class="reply-preview-title">Replying to ${escapeHtml(replyTargetMessage.senderName)}</span>
+        <span class="reply-preview-title">Selected message</span>
         <button class="clear-reply-btn" onclick="clearReplyTarget()">Cancel</button>
       </div>
       <div class="reply-preview-text">${escapeHtml(replyTargetMessage.text)}</div>
@@ -981,6 +1021,22 @@ function highlightReplySourceMessage() {
   if (!replyTargetMessage) return;
   const el = document.getElementById("msg-" + replyTargetMessage.id);
   if (el) el.classList.add("selected-reply-source");
+}
+
+function closeAllMessageMenus() {
+  document.querySelectorAll(".message-menu").forEach(menu => {
+    menu.classList.remove("open");
+  });
+}
+
+function toggleMessageMenu(messageId, event) {
+  event.stopPropagation();
+  const menu = document.getElementById("message-menu-" + messageId);
+  if (!menu) return;
+
+  const isOpen = menu.classList.contains("open");
+  closeAllMessageMenus();
+  if (!isOpen) menu.classList.add("open");
 }
 
 function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPresenceDot = false) {
@@ -1238,9 +1294,7 @@ function loadMessages() {
 
         const encodedText = encodeURIComponent(m.text || "");
         const encodedSenderName = encodeURIComponent(sender.fullName || "Member");
-
-        const replyName = escapeHtml(m.replyTo?.senderName || "");
-        const replyText = escapeHtml(m.replyTo?.text || "");
+        const replyTextEncoded = encodeURIComponent(m.text || "");
         const hasReply = !!(m.replyTo && m.replyTo.text);
 
         html += `
@@ -1255,8 +1309,7 @@ function loadMessages() {
 
             ${hasReply ? `
               <div class="quoted-reply-box">
-                <div class="quoted-reply-name">Reply to ${replyName}</div>
-                <div class="quoted-reply-text">${replyText}</div>
+                <div class="quoted-reply-text">${escapeHtml(m.replyTo.text || "")}</div>
               </div>
             ` : ""}
 
@@ -1264,10 +1317,15 @@ function loadMessages() {
 
             <div class="msg-foot">
               <span>${escapeHtml(formatDateTime(m.createdAt))}</span>
+
               <div class="msg-foot-actions">
-                <button class="reply-message-btn" onclick="openReplyToMessage('${doc.id}', '${escapeHtml(sender.fullName || "Member").replace(/'/g, "\\'")}', '${escapeHtml((m.text || "").replace(/\n/g, " ")).replace(/'/g, "\\'")}')">Reply</button>
-                <button class="transfer-message-btn" onclick="openForwardModal('${encodedText}','${encodedSenderName}')">Transfer</button>
-                ${own && canDeleteMessage(m.createdAt) ? `<button class="delete-message-btn" onclick="deleteMessage('${doc.id}')">Delete</button>` : ""}
+                <button class="message-menu-btn" onclick="toggleMessageMenu('${doc.id}', event)">⋯</button>
+
+                <div class="message-menu" id="message-menu-${doc.id}">
+                  <button class="message-menu-item" onclick="openReplyToMessage('${doc.id}', decodeURIComponent('${replyTextEncoded}'))">Reply</button>
+                  <button class="message-menu-item" onclick="openForwardModal('${encodedText}','${encodedSenderName}')">Transfer</button>
+                  ${own && canDeleteMessage(m.createdAt) ? `<button class="message-menu-item delete-item" onclick="deleteMessage('${doc.id}')">Delete</button>` : ""}
+                </div>
               </div>
             </div>
           </div>
@@ -1344,7 +1402,6 @@ async function sendMessage() {
       text,
       replyTo: replyTargetMessage ? {
         messageId: replyTargetMessage.id || "",
-        senderName: replyTargetMessage.senderName || "Member",
         text: replyTargetMessage.text || ""
       } : null,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1385,6 +1442,7 @@ async function markThreadAsRead() {
 }
 
 async function deleteMessage(messageId) {
+  closeAllMessageMenus();
   if (!currentThreadId) return;
 
   try {
@@ -1542,6 +1600,10 @@ window.addEventListener("click", (e) => {
 
   if (e.target === actionsModal) closeActionsModal();
   if (e.target === forwardModal) closeForwardModal();
+
+  if (!e.target.closest(".msg-foot-actions")) {
+    closeAllMessageMenus();
+  }
 });
 
 auth.onAuthStateChanged(async (user) => {
