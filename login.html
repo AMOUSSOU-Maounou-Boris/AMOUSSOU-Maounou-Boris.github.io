@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login | Boris Research Hub</title>
+<title>Connexion | Boris Research Hub</title>
 
 <style>
 body {
@@ -20,14 +20,12 @@ body {
   background: white;
   padding: 30px;
   border-radius: 12px;
-  width: 320px;
+  width: 330px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.2);
   text-align: center;
 }
 
-h2 {
-  margin-bottom: 20px;
-}
+h2 { margin-bottom: 20px; }
 
 input {
   width: 100%;
@@ -48,12 +46,10 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  background: #084a94;
-}
+button:hover { background: #084a94; }
 
 .error-msg {
-  background: #ffe5e5;
+  background: #fff0f0;
   color: #cc0000;
   padding: 8px;
   border-radius: 6px;
@@ -107,52 +103,74 @@ button:hover {
   <button onclick="login()">Se connecter</button>
 
   <div class="error-msg" id="errorMsg"></div>
-
   <div class="success-dot" id="successDot"></div>
 
-  <span class="small-link" onclick="goToReset()">Mot de passe oublié ?</span>
+  <span class="small-link" onclick="goSignup()">Créer un compte</span>
+  <span class="small-link" onclick="goReset()">Mot de passe oublié ?</span>
 </div>
 
-<script>
-function showError(msg) {
-  const error = document.getElementById("errorMsg");
-  error.innerText = msg;
-  error.style.display = "block";
-}
+<!-- 🔥 FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-function login() {
+/* 🔴 REMPLACE PAR TA CONFIG */
+const firebaseConfig = {
+  apiKey: "XXXX",
+  authDomain: "XXXX",
+  projectId: "XXXX",
+  storageBucket: "XXXX",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.login = function() {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
+  const error = document.getElementById("errorMsg");
 
   if (!email || !password) {
-    showError("Veuillez remplir tous les champs.");
+    error.innerText = "Veuillez remplir tous les champs.";
+    error.style.display = "block";
     return;
   }
 
-  // 🔥 Simulation utilisateur Firebase (tu peux remplacer après)
-  const user = {
-    email: email,
-    name: email.split("@")[0],
-    country: "Auto",
-    city: "Non défini"
-  };
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
 
-  // Stockage local (comme ton système actuel)
-  localStorage.setItem("user", JSON.stringify(user));
-  localStorage.setItem("lastActivity", Date.now());
+      // 🔥 stockage local pour ton site
+      localStorage.setItem("user", JSON.stringify({
+        email: user.email,
+        uid: user.uid
+      }));
 
-  document.getElementById("errorMsg").style.display = "none";
+      localStorage.setItem("lastActivity", Date.now());
 
-  // 🔥 Affiche point vert
-  const dot = document.getElementById("successDot");
-  dot.style.display = "block";
+      error.style.display = "none";
 
-  setTimeout(() => {
-    window.location.href = "insights.html";
-  }, 1200);
+      // 🟢 point vert
+      const dot = document.getElementById("successDot");
+      dot.style.display = "block";
+
+      setTimeout(() => {
+        window.location.href = "insights.html";
+      }, 1000);
+    })
+    .catch((err) => {
+      error.innerText = "Email ou mot de passe incorrect.";
+      error.style.display = "block";
+    });
 }
 
-function goToReset() {
+window.goSignup = function() {
+  window.location.href = "signup.html";
+}
+
+window.goReset = function() {
   window.location.href = "insights.html";
 }
 </script>
