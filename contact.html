@@ -4,175 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contact | Boris Research Hub</title>
-  <link rel="stylesheet" href="style.css" />
-
+  <link rel="stylesheet" href="contact.css" />
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #dfe4e7;
-      color: #0b2239;
-    }
-
-    .contact-nav {
-      background: #07294d;
-      padding: 14px 24px;
-    }
-
-    .contact-nav ul {
-      list-style: none;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 30px;
-      margin: 0;
-      padding: 0;
-      flex-wrap: wrap;
-    }
-
-    .contact-nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    .contact-nav a.active-link {
-      border-bottom: 2px solid white;
-      padding-bottom: 2px;
-    }
-
-    .login-btn,
-    .nav-account-btn,
-    .nav-logout-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 8px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      font-size: 14px;
-    }
-
-    .login-btn {
-      background: #0a66c2;
-      color: white !important;
-    }
-
-    .login-btn:hover {
-      background: #084a94;
-    }
-
-    .nav-account-btn {
-      background: #e8f1fb;
-      color: #0b2239 !important;
-    }
-
-    .nav-account-btn:hover {
-      background: #d6e8fa;
-    }
-
-    .nav-logout-btn {
-      background: #f7dede;
-      color: #8a1f1f !important;
-    }
-
-    .nav-logout-btn:hover {
-      background: #efcaca;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      background: #00ff66;
-      border-radius: 50%;
-      display: inline-block;
-      box-shadow: 0 0 8px #00ff66;
-      animation: blink 1.2s infinite;
-      flex-shrink: 0;
-    }
-
-    .auth-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0.3; }
-      100% { opacity: 1; }
-    }
-
-    .contact-container {
-      max-width: 1450px;
-      margin: 32px auto;
-      padding: 0 24px 40px;
-    }
-
-    .contact-card {
-      background: #f7f7f7;
-      border-radius: 14px;
-      padding: 28px 18px;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.02);
-    }
-
-    .contact-card h1 {
-      margin-top: 0;
-      margin-bottom: 16px;
-      font-size: 20px;
-      color: #000;
-    }
-
-    .contact-card p {
-      line-height: 1.8;
-      margin: 0 0 12px;
-      color: #111;
-    }
-
-    .contact-card a {
-      color: #0b2239;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .contact-btn {
-      display: inline-block;
-      background: #07294d;
-      color: white !important;
-      text-decoration: none;
-      font-weight: 700;
-      padding: 10px 14px;
-      border-radius: 10px;
-      transition: 0.18s ease;
-      margin-top: 4px;
-    }
-
-    .contact-btn:hover {
-      background: #0b3a69;
-    }
-
-    @media (max-width: 768px) {
-      .contact-nav ul {
-        gap: 16px;
-      }
-
-      .contact-container {
-        padding: 0 14px 30px;
-      }
-
-      .contact-card {
-        padding: 22px 14px;
-      }
-    }
+    .login-btn,.nav-account-btn,.nav-logout-btn{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;font-weight:700;text-decoration:none;cursor:pointer;border:none}
+    .login-btn{background:#0a66c2;color:#fff!important}
+    .nav-account-btn{background:#e8f1fb;color:#0b2239!important}
+    .nav-logout-btn{background:#f7dede;color:#8a1f1f!important}
+    .status-dot{width:10px;height:10px;background:#00ff66;border-radius:50%;display:inline-block;box-shadow:0 0 8px #00ff66;animation:blink 1.2s infinite}
+    .auth-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    @keyframes blink{0%{opacity:1}50%{opacity:.3}100%{opacity:1}}
   </style>
 </head>
 <body>
-
   <nav class="contact-nav">
     <ul id="nav-menu">
       <li><a href="index.html">Home</a></li>
@@ -188,96 +31,37 @@
   <main class="contact-container">
     <section class="contact-card">
       <h1>Contact</h1>
-
-      <p>
-        Feel free to contact me for academic, research or professional opportunities.
-      </p>
-
-      <p>
-        Email:
-        <a href="mailto:maounou-boris.amoussou@cnrs.fr">maounou-boris.amoussou@cnrs.fr</a>
-      </p>
-
+      <p>Feel free to contact me for academic, research or professional opportunities.</p>
+      <p>Email: <a href="mailto:maounou-boris.amoussou@cnrs.fr">maounou-boris.amoussou@cnrs.fr</a></p>
       <a href="mailto:maounou-boris.amoussou@cnrs.fr" class="contact-btn">Send me a message</a>
     </section>
   </main>
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import {
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    import {
-      ref,
-      get
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const authSection = document.getElementById("auth-section");
 
-    async function renderNavbarForUser(user) {
-      try {
-        const snap = await get(ref(db, "users/" + user.uid));
-        const profile = snap.exists() ? snap.val() : null;
-        const name = profile?.displayName || user.displayName || user.email?.split("@")[0] || "Mon compte";
-
-        authSection.innerHTML = `
-          <div class="auth-actions">
-            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
-            <a href="profile.html" class="nav-account-btn">
-              👤 ${name}
-              <span class="status-dot"></span>
-            </a>
-            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
-          </div>
-        `;
-
-        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
-          try {
-            await signOut(auth);
-            window.location.href = "contact.html";
-          } catch (error) {
-            console.error("Logout error:", error);
-            alert("Impossible de se déconnecter.");
-          }
-        });
-      } catch (error) {
-        console.error("Navbar profile load error:", error);
-
-        authSection.innerHTML = `
-          <div class="auth-actions">
-            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
-            <a href="profile.html" class="nav-account-btn">
-              👤 Mon compte
-              <span class="status-dot"></span>
-            </a>
-            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
-          </div>
-        `;
-
-        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
-          try {
-            await signOut(auth);
-            window.location.href = "contact.html";
-          } catch (err) {
-            console.error(err);
-          }
-        });
-      }
-    }
-
-    function renderNavbarGuest() {
-      authSection.innerHTML = `
-        <a href="login.html" class="login-btn">Login</a>
-      `;
-    }
-
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        await renderNavbarForUser(user);
+        const snap = await get(ref(db, "users/" + user.uid));
+        const profile = snap.exists() ? snap.val() : null;
+        const name = profile?.displayName || user.displayName || "Mon compte";
+        authSection.innerHTML = `
+          <div class="auth-actions">
+            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
+            <a href="profile.html" class="nav-account-btn">👤 ${name}<span class="status-dot"></span></a>
+            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
+          </div>
+        `;
+        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
+          await signOut(auth);
+          window.location.href = "contact.html";
+        });
       } else {
-        renderNavbarGuest();
+        authSection.innerHTML = `<a href="login.html" class="login-btn">Login</a>`;
       }
     });
   </script>
