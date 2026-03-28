@@ -1,57 +1,200 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Sign Up</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Créer un compte</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #07294d, #0b3f76);
+      padding: 20px;
+    }
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: #fff;
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+    h1 {
+      font-size: 32px;
+      color: #082c53;
+      margin-bottom: 10px;
+    }
+    .sub {
+      color: #5e738b;
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+    .field {
+      margin-bottom: 14px;
+    }
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+      color: #0b2f57;
+    }
+    .field input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d6e0ea;
+      border-radius: 14px;
+      outline: none;
+      font-size: 15px;
+    }
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      background: #0c3d73;
+      color: #fff;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .info {
+      margin-top: 16px;
+      color: #4e6278;
+      font-size: 14px;
+      text-align: center;
+    }
+    .info a {
+      color: #0c3d73;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .msg {
+      margin-top: 14px;
+      font-size: 14px;
+      min-height: 20px;
+      color: #c0392b;
+      text-align: center;
+    }
+    .success {
+      color: #14854b;
+    }
+  </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Créer un compte</h1>
+    <p class="sub">Crée ton espace privé pour rejoindre ton mini réseau social familial et académique.</p>
 
-<h2>Create Account</h2>
+    <div class="field">
+      <label for="displayName">Nom complet</label>
+      <input type="text" id="displayName" placeholder="Ex: Maounou Boris AMOUSSOU">
+    </div>
 
-<input type="email" id="email" placeholder="Email"><br><br>
-<input type="password" id="password" placeholder="Password"><br><br>
-<input type="password" id="confirm" placeholder="Confirm Password"><br><br>
+    <div class="field">
+      <label for="email">Adresse e-mail</label>
+      <input type="email" id="email" placeholder="Ex: boris@gmail.com">
+    </div>
 
-<button onclick="signup()">Sign Up</button>
+    <div class="field">
+      <label for="password">Mot de passe</label>
+      <input type="password" id="password" placeholder="Choisis un mot de passe">
+    </div>
 
-<p id="msg"></p>
+    <div class="field">
+      <label for="confirmPassword">Confirmer le mot de passe</label>
+      <input type="password" id="confirmPassword" placeholder="Répète le mot de passe">
+    </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    <button class="btn" id="signupBtn">Créer mon compte</button>
 
-const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "boris-research-hub.firebaseapp.com",
-  databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com",
-  projectId: "boris-research-hub",
-  storageBucket: "boris-research-hub.appspot.com"
-};
+    <div class="msg" id="messageBox"></div>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+    <p class="info">Tu as déjà un compte ? <a href="login.html">Se connecter</a></p>
+  </div>
 
-window.signup = async function() {
-  const email = email.value;
-  const pass = password.value;
-  const confirmPass = confirm.value;
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import {
+      createUserWithEmailAndPassword,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      ref,
+      set
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-  if(pass !== confirmPass){
-    msg.innerText = "Passwords do not match";
-    return;
-  }
+    const displayName = document.getElementById("displayName");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const signupBtn = document.getElementById("signupBtn");
+    const messageBox = document.getElementById("messageBox");
 
-  try{
-    const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-    await sendEmailVerification(userCred.user);
+    function showMessage(text, ok = false) {
+      messageBox.textContent = text;
+      messageBox.className = ok ? "msg success" : "msg";
+    }
 
-    msg.innerText = "Account created. Check your email!";
-  }catch(e){
-    msg.innerText = e.message;
-  }
-}
-</script>
+    signupBtn.addEventListener("click", async () => {
+      const name = displayName.value.trim();
+      const mail = email.value.trim();
+      const pass = password.value;
+      const confirm = confirmPassword.value;
 
+      if (!name || !mail || !pass || !confirm) {
+        showMessage("Remplis tous les champs.");
+        return;
+      }
+
+      if (pass.length < 6) {
+        showMessage("Le mot de passe doit contenir au moins 6 caractères.");
+        return;
+      }
+
+      if (pass !== confirm) {
+        showMessage("Les mots de passe ne correspondent pas.");
+        return;
+      }
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, mail, pass);
+        const user = cred.user;
+
+        await updateProfile(user, { displayName: name });
+
+        await set(ref(db, "users/" + user.uid), {
+          uid: user.uid,
+          displayName: name,
+          email: mail,
+          photoURL: "",
+          bio: "",
+          role: "member",
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        });
+
+        localStorage.setItem("displayName", name);
+
+        showMessage("Compte créé avec succès. Redirection...", true);
+
+        setTimeout(() => {
+          window.location.href = "insights.html";
+        }, 1200);
+
+      } catch (error) {
+        if (error.code === "auth/email-already-in-use") {
+          showMessage("Cette adresse e-mail est déjà utilisée.");
+        } else if (error.code === "auth/invalid-email") {
+          showMessage("Adresse e-mail invalide.");
+        } else {
+          showMessage("Erreur : " + error.message);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
