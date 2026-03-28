@@ -61,7 +61,6 @@
 
     <div id="member-zone" class="hidden-block">
       <button class="subsection-toggle" onclick="openAccountModal()" data-i18n="myAccount">My account</button>
-      <button class="subsection-toggle secondary-zone-btn" onclick="logout()" data-i18n="logout">Logout</button>
     </div>
   </aside>
 
@@ -155,7 +154,7 @@
           <textarea id="comment-input-post1" placeholder="Write a comment..."></textarea>
           <button class="small-btn" onclick="addComment('post1')" data-i18n="send">Send</button>
         </div>
-  
+
         <div id="comments-post1"></div>
       </div>
     </section>
@@ -213,7 +212,6 @@
 
     <input type="text" id="signup-firstname" placeholder="First name" class="auth-input" autocomplete="given-name">
     <input type="text" id="signup-lastname" placeholder="Last name" class="auth-input" autocomplete="family-name">
-    <input type="tel" id="signup-phone" placeholder="Phone number" class="auth-input" autocomplete="tel">
     <input type="email" id="signup-email" placeholder="Email" class="auth-input" autocomplete="email">
     <input type="password" id="signup-password" placeholder="Password" class="auth-input" autocomplete="new-password">
     <input type="password" id="signup-password-confirm" placeholder="Confirm password" class="auth-input" autocomplete="new-password">
@@ -374,6 +372,18 @@ let onlineUsersRef = null;
 const HEARTBEAT_MS = 20000;
 const ONLINE_FRESH_MS = 70000;
 
+const allowedDirectDomains = ["gmail.com", "yahoo.com", "yahoo.fr"];
+const blockedDisposableDomains = [
+  "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com",
+  "temp-mail.org", "yopmail.com", "sharklasers.com", "dispostable.com",
+  "throwawaymail.com", "fakeinbox.com", "maildrop.cc", "trashmail.com",
+  "getnada.com", "mintemail.com"
+];
+const blockedPublicDomains = [
+  "hotmail.com", "outlook.com", "live.com", "icloud.com", "proton.me",
+  "protonmail.com", "aol.com", "gmx.com", "mail.com", "yandex.com", "zoho.com"
+];
+
 const i18n = {
   en: {
     "nav.home":"Home","nav.about":"About","nav.research":"Research","nav.resume":"Resume","nav.contact":"Contact","nav.insights":"Insights",
@@ -472,6 +482,61 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function normalizeForCompare(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function isValidNamePart(value) {
+  const v = String(value || "").trim();
+  return /^[A-Za-zÀ-ÿ' -]{2,40}$/.test(v);
+}
+
+function isInstitutionalEmailDomain(domain) {
+  const d = String(domain || "").toLowerCase().trim();
+  if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(d)) return false;
+  if (allowedDirectDomains.includes(d)) return true;
+  if (blockedDisposableDomains.includes(d)) return false;
+  if (blockedPublicDomains.includes(d)) return false;
+  return true;
+}
+
+function isEmailDomainAllowed(email) {
+  const parts = String(email || "").toLowerCase().trim().split("@");
+  if (parts.length !== 2) return false;
+  const domain = parts[1];
+  return isInstitutionalEmailDomain(domain);
+}
+
+function emailContainsUserName(email, firstName, lastName) {
+  const localPart = normalizeForCompare(String(email || "").split("@")[0] || "");
+  const first = normalizeForCompare(firstName);
+  const last = normalizeForCompare(lastName);
+
+  const firstOk = first.length >= 2 && localPart.includes(first);
+  const lastOk = last.length >= 2 && localPart.includes(last);
+
+  return firstOk || lastOk;
+}
+
+function validateStrongPassword(password) {
+  const value = String(password || "");
+  const checks = {
+    length: value.length >= 8,
+    upper: /[A-Z]/.test(value),
+    lower: /[a-z]/.test(value),
+    digit: /\d/.test(value),
+    special: /[^A-Za-z0-9]/.test(value)
+  };
+  return {
+    valid: checks.length && checks.upper && checks.lower && checks.digit && checks.special,
+    checks
+  };
 }
 
 function formatDateTime(timestamp) {
@@ -670,6 +735,7 @@ async function ensureUserProfile(user, extras = {}) {
     phone: finalPhone,
     phonePrefix: finalPhonePrefix,
     email: user.email || "",
+    emailVerified: !!user.emailVerified,
     bio: finalBio,
     institution: finalInstitution,
     location: finalLocation,
@@ -709,21 +775,43 @@ function fillProfile(profile, user) {
 async function signUp() {
   const firstName = document.getElementById("signup-firstname").value.trim();
   const lastName = document.getElementById("signup-lastname").value.trim();
-  const phone = document.getElementById("signup-phone").value.trim();
-  const email = document.getElementById("signup-email").value.trim();
+  const email = document.getElementById("signup-email").value.trim().toLowerCase();
   const password = document.getElementById("signup-password").value;
   const confirm = document.getElementById("signup-password-confirm").value;
 
   if (!firstName || !lastName || !email || !password || !confirm) {
-    setMessage("signup-message", "Please fill in the required fields.", true);
+    setMessage("signup-message", "Please fill in all required fields.", true);
     return;
   }
+
+  if (!isValidNamePart(firstName) || !isValidNamePart(lastName)) {
+    setMessage("signup-message", "First name and last name must contain only real letters, spaces, apostrophes or hyphens.", true);
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setMessage("signup-message", "Invalid email format.", true);
+    return;
+  }
+
+  if (!isEmailDomainAllowed(email)) {
+    setMessage("signup-message", "Only Gmail, Yahoo, or institutional/professional email addresses are accepted.", true);
+    return;
+  }
+
+  if (!emailContainsUserName(email, firstName, lastName)) {
+    setMessage("signup-message", "For security, your email must contain at least your first name or your last name.", true);
+    return;
+  }
+
   if (password !== confirm) {
     setMessage("signup-message", "Passwords do not match.", true);
     return;
   }
-  if (password.length < 6) {
-    setMessage("signup-message", "Password must contain at least 6 characters.", true);
+
+  const passwordCheck = validateStrongPassword(password);
+  if (!passwordCheck.valid) {
+    setMessage("signup-message", "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character.", true);
     return;
   }
 
@@ -738,9 +826,10 @@ async function signUp() {
       firstName,
       lastName,
       fullName,
-      phone,
+      phone: "",
       phonePrefix: "+33",
       email,
+      emailVerified: false,
       bio: "",
       institution: "",
       location: "",
@@ -751,8 +840,15 @@ async function signUp() {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
+    await cred.user.sendEmailVerification({
+      url: window.location.origin + window.location.pathname,
+      handleCodeInApp: false
+    });
+
+    await auth.signOut();
+
     closeSignupModal();
-    setMessage("auth-message", "Account created successfully.");
+    setMessage("auth-message", "Account created. A verification email has been sent. Please verify your email before logging in.");
   } catch (error) {
     setMessage("signup-message", error.message, true);
   }
@@ -768,7 +864,20 @@ async function signIn() {
   }
 
   try {
-    await auth.signInWithEmailAndPassword(email, password);
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    await cred.user.reload();
+
+    if (!cred.user.emailVerified) {
+      await auth.signOut();
+      setMessage("auth-message", "Your email address is not verified yet. Please check your inbox and verify your account first.", true);
+      return;
+    }
+
+    await db.collection("users").doc(cred.user.uid).set({
+      emailVerified: true,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
     setMessage("auth-message", "Login successful.");
   } catch (error) {
     setMessage("auth-message", "Email or password incorrect.", true);
@@ -814,6 +923,11 @@ async function saveProfile() {
     return;
   }
 
+  if (!isValidNamePart(firstName) || !isValidNamePart(lastName)) {
+    setMessage("profile-message", "Use only valid letters for first name and last name.", true);
+    return;
+  }
+
   const fullName = `${firstName} ${lastName}`.trim();
 
   try {
@@ -827,6 +941,7 @@ async function saveProfile() {
       phone,
       phonePrefix,
       email: user.email || "",
+      emailVerified: !!user.emailVerified,
       photoURL,
       bio,
       institution,
@@ -1714,6 +1829,25 @@ async function logout() {
 
 auth.onAuthStateChanged(async (user) => {
   if (user) {
+    try {
+      await user.reload();
+    } catch (_) {}
+
+    if (!user.emailVerified) {
+      try { await auth.signOut(); } catch (_) {}
+      toggleMemberZone(false);
+      cleanupPresence();
+      document.getElementById("user-info").textContent = "";
+      document.getElementById("presence-self").textContent = "";
+      document.getElementById("inbox-list").innerHTML = "";
+      document.getElementById("thread-messages").innerHTML = "";
+      document.getElementById("message-thread").classList.add("hidden-thread");
+      setMessage("auth-message", "Please verify your email address before accessing the member area.", true);
+      loadComments("post1");
+      loadCommunityPosts();
+      return;
+    }
+
     toggleMemberZone(true);
     const profile = await ensureUserProfile(user);
 
