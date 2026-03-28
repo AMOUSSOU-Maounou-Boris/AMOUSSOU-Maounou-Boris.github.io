@@ -102,6 +102,45 @@
   </main>
 </div>
 
+<!-- ACTIONS MODAL -->
+<div id="actions-modal" class="msg-modal hidden-msg-modal">
+  <div class="msg-modal-content small-msg-modal">
+    <button class="msg-modal-close" onclick="closeActionsModal()">×</button>
+    <h3>Conversation options</h3>
+    <p id="actions-modal-name" class="msg-modal-note"></p>
+
+    <div class="msg-modal-actions">
+      <button id="block-toggle-btn" class="modal-main-btn" onclick="toggleBlockSelectedUser()">Block</button>
+      <button class="modal-secondary-btn" onclick="closeActionsModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORWARD MODAL -->
+<div id="forward-modal" class="msg-modal hidden-msg-modal">
+  <div class="msg-modal-content large-msg-modal">
+    <button class="msg-modal-close" onclick="closeForwardModal()">×</button>
+    <h3>Transfer message</h3>
+
+    <p class="msg-modal-note">Selected message:</p>
+    <div id="forward-preview" class="forward-preview-box"></div>
+
+    <input
+      type="text"
+      id="forward-search"
+      class="search-input forward-search-input"
+      placeholder="Search a member..."
+      oninput="renderForwardMembers()"
+    >
+
+    <div id="forward-members-list" class="forward-members-list"></div>
+
+    <div class="msg-modal-actions">
+      <button class="modal-secondary-btn" onclick="closeForwardModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
@@ -130,6 +169,7 @@ let currentLanguage = localStorage.getItem("site_lang") || "en";
 let threadUnsubscribe = null;
 let usersUnsubscribe = null;
 let threadsUnsubscribe = null;
+let blockedUnsubscribe = null;
 let statusesRef = null;
 let presenceConnectedRef = null;
 let presenceStatusRef = null;
@@ -138,6 +178,8 @@ let heartbeatInterval = null;
 let usersCache = {};
 let threadsCache = [];
 let statusCache = {};
+let blockedUsersCache = {};
+let forwardPayload = null;
 
 const HEARTBEAT_MS = 25000;
 const ONLINE_FRESH_MS = 90000;
@@ -364,15 +406,21 @@ function presenceText(uid) {
   return t("offline");
 }
 
+function isBlocked(uid) {
+  return !!blockedUsersCache[uid];
+}
+
 function cleanupRealtimeSubscriptions() {
   try {
     if (usersUnsubscribe) usersUnsubscribe();
     if (threadsUnsubscribe) threadsUnsubscribe();
+    if (blockedUnsubscribe) blockedUnsubscribe();
     if (statusesRef) statusesRef.off();
   } catch (_) {}
 
   usersUnsubscribe = null;
   threadsUnsubscribe = null;
+  blockedUnsubscribe = null;
   statusesRef = null;
 }
 
@@ -439,9 +487,143 @@ function setupPresence(user, fullName) {
   });
 }
 
+function openActionsModal() {
+  if (!selectedUserId || !selectedUserProfile) return;
+  document.getElementById("actions-modal").classList.remove("hidden-msg-modal");
+  document.getElementById("actions-modal-name").textContent = selectedUserProfile.fullName || "Member";
+
+  const btn = document.getElementById("block-toggle-btn");
+  btn.textContent = isBlocked(selectedUserId) ? "Unblock this user" : "Block this user";
+}
+
+function closeActionsModal() {
+  document.getElementById("actions-modal").classList.add("hidden-msg-modal");
+}
+
+async function toggleBlockSelectedUser() {
+  const user = auth.currentUser;
+  if (!user || !selectedUserId) return;
+
+  const blockRef = db.collection("users").doc(user.uid).collection("blockedUsers").doc(selectedUserId);
+
+  try {
+    if (isBlocked(selectedUserId)) {
+      await blockRef.delete();
+      setChatStatus("Utilisateur débloqué.");
+    } else {
+      await blockRef.set({
+        uid: selectedUserId,
+        fullName: selectedUserProfile?.fullName || "Member",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      setChatStatus("Utilisateur bloqué.");
+    }
+    closeActionsModal();
+  } catch (error) {
+    console.error("toggleBlockSelectedUser error:", error);
+    setChatStatus("Impossible de modifier le blocage.", true);
+  }
+}
+
+function openForwardModal(encodedText, encodedSenderName) {
+  const text = decodeURIComponent(encodedText || "");
+  const senderName = decodeURIComponent(encodedSenderName || "");
+
+  forwardPayload = {
+    text,
+    senderName
+  };
+
+  document.getElementById("forward-preview").textContent = `${senderName} : ${text}`;
+  document.getElementById("forward-search").value = "";
+  document.getElementById("forward-modal").classList.remove("hidden-msg-modal");
+  renderForwardMembers();
+}
+
+function closeForwardModal() {
+  forwardPayload = null;
+  document.getElementById("forward-modal").classList.add("hidden-msg-modal");
+}
+
+function renderForwardMembers() {
+  const user = auth.currentUser;
+  const container = document.getElementById("forward-members-list");
+  if (!user || !container) return;
+
+  const q = document.getElementById("forward-search").value.trim().toLowerCase();
+
+  const list = Object.entries(usersCache)
+    .filter(([uid]) => uid !== user.uid)
+    .filter(([uid]) => !isBlocked(uid))
+    .filter(([uid, p]) => {
+      const text = `${p.fullName || ""} ${p.institution || ""}`.toLowerCase();
+      return text.includes(q);
+    })
+    .sort((a, b) => (a[1].fullName || "").localeCompare(b[1].fullName || ""));
+
+  let html = "";
+
+  list.forEach(([uid, profile]) => {
+    html += `
+      <div class="forward-member-item">
+        ${avatarHtml(profile)}
+        <div class="forward-member-text">
+          <strong>${escapeHtml(profile.fullName || "Member")}</strong>
+          <span>${escapeHtml(profile.institution || "")}</span>
+        </div>
+        <button class="modal-main-btn small-forward-btn" onclick="forwardMessageToUser('${uid}')">Transfer</button>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html || "<p class='empty-text dark-empty-text'>No available member.</p>";
+}
+
+async function forwardMessageToUser(targetUid) {
+  const user = auth.currentUser;
+  if (!user || !forwardPayload || !targetUid) return;
+
+  try {
+    const targetProfile = usersCache[targetUid] || { fullName: "Member" };
+    const threadId = threadIdFor(user.uid, targetUid);
+    const threadRef = db.collection("privateThreads").doc(threadId);
+
+    const forwardedText = `Transferred message from ${forwardPayload.senderName}:\n${forwardPayload.text}`;
+
+    await threadRef.set({
+      participants: [user.uid, targetUid],
+      participantNames: {
+        [user.uid]: currentUserProfile?.fullName || user.displayName || "Member",
+        [targetUid]: targetProfile.fullName || "Member"
+      },
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastMessage: forwardedText,
+      lastSenderId: user.uid,
+      unreadCountByUser: {
+        [user.uid]: 0,
+        [targetUid]: firebase.firestore.FieldValue.increment(1)
+      }
+    }, { merge: true });
+
+    await threadRef.collection("messages").add({
+      senderId: user.uid,
+      receiverId: targetUid,
+      text: forwardedText,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    closeForwardModal();
+    setChatStatus("Message transféré.");
+  } catch (error) {
+    console.error("forwardMessageToUser error:", error);
+    setChatStatus("Impossible de transférer le message.", true);
+  }
+}
+
 function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPresenceDot = false) {
   const searchText = `${(profile?.fullName || "").toLowerCase()} ${(profile?.institution || "").toLowerCase()}`;
   const online = isOnline(uid);
+  const blocked = isBlocked(uid);
 
   return `
     <div class="member-list-item"
@@ -456,11 +638,11 @@ function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPr
                   onclick="event.stopPropagation(); selectConversation('${uid}')">
             ${escapeHtml(profile?.fullName || "Member")}
           </button>
-          ${showPresenceDot ? `<span class="presence-chip ${online ? "online-chip" : "offline-chip"}">${escapeHtml(online ? t("onlineNow") : t("offline"))}</span>` : ""}
+          ${blocked ? `<span class="blocked-chip">Blocked</span>` : (showPresenceDot ? `<span class="presence-chip ${online ? "online-chip" : "offline-chip"}">${escapeHtml(online ? t("onlineNow") : t("offline"))}</span>` : "")}
         </div>
 
         ${subtitle ? `<span class="member-subtitle">${escapeHtml(subtitle)}</span>` : ""}
-        <span class="member-presence-text">${escapeHtml(presenceText(uid))}</span>
+        <span class="member-presence-text">${blocked ? "You blocked this user" : escapeHtml(presenceText(uid))}</span>
       </div>
 
       <button type="button"
@@ -511,6 +693,7 @@ function renderInbox() {
 
     const profile = usersCache[otherUserId] || { fullName: "Member" };
     const unread = unreadCountFor(data, user.uid);
+    const blocked = isBlocked(otherUserId);
 
     html += `
       <div class="member-list-item"
@@ -525,11 +708,11 @@ function renderInbox() {
                     onclick="event.stopPropagation(); selectConversation('${otherUserId}')">
               ${escapeHtml(profile.fullName || "Member")}
             </button>
-            ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ""}
+            ${blocked ? `<span class="blocked-chip">Blocked</span>` : (unread > 0 ? `<span class="unread-badge">${unread}</span>` : "")}
           </div>
 
           <span class="member-subtitle">${escapeHtml(data.lastMessage || "")}</span>
-          <span class="member-presence-text">${escapeHtml(presenceText(otherUserId))}</span>
+          <span class="member-presence-text">${blocked ? "You blocked this user" : escapeHtml(presenceText(otherUserId))}</span>
         </div>
 
         <button type="button"
@@ -564,7 +747,6 @@ function renderRecentThreads() {
     const otherUserId = (data.participants || []).find(id => id !== user.uid);
     if (!otherUserId) return;
     const profile = usersCache[otherUserId] || { fullName: "Member" };
-
     html += renderMemberCard(otherUserId, profile, data.lastMessage || "", true, true);
   });
 
@@ -612,14 +794,22 @@ function renderChatHeader() {
     return;
   }
 
+  const blocked = isBlocked(selectedUserId);
+
   box.innerHTML = `
     ${avatarHtml(selectedUserProfile)}
-    <div>
-      <h3><a class="profile-link-dark" href="profile.html?uid=${selectedUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a></h3>
-      <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
-      <p id="chat-presence" class="chat-presence-line ${isOnline(selectedUserId) ? "presence-online" : "presence-offline"}">
-        ${escapeHtml(presenceText(selectedUserId))}
-      </p>
+    <div class="chat-header-main">
+      <div>
+        <h3><a class="profile-link-dark" href="profile.html?uid=${selectedUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a></h3>
+        <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
+        <p id="chat-presence" class="chat-presence-line ${isOnline(selectedUserId) ? "presence-online" : "presence-offline"}">
+          ${blocked ? "You blocked this user" : escapeHtml(presenceText(selectedUserId))}
+        </p>
+      </div>
+
+      <div class="chat-header-actions">
+        <button class="header-action-btn" onclick="openActionsModal()">Options</button>
+      </div>
     </div>
   `;
 }
@@ -636,9 +826,27 @@ async function selectConversation(otherUserId) {
   selectedUserProfile = usersCache[otherUserId] || { fullName: "Member" };
 
   renderChatHeader();
+  updateComposerState();
   setChatStatus("");
   await markThreadAsRead();
   loadMessages();
+}
+
+function updateComposerState() {
+  const input = document.getElementById("message-input");
+  const sendBtn = document.querySelector(".send-btn");
+
+  if (!input || !sendBtn) return;
+
+  if (selectedUserId && isBlocked(selectedUserId)) {
+    input.disabled = true;
+    sendBtn.disabled = true;
+    input.placeholder = "You blocked this user. Unblock to write again.";
+  } else {
+    input.disabled = false;
+    sendBtn.disabled = false;
+    input.placeholder = "Write a private message...";
+  }
 }
 
 function loadMessages() {
@@ -663,6 +871,9 @@ function loadMessages() {
         const sender = usersCache[m.senderId] || {};
         const own = user && user.uid === m.senderId;
 
+        const encodedText = encodeURIComponent(m.text || "");
+        const encodedSenderName = encodeURIComponent(sender.fullName || "Member");
+
         html += `
           <div class="msg-bubble ${own ? 'own-msg' : ''}">
             <div class="msg-head">
@@ -672,16 +883,21 @@ function loadMessages() {
                 <span class="msg-presence-inline ${isOnline(m.senderId) ? "presence-online" : "presence-offline"}">${escapeHtml(presenceText(m.senderId))}</span>
               </div>
             </div>
+
             <div class="msg-text">${escapeHtml(m.text || "")}</div>
+
             <div class="msg-foot">
               <span>${escapeHtml(formatDateTime(m.createdAt))}</span>
-              ${own && canDeleteMessage(m.createdAt) ? `<button class="delete-message-btn" onclick="deleteMessage('${doc.id}')">Delete</button>` : ""}
+              <div class="msg-foot-actions">
+                <button class="transfer-message-btn" onclick="openForwardModal('${encodedText}','${encodedSenderName}')">Transfer</button>
+                ${own && canDeleteMessage(m.createdAt) ? `<button class="delete-message-btn" onclick="deleteMessage('${doc.id}')">Delete</button>` : ""}
+              </div>
             </div>
           </div>
         `;
       });
 
-      container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("noMessageYet"))}</p>`;
+      container.innerHTML = html || `<p class="empty-text dark-empty-text">${escapeHtml(t("noMessageYet"))}</p>`;
       container.scrollTop = container.scrollHeight;
     }, (error) => {
       console.error("loadMessages error:", error);
@@ -698,6 +914,11 @@ async function sendMessage() {
 
   if (!selectedUserId) {
     alert(t("chooseMember"));
+    return;
+  }
+
+  if (isBlocked(selectedUserId)) {
+    setChatStatus("Impossible d’écrire à un utilisateur bloqué.", true);
     return;
   }
 
@@ -740,7 +961,7 @@ async function sendMessage() {
     console.error("sendMessage error:", error);
     setChatStatus(t("sendError"), true);
   } finally {
-    if (sendBtn) sendBtn.disabled = false;
+    updateComposerState();
   }
 }
 
@@ -836,6 +1057,8 @@ function subscribeUsers() {
     }
 
     renderAllPanels();
+    updateComposerState();
+    renderForwardMembers();
   });
 }
 
@@ -851,6 +1074,37 @@ function subscribeThreads() {
       threadsCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       renderInbox();
       renderRecentThreads();
+    });
+}
+
+function subscribeBlockedUsers() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  if (blockedUnsubscribe) blockedUnsubscribe();
+
+  blockedUnsubscribe = db.collection("users")
+    .doc(user.uid)
+    .collection("blockedUsers")
+    .onSnapshot((snapshot) => {
+      const nextBlocked = {};
+      snapshot.forEach((doc) => {
+        nextBlocked[doc.id] = doc.data();
+      });
+      blockedUsersCache = nextBlocked;
+
+      renderAllPanels();
+      renderChatHeader();
+      updateComposerState();
+
+      const btn = document.getElementById("block-toggle-btn");
+      if (btn && selectedUserId) {
+        btn.textContent = isBlocked(selectedUserId) ? "Unblock this user" : "Block this user";
+      }
+
+      renderForwardMembers();
+    }, (error) => {
+      console.error("subscribeBlockedUsers error:", error);
     });
 }
 
@@ -877,6 +1131,14 @@ function subscribeStatuses() {
   });
 }
 
+window.addEventListener("click", (e) => {
+  const actionsModal = document.getElementById("actions-modal");
+  const forwardModal = document.getElementById("forward-modal");
+
+  if (e.target === actionsModal) closeActionsModal();
+  if (e.target === forwardModal) closeForwardModal();
+});
+
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
     const fromLogout = sessionStorage.getItem("afterMessagesLogout");
@@ -901,6 +1163,7 @@ auth.onAuthStateChanged(async (user) => {
   renderChatHeader();
   subscribeUsers();
   subscribeThreads();
+  subscribeBlockedUsers();
   subscribeStatuses();
 
   const params = new URLSearchParams(window.location.search);
