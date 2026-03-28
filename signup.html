@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créer un compte | Boris Research Hub</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #0a66c2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.signup-box {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 350px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 7px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #0a66c2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #084a94;
+}
+
+.error-msg {
+  background: #ffe5e5;
+  color: #cc0000;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 10px;
+  display: none;
+  animation: shake 0.4s;
+}
+
+.success-msg {
+  background: #e6ffed;
+  color: #007f3d;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 10px;
+  display: none;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0);}
+  25% { transform: translateX(-5px);}
+  50% { transform: translateX(5px);}
+  75% { transform: translateX(-5px);}
+  100% { transform: translateX(0);}
+}
+
+.small-link {
+  margin-top: 10px;
+  display: block;
+  font-size: 13px;
+  color: #0a66c2;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="signup-box">
+  <h2>Créer un compte</h2>
+
+  <input type="text" id="name" placeholder="Nom complet">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Mot de passe">
+  <input type="password" id="confirmPassword" placeholder="Confirmer le mot de passe">
+  <input type="text" id="city" placeholder="Ville">
+
+  <button onclick="signup()">S'inscrire</button>
+
+  <div class="error-msg" id="errorMsg"></div>
+  <div class="success-msg" id="successMsg"></div>
+
+  <span class="small-link" onclick="goLogin()">Déjà un compte ? Se connecter</span>
+</div>
+
+<script>
+function showError(msg) {
+  const e = document.getElementById("errorMsg");
+  e.innerText = msg;
+  e.style.display = "block";
+}
+
+function showSuccess(msg) {
+  const s = document.getElementById("successMsg");
+  s.innerText = msg;
+  s.style.display = "block";
+}
+
+function signup() {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const confirm = document.getElementById("confirmPassword").value;
+  const city = document.getElementById("city").value.trim();
+
+  if (!name || !email || !password || !confirm) {
+    showError("Veuillez remplir tous les champs.");
+    return;
+  }
+
+  if (password !== confirm) {
+    showError("Les mots de passe ne correspondent pas.");
+    return;
+  }
+
+  // 🔥 Pays automatique
+  const country = Intl.DateTimeFormat().resolvedOptions().timeZone.includes("Paris")
+    ? "France"
+    : "International";
+
+  const user = {
+    name,
+    email,
+    password,
+    country,
+    city,
+    createdAt: Date.now()
+  };
+
+  // 🔥 Sauvegarde (simulate Firebase)
+  localStorage.setItem("user", JSON.stringify(user));
+
+  showSuccess("Compte créé avec succès !");
+
+  setTimeout(() => {
+    window.location.href = "login.html";
+  }, 1500);
+}
+
+function goLogin() {
+  window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>
