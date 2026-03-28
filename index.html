@@ -6,17 +6,53 @@
   <title>Home | Boris Research Hub</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="home.css" />
+
+  <style>
+    /* 🔐 Bouton login */
+    .login-btn {
+      background: #0a66c2;
+      color: white !important;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .login-btn:hover {
+      background: #084a94;
+    }
+
+    /* 🟢 Point connecté */
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: #00ff66;
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 6px;
+      box-shadow: 0 0 8px #00ff66;
+      animation: blink 1.2s infinite;
+    }
+
+    @keyframes blink {
+      0% {opacity: 1;}
+      50% {opacity: 0.3;}
+      100% {opacity: 1;}
+    }
+  </style>
 </head>
 <body>
 
 <nav class="home-nav">
-  <ul>
+  <ul id="nav-menu">
     <li><a href="index.html">Home</a></li>
     <li><a href="about.html">About</a></li>
     <li><a href="research.html">Research</a></li>
     <li><a href="resume.html">Resume</a></li>
     <li><a href="contact.html">Contact</a></li>
     <li><a href="insights.html">Insights</a></li>
+
+    <!-- 🔐 Login / Compte -->
+    <li id="auth-section"></li>
   </ul>
 </nav>
 
@@ -50,13 +86,13 @@
       <div class="hero-slider">
         <div class="slides-wrapper">
           <div class="slide active">
-            <img src="stage1.jpg" alt="Laboratory photo">
+            <img src="stage1.jpg">
           </div>
           <div class="slide">
-            <img src="stage2.jpg" alt="Conference photo">
+            <img src="stage2.jpg">
           </div>
           <div class="slide">
-            <img src="stage3.jpg" alt="Research activity photo">
+            <img src="stage3.jpg">
           </div>
         </div>
 
@@ -108,13 +144,9 @@
   function showSlide(index) {
     if (!slides.length) return;
 
-    if (index >= slides.length) {
-      currentSlide = 0;
-    } else if (index < 0) {
-      currentSlide = slides.length - 1;
-    } else {
-      currentSlide = index;
-    }
+    if (index >= slides.length) currentSlide = 0;
+    else if (index < 0) currentSlide = slides.length - 1;
+    else currentSlide = index;
 
     slides.forEach((slide, i) => {
       slide.classList.toggle("active", i === currentSlide);
@@ -158,6 +190,24 @@
     else if (q.includes("home")) window.location.href = "index.html";
     else alert("No direct result found.");
   }
+
+  // 🔐 Gestion Login/Navbar dynamique
+  function updateNavbar() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const authSection = document.getElementById("auth-section");
+
+    if (user) {
+      authSection.innerHTML = `
+        <a href="account.html">👤 Mon compte <span class="status-dot"></span></a>
+      `;
+    } else {
+      authSection.innerHTML = `
+        <a href="insights.html" class="login-btn">Login</a>
+      `;
+    }
+  }
+
+  updateNavbar();
 
   showSlide(0);
   startAutoSlide();
