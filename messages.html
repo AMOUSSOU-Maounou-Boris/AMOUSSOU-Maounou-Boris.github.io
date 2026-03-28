@@ -1,58 +1,477 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Messages | Boris Research Hub</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="messages.css" />
-
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-
   <style>
-    .chat-header-main {
-      width: 100%;
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+      color: #0d2746;
+    }
+
+    .topbar {
+      background: #07294d;
+      padding: 18px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar nav {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 26px;
+      flex-wrap: wrap;
+    }
+
+    .topbar a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      padding-bottom: 4px;
+    }
+
+    .topbar a.active {
+      border-bottom: 2px solid #fff;
+    }
+
+    .page {
+      display: grid;
+      grid-template-columns: 290px 1fr;
+      min-height: calc(100vh - 64px);
+    }
+
+    .sidebar {
+      background: linear-gradient(180deg, #0a315d 0%, #062341 100%);
+      color: #fff;
+      padding: 14px 12px;
+      overflow-y: auto;
+    }
+
+    .sidebar-top {
+      display: flex;
+      gap: 12px;
       align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #173f70;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .avatar.large {
+      width: 58px;
+      height: 58px;
+      font-size: 21px;
+    }
+
+    .avatar.small {
+      width: 44px;
+      height: 44px;
+      font-size: 16px;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .sidebar-top h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+    }
+
+    .sidebar-top p {
+      margin: 0;
+      font-size: 13px;
+      color: #d7e4f1;
+    }
+
+    .logout-btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      background: #ef6a61;
+      color: #fff;
+      padding: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .search-input {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .tab-btn {
+      border: none;
+      border-radius: 10px;
+      background: #173f70;
+      color: #fff;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .tab-btn.active {
+      background: #fff;
+      color: #062341;
+    }
+
+    .members-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .member-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .member-card:hover {
+      background: rgba(255,255,255,0.16);
+    }
+
+    .member-main {
+      min-width: 0;
+    }
+
+    .member-name {
+      color: #fff;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .member-sub {
+      color: #dce7f4;
+      font-size: 12px;
+      line-height: 1.35;
+      margin-bottom: 4px;
+    }
+
+    .member-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #dce7f4;
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #92a4ba;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .status-dot.online {
+      background: #16e26f;
+      box-shadow: 0 0 8px rgba(22, 226, 111, 0.8);
+    }
+
+    .profile-btn {
+      border: none;
+      background: #fff;
+      color: #07294d;
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .main {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
       gap: 12px;
     }
 
-    .chat-header-actions {
+    .chat-header {
+      background: #fff;
+      border-radius: 18px;
+      padding: 14px;
       display: flex;
-      gap: 8px;
       align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
 
-    .header-action-btn {
+    .chat-header-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .chat-header-main h3 {
+      margin: 0 0 4px;
+      font-size: 20px;
+    }
+
+    .chat-header-main p {
+      margin: 0;
+      color: #5e738b;
+      font-size: 14px;
+    }
+
+    .chat-options-btn {
+      border: none;
+      background: #eef4fb;
+      color: #0c3d73;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .chat-box {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      min-height: 76vh;
+      overflow: hidden;
+    }
+
+    .chat-status-bar {
+      min-height: 18px;
+      padding: 12px 16px 0;
+      font-size: 14px;
+      color: #14854b;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #f8fbff;
+    }
+
+    .empty-state {
+      color: #61758d;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .message-row {
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .message-row.me {
+      justify-content: flex-end;
+    }
+
+    .message-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 76%;
+    }
+
+    .message-card {
+      background: #ffffff;
+      border: 1px solid #e3ebf3;
+      border-radius: 18px;
+      padding: 10px 12px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+      position: relative;
+    }
+
+    .message-row.me .message-card {
+      background: #0c3d73;
+      color: #fff;
+      border-color: #0c3d73;
+    }
+
+    .message-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .message-author {
+      font-size: 12px;
+      font-weight: 800;
+      color: #5a6e84;
+    }
+
+    .message-row.me .message-author {
+      color: #d9e6f5;
+    }
+
+    .message-menu-wrap {
+      position: relative;
+    }
+
+    .message-menu-btn {
       border: none;
       background: #eef4fb;
       color: #0b2239;
-      border-radius: 12px;
-      padding: 9px 14px;
+      border-radius: 10px;
+      width: 34px;
+      height: 34px;
       cursor: pointer;
+      font-size: 18px;
       font-weight: 800;
     }
 
-    .header-action-btn:hover {
-      background: #ddeaf8;
+    .message-row.me .message-menu-btn {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
     }
 
-    .blocked-chip {
-      display: inline-flex;
-      align-items: center;
-      padding: 5px 10px;
-      border-radius: 999px;
+    .message-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      min-width: 150px;
+      background: #fff;
+      border: 1px solid #dce6f1;
+      border-radius: 14px;
+      box-shadow: 0 16px 32px rgba(10, 25, 41, 0.14);
+      padding: 8px;
+      z-index: 100;
+      display: none;
+    }
+
+    .message-menu.open {
+      display: block;
+    }
+
+    .message-menu button {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: #0b2239;
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .message-menu button:hover {
+      background: #eef4fb;
+    }
+
+    .message-menu .danger {
+      color: #8a1f1f;
+      background: #fff7f7;
+    }
+
+    .message-menu .danger:hover {
+      background: #f9e2e2;
+    }
+
+    .reply-box {
+      background: #eef4fb;
+      border-left: 4px solid #0c3d73;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      color: #42586f;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .message-row.me .reply-box {
+      background: rgba(255,255,255,0.14);
+      color: #edf4ff;
+      border-left-color: #d5e7ff;
+    }
+
+    .message-text {
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 14px;
+    }
+
+    .message-time {
+      margin-top: 8px;
       font-size: 11px;
-      font-weight: 800;
-      background: rgba(255, 196, 0, 0.18);
-      color: #ffe8a3;
+      opacity: 0.85;
     }
 
-    .reply-preview-box {
+    .message-selected {
+      outline: 2px solid #8bb7ea;
+      box-shadow: 0 0 0 4px rgba(139,183,234,0.18);
+    }
+
+    .blocked-warning {
+      margin-top: 8px;
+      background: #fdecea;
+      color: #b00020;
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .composer {
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+      padding: 14px;
+    }
+
+    .reply-preview {
       background: #eef5fc;
       border: 1px solid #d8e5f4;
       border-left: 4px solid #0b2239;
@@ -75,7 +494,14 @@
       color: #0b2239;
     }
 
-    .clear-reply-btn {
+    .reply-preview-text {
+      font-size: 13px;
+      color: #33485f;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .cancel-reply-btn {
       border: none;
       background: #f3d6d6;
       color: #7a1f1f;
@@ -86,134 +512,60 @@
       font-weight: 700;
     }
 
-    .clear-reply-btn:hover {
-      background: #ebc3c3;
-    }
-
-    .reply-preview-text {
-      font-size: 13px;
-      color: #33485f;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .quoted-reply-box {
-      background: #eef4fb;
-      border-left: 4px solid #0b2239;
-      border-radius: 10px;
-      padding: 8px 10px;
-      margin-bottom: 8px;
-    }
-
-    .quoted-reply-text {
-      font-size: 12px;
-      color: #4f6276;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .selected-reply-source {
-      outline: 2px solid #8bb7ea;
-      box-shadow: 0 0 0 4px rgba(139, 183, 234, 0.18);
-    }
-
-    .msg-system-error {
-      margin-top: 10px;
-      padding: 10px 14px;
-      background: #fdecea;
-      color: #b00020;
-      border-radius: 10px;
-      text-align: center;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .msg-foot-actions {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .message-menu-btn {
-      border: none;
-      background: #eef4fb;
-      color: #0b2239;
-      border-radius: 10px;
-      width: 34px;
-      height: 34px;
-      cursor: pointer;
-      font-size: 20px;
-      line-height: 1;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .message-menu-btn:hover {
-      background: #ddeaf8;
-    }
-
-    .message-menu {
-      position: absolute;
-      right: 0;
-      top: calc(100% + 6px);
-      min-width: 150px;
-      background: #ffffff;
-      border: 1px solid #dce6f1;
-      border-radius: 14px;
-      box-shadow: 0 16px 32px rgba(10, 25, 41, 0.14);
-      padding: 8px;
-      z-index: 40;
-      display: none;
-    }
-
-    .message-menu.open {
-      display: block;
-    }
-
-    .message-menu-item {
+    .composer textarea {
       width: 100%;
+      min-height: 82px;
+      resize: vertical;
+      border: 1px solid #d7e0ea;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+
+    .composer-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .emoji-btn,
+    .send-btn {
       border: none;
-      background: transparent;
-      color: #0b2239;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 10px 12px;
-      text-align: left;
       cursor: pointer;
-      font-size: 13px;
       font-weight: 700;
     }
 
-    .message-menu-item:hover {
-      background: #eef4fb;
+    .emoji-btn {
+      background: #f3f7fb;
     }
 
-    .message-menu-item.delete-item {
-      color: #8a1f1f;
-      background: #fff7f7;
+    .send-btn {
+      background: #0c3d73;
+      color: #fff;
+      min-width: 100px;
     }
 
-    .message-menu-item.delete-item:hover {
-      background: #f9e2e2;
-    }
-
-    .msg-modal {
+    .modal {
       position: fixed;
       inset: 0;
       background: rgba(0,0,0,0.45);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       z-index: 2000;
       padding: 14px;
     }
 
-    .hidden-msg-modal {
-      display: none;
+    .modal.open {
+      display: flex;
     }
 
-    .msg-modal-content {
+    .modal-content {
       background: white;
       border-radius: 18px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.25);
@@ -222,17 +574,13 @@
       width: min(520px, 96%);
     }
 
-    .small-msg-modal {
-      width: min(420px, 96%);
-    }
-
-    .large-msg-modal {
+    .modal-content.large {
       width: min(700px, 96%);
       max-height: 88vh;
       overflow-y: auto;
     }
 
-    .msg-modal-close {
+    .modal-close {
       position: absolute;
       right: 12px;
       top: 10px;
@@ -243,25 +591,25 @@
       color: #0b2239;
     }
 
-    .msg-modal-content h3 {
+    .modal-content h3 {
       margin-top: 0;
       color: #0b2239;
     }
 
-    .msg-modal-note {
+    .modal-note {
       color: #5e6d7d;
       font-size: 14px;
       margin-bottom: 14px;
     }
 
-    .msg-modal-actions {
+    .modal-actions {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
       margin-top: 16px;
     }
 
-    .modal-main-btn {
+    .main-btn {
       border: none;
       background: #0b2239;
       color: white;
@@ -271,7 +619,7 @@
       font-weight: 800;
     }
 
-    .modal-secondary-btn {
+    .secondary-btn {
       border: none;
       background: #eef4fb;
       color: #0b2239;
@@ -292,13 +640,13 @@
       margin-bottom: 14px;
     }
 
-    .forward-members-list {
+    .forward-members {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .forward-member-item {
+    .forward-member {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -325,1322 +673,978 @@
       margin-top: 3px;
     }
 
-    .small-forward-btn {
-      padding: 8px 12px;
+    .empty-text {
+      color: #60748c;
+      text-align: center;
+      padding: 18px 10px;
     }
 
-    .dark-empty-text {
-      color: #5f6f81;
-      background: #f3f7fb;
+    @media (max-width: 950px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        max-height: 44vh;
+      }
+
+      .message-wrap {
+        max-width: 90%;
+      }
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 680px) {
+      .forward-member {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
       .chat-header-main {
         flex-direction: column;
         align-items: flex-start;
-      }
-
-      .msg-foot {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .forward-member-item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .small-forward-btn {
-        width: 100%;
-      }
-
-      .message-menu {
-        right: auto;
-        left: 0;
       }
     }
   </style>
 </head>
 <body>
+  <header class="topbar">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="research.html">Research</a>
+      <a href="cv.html">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html">Insights</a>
+      <a href="messages.html" class="active">Messages</a>
+      <a href="profile.html">Mon compte</a>
+    </nav>
+  </header>
 
-<nav class="msg-nav">
-  <ul>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="research.html">Research</a></li>
-    <li><a href="resume.html">Resume</a></li>
-    <li><a href="contact.html">Contact</a></li>
-    <li><a href="insights.html">Insights</a></li>
-    <li><a href="messages.html" class="active-link">Messages</a></li>
-  </ul>
-
-  <div class="lang-switcher">
-    <button type="button" onclick="setLanguage('en')">EN</button>
-    <button type="button" onclick="setLanguage('fr')">FR</button>
-    <button type="button" onclick="setLanguage('es')">ES</button>
-  </div>
-</nav>
-
-<div class="messages-layout">
-  <aside class="messages-sidebar">
-    <div class="sidebar-top">
-      <div id="current-user-avatar-wrap">
-        <div class="member-avatar large-avatar">MB</div>
-      </div>
-      <div>
-        <h2 data-i18n="messaging">Messaging</h2>
-        <p id="current-user-name">Member</p>
-      </div>
-    </div>
-
-    <div class="sidebar-actions">
-      <button class="sidebar-logout-btn" onclick="logoutFromMessages()" data-i18n="logout">Logout</button>
-    </div>
-
-    <input
-      type="text"
-      id="member-search"
-      class="search-input"
-      placeholder="Search a member..."
-      oninput="filterMembers()"
-    >
-
-    <div class="tabs">
-      <button class="tab-btn active-tab" onclick="switchTab('all-members', this)" data-i18n="allMembers">All members</button>
-      <button class="tab-btn" onclick="switchTab('inbox-list', this)" data-i18n="inbox">Inbox</button>
-      <button class="tab-btn" onclick="switchTab('online-list', this)" data-i18n="online">Online</button>
-      <button class="tab-btn" onclick="switchTab('recent-list', this)" data-i18n="recent">Recent</button>
-    </div>
-
-    <div id="all-members" class="tab-panel"></div>
-    <div id="inbox-list" class="tab-panel hidden-panel"></div>
-    <div id="online-list" class="tab-panel hidden-panel"></div>
-    <div id="recent-list" class="tab-panel hidden-panel"></div>
-  </aside>
-
-  <main class="messages-main">
-    <section class="chat-header-card">
-      <div id="chat-user-summary" class="chat-user-summary">
-        <div class="member-avatar">MB</div>
+  <div class="page">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="avatar large" id="myAvatar">MB</div>
         <div>
-          <h3 id="chat-title">Select a conversation</h3>
-          <p id="chat-subtitle">Your private messages will appear here.</p>
-          <p id="chat-presence" class="chat-presence-line"></p>
+          <h2>Messagerie</h2>
+          <p id="myName">Chargement...</p>
         </div>
       </div>
-    </section>
 
-    <section class="chat-body-card">
-      <div id="chat-status-message" class="chat-status-message"></div>
-      <div id="chat-messages" class="chat-messages"></div>
+      <button class="logout-btn" id="logoutBtn">Déconnexion</button>
 
-      <div class="chat-composer">
-        <div id="reply-preview-mount"></div>
+      <input
+        type="text"
+        id="memberSearch"
+        class="search-input"
+        placeholder="Rechercher un membre..."
+      />
 
-        <textarea id="message-input" placeholder="Write a private message..."></textarea>
-
-        <div class="composer-actions">
-          <button class="emoji-btn" onclick="insertEmoji('message-input','😀')">😀</button>
-          <button class="emoji-btn" onclick="insertEmoji('message-input','👍')">👍</button>
-          <button class="emoji-btn" onclick="insertEmoji('message-input','❤️')">❤️</button>
-          <button class="emoji-btn" onclick="insertEmoji('message-input','🔥')">🔥</button>
-          <button class="emoji-btn" onclick="insertEmoji('message-input','🧪')">🧪</button>
-          <button class="emoji-btn" onclick="insertEmoji('message-input','💡')">💡</button>
-          <button class="send-btn" onclick="sendMessage()" data-i18n="send">Send</button>
-        </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="all">Tous les membres</button>
+        <button class="tab-btn" data-tab="inbox">Boîte de réception</button>
+        <button class="tab-btn" data-tab="online">En ligne</button>
+        <button class="tab-btn" data-tab="recent">Récentes</button>
       </div>
-    </section>
-  </main>
-</div>
 
-<div id="actions-modal" class="msg-modal hidden-msg-modal">
-  <div class="msg-modal-content small-msg-modal">
-    <button class="msg-modal-close" onclick="closeActionsModal()">×</button>
-    <h3>Conversation options</h3>
-    <p id="actions-modal-name" class="msg-modal-note"></p>
+      <div class="members-list" id="membersList"></div>
+    </aside>
 
-    <div class="msg-modal-actions">
-      <button id="block-toggle-btn" class="modal-main-btn" onclick="toggleBlockSelectedUser()">Block</button>
-      <button class="modal-secondary-btn" onclick="closeActionsModal()">Close</button>
+    <main class="main">
+      <section class="chat-header">
+        <div class="avatar" id="chatAvatar">MB</div>
+
+        <div class="chat-header-main">
+          <div>
+            <h3 id="chatTitle">Sélectionne une conversation</h3>
+            <p id="chatSubtitle">Tes messages privés vont apparaître ici.</p>
+            <p id="chatPresence"></p>
+          </div>
+
+          <button class="chat-options-btn" id="chatOptionsBtn" style="display:none;">Options</button>
+        </div>
+      </section>
+
+      <section class="chat-box">
+        <div class="chat-status-bar" id="chatStatusBar"></div>
+
+        <div class="chat-messages" id="chatMessages">
+          <div class="empty-state">Aucune conversation sélectionnée.</div>
+        </div>
+
+        <div class="composer">
+          <div id="replyPreviewMount"></div>
+
+          <textarea id="messageInput" placeholder="Écris un message privé..."></textarea>
+
+          <div class="composer-actions">
+            <button class="emoji-btn" type="button" data-emoji="😀">😀</button>
+            <button class="emoji-btn" type="button" data-emoji="👍">👍</button>
+            <button class="emoji-btn" type="button" data-emoji="❤️">❤️</button>
+            <button class="emoji-btn" type="button" data-emoji="🔥">🔥</button>
+            <button class="emoji-btn" type="button" data-emoji="🧪">🧪</button>
+            <button class="emoji-btn" type="button" data-emoji="💡">💡</button>
+            <button class="send-btn" type="button" id="sendBtn">Envoyer</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="optionsModal">
+    <div class="modal-content">
+      <button class="modal-close" type="button" id="closeOptionsModal">×</button>
+      <h3>Options de conversation</h3>
+      <p class="modal-note" id="optionsModalName"></p>
+
+      <div class="modal-actions">
+        <button class="main-btn" id="blockToggleBtn">Bloquer</button>
+        <button class="secondary-btn" type="button" id="cancelOptionsBtn">Fermer</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="forward-modal" class="msg-modal hidden-msg-modal">
-  <div class="msg-modal-content large-msg-modal">
-    <button class="msg-modal-close" onclick="closeForwardModal()">×</button>
-    <h3>Transfer message</h3>
+  <div class="modal" id="forwardModal">
+    <div class="modal-content large">
+      <button class="modal-close" type="button" id="closeForwardModal">×</button>
+      <h3>Transférer le message</h3>
+      <p class="modal-note">Message sélectionné :</p>
 
-    <p class="msg-modal-note">Selected message:</p>
-    <div id="forward-preview" class="forward-preview-box"></div>
+      <div class="forward-preview-box" id="forwardPreview"></div>
 
-    <input
-      type="text"
-      id="forward-search"
-      class="search-input"
-      placeholder="Search a member..."
-      oninput="renderForwardMembers()"
-    >
+      <input
+        type="text"
+        id="forwardSearch"
+        class="search-input"
+        placeholder="Rechercher un membre..."
+      />
 
-    <div id="forward-members-list" class="forward-members-list"></div>
+      <div class="forward-members" id="forwardMembers"></div>
 
-    <div class="msg-modal-actions">
-      <button class="modal-secondary-btn" onclick="closeForwardModal()">Close</button>
+      <div class="modal-actions">
+        <button class="secondary-btn" type="button" id="cancelForwardBtn">Fermer</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyA-pOkvoJaNOGMyXVYPRFSej6HVu8mc_ns",
-  authDomain: "boris-research-hub.firebaseapp.com",
-  projectId: "boris-research-hub",
-  storageBucket: "boris-research-hub.firebasestorage.app",
-  messagingSenderId: "71055508172",
-  appId: "1:71055508172:web:72229e3f5ad664eb35b869",
-  measurementId: "G-9Q6SJ96NBS",
-  databaseURL: "https://boris-research-hub-default-rtdb.firebaseio.com"
-};
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+    import {
+      ref,
+      set,
+      update,
+      get,
+      push,
+      remove,
+      onValue,
+      onDisconnect
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const db = firebase.firestore();
-const auth = firebase.auth();
-const rtdb = firebase.database();
+    const myAvatar = document.getElementById("myAvatar");
+    const myName = document.getElementById("myName");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const memberSearch = document.getElementById("memberSearch");
+    const membersList = document.getElementById("membersList");
 
-let currentUserProfile = null;
-let selectedUserId = null;
-let selectedUserProfile = null;
-let currentThreadId = null;
-let currentLanguage = localStorage.getItem("site_lang") || "en";
+    const chatAvatar = document.getElementById("chatAvatar");
+    const chatTitle = document.getElementById("chatTitle");
+    const chatSubtitle = document.getElementById("chatSubtitle");
+    const chatPresence = document.getElementById("chatPresence");
+    const chatOptionsBtn = document.getElementById("chatOptionsBtn");
+    const chatStatusBar = document.getElementById("chatStatusBar");
+    const chatMessages = document.getElementById("chatMessages");
 
-let threadUnsubscribe = null;
-let usersUnsubscribe = null;
-let threadsUnsubscribe = null;
-let blockedUnsubscribe = null;
-let statusesRef = null;
-let presenceConnectedRef = null;
-let presenceStatusRef = null;
-let heartbeatInterval = null;
+    const replyPreviewMount = document.getElementById("replyPreviewMount");
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
 
-let usersCache = {};
-let threadsCache = [];
-let statusCache = {};
-let blockedUsersCache = {};
-let forwardPayload = null;
-let replyTargetMessage = null;
-let lastSendBlockedError = false;
+    const optionsModal = document.getElementById("optionsModal");
+    const closeOptionsModal = document.getElementById("closeOptionsModal");
+    const cancelOptionsBtn = document.getElementById("cancelOptionsBtn");
+    const optionsModalName = document.getElementById("optionsModalName");
+    const blockToggleBtn = document.getElementById("blockToggleBtn");
 
-const HEARTBEAT_MS = 25000;
-const ONLINE_FRESH_MS = 90000;
+    const forwardModal = document.getElementById("forwardModal");
+    const closeForwardModalBtn = document.getElementById("closeForwardModal");
+    const cancelForwardBtn = document.getElementById("cancelForwardBtn");
+    const forwardPreview = document.getElementById("forwardPreview");
+    const forwardSearch = document.getElementById("forwardSearch");
+    const forwardMembers = document.getElementById("forwardMembers");
 
-const i18n = {
-  en: {
-    messaging: "Messaging",
-    allMembers: "All members",
-    inbox: "Inbox",
-    online: "Online",
-    recent: "Recent",
-    logout: "Logout",
-    send: "Send",
-    selectConversation: "Select a conversation",
-    privateMessagesHere: "Your private messages will appear here.",
-    onlineNow: "Online",
-    offlineSince: "Offline since",
-    offline: "Offline",
-    noMemberYet: "No member yet.",
-    noMessageYet: "No message yet.",
-    noMessageReceived: "No message received yet.",
-    noRecentConversation: "No recent conversation.",
-    nobodyOnline: "Nobody online.",
-    sending: "Sending...",
-    messageSent: "Message sent.",
-    loadError: "Unable to load messages.",
-    sendError: "Unable to send the message.",
-    deleteError: "Unable to delete the message.",
-    chooseMember: "Please select a member first."
-  },
-  fr: {
-    messaging: "Messagerie",
-    allMembers: "Tous les membres",
-    inbox: "Boîte de réception",
-    online: "En ligne",
-    recent: "Récentes",
-    logout: "Déconnexion",
-    send: "Envoyer",
-    selectConversation: "Sélectionne une conversation",
-    privateMessagesHere: "Tes messages privés vont apparaître ici.",
-    onlineNow: "En ligne",
-    offlineSince: "Déconnecté depuis",
-    offline: "Hors ligne",
-    noMemberYet: "Aucun membre pour le moment.",
-    noMessageYet: "Aucun message pour le moment.",
-    noMessageReceived: "Aucun message reçu pour le moment.",
-    noRecentConversation: "Aucune conversation récente.",
-    nobodyOnline: "Personne en ligne.",
-    sending: "Envoi en cours...",
-    messageSent: "Message envoyé.",
-    loadError: "Impossible de charger les messages.",
-    sendError: "Impossible d'envoyer le message.",
-    deleteError: "Impossible de supprimer le message.",
-    chooseMember: "Choisis d'abord un membre."
-  },
-  es: {
-    messaging: "Mensajería",
-    allMembers: "Todos los miembros",
-    inbox: "Bandeja",
-    online: "En línea",
-    recent: "Recientes",
-    logout: "Cerrar sesión",
-    send: "Enviar",
-    selectConversation: "Selecciona una conversación",
-    privateMessagesHere: "Tus mensajes privados aparecerán aquí.",
-    onlineNow: "En línea",
-    offlineSince: "Desconectado desde",
-    offline: "Desconectado",
-    noMemberYet: "Ningún miembro todavía.",
-    noMessageYet: "Ningún mensaje todavía.",
-    noMessageReceived: "No hay mensajes recibidos todavía.",
-    noRecentConversation: "No hay conversación reciente.",
-    nobodyOnline: "Nadie en línea.",
-    sending: "Enviando...",
-    messageSent: "Mensaje enviado.",
-    loadError: "No se pueden cargar los mensajes.",
-    sendError: "No se puede enviar el mensaje.",
-    deleteError: "No se puede eliminar el mensaje.",
-    chooseMember: "Selecciona primero un miembro."
-  }
-};
+    let currentUser = null;
+    let currentUserProfile = null;
+    let selectedUserId = null;
+    let selectedUserProfile = null;
+    let currentChatId = null;
+    let currentTab = "all";
 
-function t(key) {
-  return (i18n[currentLanguage] && i18n[currentLanguage][key]) || key;
-}
+    let usersCache = {};
+    let presenceCache = {};
+    let userChatsCache = {};
+    let blockedUsersCache = {};
 
-function setLanguage(lang) {
-  currentLanguage = lang;
-  localStorage.setItem("site_lang", lang);
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.dataset.i18n;
-    if (i18n[lang] && i18n[lang][key]) {
-      el.textContent = i18n[lang][key];
+    let replyTarget = null;
+    let forwardPayload = null;
+    let lastBlockedError = false;
+
+    function escapeHtml(text = "") {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
     }
-  });
-  renderAllPanels();
-  renderChatHeader();
-}
-setLanguage(currentLanguage);
 
-function redirectToInsightsLoginMessage() {
-  sessionStorage.setItem("insightsAuthNotice", "login required");
-  window.location.href = "insights.html";
-}
-
-function escapeHtml(value) {
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function getInitials(firstName, lastName, fullName) {
-  const f = (firstName || "").trim();
-  const l = (lastName || "").trim();
-  if (f || l) return `${f.charAt(0)}${l.charAt(0)}`.toUpperCase();
-  const parts = (fullName || "Member").trim().split(" ").filter(Boolean);
-  return (parts.slice(0, 2).map(p => p.charAt(0)).join("") || "MB").toUpperCase();
-}
-
-function avatarHtml(profile, cls = "") {
-  const photo = profile?.photoURL || "";
-  const color = profile?.avatarColor || "#16385d";
-  const initials = escapeHtml(getInitials(profile?.firstName, profile?.lastName, profile?.fullName));
-
-  if (photo) {
-    return `<div class="member-avatar ${cls}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
-  }
-  return `<div class="member-avatar ${cls}" style="background:${escapeHtml(color)}">${initials}</div>`;
-}
-
-function switchTab(id, btn) {
-  document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden-panel"));
-  document.getElementById(id).classList.remove("hidden-panel");
-  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active-tab"));
-  btn.classList.add("active-tab");
-}
-
-function filterMembers() {
-  const q = document.getElementById("member-search").value.trim().toLowerCase();
-  document.querySelectorAll(".member-list-item").forEach(item => {
-    const text = item.dataset.search || "";
-    item.style.display = text.includes(q) ? "flex" : "none";
-  });
-}
-
-function insertEmoji(targetId, emoji) {
-  const input = document.getElementById(targetId);
-  if (!input) return;
-  input.value += emoji;
-  input.focus();
-}
-
-function formatDateTime(timestamp) {
-  if (!timestamp) return "";
-  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-  return date.toLocaleString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-function formatLastSeen(ms) {
-  const num = Number(ms || 0);
-  if (!num) return "";
-  const date = new Date(num);
-  if (isNaN(date.getTime())) return "";
-  return date.toLocaleString("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-function canDeleteMessage(createdAt) {
-  if (!createdAt) return false;
-  const date = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
-  return (Date.now() - date.getTime()) <= (30 * 60 * 1000);
-}
-
-function threadIdFor(uid1, uid2) {
-  return [uid1, uid2].sort().join("_");
-}
-
-function setChatStatus(text, isError = false) {
-  const box = document.getElementById("chat-status-message");
-  if (!box) return;
-  box.textContent = text || "";
-  box.style.color = isError ? "#b00020" : "#0b7a3b";
-}
-
-function unreadCountFor(data, uid) {
-  if (!data || !data.unreadCountByUser) return 0;
-  return data.unreadCountByUser[uid] || 0;
-}
-
-function getStatusFor(uid) {
-  return statusCache[uid] || null;
-}
-
-function isOnline(uid) {
-  const data = getStatusFor(uid);
-  if (!data) return false;
-  const lastChanged = Number(data.last_changed || 0);
-  return data.state === "online" && lastChanged && ((Date.now() - lastChanged) <= ONLINE_FRESH_MS);
-}
-
-function presenceText(uid) {
-  const data = getStatusFor(uid);
-
-  if (!data) return t("offline");
-  if (isOnline(uid)) return t("onlineNow");
-
-  if (data.last_changed) {
-    const formatted = formatLastSeen(data.last_changed);
-    if (formatted) return `${t("offlineSince")} ${formatted}`;
-  }
-
-  return t("offline");
-}
-
-function isBlocked(uid) {
-  return !!blockedUsersCache[uid];
-}
-
-function cleanupRealtimeSubscriptions() {
-  try {
-    if (usersUnsubscribe) usersUnsubscribe();
-    if (threadsUnsubscribe) threadsUnsubscribe();
-    if (blockedUnsubscribe) blockedUnsubscribe();
-    if (statusesRef) statusesRef.off();
-  } catch (_) {}
-
-  usersUnsubscribe = null;
-  threadsUnsubscribe = null;
-  blockedUnsubscribe = null;
-  statusesRef = null;
-}
-
-function stopHeartbeat() {
-  if (heartbeatInterval) {
-    clearInterval(heartbeatInterval);
-    heartbeatInterval = null;
-  }
-}
-
-function writeOnlinePresence(fullName) {
-  if (!presenceStatusRef) return Promise.resolve();
-
-  return presenceStatusRef.set({
-    state: "online",
-    fullName: fullName || auth.currentUser?.displayName || "Member",
-    last_changed: firebase.database.ServerValue.TIMESTAMP
-  });
-}
-
-function startHeartbeat(fullName) {
-  stopHeartbeat();
-
-  writeOnlinePresence(fullName).catch((error) => {
-    console.error("presence write error:", error);
-  });
-
-  heartbeatInterval = setInterval(() => {
-    writeOnlinePresence(fullName).catch((error) => {
-      console.error("presence heartbeat error:", error);
-    });
-  }, HEARTBEAT_MS);
-}
-
-function cleanupPresence() {
-  try {
-    if (presenceConnectedRef) presenceConnectedRef.off();
-    if (presenceStatusRef) presenceStatusRef.off();
-  } catch (_) {}
-
-  stopHeartbeat();
-  presenceConnectedRef = null;
-  presenceStatusRef = null;
-}
-
-function setupPresence(user, fullName) {
-  cleanupPresence();
-
-  presenceStatusRef = rtdb.ref("/status/" + user.uid);
-  presenceConnectedRef = rtdb.ref(".info/connected");
-
-  presenceConnectedRef.on("value", (snap) => {
-    if (snap.val() === false) return;
-
-    presenceStatusRef.onDisconnect().set({
-      state: "offline",
-      fullName: fullName || user.displayName || "Member",
-      last_changed: firebase.database.ServerValue.TIMESTAMP
-    }).then(() => {
-      startHeartbeat(fullName || user.displayName || "Member");
-    }).catch((error) => {
-      console.error("setupPresence error:", error);
-    });
-  });
-}
-
-function openActionsModal() {
-  if (!selectedUserId || !selectedUserProfile) return;
-  document.getElementById("actions-modal").classList.remove("hidden-msg-modal");
-  document.getElementById("actions-modal-name").textContent = selectedUserProfile.fullName || "Member";
-
-  const btn = document.getElementById("block-toggle-btn");
-  btn.textContent = isBlocked(selectedUserId) ? "Unblock this user" : "Block this user";
-}
-
-function closeActionsModal() {
-  document.getElementById("actions-modal").classList.add("hidden-msg-modal");
-}
-
-async function toggleBlockSelectedUser() {
-  const user = auth.currentUser;
-  if (!user || !selectedUserId) return;
-
-  const blockRef = db.collection("users").doc(user.uid).collection("blockedUsers").doc(selectedUserId);
-
-  try {
-    if (isBlocked(selectedUserId)) {
-      await blockRef.delete();
-      setChatStatus("Utilisateur débloqué.");
-    } else {
-      await blockRef.set({
-        uid: selectedUserId,
-        fullName: selectedUserProfile?.fullName || "Member",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      setChatStatus("Utilisateur bloqué.");
+    function getInitials(name = "", email = "") {
+      const source = (name || email || "U").trim();
+      const parts = source.split(" ").filter(Boolean);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return source.slice(0, 2).toUpperCase();
     }
-    closeActionsModal();
-  } catch (error) {
-    console.error("toggleBlockSelectedUser error:", error);
-    setChatStatus("Impossible de modifier le blocage.", true);
-  }
-}
 
-function openForwardModal(encodedText, encodedSenderName) {
-  const text = decodeURIComponent(encodedText || "");
-  const senderName = decodeURIComponent(encodedSenderName || "");
-
-  forwardPayload = {
-    text,
-    senderName
-  };
-
-  document.getElementById("forward-preview").textContent = `${senderName} : ${text}`;
-  document.getElementById("forward-search").value = "";
-  document.getElementById("forward-modal").classList.remove("hidden-msg-modal");
-  renderForwardMembers();
-}
-
-function closeForwardModal() {
-  forwardPayload = null;
-  document.getElementById("forward-modal").classList.add("hidden-msg-modal");
-}
-
-function renderForwardMembers() {
-  const user = auth.currentUser;
-  const container = document.getElementById("forward-members-list");
-  if (!user || !container) return;
-
-  const q = document.getElementById("forward-search").value.trim().toLowerCase();
-
-  const list = Object.entries(usersCache)
-    .filter(([uid]) => uid !== user.uid)
-    .filter(([uid]) => !isBlocked(uid))
-    .filter(([uid, p]) => {
-      const text = `${p.fullName || ""} ${p.institution || ""}`.toLowerCase();
-      return text.includes(q);
-    })
-    .sort((a, b) => (a[1].fullName || "").localeCompare(b[1].fullName || ""));
-
-  let html = "";
-
-  list.forEach(([uid, profile]) => {
-    html += `
-      <div class="forward-member-item">
-        ${avatarHtml(profile)}
-        <div class="forward-member-text">
-          <strong>${escapeHtml(profile.fullName || "Member")}</strong>
-          <span>${escapeHtml(profile.institution || "")}</span>
-        </div>
-        <button class="modal-main-btn small-forward-btn" onclick="forwardMessageToUser('${uid}')">Transfer</button>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html || "<p class='empty-text dark-empty-text'>No available member.</p>";
-}
-
-async function forwardMessageToUser(targetUid) {
-  const user = auth.currentUser;
-  if (!user || !forwardPayload || !targetUid) return;
-
-  try {
-    const targetProfile = usersCache[targetUid] || { fullName: "Member" };
-    const threadId = threadIdFor(user.uid, targetUid);
-    const threadRef = db.collection("privateThreads").doc(threadId);
-
-    const forwardedText = `Transferred message:\n${forwardPayload.text}`;
-
-    await threadRef.set({
-      participants: [user.uid, targetUid],
-      participantNames: {
-        [user.uid]: currentUserProfile?.fullName || user.displayName || "Member",
-        [targetUid]: targetProfile.fullName || "Member"
-      },
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      lastMessage: forwardedText,
-      lastSenderId: user.uid,
-      unreadCountByUser: {
-        [user.uid]: 0,
-        [targetUid]: firebase.firestore.FieldValue.increment(1)
+    function avatarHTML(profile, cls = "") {
+      const photo = profile?.photoURL || "";
+      const name = profile?.displayName || "";
+      const email = profile?.email || "";
+      if (photo) {
+        return `<div class="avatar ${cls}"><img src="${escapeHtml(photo)}" alt="avatar"></div>`;
       }
-    }, { merge: true });
+      return `<div class="avatar ${cls}">${escapeHtml(getInitials(name, email))}</div>`;
+    }
 
-    await threadRef.collection("messages").add({
-      senderId: user.uid,
-      receiverId: targetUid,
-      text: forwardedText,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    function formatDate(ts) {
+      if (!ts) return "";
+      const date = new Date(ts);
+      return date.toLocaleString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
 
-    closeForwardModal();
-    setChatStatus("Message transféré.");
-  } catch (error) {
-    console.error("forwardMessageToUser error:", error);
-    setChatStatus("Impossible de transférer le message.", true);
-  }
-}
+    function makeChatId(uid1, uid2) {
+      return [uid1, uid2].sort().join("_");
+    }
 
-function openReplyToMessage(messageId, text) {
-  replyTargetMessage = {
-    id: messageId,
-    text: text || ""
-  };
+    function isOnline(uid) {
+      return !!presenceCache[uid]?.online;
+    }
 
-  renderReplyComposerBar();
-  highlightReplySourceMessage();
-  closeAllMessageMenus();
-  document.getElementById("message-input").focus();
-}
+    function presenceText(uid) {
+      const p = presenceCache[uid] || {};
+      if (p.online) return "En ligne";
+      if (p.lastSeen) return "Vu : " + formatDate(p.lastSeen);
+      return "Hors ligne";
+    }
 
-function clearReplyTarget() {
-  replyTargetMessage = null;
-  renderReplyComposerBar();
-  clearReplySourceHighlight();
-}
+    function isBlocked(uid) {
+      return !!blockedUsersCache[uid];
+    }
 
-function renderReplyComposerBar() {
-  const mount = document.getElementById("reply-preview-mount");
-  if (!mount) return;
+    function setStatus(text = "", isError = false) {
+      chatStatusBar.textContent = text;
+      chatStatusBar.style.color = isError ? "#b00020" : "#14854b";
+    }
 
-  if (!replyTargetMessage) {
-    mount.innerHTML = "";
-    return;
-  }
+    function canDeleteMessage(createdAt, senderId) {
+      if (!currentUser || senderId !== currentUser.uid) return false;
+      if (!createdAt) return false;
+      return Date.now() - createdAt <= 30 * 60 * 1000;
+    }
 
-  mount.innerHTML = `
-    <div class="reply-preview-box">
-      <div class="reply-preview-head">
-        <span class="reply-preview-title">Selected message</span>
-        <button class="clear-reply-btn" onclick="clearReplyTarget()">Cancel</button>
-      </div>
-      <div class="reply-preview-text">${escapeHtml(replyTargetMessage.text)}</div>
-    </div>
-  `;
-}
+    async function ensureMyProfile(user) {
+      const userRef = ref(db, "users/" + user.uid);
+      const snap = await get(userRef);
 
-function clearReplySourceHighlight() {
-  document.querySelectorAll(".msg-bubble").forEach(el => {
-    el.classList.remove("selected-reply-source");
-  });
-}
+      const payload = {
+        uid: user.uid,
+        email: user.email || "",
+        displayName: user.displayName || localStorage.getItem("displayName") || user.email?.split("@")[0] || "Utilisateur",
+        photoURL: snap.exists() ? (snap.val().photoURL || "") : "",
+        bio: snap.exists() ? (snap.val().bio || "") : "",
+        updatedAt: Date.now()
+      };
 
-function highlightReplySourceMessage() {
-  clearReplySourceHighlight();
-  if (!replyTargetMessage) return;
-  const el = document.getElementById("msg-" + replyTargetMessage.id);
-  if (el) el.classList.add("selected-reply-source");
-}
+      if (!snap.exists()) {
+        payload.createdAt = Date.now();
+      }
 
-function closeAllMessageMenus() {
-  document.querySelectorAll(".message-menu").forEach(menu => {
-    menu.classList.remove("open");
-  });
-}
+      await update(userRef, payload);
+      return payload;
+    }
 
-function toggleMessageMenu(messageId, event) {
-  event.stopPropagation();
-  const menu = document.getElementById("message-menu-" + messageId);
-  if (!menu) return;
+    async function setupPresence(user, displayName) {
+      const connectedRef = ref(db, ".info/connected");
+      const presenceRef = ref(db, "presence/" + user.uid);
 
-  const isOpen = menu.classList.contains("open");
-  closeAllMessageMenus();
-  if (!isOpen) menu.classList.add("open");
-}
+      onValue(connectedRef, async (snap) => {
+        if (snap.val() === true) {
+          await onDisconnect(presenceRef).set({
+            online: false,
+            lastSeen: Date.now(),
+            displayName: displayName || user.displayName || "Utilisateur"
+          });
 
-function renderMemberCard(uid, profile, subtitle, clickableToChat = true, showPresenceDot = false) {
-  const searchText = `${(profile?.fullName || "").toLowerCase()} ${(profile?.institution || "").toLowerCase()}`;
-  const online = isOnline(uid);
-  const blocked = isBlocked(uid);
+          await set(presenceRef, {
+            online: true,
+            lastSeen: Date.now(),
+            displayName: displayName || user.displayName || "Utilisateur"
+          });
+        }
+      });
 
-  return `
-    <div class="member-list-item"
-         data-search="${escapeHtml(searchText)}"
-         ${clickableToChat ? `onclick="selectConversation('${uid}')"` : ""}>
-      ${avatarHtml(profile)}
+      window.addEventListener("beforeunload", () => {
+        set(presenceRef, {
+          online: false,
+          lastSeen: Date.now(),
+          displayName: displayName || user.displayName || "Utilisateur"
+        });
+      });
+    }
 
-      <div class="member-text">
-        <div class="member-top-line">
-          <button type="button"
-                  class="member-name-btn"
-                  onclick="event.stopPropagation(); selectConversation('${uid}')">
-            ${escapeHtml(profile?.fullName || "Member")}
-          </button>
-          ${blocked ? `<span class="blocked-chip">Blocked</span>` : (showPresenceDot ? `<span class="presence-chip ${online ? "online-chip" : "offline-chip"}">${escapeHtml(online ? t("onlineNow") : t("offline"))}</span>` : "")}
-        </div>
+    function closeAllMenus() {
+      document.querySelectorAll(".message-menu").forEach(menu => {
+        menu.classList.remove("open");
+      });
+    }
 
-        ${subtitle ? `<span class="member-subtitle">${escapeHtml(subtitle)}</span>` : ""}
-        <span class="member-presence-text">${blocked ? "You blocked this user" : escapeHtml(presenceText(uid))}</span>
-      </div>
+    function renderReplyPreview() {
+      if (!replyTarget) {
+        replyPreviewMount.innerHTML = "";
+        return;
+      }
 
-      <button type="button"
-              class="member-profile-btn"
-              onclick="event.stopPropagation(); window.location.href='profile.html?uid=${uid}'">
-        Profile
-      </button>
-    </div>
-  `;
-}
-
-function renderAllMembers() {
-  const user = auth.currentUser;
-  const container = document.getElementById("all-members");
-  if (!user || !container) return;
-
-  const list = Object.entries(usersCache)
-    .filter(([uid]) => uid !== user.uid)
-    .sort((a, b) => (a[1].fullName || "").localeCompare(b[1].fullName || ""));
-
-  let html = "";
-  list.forEach(([uid, profile]) => {
-    html += renderMemberCard(uid, profile, profile.institution || "", true, true);
-  });
-
-  container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("noMemberYet"))}</p>`;
-}
-
-function renderInbox() {
-  const user = auth.currentUser;
-  const container = document.getElementById("inbox-list");
-  if (!user || !container) return;
-
-  const docs = threadsCache
-    .filter(doc => (doc.participants || []).includes(user.uid))
-    .filter(doc => (doc.lastMessage || "").trim() !== "")
-    .sort((a, b) => {
-      const ta = a.updatedAt?.toMillis?.() || 0;
-      const tb = b.updatedAt?.toMillis?.() || 0;
-      return tb - ta;
-    });
-
-  let html = "";
-
-  docs.forEach(data => {
-    const otherUserId = (data.participants || []).find(id => id !== user.uid);
-    if (!otherUserId) return;
-
-    const profile = usersCache[otherUserId] || { fullName: "Member" };
-    const unread = unreadCountFor(data, user.uid);
-    const blocked = isBlocked(otherUserId);
-
-    html += `
-      <div class="member-list-item"
-           data-search="${escapeHtml(((profile.fullName || "") + " " + (profile.institution || "")).toLowerCase())}"
-           onclick="selectConversation('${otherUserId}')">
-        ${avatarHtml(profile)}
-
-        <div class="member-text">
-          <div class="member-top-line">
-            <button type="button"
-                    class="member-name-btn"
-                    onclick="event.stopPropagation(); selectConversation('${otherUserId}')">
-              ${escapeHtml(profile.fullName || "Member")}
-            </button>
-            ${blocked ? `<span class="blocked-chip">Blocked</span>` : (unread > 0 ? `<span class="unread-badge">${unread}</span>` : "")}
+      replyPreviewMount.innerHTML = `
+        <div class="reply-preview">
+          <div class="reply-preview-head">
+            <span class="reply-preview-title">Réponse au message sélectionné</span>
+            <button class="cancel-reply-btn" type="button" id="cancelReplyBtn">Annuler</button>
           </div>
-
-          <span class="member-subtitle">${escapeHtml(data.lastMessage || "")}</span>
-          <span class="member-presence-text">${blocked ? "You blocked this user" : escapeHtml(presenceText(otherUserId))}</span>
+          <div class="reply-preview-text">${escapeHtml(replyTarget.text || "")}</div>
         </div>
+      `;
 
-        <button type="button"
-                class="member-profile-btn"
-                onclick="event.stopPropagation(); window.location.href='profile.html?uid=${otherUserId}'">
-          Profile
-        </button>
-      </div>
-    `;
-  });
+      document.getElementById("cancelReplyBtn").addEventListener("click", () => {
+        replyTarget = null;
+        renderReplyPreview();
+        clearReplyHighlight();
+      });
+    }
 
-  container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("noMessageReceived"))}</p>`;
-}
+    function clearReplyHighlight() {
+      document.querySelectorAll(".message-card").forEach(el => {
+        el.classList.remove("message-selected");
+      });
+    }
 
-function renderRecentThreads() {
-  const user = auth.currentUser;
-  const container = document.getElementById("recent-list");
-  if (!user || !container) return;
+    function highlightReplyMessage() {
+      clearReplyHighlight();
+      if (!replyTarget) return;
+      const el = document.getElementById("msg-" + replyTarget.id);
+      if (el) el.classList.add("message-selected");
+    }
 
-  const docs = threadsCache
-    .filter(doc => (doc.participants || []).includes(user.uid))
-    .filter(doc => (doc.lastMessage || "").trim() !== "")
-    .sort((a, b) => {
-      const ta = a.updatedAt?.toMillis?.() || 0;
-      const tb = b.updatedAt?.toMillis?.() || 0;
-      return tb - ta;
-    })
-    .slice(0, 10);
+    function renderChatHeader() {
+      if (!selectedUserId || !selectedUserProfile) {
+        chatAvatar.innerHTML = "MB";
+        chatTitle.textContent = "Sélectionne une conversation";
+        chatSubtitle.textContent = "Tes messages privés vont apparaître ici.";
+        chatPresence.textContent = "";
+        chatOptionsBtn.style.display = "none";
+        return;
+      }
 
-  let html = "";
-  docs.forEach(data => {
-    const otherUserId = (data.participants || []).find(id => id !== user.uid);
-    if (!otherUserId) return;
-    const profile = usersCache[otherUserId] || { fullName: "Member" };
-    html += renderMemberCard(otherUserId, profile, data.lastMessage || "", true, true);
-  });
+      chatAvatar.outerHTML = avatarHTML(selectedUserProfile, "");
+      const newAvatar = document.querySelector(".chat-header .avatar");
+      newAvatar.id = "chatAvatar";
 
-  container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("noRecentConversation"))}</p>`;
-}
+      chatTitle.textContent = selectedUserProfile.displayName || "Membre";
+      chatSubtitle.textContent = selectedUserProfile.bio || selectedUserProfile.email || "Conversation privée";
+      chatPresence.textContent = isBlocked(selectedUserId) ? "Tu as bloqué cet utilisateur" : presenceText(selectedUserId);
+      chatOptionsBtn.style.display = "inline-flex";
+    }
 
-function renderOnlineMembers() {
-  const user = auth.currentUser;
-  const container = document.getElementById("online-list");
-  if (!user || !container) return;
+    function updateComposerState() {
+      if (selectedUserId && isBlocked(selectedUserId)) {
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        messageInput.placeholder = "Tu as bloqué cet utilisateur. Débloque-le pour écrire.";
+      } else {
+        messageInput.disabled = false;
+        sendBtn.disabled = false;
+        messageInput.placeholder = "Écris un message privé...";
+      }
+    }
 
-  const list = Object.entries(usersCache)
-    .filter(([uid]) => uid !== user.uid)
-    .filter(([uid]) => isOnline(uid))
-    .sort((a, b) => (a[1].fullName || "").localeCompare(b[1].fullName || ""));
+    function renderMemberCard(uid, profile, subtitle = "", showUnread = false) {
+      const online = isOnline(uid);
+      const blocked = isBlocked(uid);
+      const searchText = `${(profile.displayName || "").toLowerCase()} ${(profile.email || "").toLowerCase()} ${(profile.bio || "").toLowerCase()}`;
+      const unreadCount = userChatsCache[uid]?.unreadCount || 0;
 
-  let html = "";
-  list.forEach(([uid, profile]) => {
-    html += renderMemberCard(uid, profile, profile.institution || "", true, true);
-  });
-
-  container.innerHTML = html || `<p class="empty-text">${escapeHtml(t("nobodyOnline"))}</p>`;
-}
-
-function renderAllPanels() {
-  renderAllMembers();
-  renderInbox();
-  renderOnlineMembers();
-  renderRecentThreads();
-}
-
-function renderChatHeader() {
-  const box = document.getElementById("chat-user-summary");
-  if (!box) return;
-
-  if (!selectedUserId || !selectedUserProfile) {
-    box.innerHTML = `
-      <div class="member-avatar">MB</div>
-      <div>
-        <h3 id="chat-title">${escapeHtml(t("selectConversation"))}</h3>
-        <p id="chat-subtitle">${escapeHtml(t("privateMessagesHere"))}</p>
-        <p id="chat-presence" class="chat-presence-line"></p>
-      </div>
-    `;
-    return;
-  }
-
-  const blocked = isBlocked(selectedUserId);
-
-  box.innerHTML = `
-    ${avatarHtml(selectedUserProfile)}
-    <div class="chat-header-main">
-      <div>
-        <h3><a class="profile-link-dark" href="profile.html?uid=${selectedUserId}">${escapeHtml(selectedUserProfile.fullName || "Member")}</a></h3>
-        <p>${escapeHtml(selectedUserProfile.institution || "Private conversation")}</p>
-        <p id="chat-presence" class="chat-presence-line ${isOnline(selectedUserId) ? "presence-online" : "presence-offline"}">
-          ${blocked ? "You blocked this user" : escapeHtml(presenceText(selectedUserId))}
-        </p>
-      </div>
-
-      <div class="chat-header-actions">
-        <button class="header-action-btn" onclick="openActionsModal()">Options</button>
-      </div>
-    </div>
-  `;
-}
-
-function updateComposerState() {
-  const input = document.getElementById("message-input");
-  const sendBtn = document.querySelector(".send-btn");
-
-  if (!input || !sendBtn) return;
-
-  if (selectedUserId && isBlocked(selectedUserId)) {
-    input.disabled = true;
-    sendBtn.disabled = true;
-    input.placeholder = "You blocked this user. Unblock to write again.";
-  } else {
-    input.disabled = false;
-    sendBtn.disabled = false;
-    input.placeholder = "Write a private message...";
-  }
-}
-
-async function selectConversation(otherUserId) {
-  const user = auth.currentUser;
-  if (!user) {
-    redirectToInsightsLoginMessage();
-    return;
-  }
-
-  selectedUserId = otherUserId;
-  currentThreadId = threadIdFor(user.uid, otherUserId);
-  selectedUserProfile = usersCache[otherUserId] || { fullName: "Member" };
-  lastSendBlockedError = false;
-  clearReplyTarget();
-
-  renderChatHeader();
-  updateComposerState();
-  setChatStatus("");
-  await markThreadAsRead();
-  loadMessages();
-}
-
-function loadMessages() {
-  if (!currentThreadId) return;
-
-  if (threadUnsubscribe) {
-    threadUnsubscribe();
-    threadUnsubscribe = null;
-  }
-
-  threadUnsubscribe = db.collection("privateThreads")
-    .doc(currentThreadId)
-    .collection("messages")
-    .orderBy("createdAt", "asc")
-    .onSnapshot((snapshot) => {
-      const user = auth.currentUser;
-      const container = document.getElementById("chat-messages");
-      let html = "";
-
-      snapshot.docs.forEach((doc) => {
-        const m = doc.data();
-        const sender = usersCache[m.senderId] || {};
-        const own = user && user.uid === m.senderId;
-
-        const encodedText = encodeURIComponent(m.text || "");
-        const encodedSenderName = encodeURIComponent(sender.fullName || "Member");
-        const replyTextEncoded = encodeURIComponent(m.text || "");
-        const hasReply = !!(m.replyTo && m.replyTo.text);
-
-        html += `
-          <div class="msg-bubble ${own ? 'own-msg' : ''}" id="msg-${doc.id}">
-            <div class="msg-head">
-              ${avatarHtml(sender)}
-              <div class="msg-head-text">
-                <strong><a class="profile-link-dark" href="profile.html?uid=${m.senderId}">${escapeHtml(sender.fullName || "Member")}</a></strong>
-                <span class="msg-presence-inline ${isOnline(m.senderId) ? "presence-online" : "presence-offline"}">${escapeHtml(presenceText(m.senderId))}</span>
-              </div>
-            </div>
-
-            ${hasReply ? `
-              <div class="quoted-reply-box">
-                <div class="quoted-reply-text">${escapeHtml(m.replyTo.text || "")}</div>
-              </div>
-            ` : ""}
-
-            <div class="msg-text">${escapeHtml(m.text || "")}</div>
-
-            <div class="msg-foot">
-              <span>${escapeHtml(formatDateTime(m.createdAt))}</span>
-
-              <div class="msg-foot-actions">
-                <button class="message-menu-btn" onclick="toggleMessageMenu('${doc.id}', event)">⋯</button>
-
-                <div class="message-menu" id="message-menu-${doc.id}">
-                  <button class="message-menu-item" onclick="openReplyToMessage('${doc.id}', decodeURIComponent('${replyTextEncoded}'))">Reply</button>
-                  <button class="message-menu-item" onclick="openForwardModal('${encodedText}','${encodedSenderName}')">Transfer</button>
-                  ${own && canDeleteMessage(m.createdAt) ? `<button class="message-menu-item delete-item" onclick="deleteMessage('${doc.id}')">Delete</button>` : ""}
-                </div>
-              </div>
+      return `
+        <div class="member-card" data-search="${escapeHtml(searchText)}" data-uid="${uid}">
+          ${avatarHTML(profile, "small")}
+          <div class="member-main">
+            <div class="member-name">${escapeHtml(profile.displayName || "Membre")}</div>
+            <div class="member-sub">${escapeHtml(subtitle || profile.email || "")}</div>
+            <div class="member-status">
+              <span class="status-dot ${online ? "online" : ""}"></span>
+              <span>${blocked ? "Bloqué" : escapeHtml(presenceText(uid))}</span>
+              ${showUnread && unreadCount > 0 && !blocked ? `<span>• ${unreadCount} non lu(s)</span>` : ""}
             </div>
           </div>
-        `;
+          <button class="profile-btn" type="button" data-profile-uid="${uid}">Profile</button>
+        </div>
+      `;
+    }
+
+    function getFilteredUsersArray() {
+      if (!currentUser) return [];
+      const search = memberSearch.value.trim().toLowerCase();
+
+      let users = Object.values(usersCache).filter(u => u.uid !== currentUser.uid);
+
+      if (currentTab === "online") {
+        users = users.filter(u => isOnline(u.uid));
+      }
+
+      if (currentTab === "inbox") {
+        users = users.filter(u => !!userChatsCache[u.uid]);
+        users.sort((a, b) => (userChatsCache[b.uid]?.updatedAt || 0) - (userChatsCache[a.uid]?.updatedAt || 0));
+      } else if (currentTab === "recent") {
+        users = users.filter(u => !!userChatsCache[u.uid]);
+        users.sort((a, b) => (userChatsCache[b.uid]?.updatedAt || 0) - (userChatsCache[a.uid]?.updatedAt || 0));
+        users = users.slice(0, 10);
+      } else {
+        users.sort((a, b) => (a.displayName || "").localeCompare(b.displayName || ""));
+      }
+
+      users = users.filter(u => {
+        const text = `${u.displayName || ""} ${u.email || ""} ${u.bio || ""}`.toLowerCase();
+        return text.includes(search);
       });
 
-      let finalHtml = html || `<p class="empty-text dark-empty-text">${escapeHtml(t("noMessageYet"))}</p>`;
+      return users;
+    }
 
-      if (lastSendBlockedError) {
-        finalHtml += `
-          <div class="msg-system-error">
-            Message impossible : l’un d’entre vous a bloqué l’autre
+    function renderMembers() {
+      const list = getFilteredUsersArray();
+
+      if (!list.length) {
+        membersList.innerHTML = `<div class="empty-text">Aucun membre trouvé.</div>`;
+        return;
+      }
+
+      membersList.innerHTML = list.map(profile => {
+        const subtitle =
+          currentTab === "inbox" || currentTab === "recent"
+            ? (userChatsCache[profile.uid]?.lastMessage || profile.email || "")
+            : (profile.bio || profile.email || "");
+        return renderMemberCard(profile.uid, profile, subtitle, currentTab === "inbox");
+      }).join("");
+
+      document.querySelectorAll(".member-card").forEach(card => {
+        card.addEventListener("click", (e) => {
+          if (e.target.closest(".profile-btn")) return;
+          selectConversation(card.dataset.uid);
+        });
+      });
+
+      document.querySelectorAll(".profile-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const uid = btn.dataset.profileUid;
+          window.location.href = `profile.html?uid=${encodeURIComponent(uid)}`;
+        });
+      });
+    }
+
+    function openOptionsModal() {
+      if (!selectedUserId || !selectedUserProfile) return;
+      optionsModal.classList.add("open");
+      optionsModalName.textContent = selectedUserProfile.displayName || "Membre";
+      blockToggleBtn.textContent = isBlocked(selectedUserId) ? "Débloquer cet utilisateur" : "Bloquer cet utilisateur";
+    }
+
+    function closeOptions() {
+      optionsModal.classList.remove("open");
+    }
+
+    async function toggleBlockSelectedUser() {
+      if (!currentUser || !selectedUserId) return;
+
+      const blockRef = ref(db, "users/" + currentUser.uid + "/blockedUsers/" + selectedUserId);
+
+      try {
+        if (isBlocked(selectedUserId)) {
+          await remove(blockRef);
+          setStatus("Utilisateur débloqué.");
+        } else {
+          await set(blockRef, {
+            uid: selectedUserId,
+            displayName: selectedUserProfile?.displayName || "Membre",
+            createdAt: Date.now()
+          });
+          setStatus("Utilisateur bloqué.");
+        }
+
+        closeOptions();
+      } catch (error) {
+        console.error(error);
+        setStatus("Impossible de modifier le blocage.", true);
+      }
+    }
+
+    function openForwardModal(text, senderName) {
+      forwardPayload = { text, senderName };
+      forwardPreview.textContent = `${senderName} : ${text}`;
+      forwardSearch.value = "";
+      forwardModal.classList.add("open");
+      renderForwardMembers();
+    }
+
+    function closeForwardModal() {
+      forwardPayload = null;
+      forwardModal.classList.remove("open");
+    }
+
+    function renderForwardMembers() {
+      if (!currentUser) return;
+      const search = forwardSearch.value.trim().toLowerCase();
+
+      const users = Object.values(usersCache)
+        .filter(u => u.uid !== currentUser.uid)
+        .filter(u => !isBlocked(u.uid))
+        .filter(u => `${u.displayName || ""} ${u.email || ""}`.toLowerCase().includes(search))
+        .sort((a, b) => (a.displayName || "").localeCompare(b.displayName || ""));
+
+      if (!users.length) {
+        forwardMembers.innerHTML = `<div class="empty-text">Aucun membre disponible.</div>`;
+        return;
+      }
+
+      forwardMembers.innerHTML = users.map(u => `
+        <div class="forward-member">
+          ${avatarHTML(u, "small")}
+          <div class="forward-member-text">
+            <strong>${escapeHtml(u.displayName || "Membre")}</strong>
+            <span>${escapeHtml(u.email || "")}</span>
           </div>
-        `;
-      }
+          <button class="main-btn" type="button" data-forward-uid="${u.uid}">Transférer</button>
+        </div>
+      `).join("");
 
-      container.innerHTML = finalHtml;
-      container.scrollTop = container.scrollHeight;
-      highlightReplySourceMessage();
-    }, (error) => {
-      console.error("loadMessages error:", error);
-      setChatStatus(t("loadError"), true);
-    });
-}
-
-async function sendMessage() {
-  const user = auth.currentUser;
-  if (!user) {
-    redirectToInsightsLoginMessage();
-    return;
-  }
-
-  if (!selectedUserId) {
-    alert(t("chooseMember"));
-    return;
-  }
-
-  if (isBlocked(selectedUserId)) {
-    lastSendBlockedError = true;
-    setChatStatus("");
-    loadMessages();
-    return;
-  }
-
-  const input = document.getElementById("message-input");
-  const text = input.value.trim();
-  if (!text) return;
-
-  const sendBtn = document.querySelector(".send-btn");
-  if (sendBtn) sendBtn.disabled = true;
-  setChatStatus("");
-
-  try {
-    const threadRef = db.collection("privateThreads").doc(currentThreadId);
-
-    await threadRef.set({
-      participants: [user.uid, selectedUserId],
-      participantNames: {
-        [user.uid]: currentUserProfile?.fullName || user.displayName || "Member",
-        [selectedUserId]: selectedUserProfile?.fullName || "Member"
-      },
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      lastMessage: text,
-      lastSenderId: user.uid,
-      unreadCountByUser: {
-        [user.uid]: 0,
-        [selectedUserId]: firebase.firestore.FieldValue.increment(1)
-      }
-    }, { merge: true });
-
-    await threadRef.collection("messages").add({
-      senderId: user.uid,
-      receiverId: selectedUserId,
-      text,
-      replyTo: replyTargetMessage ? {
-        messageId: replyTargetMessage.id || "",
-        text: replyTargetMessage.text || ""
-      } : null,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    input.value = "";
-    lastSendBlockedError = false;
-    clearReplyTarget();
-  } catch (error) {
-    console.error("sendMessage error:", error);
-
-    if (String(error.message || "").toLowerCase().includes("missing or insufficient permissions")) {
-      lastSendBlockedError = true;
-      setChatStatus("");
-      loadMessages();
-    } else {
-      setChatStatus(t("sendError"), true);
-    }
-  } finally {
-    updateComposerState();
-    if (sendBtn) sendBtn.disabled = false;
-  }
-}
-
-async function markThreadAsRead() {
-  const user = auth.currentUser;
-  if (!user || !currentThreadId) return;
-
-  try {
-    await db.collection("privateThreads").doc(currentThreadId).set({
-      unreadCountByUser: {
-        [user.uid]: 0
-      }
-    }, { merge: true });
-  } catch (error) {
-    console.error("markThreadAsRead error:", error);
-  }
-}
-
-async function deleteMessage(messageId) {
-  closeAllMessageMenus();
-  if (!currentThreadId) return;
-
-  try {
-    await db.collection("privateThreads")
-      .doc(currentThreadId)
-      .collection("messages")
-      .doc(messageId)
-      .delete();
-  } catch (error) {
-    console.error("deleteMessage error:", error);
-    setChatStatus(t("deleteError"), true);
-  }
-}
-
-async function logoutFromMessages() {
-  const user = auth.currentUser;
-  const btn = document.querySelector(".sidebar-logout-btn");
-
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = "Logging out...";
-  }
-
-  setChatStatus("Déconnexion en cours...");
-
-  try {
-    sessionStorage.setItem("afterMessagesLogout", "1");
-
-    stopHeartbeat();
-
-    if (user) {
-      rtdb.ref("/status/" + user.uid).set({
-        state: "offline",
-        fullName: user.displayName || currentUserProfile?.fullName || "Member",
-        last_changed: firebase.database.ServerValue.TIMESTAMP
-      }).catch((error) => {
-        console.error("presence logout error:", error);
+      document.querySelectorAll("[data-forward-uid]").forEach(btn => {
+        btn.addEventListener("click", () => forwardMessageToUser(btn.dataset.forwardUid));
       });
     }
 
-    cleanupPresence();
-    cleanupRealtimeSubscriptions();
+    async function forwardMessageToUser(targetUid) {
+      if (!currentUser || !forwardPayload || !targetUid) return;
 
-    auth.signOut().catch((error) => {
-      console.error("logout error:", error);
-    });
+      try {
+        const chatId = makeChatId(currentUser.uid, targetUid);
+        const messageRef = push(ref(db, "privateMessages/" + chatId));
 
-    window.location.href = "insights.html";
-  } catch (error) {
-    console.error("logout launch error:", error);
-    window.location.href = "insights.html";
-  }
-}
+        const forwardedText = `Message transféré :\n${forwardPayload.text}`;
 
-function subscribeUsers() {
-  if (usersUnsubscribe) usersUnsubscribe();
+        await set(messageRef, {
+          senderId: currentUser.uid,
+          receiverId: targetUid,
+          text: forwardedText,
+          replyTo: null,
+          createdAt: Date.now()
+        });
 
-  usersUnsubscribe = db.collection("users").onSnapshot((snapshot) => {
-    const nextUsers = {};
-    snapshot.forEach((doc) => {
-      nextUsers[doc.id] = doc.data();
-    });
-    usersCache = nextUsers;
+        await update(ref(db, "userChats/" + currentUser.uid + "/" + targetUid), {
+          chatId,
+          withUid: targetUid,
+          lastMessage: forwardedText,
+          updatedAt: Date.now(),
+          unreadCount: 0
+        });
 
-    if (auth.currentUser) {
-      currentUserProfile = usersCache[auth.currentUser.uid] || currentUserProfile;
-      document.getElementById("current-user-avatar-wrap").innerHTML = avatarHtml(currentUserProfile, "large-avatar");
-      document.getElementById("current-user-name").textContent = currentUserProfile?.fullName || "Member";
+        await update(ref(db, "userChats/" + targetUid + "/" + currentUser.uid), {
+          chatId,
+          withUid: currentUser.uid,
+          lastMessage: forwardedText,
+          updatedAt: Date.now(),
+          unreadCount: (userChatsCache[targetUid]?.unreadCount || 0) + 1
+        });
+
+        closeForwardModal();
+        setStatus("Message transféré.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Impossible de transférer le message.", true);
+      }
     }
 
-    if (selectedUserId) {
-      selectedUserProfile = usersCache[selectedUserId] || selectedUserProfile;
-      renderChatHeader();
-    }
+    async function selectConversation(uid) {
+      if (!currentUser) return;
 
-    renderAllPanels();
-    updateComposerState();
-    renderForwardMembers();
-  });
-}
+      selectedUserId = uid;
+      selectedUserProfile = usersCache[uid] || null;
+      currentChatId = makeChatId(currentUser.uid, uid);
+      lastBlockedError = false;
+      replyTarget = null;
 
-function subscribeThreads() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  if (threadsUnsubscribe) threadsUnsubscribe();
-
-  threadsUnsubscribe = db.collection("privateThreads")
-    .where("participants", "array-contains", user.uid)
-    .onSnapshot((snapshot) => {
-      threadsCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      renderInbox();
-      renderRecentThreads();
-    });
-}
-
-function subscribeBlockedUsers() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  if (blockedUnsubscribe) blockedUnsubscribe();
-
-  blockedUnsubscribe = db.collection("users")
-    .doc(user.uid)
-    .collection("blockedUsers")
-    .onSnapshot((snapshot) => {
-      const nextBlocked = {};
-      snapshot.forEach((doc) => {
-        nextBlocked[doc.id] = doc.data();
-      });
-      blockedUsersCache = nextBlocked;
-
-      renderAllPanels();
+      renderReplyPreview();
       renderChatHeader();
       updateComposerState();
-
-      const btn = document.getElementById("block-toggle-btn");
-      if (btn && selectedUserId) {
-        btn.textContent = isBlocked(selectedUserId) ? "Unblock this user" : "Block this user";
-      }
-
-      renderForwardMembers();
-      loadMessages();
-    }, (error) => {
-      console.error("subscribeBlockedUsers error:", error);
-    });
-}
-
-function subscribeStatuses() {
-  if (statusesRef) {
-    try { statusesRef.off(); } catch (_) {}
-  }
-
-  statusesRef = rtdb.ref("/status");
-  statusesRef.on("value", (snapshot) => {
-    const nextStatuses = {};
-    snapshot.forEach((child) => {
-      nextStatuses[child.key] = child.val();
-    });
-    statusCache = nextStatuses;
-
-    renderAllMembers();
-    renderOnlineMembers();
-    renderInbox();
-    renderRecentThreads();
-    renderChatHeader();
-  }, (error) => {
-    console.error("status subscribe error:", error);
-  });
-}
-
-window.addEventListener("click", (e) => {
-  const actionsModal = document.getElementById("actions-modal");
-  const forwardModal = document.getElementById("forward-modal");
-
-  if (e.target === actionsModal) closeActionsModal();
-  if (e.target === forwardModal) closeForwardModal();
-
-  if (!e.target.closest(".msg-foot-actions")) {
-    closeAllMessageMenus();
-  }
-});
-
-auth.onAuthStateChanged(async (user) => {
-  if (!user) {
-    const fromLogout = sessionStorage.getItem("afterMessagesLogout");
-    if (fromLogout) {
-      sessionStorage.removeItem("afterMessagesLogout");
-      window.location.href = "insights.html";
-      return;
+      setStatus("");
+      await markConversationRead();
+      listenToMessages();
     }
 
-    redirectToInsightsLoginMessage();
-    return;
-  }
+    function renderMessages(data) {
+      if (!currentUser) return;
 
-  const snap = await db.collection("users").doc(user.uid).get();
-  currentUserProfile = snap.exists ? snap.data() : { fullName: user.displayName || "Member" };
+      if (!data) {
+        chatMessages.innerHTML = `<div class="empty-state">Aucun message pour le moment.</div>`;
+        return;
+      }
 
-  document.getElementById("current-user-avatar-wrap").innerHTML = avatarHtml(currentUserProfile, "large-avatar");
-  document.getElementById("current-user-name").textContent = currentUserProfile.fullName || "Member";
+      const messages = Object.entries(data)
+        .map(([id, val]) => ({ id, ...val }))
+        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
-  setupPresence(user, currentUserProfile.fullName || user.displayName || "Member");
+      let html = messages.map(msg => {
+        const isMe = msg.senderId === currentUser.uid;
+        const sender = usersCache[msg.senderId] || {};
+        const canDelete = canDeleteMessage(msg.createdAt, msg.senderId);
 
-  renderChatHeader();
-  renderReplyComposerBar();
-  subscribeUsers();
-  subscribeThreads();
-  subscribeBlockedUsers();
-  subscribeStatuses();
+        return `
+          <div class="message-row ${isMe ? "me" : ""}">
+            <div class="message-wrap">
+              <div class="message-card" id="msg-${msg.id}">
+                <div class="message-head">
+                  <div class="message-author">${escapeHtml(sender.displayName || "Membre")}</div>
 
-  const params = new URLSearchParams(window.location.search);
-  const preselectedUser = params.get("user");
-  if (preselectedUser) {
-    setTimeout(() => selectConversation(preselectedUser), 300);
-  }
-});
-</script>
+                  <div class="message-menu-wrap">
+                    <button class="message-menu-btn" type="button" data-menu-btn="${msg.id}">⋯</button>
+                    <div class="message-menu" id="menu-${msg.id}">
+                      <button type="button" data-reply-id="${msg.id}" data-reply-text="${encodeURIComponent(msg.text || "")}">Reply</button>
+                      <button type="button" data-forward-text="${encodeURIComponent(msg.text || "")}" data-forward-sender="${encodeURIComponent(sender.displayName || "Membre")}">Transfer</button>
+                      ${canDelete ? `<button class="danger" type="button" data-delete-id="${msg.id}">Delete</button>` : ""}
+                    </div>
+                  </div>
+                </div>
 
+                ${msg.replyTo && msg.replyTo.text ? `<div class="reply-box">${escapeHtml(msg.replyTo.text)}</div>` : ""}
+
+                <div class="message-text">${escapeHtml(msg.text || "")}</div>
+                <div class="message-time">${escapeHtml(formatDate(msg.createdAt))}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      if (lastBlockedError) {
+        html += `<div class="blocked-warning">Message impossible : l’un d’entre vous a bloqué l’autre.</div>`;
+      }
+
+      chatMessages.innerHTML = html;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      highlightReplyMessage();
+
+      document.querySelectorAll("[data-menu-btn]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.menuBtn;
+          const menu = document.getElementById("menu-" + id);
+          const isOpen = menu.classList.contains("open");
+          closeAllMenus();
+          if (!isOpen) menu.classList.add("open");
+        });
+      });
+
+      document.querySelectorAll("[data-reply-id]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          replyTarget = {
+            id: btn.dataset.replyId,
+            text: decodeURIComponent(btn.dataset.replyText || "")
+          };
+          renderReplyPreview();
+          highlightReplyMessage();
+          closeAllMenus();
+          messageInput.focus();
+        });
+      });
+
+      document.querySelectorAll("[data-forward-text]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          openForwardModal(
+            decodeURIComponent(btn.dataset.forwardText || ""),
+            decodeURIComponent(btn.dataset.forwardSender || "")
+          );
+          closeAllMenus();
+        });
+      });
+
+      document.querySelectorAll("[data-delete-id]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          closeAllMenus();
+          await deleteMessage(btn.dataset.deleteId);
+        });
+      });
+    }
+
+    function listenToMessages() {
+      if (!currentChatId) return;
+
+      const messagesRef = ref(db, "privateMessages/" + currentChatId);
+      onValue(messagesRef, (snap) => {
+        renderMessages(snap.val());
+      }, (error) => {
+        console.error(error);
+        setStatus("Impossible de charger les messages.", true);
+      });
+    }
+
+    async function sendMessage() {
+      if (!currentUser) return;
+
+      if (!selectedUserId) {
+        alert("Choisis d’abord un membre.");
+        return;
+      }
+
+      if (isBlocked(selectedUserId)) {
+        lastBlockedError = true;
+        renderMessages(null);
+        return;
+      }
+
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      try {
+        sendBtn.disabled = true;
+        setStatus("");
+
+        const chatId = makeChatId(currentUser.uid, selectedUserId);
+        const targetProfile = usersCache[selectedUserId] || {};
+        const messageRef = push(ref(db, "privateMessages/" + chatId));
+
+        await set(messageRef, {
+          senderId: currentUser.uid,
+          receiverId: selectedUserId,
+          text,
+          replyTo: replyTarget ? {
+            messageId: replyTarget.id || "",
+            text: replyTarget.text || ""
+          } : null,
+          createdAt: Date.now()
+        });
+
+        await update(ref(db, "userChats/" + currentUser.uid + "/" + selectedUserId), {
+          chatId,
+          withUid: selectedUserId,
+          lastMessage: text,
+          updatedAt: Date.now(),
+          unreadCount: 0,
+          withName: targetProfile.displayName || "Membre"
+        });
+
+        const targetCurrentSnap = await get(ref(db, "userChats/" + selectedUserId + "/" + currentUser.uid));
+        const targetCurrent = targetCurrentSnap.val() || {};
+        const newUnread = (targetCurrent.unreadCount || 0) + 1;
+
+        await update(ref(db, "userChats/" + selectedUserId + "/" + currentUser.uid), {
+          chatId,
+          withUid: currentUser.uid,
+          lastMessage: text,
+          updatedAt: Date.now(),
+          unreadCount: newUnread,
+          withName: currentUserProfile?.displayName || "Membre"
+        });
+
+        messageInput.value = "";
+        replyTarget = null;
+        renderReplyPreview();
+        clearReplyHighlight();
+        lastBlockedError = false;
+      } catch (error) {
+        console.error(error);
+        setStatus("Impossible d’envoyer le message.", true);
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+
+    async function markConversationRead() {
+      if (!currentUser || !selectedUserId) return;
+      try {
+        await update(ref(db, "userChats/" + currentUser.uid + "/" + selectedUserId), {
+          unreadCount: 0
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function deleteMessage(messageId) {
+      if (!currentChatId) return;
+
+      try {
+        await remove(ref(db, "privateMessages/" + currentChatId + "/" + messageId));
+      } catch (error) {
+        console.error(error);
+        setStatus("Impossible de supprimer le message.", true);
+      }
+    }
+
+    async function logoutFromMessages() {
+      if (currentUser) {
+        try {
+          await set(ref(db, "presence/" + currentUser.uid), {
+            online: false,
+            lastSeen: Date.now(),
+            displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur"
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      await signOut(auth);
+      window.location.href = "insights.html";
+    }
+
+    function attachMainListeners() {
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentTab = btn.dataset.tab;
+          renderMembers();
+        });
+      });
+
+      memberSearch.addEventListener("input", renderMembers);
+
+      document.querySelectorAll(".emoji-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          messageInput.value += btn.dataset.emoji;
+          messageInput.focus();
+        });
+      });
+
+      sendBtn.addEventListener("click", sendMessage);
+
+      messageInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      logoutBtn.addEventListener("click", logoutFromMessages);
+
+      chatOptionsBtn.addEventListener("click", openOptionsModal);
+      closeOptionsModal.addEventListener("click", closeOptions);
+      cancelOptionsBtn.addEventListener("click", closeOptions);
+      blockToggleBtn.addEventListener("click", toggleBlockSelectedUser);
+
+      closeForwardModalBtn.addEventListener("click", closeForwardModal);
+      cancelForwardBtn.addEventListener("click", closeForwardModal);
+      forwardSearch.addEventListener("input", renderForwardMembers);
+
+      window.addEventListener("click", (e) => {
+        if (!e.target.closest(".message-menu-wrap")) {
+          closeAllMenus();
+        }
+        if (e.target === optionsModal) closeOptions();
+        if (e.target === forwardModal) closeForwardModal();
+      });
+    }
+
+    function subscribeUsers() {
+      onValue(ref(db, "users"), (snap) => {
+        usersCache = snap.val() || {};
+
+        if (currentUser) {
+          currentUserProfile = usersCache[currentUser.uid] || currentUserProfile;
+          myAvatar.outerHTML = avatarHTML(currentUserProfile, "large");
+          document.querySelector(".sidebar-top .avatar").id = "myAvatar";
+          myName.textContent = currentUserProfile?.displayName || "Utilisateur";
+        }
+
+        if (selectedUserId) {
+          selectedUserProfile = usersCache[selectedUserId] || selectedUserProfile;
+          renderChatHeader();
+        }
+
+        renderMembers();
+        renderForwardMembers();
+      });
+    }
+
+    function subscribePresence() {
+      onValue(ref(db, "presence"), (snap) => {
+        presenceCache = snap.val() || {};
+        renderMembers();
+        renderChatHeader();
+      });
+    }
+
+    function subscribeUserChats() {
+      if (!currentUser) return;
+
+      onValue(ref(db, "userChats/" + currentUser.uid), (snap) => {
+        userChatsCache = snap.val() || {};
+        renderMembers();
+      });
+    }
+
+    function subscribeBlockedUsers() {
+      if (!currentUser) return;
+
+      onValue(ref(db, "users/" + currentUser.uid + "/blockedUsers"), (snap) => {
+        blockedUsersCache = snap.val() || {};
+        renderMembers();
+        renderChatHeader();
+        updateComposerState();
+      });
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentUser = user;
+      currentUserProfile = await ensureMyProfile(user);
+
+      myAvatar.outerHTML = avatarHTML(currentUserProfile, "large");
+      document.querySelector(".sidebar-top .avatar").id = "myAvatar";
+      myName.textContent = currentUserProfile.displayName || "Utilisateur";
+
+      await setupPresence(user, currentUserProfile.displayName || user.displayName || "Utilisateur");
+
+      attachMainListeners();
+      renderChatHeader();
+      renderReplyPreview();
+
+      subscribeUsers();
+      subscribePresence();
+      subscribeUserChats();
+      subscribeBlockedUsers();
+
+      const params = new URLSearchParams(window.location.search);
+      const preselectedUser = params.get("user");
+      if (preselectedUser) {
+        setTimeout(() => selectConversation(preselectedUser), 300);
+      }
+    });
+  </script>
 </body>
 </html>
