@@ -3,73 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resume | Boris Research Hub</title>
-  <link rel="stylesheet" href="cv.css" />
-  <style>
-    .login-btn,.nav-account-btn,.nav-logout-btn{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;font-weight:700;text-decoration:none;cursor:pointer;border:none}
-    .login-btn{background:#0a66c2;color:#fff!important}
-    .nav-account-btn{background:#e8f1fb;color:#0b2239!important}
-    .nav-logout-btn{background:#f7dede;color:#8a1f1f!important}
-    .status-dot{width:10px;height:10px;background:#00ff66;border-radius:50%;display:inline-block;box-shadow:0 0 8px #00ff66;animation:blink 1.2s infinite}
-    .auth-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    @keyframes blink{0%{opacity:1}50%{opacity:.3}100%{opacity:1}}
-  </style>
+  <title>Resume - Boris AMOUSSOU</title>
+  <link rel="stylesheet" href="public.css" />
 </head>
 <body>
-  <nav class="cv-nav">
-    <ul id="nav-menu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="research.html">Research</a></li>
-      <li><a href="cv.html" class="active-link">Resume</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="insights.html">Insights</a></li>
-      <li id="auth-section"></li>
-    </ul>
-  </nav>
+  <header class="topbar">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="research.html">Research</a>
+      <a href="cv.html" class="active">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html">Insights</a>
+      <a href="insights.html" class="login-link">Login</a>
+    </nav>
+  </header>
 
-  <main class="cv-container">
-    <section class="cv-card">
-      <h1>Resume</h1>
-      <p>Master’s Degree in Green Chemistry, Catalysis and Environment, University of Poitiers – France</p>
-      <p>Strong background in:</p>
-      <ul>
-        <li>Electrochemistry</li>
-        <li>Catalysis</li>
-        <li>Materials science</li>
-        <li>Environmental chemistry</li>
-      </ul>
-      <a href="#" class="cv-btn">Download my CV</a>
+  <main class="public-layout">
+    <aside class="sidebar">
+      <div class="profile-pic">
+        <img src="images/profile.jpg" alt="Photo de profil" />
+      </div>
+
+      <h1>Maounou Boris<br />AMOUSSOU</h1>
+      <div class="subtitle">
+        Chemical Engineer<br />
+        Green Chemistry & Environment
+      </div>
+
+      <div class="quick-search-title">Quick Search</div>
+      <div class="quick-search">
+        <input type="text" placeholder="Search page..." />
+        <button type="button">Search</button>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="hero-card">
+        <h2>Resume</h2>
+        <p>
+          This page summarizes my academic background, skills, laboratory experience,
+          and scientific profile.
+        </p>
+      </div>
+
+      <div class="section-card">
+        <h2>Education & Experience</h2>
+
+        <div class="resume-list">
+          <div class="line-card">
+            <strong>Chemical Engineering</strong>
+            <span>
+              Academic training in chemistry, laboratory methods, and scientific analysis.
+            </span>
+          </div>
+
+          <div class="line-card">
+            <strong>Green Chemistry & Environment</strong>
+            <span>
+              Specialized interest in sustainable processes and environmentally oriented chemistry.
+            </span>
+          </div>
+
+          <div class="line-card">
+            <strong>Laboratory Experience</strong>
+            <span>
+              Experimental practice, scientific data interpretation, and research participation.
+            </span>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
-
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const authSection = document.getElementById("auth-section");
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const snap = await get(ref(db, "users/" + user.uid));
-        const profile = snap.exists() ? snap.val() : null;
-        const name = profile?.displayName || user.displayName || "Mon compte";
-        authSection.innerHTML = `
-          <div class="auth-actions">
-            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
-            <a href="profile.html" class="nav-account-btn">👤 ${name}<span class="status-dot"></span></a>
-            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
-          </div>
-        `;
-        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
-          await signOut(auth);
-          window.location.href = "cv.html";
-        });
-      } else {
-        authSection.innerHTML = `<a href="login.html" class="login-btn">Login</a>`;
-      }
-    });
-  </script>
 </body>
 </html>
