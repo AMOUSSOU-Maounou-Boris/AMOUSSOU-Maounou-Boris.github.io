@@ -386,7 +386,16 @@
       font-weight:700;
     }
 
-    .chat-options-btn{
+    .chat-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .chat-options-btn,
+    .chat-select-btn,
+    .chat-delete-selected-btn{
       border:none;
       background:#eef4fb;
       color:var(--text);
@@ -396,12 +405,22 @@
       cursor:pointer;
     }
 
+    .chat-delete-selected-btn{
+      background:#fff4f4;
+      color:#b82d2d;
+      display:none;
+    }
+
+    .chat-select-btn{
+      display:none;
+    }
+
     .chat-box{
       background:#fff;
       border-radius:26px;
       box-shadow:var(--shadow);
       display:grid;
-      grid-template-rows:auto 1fr auto;
+      grid-template-rows:auto auto 1fr auto;
       min-height:620px;
       overflow:hidden;
     }
@@ -411,6 +430,14 @@
       padding:14px 20px 0;
       font-weight:700;
       font-size:14px;
+    }
+
+    .typing-bar{
+      min-height:22px;
+      padding:4px 20px 0;
+      color:#0f4d92;
+      font-size:13px;
+      font-weight:700;
     }
 
     .chat-messages{
@@ -435,6 +462,8 @@
     .message-row{
       display:flex;
       justify-content:flex-start;
+      gap:10px;
+      align-items:flex-start;
     }
 
     .message-row.me{
@@ -444,6 +473,18 @@
     .message-wrap{
       max-width:78%;
       min-width:220px;
+    }
+
+    .message-select-check{
+      margin-top:12px;
+      width:18px;
+      height:18px;
+      accent-color:#0f4d92;
+      display:none;
+    }
+
+    .selection-mode .message-select-check.selectable{
+      display:block;
     }
 
     .message-card{
@@ -462,6 +503,11 @@
     .message-card.message-selected{
       outline:2px solid #7db5ff;
       background:#eef6ff;
+    }
+
+    .message-card.bulk-selected{
+      outline:2px solid #0f4d92;
+      background:#eaf3ff;
     }
 
     .message-head{
@@ -516,6 +562,10 @@
       font-size:18px;
       cursor:pointer;
       font-weight:800;
+    }
+
+    .selection-mode .message-menu-btn{
+      display:none;
     }
 
     .message-menu{
@@ -937,6 +987,16 @@
       color:var(--text);
     }
 
+    .danger-soft-btn{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      font-weight:800;
+      cursor:pointer;
+      background:#fff4f4;
+      color:#b82d2d;
+    }
+
     .forward-preview-box{
       padding:14px;
       background:#f7fbff;
@@ -986,6 +1046,51 @@
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+    }
+
+    .report-reasons{
+      display:grid;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .reason-item{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:12px 14px;
+      border:1px solid #d8e4f2;
+      border-radius:14px;
+      background:#f9fbfe;
+    }
+
+    .reason-item input{
+      margin-top:3px;
+    }
+
+    .report-textarea{
+      width:100%;
+      min-height:110px;
+      resize:vertical;
+      border:1px solid #d4dfed;
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:15px;
+      outline:none;
+      margin-bottom:14px;
+      font-family:inherit;
+    }
+
+    .report-textarea:focus{
+      border-color:#7fb5ff;
+      box-shadow:0 0 0 3px rgba(47, 140, 255, 0.13);
+    }
+
+    .report-msg{
+      min-height:18px;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:8px;
     }
 
     @media (max-width: 980px){
@@ -1054,12 +1159,17 @@
             <p id="chatSubtitle">Tes messages privés vont apparaître ici.</p>
             <p id="chatPresence"></p>
           </div>
-          <button class="chat-options-btn" id="chatOptionsBtn" style="display:none;" type="button">Options</button>
+          <div class="chat-actions">
+            <button class="chat-select-btn" id="toggleSelectionBtn" type="button">Sélectionner</button>
+            <button class="chat-delete-selected-btn" id="deleteSelectedBtn" type="button">Supprimer la sélection</button>
+            <button class="chat-options-btn" id="chatOptionsBtn" style="display:none;" type="button">Options</button>
+          </div>
         </div>
       </section>
 
       <section class="chat-box">
         <div class="chat-status-bar" id="chatStatusBar"></div>
+        <div class="typing-bar" id="typingBar"></div>
 
         <div class="chat-messages" id="chatMessages">
           <div class="empty-state">Aucune conversation sélectionnée.</div>
@@ -1129,6 +1239,7 @@
       <p class="modal-note" id="optionsModalName"></p>
 
       <div class="modal-actions">
+        <button class="danger-soft-btn" id="openReportModalBtn" type="button">Signaler</button>
         <button class="main-btn" id="blockToggleBtn" type="button">Bloquer</button>
         <button class="secondary-btn" type="button" id="cancelOptionsBtn">Fermer</button>
       </div>
@@ -1152,10 +1263,50 @@
     </div>
   </div>
 
+  <div class="modal" id="reportModal">
+    <div class="modal-content">
+      <button class="modal-close" type="button" id="closeReportModal">×</button>
+      <h3>Signaler cet utilisateur</h3>
+      <p class="modal-note">Choisis un motif ou écris une explication.</p>
+
+      <div class="report-reasons">
+        <label class="reason-item">
+          <input type="radio" name="reportReason" value="Spam ou publicité" />
+          <span>Spam ou publicité</span>
+        </label>
+
+        <label class="reason-item">
+          <input type="radio" name="reportReason" value="Harcèlement ou insultes" />
+          <span>Harcèlement ou insultes</span>
+        </label>
+
+        <label class="reason-item">
+          <input type="radio" name="reportReason" value="Usurpation d'identité ou faux compte" />
+          <span>Usurpation d'identité ou faux compte</span>
+        </label>
+
+        <label class="reason-item">
+          <input type="radio" name="reportReason" value="Contenu inapproprié ou comportement suspect" />
+          <span>Contenu inapproprié ou comportement suspect</span>
+        </label>
+      </div>
+
+      <textarea class="report-textarea" id="reportText" placeholder="Précise le problème..."></textarea>
+      <div class="report-msg" id="reportMsg"></div>
+
+      <div class="modal-actions">
+        <button class="secondary-btn" type="button" id="cancelReportBtn">Annuler</button>
+        <button class="main-btn" type="button" id="sendReportBtn">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { ref, set, update, get, push, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const REPORT_EMAIL = "maounou-boris.amoussou@cnrs.fr";
 
     const myAvatar = document.getElementById("myAvatar");
     const myName = document.getElementById("myName");
@@ -1168,6 +1319,7 @@
     const chatPresence = document.getElementById("chatPresence");
     const chatOptionsBtn = document.getElementById("chatOptionsBtn");
     const chatStatusBar = document.getElementById("chatStatusBar");
+    const typingBar = document.getElementById("typingBar");
     const chatMessages = document.getElementById("chatMessages");
     const messageInput = document.getElementById("messageInput");
     const sendBtn = document.getElementById("sendBtn");
@@ -1188,6 +1340,16 @@
     const attachmentInput = document.getElementById("attachmentInput");
     const attachmentPreview = document.getElementById("attachmentPreview");
     const topUnreadBadge = document.getElementById("topUnreadBadge");
+    const toggleSelectionBtn = document.getElementById("toggleSelectionBtn");
+    const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
+
+    const openReportModalBtn = document.getElementById("openReportModalBtn");
+    const reportModal = document.getElementById("reportModal");
+    const closeReportModal = document.getElementById("closeReportModal");
+    const cancelReportBtn = document.getElementById("cancelReportBtn");
+    const sendReportBtn = document.getElementById("sendReportBtn");
+    const reportText = document.getElementById("reportText");
+    const reportMsg = document.getElementById("reportMsg");
 
     let currentUser = null;
     let currentUserProfile = null;
@@ -1203,6 +1365,9 @@
     let selectedAttachment = null;
     let activityTimeout = null;
     let unreadCounts = {};
+    let selectionMode = false;
+    let selectedMessageIds = new Set();
+    let typingTimeout = null;
 
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
     const LAST_ACTIVITY_KEY = "insights_last_activity";
@@ -1285,7 +1450,7 @@
         return "Hors ligne";
       }
 
-      if (privacy.hidePresence) return "";
+      if (privacy.hidePresence) return "Visibilité masquée";
       if (data.online) return "En ligne";
       if (data.lastSeen) return "Vu : " + formatDate(data.lastSeen);
       return "Hors ligne";
@@ -1327,6 +1492,11 @@
     function setStatus(text = "", isError = false) {
       chatStatusBar.textContent = text;
       chatStatusBar.style.color = isError ? "#b00020" : "#14854b";
+    }
+
+    function setReportMsg(text = "", ok = false) {
+      reportMsg.textContent = text;
+      reportMsg.style.color = ok ? "#14854b" : "#c0392b";
     }
 
     function canDeleteMessage(msg) {
@@ -1406,6 +1576,43 @@
       });
     }
 
+    function updateUnreadBadges() {
+      const totalUnread = Object.values(unreadCounts).reduce((sum, n) => sum + (n || 0), 0);
+      if (totalUnread > 0) {
+        topUnreadBadge.style.display = "inline-flex";
+        topUnreadBadge.textContent = totalUnread > 99 ? "99+" : String(totalUnread);
+      } else {
+        topUnreadBadge.style.display = "none";
+        topUnreadBadge.textContent = "";
+      }
+    }
+
+    async function markConversationAsRead(chatId) {
+      if (!currentUser || !chatId) return;
+      const snap = await get(ref(db, "privateMessages/" + chatId));
+      if (!snap.exists()) return;
+
+      const messages = snap.val() || {};
+      const updates = {};
+      let hasUpdates = false;
+
+      Object.entries(messages).forEach(([msgId, msg]) => {
+        if (
+          msg &&
+          msg.receiverId === currentUser.uid &&
+          msg.senderId !== currentUser.uid &&
+          !(msg.readBy && msg.readBy[currentUser.uid])
+        ) {
+          updates[`${msgId}/readBy/${currentUser.uid}`] = true;
+          hasUpdates = true;
+        }
+      });
+
+      if (hasUpdates) {
+        await update(ref(db, "privateMessages/" + chatId), updates);
+      }
+    }
+
     function renderReplyPreview() {
       if (!replyTarget) {
         replyPreviewMount.innerHTML = "";
@@ -1444,40 +1651,83 @@
       document.querySelectorAll(".message-menu").forEach(menu => menu.classList.remove("open"));
     }
 
-    function updateUnreadBadges() {
-      const totalUnread = Object.values(unreadCounts).reduce((sum, n) => sum + (n || 0), 0);
-      if (totalUnread > 0) {
-        topUnreadBadge.style.display = "inline-flex";
-        topUnreadBadge.textContent = totalUnread > 99 ? "99+" : String(totalUnread);
+    async function setTypingState(isTyping) {
+      if (!currentUser || !currentChatId) return;
+      const typingRef = ref(db, `typingStatus/${currentChatId}/${currentUser.uid}`);
+      await set(typingRef, {
+        typing: !!isTyping,
+        displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
+        updatedAt: Date.now()
+      });
+    }
+
+    function scheduleStopTyping() {
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(async () => {
+        await setTypingState(false);
+      }, 1200);
+    }
+
+    function listenTypingStatus() {
+      if (!currentChatId || !selectedUserId) {
+        typingBar.textContent = "";
+        return;
+      }
+
+      onValue(ref(db, `typingStatus/${currentChatId}`), (snap) => {
+        const typingData = snap.val() || {};
+        const other = typingData[selectedUserId];
+
+        if (other && other.typing) {
+          const age = Date.now() - (other.updatedAt || 0);
+          if (age <= 5000) {
+            const name = selectedUserProfile?.displayName || other.displayName || "Cette personne";
+            typingBar.textContent = `${name} est en train d'écrire...`;
+            return;
+          }
+        }
+
+        typingBar.textContent = "";
+      });
+    }
+
+    function clearSelectionMode() {
+      selectionMode = false;
+      selectedMessageIds.clear();
+      chatMessages.classList.remove("selection-mode");
+      deleteSelectedBtn.style.display = "none";
+      toggleSelectionBtn.textContent = "Sélectionner";
+    }
+
+    function updateSelectionUI() {
+      if (selectionMode) {
+        chatMessages.classList.add("selection-mode");
+        toggleSelectionBtn.textContent = "Annuler sélection";
+        deleteSelectedBtn.style.display = selectedMessageIds.size ? "inline-flex" : "none";
       } else {
-        topUnreadBadge.style.display = "none";
-        topUnreadBadge.textContent = "";
+        chatMessages.classList.remove("selection-mode");
+        toggleSelectionBtn.textContent = "Sélectionner";
+        deleteSelectedBtn.style.display = "none";
       }
     }
 
-    async function markConversationAsRead(chatId) {
-      if (!currentUser || !chatId) return;
-      const snap = await get(ref(db, "privateMessages/" + chatId));
-      if (!snap.exists()) return;
+    async function deleteSelectedMessages() {
+      if (!currentChatId || !selectedMessageIds.size) return;
 
-      const messages = snap.val() || {};
-      const updates = {};
-      let hasUpdates = false;
+      const ok = confirm("Supprimer tous les messages sélectionnés ?");
+      if (!ok) return;
 
-      Object.entries(messages).forEach(([msgId, msg]) => {
-        if (
-          msg &&
-          msg.receiverId === currentUser.uid &&
-          msg.senderId !== currentUser.uid &&
-          !(msg.readBy && msg.readBy[currentUser.uid])
-        ) {
-          updates[`${msgId}/readBy/${currentUser.uid}`] = true;
-          hasUpdates = true;
-        }
-      });
-
-      if (hasUpdates) {
-        await update(ref(db, "privateMessages/" + chatId), updates);
+      try {
+        const deletions = Array.from(selectedMessageIds).map((id) =>
+          remove(ref(db, `privateMessages/${currentChatId}/${id}`))
+        );
+        await Promise.all(deletions);
+        selectedMessageIds.clear();
+        updateSelectionUI();
+        setStatus("Messages sélectionnés supprimés.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Impossible de supprimer la sélection.", true);
       }
     }
 
@@ -1488,6 +1738,8 @@
         chatSubtitle.textContent = "Tes messages privés vont apparaître ici.";
         chatPresence.textContent = "";
         chatOptionsBtn.style.display = "none";
+        toggleSelectionBtn.style.display = "none";
+        deleteSelectedBtn.style.display = "none";
         return;
       }
 
@@ -1510,6 +1762,8 @@
       }
 
       chatOptionsBtn.style.display = "inline-flex";
+      toggleSelectionBtn.style.display = "inline-flex";
+      updateSelectionUI();
     }
 
     function updateComposerState() {
@@ -1624,6 +1878,66 @@
 
     function closeOptionsModalFn() {
       optionsModal.classList.remove("open");
+    }
+
+    function openReportModal() {
+      if (!selectedUserId || !selectedUserProfile) return;
+      closeOptionsModalFn();
+      reportModal.classList.add("open");
+      reportText.value = "";
+      setReportMsg("");
+      document.querySelectorAll('input[name="reportReason"]').forEach(el => { el.checked = false; });
+    }
+
+    function closeReportModalFn() {
+      reportModal.classList.remove("open");
+    }
+
+    async function sendReport() {
+      if (!currentUser || !selectedUserId || !selectedUserProfile) return;
+
+      const checked = document.querySelector('input[name="reportReason"]:checked');
+      const quickReason = checked ? checked.value : "";
+      const customReason = reportText.value.trim();
+
+      if (!quickReason && !customReason) {
+        setReportMsg("Choisis un motif ou écris une explication.");
+        return;
+      }
+
+      const finalReason = customReason ? (quickReason ? `${quickReason} | ${customReason}` : customReason) : quickReason;
+      const reporterName = currentUserProfile?.displayName || currentUser.displayName || "Utilisateur";
+
+      try {
+        sendReportBtn.disabled = true;
+
+        const subject = encodeURIComponent("Signalement utilisateur - Messagerie Boris Research Hub");
+        const body = encodeURIComponent(
+`Un nouveau signalement a été envoyé depuis la messagerie.
+
+Utilisateur signalé : ${selectedUserProfile.displayName || "Membre"}
+UID signalé : ${selectedUserId}
+Email visible : ${selectedUserProfile.email || ""}
+
+Signalé par : ${reporterName}
+Email du signaleur : ${currentUser.email || ""}
+
+Motif :
+${finalReason}
+
+Date :
+${new Date().toLocaleString("fr-FR")}`
+        );
+
+        window.location.href = `mailto:${REPORT_EMAIL}?subject=${subject}&body=${body}`;
+        setReportMsg("Signalement préparé par email.", true);
+        setTimeout(() => closeReportModalFn(), 700);
+      } catch (error) {
+        console.error(error);
+        setReportMsg("Impossible de préparer le signalement.");
+      } finally {
+        sendReportBtn.disabled = false;
+      }
     }
 
     async function toggleBlockSelectedUser() {
@@ -1747,6 +2061,7 @@
       selectedUserProfile = usersCache[uid] || null;
       currentChatId = makeChatId(currentUser.uid, uid);
       replyTarget = null;
+      clearSelectionMode();
 
       renderReplyPreview();
       renderChatHeader();
@@ -1759,6 +2074,7 @@
       }
 
       await markConversationAsRead(currentChatId);
+      listenTypingStatus();
       listenMessages();
     }
 
@@ -1796,6 +2112,7 @@
     function renderMessages(messagesObj) {
       if (!messagesObj) {
         chatMessages.innerHTML = `<div class="empty-state">Aucun message pour le moment.</div>`;
+        updateSelectionUI();
         return;
       }
 
@@ -1806,10 +2123,20 @@
       chatMessages.innerHTML = messages.map(msg => {
         const isMine = currentUser && msg.senderId === currentUser.uid;
         const sender = usersCache[msg.senderId] || {};
+        const selectable = canDeleteMessage(msg);
+        const isChecked = selectedMessageIds.has(msg.id);
+
         return `
           <div class="message-row ${isMine ? "me" : ""}">
+            <input
+              class="message-select-check ${selectable ? "selectable" : ""}"
+              type="checkbox"
+              data-select-id="${msg.id}"
+              ${isChecked ? "checked" : ""}
+              ${selectable ? "" : "disabled"}
+            >
             <div class="message-wrap">
-              <div class="message-card" id="msg-${msg.id}">
+              <div class="message-card ${isChecked ? "bulk-selected" : ""}" id="msg-${msg.id}">
                 <div class="message-head">
                   <div class="message-author">${escapeHtml(sender.displayName || "Membre")}</div>
                   <div class="message-menu-wrap">
@@ -1833,6 +2160,7 @@
       }).join("");
 
       highlightReplySource();
+      updateSelectionUI();
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
       document.querySelectorAll("[data-menu-btn]").forEach(btn => {
@@ -1870,6 +2198,18 @@
         btn.addEventListener("click", async () => {
           closeAllMenus();
           await deleteMessage(btn.dataset.deleteId);
+        });
+      });
+
+      document.querySelectorAll("[data-select-id]").forEach(box => {
+        box.addEventListener("change", () => {
+          const id = box.dataset.selectId;
+          if (box.checked) selectedMessageIds.add(id);
+          else selectedMessageIds.delete(id);
+
+          const card = document.getElementById("msg-" + id);
+          if (card) card.classList.toggle("bulk-selected", box.checked);
+          updateSelectionUI();
         });
       });
     }
@@ -2043,6 +2383,8 @@
           }
         });
 
+        await setTypingState(false);
+
         messageInput.value = "";
         replyTarget = null;
         renderReplyPreview();
@@ -2066,6 +2408,26 @@
       }
     }
 
+    async function deleteSelectedMessages() {
+      if (!currentChatId || !selectedMessageIds.size) return;
+
+      const ok = confirm("Supprimer tous les messages sélectionnés ?");
+      if (!ok) return;
+
+      try {
+        const deletions = Array.from(selectedMessageIds).map((id) =>
+          remove(ref(db, `privateMessages/${currentChatId}/${id}`))
+        );
+        await Promise.all(deletions);
+        selectedMessageIds.clear();
+        updateSelectionUI();
+        setStatus("Messages sélectionnés supprimés.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Impossible de supprimer la sélection.", true);
+      }
+    }
+
     async function logout() {
       if (currentUser) {
         try {
@@ -2075,6 +2437,10 @@
             displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur"
           });
         } catch (_) {}
+
+        if (currentChatId) {
+          try { await setTypingState(false); } catch (_) {}
+        }
       }
 
       await signOut(auth);
@@ -2103,6 +2469,15 @@
       togglePanelBtn.addEventListener("click", () => {
         composerPanel.classList.toggle("open");
       });
+
+      toggleSelectionBtn.addEventListener("click", () => {
+        selectionMode = !selectionMode;
+        if (!selectionMode) selectedMessageIds.clear();
+        updateSelectionUI();
+        if (currentChatId) listenMessages();
+      });
+
+      deleteSelectedBtn.addEventListener("click", deleteSelectedMessages);
 
       document.querySelectorAll("[data-sticker]").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -2172,10 +2547,22 @@
 
       sendBtn.addEventListener("click", sendMessage);
 
-      messageInput.addEventListener("keydown", (e) => {
+      messageInput.addEventListener("input", async () => {
+        if (!selectedUserId || isConversationBlocked(selectedUserId)) return;
+
+        if (messageInput.value.trim()) {
+          await setTypingState(true);
+          scheduleStopTyping();
+        } else {
+          clearTimeout(typingTimeout);
+          await setTypingState(false);
+        }
+      });
+
+      messageInput.addEventListener("keydown", async (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
-          sendMessage();
+          await sendMessage();
         }
       });
 
@@ -2188,10 +2575,16 @@
       cancelForwardBtn.addEventListener("click", closeForwardModalFn);
       forwardSearch.addEventListener("input", renderForwardMembers);
 
+      openReportModalBtn.addEventListener("click", openReportModal);
+      closeReportModal.addEventListener("click", closeReportModalFn);
+      cancelReportBtn.addEventListener("click", closeReportModalFn);
+      sendReportBtn.addEventListener("click", sendReport);
+
       window.addEventListener("click", (e) => {
         if (!e.target.closest(".message-menu-wrap")) closeAllMenus();
         if (e.target === optionsModal) closeOptionsModalFn();
         if (e.target === forwardModal) closeForwardModalFn();
+        if (e.target === reportModal) closeReportModalFn();
       });
     }
 
