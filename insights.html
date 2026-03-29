@@ -1,3 +1,4 @@
+<!-- insights.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -26,6 +27,11 @@
       font-family:Arial, Helvetica, sans-serif;
       background:var(--bg);
       color:var(--text);
+    }
+
+    body.secure-page *:not(input):not(textarea){
+      -webkit-user-drag:none;
+      user-select:none;
     }
 
     .topbar{
@@ -210,19 +216,48 @@
       margin-bottom:0;
     }
 
-    .privacy-card{
+    .privacy-shell{
       margin-top:16px;
-      background:rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:18px;
-      padding:14px;
       position:relative;
       z-index:1;
     }
 
-    .privacy-card h3{
-      margin:0 0 10px;
+    .privacy-toggle-btn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      border:none;
+      cursor:pointer;
+      border-radius:18px;
+      padding:14px 16px;
+      background:rgba(255,255,255,0.10);
+      color:#fff;
       font-size:17px;
+      font-weight:800;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .privacy-toggle-btn span:last-child{
+      font-size:18px;
+      transition:.18s ease;
+    }
+
+    .privacy-toggle-btn.open span:last-child{
+      transform:rotate(180deg);
+    }
+
+    .privacy-card{
+      margin-top:10px;
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .privacy-card.hidden-panel{
+      display:none;
     }
 
     .privacy-item{
@@ -347,12 +382,6 @@
 
     .file-label input{ display:none; }
 
-    .helper-note{
-      color:var(--muted);
-      font-size:13px;
-      font-weight:700;
-    }
-
     .primary-btn, .danger-btn, .small-btn, .report-btn{
       border:none;
       cursor:pointer;
@@ -408,13 +437,35 @@
       gap:12px;
     }
 
-    .preview-grid img{
+    .preview-grid .img-frame,
+    .post-gallery .img-frame{
       width:100%;
-      height:140px;
-      object-fit:cover;
       border-radius:16px;
       border:1px solid #dde5ef;
+      background:#f7fbff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .preview-grid .img-frame{
+      height:160px;
+    }
+
+    .post-gallery .img-frame{
+      height:220px;
+      border:1px solid #e1e9f4;
+      background:#fbfdff;
+    }
+
+    .preview-grid img,
+    .post-gallery img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
       display:block;
+      background:#fff;
     }
 
     .pdf-card{
@@ -568,16 +619,6 @@
       margin-top:8px;
     }
 
-    .post-gallery img{
-      width:100%;
-      height:220px;
-      object-fit:cover;
-      display:block;
-      border-radius:16px;
-      border:1px solid #e1e9f4;
-      background:#fff;
-    }
-
     .post-actions{
       display:flex;
       gap:12px;
@@ -658,7 +699,6 @@
       box-shadow:var(--shadow);
     }
 
-    /* AUTH */
     .auth-overlay{
       position:fixed;
       inset:0;
@@ -790,7 +830,6 @@
       text-align:center;
     }
 
-    /* REPORT */
     .modal-overlay{
       position:fixed;
       inset:0;
@@ -882,7 +921,7 @@
     }
   </style>
 </head>
-<body>
+<body class="secure-page">
 
   <header class="topbar" id="publicTopbar">
     <nav>
@@ -1002,37 +1041,43 @@
         <div class="avatar" id="meAvatar">MB</div>
         <h2 id="meName">Chargement...</h2>
         <p id="meBio">Bienvenue sur ton espace social privé.</p>
+
         <a class="panel-btn" href="profile.html">Voir mon profil</a>
         <a class="panel-btn alt" href="messages.html">Messagerie</a>
 
-        <div class="privacy-card">
-          <h3>Confidentialité</h3>
+        <div class="privacy-shell">
+          <button class="privacy-toggle-btn" id="privacyToggleBtn" type="button">
+            <span>Confidentialité</span>
+            <span>⌄</span>
+          </button>
 
-          <div class="privacy-item">
-            <span>Masquer la présence en ligne</span>
-            <label class="switch">
-              <input type="checkbox" id="hidePresenceToggle">
-              <span class="slider"></span>
-            </label>
+          <div class="privacy-card hidden-panel" id="privacyPanel">
+            <div class="privacy-item">
+              <span>Masquer la présence en ligne</span>
+              <label class="switch">
+                <input type="checkbox" id="hidePresenceToggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="privacy-item">
+              <span>Masquer l'email</span>
+              <label class="switch">
+                <input type="checkbox" id="hideEmailToggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="privacy-item">
+              <span>Masquer la bio</span>
+              <label class="switch">
+                <input type="checkbox" id="hideBioToggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="privacy-msg" id="privacyMsg"></div>
           </div>
-
-          <div class="privacy-item">
-            <span>Masquer l'email</span>
-            <label class="switch">
-              <input type="checkbox" id="hideEmailToggle">
-              <span class="slider"></span>
-            </label>
-          </div>
-
-          <div class="privacy-item">
-            <span>Masquer la bio</span>
-            <label class="switch">
-              <input type="checkbox" id="hideBioToggle">
-              <span class="slider"></span>
-            </label>
-          </div>
-
-          <div class="privacy-msg" id="privacyMsg"></div>
         </div>
 
         <button class="panel-btn logout-btn" id="logoutBtn" type="button">Déconnexion</button>
@@ -1050,7 +1095,6 @@
             <input type="file" id="postFileInput" accept="image/*,application/pdf" multiple />
           </label>
           <button class="primary-btn" id="publishBtn" type="button">Publier</button>
-          <span class="helper-note">Photos multiples autorisées · 1 seul PDF maximum</span>
         </div>
 
         <div id="composerPreview"></div>
@@ -1064,9 +1108,7 @@
   <div class="modal-overlay hidden" id="reportModal">
     <div class="modal-card">
       <h3 class="modal-title">Signaler cette publication</h3>
-      <div class="modal-sub">
-        Choisis un motif rapide ou écris ton explication.
-      </div>
+      <div class="modal-sub">Choisis un motif rapide ou écris ton explication.</div>
 
       <div class="report-reasons">
         <label class="reason-item">
@@ -1163,6 +1205,8 @@
     const meBio = document.getElementById("meBio");
     const logoutBtn = document.getElementById("logoutBtn");
 
+    const privacyToggleBtn = document.getElementById("privacyToggleBtn");
+    const privacyPanel = document.getElementById("privacyPanel");
     const hidePresenceToggle = document.getElementById("hidePresenceToggle");
     const hideEmailToggle = document.getElementById("hideEmailToggle");
     const hideBioToggle = document.getElementById("hideBioToggle");
@@ -1186,10 +1230,7 @@
     let postsMap = {};
     let likesMap = {};
     let commentsMap = {};
-    let selectedAttachment = {
-      images: [],
-      pdf: null
-    };
+    let selectedAttachment = { images: [], pdf: null };
     let inactivityTimeout = null;
     let currentReportTarget = null;
 
@@ -1204,6 +1245,25 @@
     const DELETE_WINDOW_MS = 30 * 60 * 1000;
     const urlParams = new URLSearchParams(window.location.search);
     const focusPostId = urlParams.get("postId");
+
+    function activatePageProtection() {
+      document.addEventListener("contextmenu", e => e.preventDefault());
+      document.addEventListener("dragstart", e => e.preventDefault());
+      document.addEventListener("copy", e => {
+        const tag = (document.activeElement?.tagName || "").toLowerCase();
+        if (tag !== "input" && tag !== "textarea") e.preventDefault();
+      });
+      document.addEventListener("keydown", async (e) => {
+        const key = (e.key || "").toLowerCase();
+        const isPrint = e.key === "PrintScreen";
+        const isSaveShot = (e.ctrlKey && e.shiftKey && key === "s") || (e.metaKey && e.shiftKey && (key === "3" || key === "4" || key === "5"));
+        const isPrintPage = (e.ctrlKey || e.metaKey) && key === "p";
+        if (isPrint || isSaveShot || isPrintPage) {
+          e.preventDefault();
+          try { await navigator.clipboard.writeText(""); } catch (_) {}
+        }
+      });
+    }
 
     function showAuthMsg(text, ok = false) {
       authMsg.textContent = text;
@@ -1253,10 +1313,7 @@
       const value = (email || "").trim().toLowerCase();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return false;
       const domain = value.split("@")[1];
-      const blocked = [
-        "yahoo.com", "hotmail.com", "outlook.com", "live.com",
-        "icloud.com", "aol.com", "mail.com", "gmx.com"
-      ];
+      const blocked = ["yahoo.com", "hotmail.com", "outlook.com", "live.com", "icloud.com", "aol.com", "mail.com", "gmx.com"];
       if (domain === "gmail.com") return true;
       if (blocked.includes(domain)) return false;
       return true;
@@ -1266,7 +1323,6 @@
       loginView.classList.add("hidden");
       signupView.classList.add("hidden");
       resetView.classList.add("hidden");
-
       if (view === "login") loginView.classList.remove("hidden");
       if (view === "signup") signupView.classList.remove("hidden");
       if (view === "reset") resetView.classList.remove("hidden");
@@ -1311,6 +1367,19 @@
       });
     }
 
+    function userPrivacy(userData = {}) {
+      return userData.privacy || { hidePresence: false, hideEmail: true, hideBio: false };
+    }
+
+    function isPresenceVisible(userData = {}, viewerUid = null) {
+      if (viewerUid && userData.uid === viewerUid) return true;
+      return !userPrivacy(userData).hidePresence;
+    }
+
+    function isUserOnline(userData = {}, viewerUid = null) {
+      return !!(userData.presence && userData.presence.online && isPresenceVisible(userData, viewerUid));
+    }
+
     async function ensureUserRecord(user, extra = {}) {
       const userRef = ref(db, "users/" + user.uid);
       const snap = await get(userRef);
@@ -1346,7 +1415,6 @@
       };
 
       if (!snap.exists()) data.createdAt = Date.now();
-
       await update(userRef, data);
       return data;
     }
@@ -1372,20 +1440,8 @@
       });
     }
 
-    function userPrivacy(userData = {}) {
-      return userData.privacy || { hidePresence: false, hideEmail: true, hideBio: false };
-    }
-
-    function isPresenceVisible(userData = {}) {
-      return !userPrivacy(userData).hidePresence;
-    }
-
-    function isUserOnline(userData = {}) {
-      return !!(userData.presence && userData.presence.online && isPresenceVisible(userData));
-    }
-
     function avatarHtml(userData = {}, sizeClass = "") {
-      const online = isUserOnline(userData);
+      const online = isUserOnline(userData, currentUser?.uid || null);
       const photo = userData.photoURL || "";
       const name = userData.displayName || "Utilisateur";
       const email = userData.email || "";
@@ -1402,27 +1458,19 @@
       meName.textContent = userData.displayName || "Utilisateur";
 
       let bioDisplay = userData.bio || "Bienvenue sur ton espace social privé.";
-      if (privacy.hideBio && currentUser && userData.uid !== currentUser.uid) bioDisplay = "";
       if (!bioDisplay) bioDisplay = privacy.hidePresence ? "Présence masquée" : "🟢 Connecté";
-
       meBio.textContent = bioDisplay;
 
       if (userData.photoURL) {
-        meAvatar.innerHTML = `<img src="${userData.photoURL}" alt="avatar">${isUserOnline(userData) ? `<span class="status-dot"></span>` : ""}`;
+        meAvatar.innerHTML = `<img src="${userData.photoURL}" alt="avatar">${isUserOnline(userData, currentUser?.uid || null) ? `<span class="status-dot"></span>` : ""}`;
       } else {
-        meAvatar.innerHTML = `${escapeHtml(initials(userData.displayName, userData.email))}${isUserOnline(userData) ? `<span class="status-dot"></span>` : ""}`;
+        meAvatar.innerHTML = `${escapeHtml(initials(userData.displayName, userData.email))}${isUserOnline(userData, currentUser?.uid || null) ? `<span class="status-dot"></span>` : ""}`;
       }
 
       hidePresenceToggle.checked = !!privacy.hidePresence;
       hideEmailToggle.checked = !!privacy.hideEmail;
       hideBioToggle.checked = !!privacy.hideBio;
       navOnlineDot.style.visibility = privacy.hidePresence ? "hidden" : "visible";
-    }
-
-    function formatBytes(bytes) {
-      if (!bytes || bytes < 1024) return `${bytes || 0} o`;
-      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
-      return `${(bytes / (1024 * 1024)).toFixed(2)} Mo`;
     }
 
     function bytesFromDataURL(dataURL) {
@@ -1457,25 +1505,16 @@
       canvas.height = newHeight;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, newWidth, newHeight);
-      return { canvas, width: newWidth, height: newHeight };
-    }
-
-    function canvasToDataURL(canvas, type, quality) {
-      return canvas.toDataURL(type, quality);
+      return { canvas };
     }
 
     async function compressImageFile(file) {
       const img = await loadImageFromFile(file);
       const { canvas } = drawResizedToCanvas(img, MAX_WIDTH, MAX_HEIGHT);
-
-      let bestDataUrl = canvasToDataURL(canvas, "image/jpeg", JPEG_QUALITY);
-      const lighter = canvasToDataURL(canvas, "image/jpeg", 0.38);
+      let bestDataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+      const lighter = canvas.toDataURL("image/jpeg", 0.38);
       if (bytesFromDataURL(lighter) < bytesFromDataURL(bestDataUrl)) bestDataUrl = lighter;
-
-      return {
-        dataUrl: bestDataUrl,
-        size: bytesFromDataURL(bestDataUrl)
-      };
+      return { dataUrl: bestDataUrl, size: bytesFromDataURL(bestDataUrl) };
     }
 
     function readFileAsDataURL(file) {
@@ -1495,11 +1534,10 @@
 
     function renderAttachmentPreview() {
       const parts = [];
-
       if (selectedAttachment.images.length) {
         parts.push(`
           <div class="preview-grid">
-            ${selectedAttachment.images.map(img => `<img src="${img.dataUrl}" alt="preview image">`).join("")}
+            ${selectedAttachment.images.map(img => `<div class="img-frame"><img src="${img.dataUrl}" alt="preview image"></div>`).join("")}
           </div>
         `);
       }
@@ -1530,12 +1568,8 @@
     }
 
     function normalizePostPdf(post) {
-      if (post.pdfUrl) {
-        return { url: post.pdfUrl, name: post.pdfName || "Document PDF" };
-      }
-      if (post.attachmentType === "pdf" && post.attachmentUrl) {
-        return { url: post.attachmentUrl, name: post.attachmentName || "Document PDF" };
-      }
+      if (post.pdfUrl) return { url: post.pdfUrl, name: post.pdfName || "Document PDF" };
+      if (post.attachmentType === "pdf" && post.attachmentUrl) return { url: post.attachmentUrl, name: post.attachmentName || "Document PDF" };
       return null;
     }
 
@@ -1565,13 +1599,13 @@
         showPrivacyMsg("Confidentialité mise à jour.", true);
       } catch (e) {
         console.error(e);
-        showPrivacyMsg("Impossible d'enregistrer.", false);
+        showPrivacyMsg("Impossible d'enregistrer.");
       }
     }
 
     function renderImagesGrid(images) {
       if (!images.length) return "";
-      return `<div class="post-gallery">${images.map(url => `<img src="${url}" alt="image publication">`).join("")}</div>`;
+      return `<div class="post-gallery">${images.map(url => `<div class="img-frame"><img src="${url}" alt="image publication"></div>`).join("")}</div>`;
     }
 
     function renderPdfCard(pdf) {
@@ -1605,7 +1639,6 @@
 
     async function sendReport() {
       if (!currentUser || !currentReportTarget) return;
-
       const checked = document.querySelector('input[name="reportReason"]:checked');
       const quickReason = checked ? checked.value : "";
       const customReason = reportCustomText.value.trim();
@@ -1702,7 +1735,6 @@ ${post.text || "[aucun texte]"}
       if (!currentUser || currentUser.uid !== authorId) return;
       const post = postsMap[postId];
       if (!post || !canDeletePost(post)) return;
-
       const ok = confirm("Supprimer cette publication ?");
       if (!ok) return;
 
@@ -1724,6 +1756,7 @@ ${post.text || "[aucun texte]"}
       feed.innerHTML = posts.map(post => {
         const author = usersMap[post.authorId] || {};
         const authorName = author.displayName || "Utilisateur";
+        const privacy = userPrivacy(author);
         const images = normalizePostImages(post);
         const pdf = normalizePostPdf(post);
         const likeCount = likesMap[post.id] ? Object.keys(likesMap[post.id]).length : 0;
@@ -1731,7 +1764,6 @@ ${post.text || "[aucun texte]"}
         const comments = commentsMap[post.id]
           ? Object.entries(commentsMap[post.id]).map(([id, val]) => ({ id, ...val })).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
           : [];
-        const privacy = userPrivacy(author);
         const bioLine = privacy.hideBio ? "" : (author.bio || "");
 
         return `
@@ -1742,7 +1774,7 @@ ${post.text || "[aucun texte]"}
                 <div class="author-meta">
                   <div class="author-name-row">
                     <strong>${escapeHtml(authorName)}</strong>
-                    ${isUserOnline(author) ? `<span class="online-badge">Connecté</span>` : ``}
+                    ${isUserOnline(author, currentUser?.uid || null) ? `<span class="online-badge">Connecté</span>` : ``}
                   </div>
                   <div class="date-line">${escapeHtml(formatDate(post.createdAt))}</div>
                   ${bioLine ? `<div class="date-line">${escapeHtml(bioLine)}</div>` : ``}
@@ -1750,12 +1782,8 @@ ${post.text || "[aucun texte]"}
               </a>
 
               <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-                ${currentUser && currentUser.uid !== post.authorId
-                  ? `<button class="report-btn" data-report-post="${post.id}" data-report-author="${post.authorId}">Signaler</button>`
-                  : ""}
-                ${canDeletePost(post)
-                  ? `<button class="danger-btn" data-delete-post="${post.id}" data-author-id="${post.authorId}">Supprimer</button>`
-                  : ""}
+                ${currentUser && currentUser.uid !== post.authorId ? `<button class="report-btn" data-report-post="${post.id}" data-report-author="${post.authorId}">Signaler</button>` : ""}
+                ${canDeletePost(post) ? `<button class="danger-btn" data-delete-post="${post.id}" data-author-id="${post.authorId}">Supprimer</button>` : ""}
               </div>
             </div>
 
@@ -1763,9 +1791,7 @@ ${post.text || "[aucun texte]"}
             ${renderImagesGrid(images)}
             ${renderPdfCard(pdf)}
 
-            ${currentUser && currentUser.uid === post.authorId
-              ? `<div class="delete-note">${escapeHtml(deleteRemainingText(post))}</div>`
-              : ""}
+            ${currentUser && currentUser.uid === post.authorId ? `<div class="delete-note">${escapeHtml(deleteRemainingText(post))}</div>` : ""}
 
             <div class="post-actions">
               <button class="react-btn ${likedByMe ? "liked" : ""}" data-like-post="${post.id}">❤️ J'aime (${likeCount})</button>
@@ -1820,7 +1846,6 @@ ${post.text || "[aucun texte]"}
     postFileInput.addEventListener("change", async () => {
       const files = Array.from(postFileInput.files || []);
       clearComposerAttachment();
-
       if (!files.length) return;
 
       const pdfs = files.filter(f => f.type === "application/pdf");
@@ -1851,11 +1876,7 @@ ${post.text || "[aucun texte]"}
           }
 
           const dataUrl = await readFileAsDataURL(file);
-          selectedAttachment.pdf = {
-            dataUrl,
-            name: file.name,
-            size: file.size
-          };
+          selectedAttachment.pdf = { dataUrl, name: file.name, size: file.size };
           renderAttachmentPreview();
           showPublishMsg("Fichier prêt.", true);
           return;
@@ -1888,7 +1909,6 @@ ${post.text || "[aucun texte]"}
 
     publishBtn.addEventListener("click", async () => {
       if (!currentUser) return;
-
       const text = postText.value.trim();
       const imageUrls = selectedAttachment.images.map(img => img.dataUrl);
       const pdf = selectedAttachment.pdf;
@@ -1954,6 +1974,12 @@ ${post.text || "[aucun texte]"}
     hideEmailToggle.addEventListener("change", updatePrivacySettings);
     hideBioToggle.addEventListener("change", updatePrivacySettings);
 
+    privacyToggleBtn.addEventListener("click", () => {
+      const opened = !privacyPanel.classList.contains("hidden-panel");
+      privacyPanel.classList.toggle("hidden-panel", opened);
+      privacyToggleBtn.classList.toggle("open", !opened);
+    });
+
     signupBtn.addEventListener("click", async () => {
       const firstName = signupFirstName.value.trim();
       const lastName = signupLastName.value.trim();
@@ -1987,7 +2013,6 @@ ${post.text || "[aucun texte]"}
         const fullName = `${firstName} ${lastName}`.trim();
 
         await updateProfile(cred.user, { displayName: fullName });
-
         await ensureUserRecord(cred.user, {
           firstName,
           lastName,
@@ -2107,6 +2132,7 @@ ${post.text || "[aucun texte]"}
       });
     });
 
+    activatePageProtection();
     bindActivityEvents();
     showView("login");
     setUIConnected(false);
