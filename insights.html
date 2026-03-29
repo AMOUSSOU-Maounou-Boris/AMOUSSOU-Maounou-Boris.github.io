@@ -41,8 +41,8 @@
       display:flex;
       gap:18px;
       justify-content:center;
-      flex-wrap:wrap;
       align-items:center;
+      flex-wrap:wrap;
     }
 
     .topbar a{
@@ -57,9 +57,7 @@
       gap:8px;
     }
 
-    .topbar a.active{
-      border-bottom-color:#fff;
-    }
+    .topbar a.active{ border-bottom-color:#fff; }
 
     .login-link{
       background:#1678e5;
@@ -140,6 +138,7 @@
       height:52px;
       font-size:18px;
       margin-bottom:0;
+      flex:0 0 52px;
     }
 
     .status-dot{
@@ -171,12 +170,14 @@
     }
 
     .profile-box p{
-      margin:0 0 20px;
+      margin:0 0 18px;
       font-size:16px;
       line-height:1.5;
       color:rgba(255,255,255,0.95);
       position:relative;
       z-index:1;
+      white-space:pre-wrap;
+      word-break:break-word;
     }
 
     .panel-btn{
@@ -206,11 +207,88 @@
     .panel-btn.logout-btn{
       background:var(--red);
       color:#fff;
+      margin-bottom:0;
     }
 
-    .feed-section{
-      min-width:0;
+    .privacy-card{
+      margin-top:16px;
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:18px;
+      padding:14px;
+      position:relative;
+      z-index:1;
     }
+
+    .privacy-card h3{
+      margin:0 0 10px;
+      font-size:17px;
+    }
+
+    .privacy-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:9px 0;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+      font-size:14px;
+      color:#fff;
+    }
+
+    .privacy-item:last-child{ border-bottom:none; }
+
+    .switch{
+      position:relative;
+      width:48px;
+      height:28px;
+      flex:0 0 48px;
+    }
+
+    .switch input{
+      opacity:0;
+      width:0;
+      height:0;
+    }
+
+    .slider{
+      position:absolute;
+      inset:0;
+      background:rgba(255,255,255,0.25);
+      border-radius:999px;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .slider::before{
+      content:"";
+      position:absolute;
+      width:22px;
+      height:22px;
+      left:3px;
+      top:3px;
+      background:#fff;
+      border-radius:50%;
+      transition:.18s ease;
+    }
+
+    .switch input:checked + .slider{
+      background:#2f8cff;
+    }
+
+    .switch input:checked + .slider::before{
+      transform:translateX(20px);
+    }
+
+    .privacy-msg{
+      margin-top:8px;
+      font-size:12px;
+      font-weight:700;
+      color:#d9f6e5;
+      min-height:16px;
+    }
+
+    .feed-section{ min-width:0; }
 
     .composer-card{
       background:var(--card);
@@ -235,6 +313,7 @@
       resize:vertical;
       outline:none;
       background:#fcfdff;
+      font-family:inherit;
     }
 
     #postText:focus,
@@ -266,8 +345,12 @@
       border:1px solid #d9e6f5;
     }
 
-    .file-label input{
-      display:none;
+    .file-label input{ display:none; }
+
+    .helper-note{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
     }
 
     .primary-btn, .danger-btn, .small-btn, .report-btn{
@@ -317,24 +400,21 @@
       border:1px solid #ffd6d6;
     }
 
-    #composerPreview{
-      margin-top:14px;
+    #composerPreview{ margin-top:14px; }
+
+    .preview-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+      gap:12px;
     }
 
-    .preview-image, .post-image{
+    .preview-grid img{
       width:100%;
-      max-width:550px;
-      border-radius:18px;
-      display:block;
+      height:140px;
       object-fit:cover;
+      border-radius:16px;
       border:1px solid #dde5ef;
-    }
-
-    .preview-meta{
-      margin-top:10px;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:700;
+      display:block;
     }
 
     .pdf-card{
@@ -389,12 +469,14 @@
       border-radius:12px;
       text-decoration:none;
       font-weight:700;
+      white-space:nowrap;
     }
 
     .small-msg{
       margin-top:12px;
       font-size:14px;
       font-weight:700;
+      min-height:18px;
     }
 
     .post-card{
@@ -428,9 +510,7 @@
       min-width:0;
     }
 
-    .author-meta{
-      min-width:0;
-    }
+    .author-meta{ min-width:0; }
 
     .author-name-row{
       display:flex;
@@ -466,11 +546,36 @@
       margin-top:3px;
     }
 
+    .delete-note{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
     .post-text{
       margin:10px 0 14px;
       white-space:pre-wrap;
       font-size:17px;
       line-height:1.55;
+      word-break:break-word;
+    }
+
+    .post-gallery{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      gap:12px;
+      margin-top:8px;
+    }
+
+    .post-gallery img{
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      display:block;
+      border-radius:16px;
+      border:1px solid #e1e9f4;
+      background:#fff;
     }
 
     .post-actions{
@@ -492,13 +597,8 @@
       transition:.18s ease;
     }
 
-    .react-btn:hover{
-      transform:translateY(-1px);
-    }
-
-    .react-btn.liked{
-      background:#ffdfe8;
-    }
+    .react-btn:hover{ transform:translateY(-1px); }
+    .react-btn.liked{ background:#ffdfe8; }
 
     .comments-box{
       margin-top:8px;
@@ -690,7 +790,7 @@
       text-align:center;
     }
 
-    /* REPORT MODAL */
+    /* REPORT */
     .modal-overlay{
       position:fixed;
       inset:0;
@@ -741,9 +841,7 @@
       background:#f9fbfe;
     }
 
-    .reason-item input{
-      margin-top:3px;
-    }
+    .reason-item input{ margin-top:3px; }
 
     .report-textarea{
       width:100%;
@@ -755,6 +853,7 @@
       font-size:15px;
       outline:none;
       margin-bottom:14px;
+      font-family:inherit;
     }
 
     .modal-actions{
@@ -774,23 +873,17 @@
       cursor:pointer;
     }
 
-    .hidden{
-      display:none !important;
-    }
+    .hidden{ display:none !important; }
 
     @media (max-width: 1000px){
-      .page{
-        grid-template-columns:1fr;
-      }
-      .left-panel{
-        position:static;
-      }
+      .page{ grid-template-columns:1fr; }
+      .left-panel{ position:static; }
+      .post-head{ align-items:flex-start; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV PUBLIC -->
   <header class="topbar" id="publicTopbar">
     <nav>
       <a href="index.html">Home</a>
@@ -803,7 +896,6 @@
     </nav>
   </header>
 
-  <!-- NAV PRIVÉ -->
   <header class="topbar hidden" id="privateTopbar">
     <nav>
       <a href="index.html">Home</a>
@@ -813,11 +905,10 @@
       <a href="contact.html">Contact</a>
       <a href="insights.html" class="active">Insights</a>
       <a href="messages.html">Messages</a>
-      <a href="profile.html"><span class="nav-online-dot"></span> Mon compte</a>
+      <a href="profile.html"><span class="nav-online-dot" id="navOnlineDot"></span> Mon compte</a>
     </nav>
   </header>
 
-  <!-- LOGIN -->
   <div class="auth-overlay" id="authOverlay">
     <div class="auth-card">
       <div class="auth-logo">I</div>
@@ -905,7 +996,6 @@
     </div>
   </div>
 
-  <!-- PAGE PRIVÉE -->
   <main class="page hidden" id="appContent">
     <aside class="left-panel">
       <div class="profile-box">
@@ -914,6 +1004,37 @@
         <p id="meBio">Bienvenue sur ton espace social privé.</p>
         <a class="panel-btn" href="profile.html">Voir mon profil</a>
         <a class="panel-btn alt" href="messages.html">Messagerie</a>
+
+        <div class="privacy-card">
+          <h3>Confidentialité</h3>
+
+          <div class="privacy-item">
+            <span>Masquer la présence en ligne</span>
+            <label class="switch">
+              <input type="checkbox" id="hidePresenceToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="privacy-item">
+            <span>Masquer l'email</span>
+            <label class="switch">
+              <input type="checkbox" id="hideEmailToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="privacy-item">
+            <span>Masquer la bio</span>
+            <label class="switch">
+              <input type="checkbox" id="hideBioToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="privacy-msg" id="privacyMsg"></div>
+        </div>
+
         <button class="panel-btn logout-btn" id="logoutBtn" type="button">Déconnexion</button>
       </div>
     </aside>
@@ -925,10 +1046,11 @@
 
         <div class="composer-actions">
           <label class="file-label">
-            <span>📎 Image ou PDF</span>
-            <input type="file" id="postFileInput" accept="image/*,application/pdf" />
+            <span>📎 Photos ou PDF</span>
+            <input type="file" id="postFileInput" accept="image/*,application/pdf" multiple />
           </label>
           <button class="primary-btn" id="publishBtn" type="button">Publier</button>
+          <span class="helper-note">Photos multiples autorisées · 1 seul PDF maximum</span>
         </div>
 
         <div id="composerPreview"></div>
@@ -939,7 +1061,6 @@
     </section>
   </main>
 
-  <!-- REPORT -->
   <div class="modal-overlay hidden" id="reportModal">
     <div class="modal-card">
       <h3 class="modal-title">Signaler cette publication</h3>
@@ -1008,6 +1129,7 @@
 
     const publicTopbar = document.getElementById("publicTopbar");
     const privateTopbar = document.getElementById("privateTopbar");
+    const navOnlineDot = document.getElementById("navOnlineDot");
     const authOverlay = document.getElementById("authOverlay");
     const appContent = document.getElementById("appContent");
     const authMsg = document.getElementById("authMsg");
@@ -1041,6 +1163,11 @@
     const meBio = document.getElementById("meBio");
     const logoutBtn = document.getElementById("logoutBtn");
 
+    const hidePresenceToggle = document.getElementById("hidePresenceToggle");
+    const hideEmailToggle = document.getElementById("hideEmailToggle");
+    const hideBioToggle = document.getElementById("hideBioToggle");
+    const privacyMsg = document.getElementById("privacyMsg");
+
     const postText = document.getElementById("postText");
     const postFileInput = document.getElementById("postFileInput");
     const publishBtn = document.getElementById("publishBtn");
@@ -1059,7 +1186,10 @@
     let postsMap = {};
     let likesMap = {};
     let commentsMap = {};
-    let selectedAttachment = null;
+    let selectedAttachment = {
+      images: [],
+      pdf: null
+    };
     let inactivityTimeout = null;
     let currentReportTarget = null;
 
@@ -1067,9 +1197,11 @@
     const LAST_ACTIVITY_KEY = "insights_last_activity";
     const MAX_INPUT_FILE_SIZE = 10 * 1024 * 1024;
     const MAX_PDF_SIZE = 2 * 1024 * 1024;
-    const MAX_WIDTH = 1280;
-    const MAX_HEIGHT = 1280;
-    const JPEG_QUALITY = 0.72;
+    const MAX_IMAGE_COUNT = 6;
+    const MAX_WIDTH = 640;
+    const MAX_HEIGHT = 640;
+    const JPEG_QUALITY = 0.48;
+    const DELETE_WINDOW_MS = 30 * 60 * 1000;
     const urlParams = new URLSearchParams(window.location.search);
     const focusPostId = urlParams.get("postId");
 
@@ -1081,6 +1213,11 @@
     function showPublishMsg(text, ok = false) {
       publishMsg.textContent = text;
       publishMsg.style.color = ok ? "#14854b" : "#c0392b";
+    }
+
+    function showPrivacyMsg(text, ok = false) {
+      privacyMsg.textContent = text;
+      privacyMsg.style.color = ok ? "#d9f6e5" : "#ffd0d0";
     }
 
     function showReportMsg(text, ok = false) {
@@ -1150,11 +1287,7 @@
     }
 
     async function forceSessionCloseWithMessage(message) {
-      try {
-        await signOut(auth);
-      } catch (e) {
-        console.error(e);
-      }
+      try { await signOut(auth); } catch (e) { console.error(e); }
       currentUser = null;
       setUIConnected(false);
       showView("login");
@@ -1165,7 +1298,6 @@
     function resetInactivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
       clearTimeout(inactivityTimeout);
-
       inactivityTimeout = setTimeout(async () => {
         await forceSessionCloseWithMessage("Session expirée, veuillez vous reconnecter.");
       }, INACTIVITY_LIMIT);
@@ -1183,7 +1315,6 @@
       const userRef = ref(db, "users/" + user.uid);
       const snap = await get(userRef);
       const oldData = snap.exists() ? snap.val() : {};
-
       const displayName =
         extra.displayName ||
         oldData.displayName ||
@@ -1204,7 +1335,13 @@
         updatedAt: Date.now(),
         presence: oldData.presence || {
           online: false,
-          lastSeen: Date.now()
+          lastSeen: Date.now(),
+          displayName
+        },
+        privacy: oldData.privacy || {
+          hidePresence: false,
+          hideEmail: true,
+          hideBio: false
         }
       };
 
@@ -1214,7 +1351,7 @@
       return data;
     }
 
-    async function setupPresence(user) {
+    async function setupPresence(user, displayName) {
       const connectedRef = ref(db, ".info/connected");
       const presenceRef = ref(db, "users/" + user.uid + "/presence");
 
@@ -1222,26 +1359,70 @@
         if (snap.val() === true) {
           await onDisconnect(presenceRef).set({
             online: false,
-            lastSeen: Date.now()
+            lastSeen: Date.now(),
+            displayName: displayName || user.displayName || "Utilisateur"
           });
 
           await set(presenceRef, {
             online: true,
-            lastSeen: Date.now()
+            lastSeen: Date.now(),
+            displayName: displayName || user.displayName || "Utilisateur"
           });
         }
       });
     }
 
-    function renderMyBox(data) {
-      meName.textContent = data.displayName || "Utilisateur";
-      meBio.textContent = data.bio || "🟢 Connecté";
+    function userPrivacy(userData = {}) {
+      return userData.privacy || { hidePresence: false, hideEmail: true, hideBio: false };
+    }
 
-      if (data.photoURL) {
-        meAvatar.innerHTML = `<img src="${data.photoURL}" alt="avatar"><span class="status-dot"></span>`;
+    function isPresenceVisible(userData = {}) {
+      return !userPrivacy(userData).hidePresence;
+    }
+
+    function isUserOnline(userData = {}) {
+      return !!(userData.presence && userData.presence.online && isPresenceVisible(userData));
+    }
+
+    function avatarHtml(userData = {}, sizeClass = "") {
+      const online = isUserOnline(userData);
+      const photo = userData.photoURL || "";
+      const name = userData.displayName || "Utilisateur";
+      const email = userData.email || "";
+      return `
+        <div class="avatar ${sizeClass}">
+          ${photo ? `<img src="${photo}" alt="avatar">` : escapeHtml(initials(name, email))}
+          ${online ? `<span class="status-dot"></span>` : ""}
+        </div>
+      `;
+    }
+
+    function renderMyBox(userData) {
+      const privacy = userPrivacy(userData);
+      meName.textContent = userData.displayName || "Utilisateur";
+
+      let bioDisplay = userData.bio || "Bienvenue sur ton espace social privé.";
+      if (privacy.hideBio && currentUser && userData.uid !== currentUser.uid) bioDisplay = "";
+      if (!bioDisplay) bioDisplay = privacy.hidePresence ? "Présence masquée" : "🟢 Connecté";
+
+      meBio.textContent = bioDisplay;
+
+      if (userData.photoURL) {
+        meAvatar.innerHTML = `<img src="${userData.photoURL}" alt="avatar">${isUserOnline(userData) ? `<span class="status-dot"></span>` : ""}`;
       } else {
-        meAvatar.innerHTML = `${initials(data.displayName, data.email)}<span class="status-dot"></span>`;
+        meAvatar.innerHTML = `${escapeHtml(initials(userData.displayName, userData.email))}${isUserOnline(userData) ? `<span class="status-dot"></span>` : ""}`;
       }
+
+      hidePresenceToggle.checked = !!privacy.hidePresence;
+      hideEmailToggle.checked = !!privacy.hideEmail;
+      hideBioToggle.checked = !!privacy.hideBio;
+      navOnlineDot.style.visibility = privacy.hidePresence ? "hidden" : "visible";
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes < 1024) return `${bytes || 0} o`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
+      return `${(bytes / (1024 * 1024)).toFixed(2)} Mo`;
     }
 
     function bytesFromDataURL(dataURL) {
@@ -1249,12 +1430,6 @@
       const base64 = dataURL.split(",")[1] || "";
       const padding = (base64.match(/=*$/) || [""])[0].length;
       return Math.floor((base64.length * 3) / 4) - padding;
-    }
-
-    function formatBytes(bytes) {
-      if (!bytes || bytes < 1024) return `${bytes || 0} o`;
-      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
-      return `${(bytes / (1024 * 1024)).toFixed(2)} Mo`;
     }
 
     function loadImageFromFile(file) {
@@ -1274,16 +1449,14 @@
     function drawResizedToCanvas(img, maxWidth, maxHeight) {
       let { width, height } = img;
       const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
-      const newWidth = Math.round(width * ratio);
-      const newHeight = Math.round(height * ratio);
+      const newWidth = Math.max(1, Math.round(width * ratio));
+      const newHeight = Math.max(1, Math.round(height * ratio));
 
       const canvas = document.createElement("canvas");
       canvas.width = newWidth;
       canvas.height = newHeight;
-
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, newWidth, newHeight);
-
       return { canvas, width: newWidth, height: newHeight };
     }
 
@@ -1293,29 +1466,15 @@
 
     async function compressImageFile(file) {
       const img = await loadImageFromFile(file);
-      const { canvas, width, height } = drawResizedToCanvas(img, MAX_WIDTH, MAX_HEIGHT);
+      const { canvas } = drawResizedToCanvas(img, MAX_WIDTH, MAX_HEIGHT);
 
-      const originalType = file.type === "image/png" ? "image/png" : "image/jpeg";
-      let bestDataUrl = canvasToDataURL(canvas, originalType, JPEG_QUALITY);
-
-      if (originalType === "image/png") {
-        const jpegVersion = canvasToDataURL(canvas, "image/jpeg", 0.78);
-        if (bytesFromDataURL(jpegVersion) < bytesFromDataURL(bestDataUrl)) {
-          bestDataUrl = jpegVersion;
-        }
-      } else {
-        const lighter = canvasToDataURL(canvas, "image/jpeg", 0.64);
-        if (bytesFromDataURL(lighter) < bytesFromDataURL(bestDataUrl)) {
-          bestDataUrl = lighter;
-        }
-      }
+      let bestDataUrl = canvasToDataURL(canvas, "image/jpeg", JPEG_QUALITY);
+      const lighter = canvasToDataURL(canvas, "image/jpeg", 0.38);
+      if (bytesFromDataURL(lighter) < bytesFromDataURL(bestDataUrl)) bestDataUrl = lighter;
 
       return {
         dataUrl: bestDataUrl,
-        width,
-        height,
-        originalSize: file.size,
-        compressedSize: bytesFromDataURL(bestDataUrl)
+        size: bytesFromDataURL(bestDataUrl)
       };
     }
 
@@ -1328,63 +1487,107 @@
       });
     }
 
-    function renderAttachmentPreview(attachment) {
-      if (!attachment) {
-        composerPreview.innerHTML = "";
-        return;
-      }
+    function clearComposerAttachment() {
+      selectedAttachment = { images: [], pdf: null };
+      postFileInput.value = "";
+      composerPreview.innerHTML = "";
+    }
 
-      if (attachment.type === "image") {
-        composerPreview.innerHTML = `
-          <img src="${attachment.dataUrl}" class="preview-image" alt="preview">
-          <div class="preview-meta">
-            Image compressée : ${attachment.width} × ${attachment.height} —
-            avant ${formatBytes(attachment.originalSize)} —
-            après ${formatBytes(attachment.compressedSize)}
+    function renderAttachmentPreview() {
+      const parts = [];
+
+      if (selectedAttachment.images.length) {
+        parts.push(`
+          <div class="preview-grid">
+            ${selectedAttachment.images.map(img => `<img src="${img.dataUrl}" alt="preview image">`).join("")}
           </div>
-        `;
-        return;
+        `);
       }
 
-      if (attachment.type === "pdf") {
-        composerPreview.innerHTML = `
+      if (selectedAttachment.pdf) {
+        parts.push(`
           <div class="pdf-card">
             <div class="pdf-info">
               <div class="pdf-icon">PDF</div>
               <div>
-                <div class="pdf-title">${escapeHtml(attachment.name)}</div>
-                <div class="pdf-sub">Taille : ${formatBytes(attachment.size)}</div>
+                <div class="pdf-title">${escapeHtml(selectedAttachment.pdf.name)}</div>
+                <div class="pdf-sub">Document prêt à être publié</div>
               </div>
             </div>
-            <a class="pdf-open" href="${attachment.dataUrl}" target="_blank" rel="noopener">Ouvrir</a>
+            <a class="pdf-open" href="${selectedAttachment.pdf.dataUrl}" target="_blank" rel="noopener">Ouvrir</a>
           </div>
-        `;
+        `);
+      }
+
+      composerPreview.innerHTML = parts.join("");
+    }
+
+    function normalizePostImages(post) {
+      if (Array.isArray(post.imageUrls) && post.imageUrls.length) return post.imageUrls;
+      if (post.imageUrl) return [post.imageUrl];
+      if (post.attachmentType === "image" && post.attachmentUrl) return [post.attachmentUrl];
+      return [];
+    }
+
+    function normalizePostPdf(post) {
+      if (post.pdfUrl) {
+        return { url: post.pdfUrl, name: post.pdfName || "Document PDF" };
+      }
+      if (post.attachmentType === "pdf" && post.attachmentUrl) {
+        return { url: post.attachmentUrl, name: post.attachmentName || "Document PDF" };
+      }
+      return null;
+    }
+
+    function canDeletePost(post) {
+      if (!currentUser) return false;
+      if (currentUser.uid !== post.authorId) return false;
+      if (!post.createdAt) return false;
+      return (Date.now() - post.createdAt) <= DELETE_WINDOW_MS;
+    }
+
+    function deleteRemainingText(post) {
+      if (!post.createdAt) return "";
+      const remaining = DELETE_WINDOW_MS - (Date.now() - post.createdAt);
+      if (remaining <= 0) return "Suppression impossible après 30 min";
+      const mins = Math.max(1, Math.ceil(remaining / 60000));
+      return `Suppression possible encore ${mins} min`;
+    }
+
+    async function updatePrivacySettings() {
+      if (!currentUser) return;
+      try {
+        await update(ref(db, "users/" + currentUser.uid + "/privacy"), {
+          hidePresence: !!hidePresenceToggle.checked,
+          hideEmail: !!hideEmailToggle.checked,
+          hideBio: !!hideBioToggle.checked
+        });
+        showPrivacyMsg("Confidentialité mise à jour.", true);
+      } catch (e) {
+        console.error(e);
+        showPrivacyMsg("Impossible d'enregistrer.", false);
       }
     }
 
-    function renderPostAttachment(post) {
-      if (!post.attachmentUrl) return "";
+    function renderImagesGrid(images) {
+      if (!images.length) return "";
+      return `<div class="post-gallery">${images.map(url => `<img src="${url}" alt="image publication">`).join("")}</div>`;
+    }
 
-      if (post.attachmentType === "image") {
-        return `<img src="${post.attachmentUrl}" class="post-image" alt="image publication">`;
-      }
-
-      if (post.attachmentType === "pdf") {
-        return `
-          <div class="pdf-card">
-            <div class="pdf-info">
-              <div class="pdf-icon">PDF</div>
-              <div>
-                <div class="pdf-title">${escapeHtml(post.attachmentName || "Document PDF")}</div>
-                <div class="pdf-sub">Document joint</div>
-              </div>
+    function renderPdfCard(pdf) {
+      if (!pdf) return "";
+      return `
+        <div class="pdf-card">
+          <div class="pdf-info">
+            <div class="pdf-icon">PDF</div>
+            <div>
+              <div class="pdf-title">${escapeHtml(pdf.name || "Document PDF")}</div>
+              <div class="pdf-sub">Document joint</div>
             </div>
-            <a class="pdf-open" href="${post.attachmentUrl}" target="_blank" rel="noopener">Ouvrir</a>
           </div>
-        `;
-      }
-
-      return "";
+          <a class="pdf-open" href="${pdf.url}" target="_blank" rel="noopener">Ouvrir</a>
+        </div>
+      `;
     }
 
     function openReportModal(postId, authorId) {
@@ -1415,10 +1618,7 @@
       const post = postsMap[currentReportTarget.postId] || {};
       const reportedUser = usersMap[currentReportTarget.authorId] || {};
       const reporterUser = usersMap[currentUser.uid] || {};
-
-      const finalReason = customReason
-        ? (quickReason ? `${quickReason} | ${customReason}` : customReason)
-        : quickReason;
+      const finalReason = customReason ? (quickReason ? `${quickReason} | ${customReason}` : customReason) : quickReason;
 
       try {
         sendReportBtn.disabled = true;
@@ -1454,12 +1654,8 @@ ${post.text || "[aucun texte]"}
         );
 
         window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-
         showReportMsg("Signalement envoyé.", true);
-
-        setTimeout(() => {
-          closeReportModal();
-        }, 800);
+        setTimeout(() => closeReportModal(), 800);
       } catch (e) {
         console.error(e);
         showReportMsg("Impossible d'envoyer le signalement.");
@@ -1477,6 +1673,44 @@ ${post.text || "[aucun texte]"}
       setTimeout(() => target.classList.remove("highlight-post"), 4000);
     }
 
+    async function toggleLike(postId) {
+      if (!currentUser) return;
+      const likeRef = ref(db, `likes/${postId}/${currentUser.uid}`);
+      const snap = await get(likeRef);
+      if (snap.exists()) await remove(likeRef);
+      else await set(likeRef, true);
+    }
+
+    async function addComment(postId) {
+      if (!currentUser) return;
+      const input = document.getElementById(`comment-input-${postId}`);
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      const commentRef = push(ref(db, `comments/${postId}`));
+      await set(commentRef, {
+        authorId: currentUser.uid,
+        text,
+        createdAt: Date.now()
+      });
+
+      input.value = "";
+    }
+
+    async function deletePost(postId, authorId) {
+      if (!currentUser || currentUser.uid !== authorId) return;
+      const post = postsMap[postId];
+      if (!post || !canDeletePost(post)) return;
+
+      const ok = confirm("Supprimer cette publication ?");
+      if (!ok) return;
+
+      await remove(ref(db, "posts/" + postId));
+      await remove(ref(db, "comments/" + postId));
+      await remove(ref(db, "likes/" + postId));
+    }
+
     function rerenderFeed() {
       const posts = Object.entries(postsMap || {})
         .map(([id, value]) => ({ id, ...value }))
@@ -1490,28 +1724,28 @@ ${post.text || "[aucun texte]"}
       feed.innerHTML = posts.map(post => {
         const author = usersMap[post.authorId] || {};
         const authorName = author.displayName || "Utilisateur";
-        const authorPhoto = author.photoURL || "";
-        const comments = commentsMap[post.id]
-          ? Object.entries(commentsMap[post.id]).map(([id, val]) => ({ id, ...val }))
-          : [];
-
+        const images = normalizePostImages(post);
+        const pdf = normalizePostPdf(post);
         const likeCount = likesMap[post.id] ? Object.keys(likesMap[post.id]).length : 0;
         const likedByMe = !!(currentUser && likesMap[post.id] && likesMap[post.id][currentUser.uid]);
+        const comments = commentsMap[post.id]
+          ? Object.entries(commentsMap[post.id]).map(([id, val]) => ({ id, ...val })).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+          : [];
+        const privacy = userPrivacy(author);
+        const bioLine = privacy.hideBio ? "" : (author.bio || "");
 
         return `
           <article class="post-card ${focusPostId === post.id ? "highlight-post" : ""}" id="post-${post.id}">
             <div class="post-head">
               <a href="profile.html?uid=${encodeURIComponent(post.authorId)}" class="author-block">
-                <div class="avatar small-avatar">
-                  ${authorPhoto ? `<img src="${authorPhoto}" alt="avatar">` : initials(authorName, author.email)}
-                  ${author.presence && author.presence.online ? `<span class="status-dot"></span>` : ""}
-                </div>
+                ${avatarHtml(author, "small-avatar")}
                 <div class="author-meta">
                   <div class="author-name-row">
                     <strong>${escapeHtml(authorName)}</strong>
-                    ${author.presence && author.presence.online ? `<span class="online-badge">Connecté</span>` : ``}
+                    ${isUserOnline(author) ? `<span class="online-badge">Connecté</span>` : ``}
                   </div>
                   <div class="date-line">${escapeHtml(formatDate(post.createdAt))}</div>
+                  ${bioLine ? `<div class="date-line">${escapeHtml(bioLine)}</div>` : ``}
                 </div>
               </a>
 
@@ -1519,14 +1753,19 @@ ${post.text || "[aucun texte]"}
                 ${currentUser && currentUser.uid !== post.authorId
                   ? `<button class="report-btn" data-report-post="${post.id}" data-report-author="${post.authorId}">Signaler</button>`
                   : ""}
-                ${currentUser && currentUser.uid === post.authorId
+                ${canDeletePost(post)
                   ? `<button class="danger-btn" data-delete-post="${post.id}" data-author-id="${post.authorId}">Supprimer</button>`
                   : ""}
               </div>
             </div>
 
             ${post.text ? `<p class="post-text">${escapeHtml(post.text)}</p>` : ""}
-            ${renderPostAttachment(post)}
+            ${renderImagesGrid(images)}
+            ${renderPdfCard(pdf)}
+
+            ${currentUser && currentUser.uid === post.authorId
+              ? `<div class="delete-note">${escapeHtml(deleteRemainingText(post))}</div>`
+              : ""}
 
             <div class="post-actions">
               <button class="react-btn ${likedByMe ? "liked" : ""}" data-like-post="${post.id}">❤️ J'aime (${likeCount})</button>
@@ -1560,128 +1799,89 @@ ${post.text || "[aucun texte]"}
       }).join("");
 
       document.querySelectorAll("[data-like-post]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const postId = btn.dataset.likePost;
-          const likeRef = ref(db, `likes/${postId}/${currentUser.uid}`);
-          const snap = await get(likeRef);
-          if (snap.exists()) await remove(likeRef);
-          else await set(likeRef, true);
-        });
+        btn.addEventListener("click", () => toggleLike(btn.dataset.likePost));
       });
 
       document.querySelectorAll("[data-comment-post]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const postId = btn.dataset.commentPost;
-          const input = document.getElementById(`comment-input-${postId}`);
-          const text = input.value.trim();
-          if (!text) return;
-
-          const commentRef = push(ref(db, `comments/${postId}`));
-          await set(commentRef, {
-            authorId: currentUser.uid,
-            text,
-            createdAt: Date.now()
-          });
-
-          input.value = "";
-        });
+        btn.addEventListener("click", () => addComment(btn.dataset.commentPost));
       });
 
       document.querySelectorAll("[data-delete-post]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const postId = btn.dataset.deletePost;
-          const authorId = btn.dataset.authorId;
-          if (!currentUser || currentUser.uid !== authorId) return;
-
-          const ok = confirm("Supprimer cette publication ?");
-          if (!ok) return;
-
-          await remove(ref(db, "posts/" + postId));
-          await remove(ref(db, "likes/" + postId));
-          await remove(ref(db, "comments/" + postId));
-        });
+        btn.addEventListener("click", () => deletePost(btn.dataset.deletePost, btn.dataset.authorId));
       });
 
       document.querySelectorAll("[data-report-post]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          openReportModal(btn.dataset.reportPost, btn.dataset.reportAuthor);
-        });
+        btn.addEventListener("click", () => openReportModal(btn.dataset.reportPost, btn.dataset.reportAuthor));
       });
 
       scrollToFocusedPostIfNeeded();
     }
 
     postFileInput.addEventListener("change", async () => {
-      const file = postFileInput.files[0];
-      if (!file) {
-        selectedAttachment = null;
-        composerPreview.innerHTML = "";
+      const files = Array.from(postFileInput.files || []);
+      clearComposerAttachment();
+
+      if (!files.length) return;
+
+      const pdfs = files.filter(f => f.type === "application/pdf");
+      const images = files.filter(f => f.type.startsWith("image/"));
+      const others = files.filter(f => !f.type.startsWith("image/") && f.type !== "application/pdf");
+
+      if (others.length) {
+        showPublishMsg("Choisis uniquement des photos ou un PDF.");
         return;
       }
 
-      if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
-        selectedAttachment = null;
-        composerPreview.innerHTML = "";
-        postFileInput.value = "";
-        showPublishMsg("Choisis uniquement une image ou un PDF.");
+      if (pdfs.length > 1) {
+        showPublishMsg("Un seul PDF est autorisé.");
         return;
       }
 
-      if (file.size > MAX_INPUT_FILE_SIZE) {
-        selectedAttachment = null;
-        composerPreview.innerHTML = "";
-        postFileInput.value = "";
-        showPublishMsg("Fichier trop lourd. Maximum 10 Mo.");
+      if (pdfs.length && images.length) {
+        showPublishMsg("Choisis soit des photos, soit un PDF, pas les deux en même temps.");
         return;
       }
 
       try {
-        if (file.type === "application/pdf") {
+        if (pdfs.length) {
+          const file = pdfs[0];
           if (file.size > MAX_PDF_SIZE) {
-            selectedAttachment = null;
-            composerPreview.innerHTML = "";
-            postFileInput.value = "";
             showPublishMsg("PDF trop lourd. Garde un PDF de 2 Mo maximum.");
             return;
           }
 
           const dataUrl = await readFileAsDataURL(file);
-          selectedAttachment = {
-            type: "pdf",
+          selectedAttachment.pdf = {
             dataUrl,
             name: file.name,
             size: file.size
           };
-          renderAttachmentPreview(selectedAttachment);
-          showPublishMsg("PDF prêt à être publié.", true);
+          renderAttachmentPreview();
+          showPublishMsg("Fichier prêt.", true);
           return;
         }
 
-        showPublishMsg("Compression de l'image en cours...", true);
-        const result = await compressImageFile(file);
-
-        selectedAttachment = {
-          type: "image",
-          dataUrl: result.dataUrl,
-          width: result.width,
-          height: result.height,
-          originalSize: result.originalSize,
-          compressedSize: result.compressedSize,
-          name: file.name
-        };
-
-        renderAttachmentPreview(selectedAttachment);
-
-        if (result.compressedSize > 900 * 1024) {
-          showPublishMsg("Image compressée, mais encore un peu lourde.", false);
-        } else {
-          showPublishMsg("Image compressée avec succès.", true);
+        if (images.length > MAX_IMAGE_COUNT) {
+          showPublishMsg(`Maximum ${MAX_IMAGE_COUNT} photos à la fois.`);
+          return;
         }
+
+        for (const file of images) {
+          if (file.size > MAX_INPUT_FILE_SIZE) continue;
+          const result = await compressImageFile(file);
+          selectedAttachment.images.push(result);
+        }
+
+        if (!selectedAttachment.images.length) {
+          showPublishMsg("Aucune image valide.");
+          return;
+        }
+
+        renderAttachmentPreview();
+        showPublishMsg("Fichiers prêts.", true);
       } catch (e) {
         console.error(e);
-        selectedAttachment = null;
-        composerPreview.innerHTML = "";
-        postFileInput.value = "";
+        clearComposerAttachment();
         showPublishMsg("Impossible de traiter ce fichier.");
       }
     });
@@ -1690,8 +1890,10 @@ ${post.text || "[aucun texte]"}
       if (!currentUser) return;
 
       const text = postText.value.trim();
+      const imageUrls = selectedAttachment.images.map(img => img.dataUrl);
+      const pdf = selectedAttachment.pdf;
 
-      if (!text && !selectedAttachment) {
+      if (!text && !imageUrls.length && !pdf) {
         showPublishMsg("Écris quelque chose ou ajoute un fichier.");
         return;
       }
@@ -1704,16 +1906,14 @@ ${post.text || "[aucun texte]"}
         await set(postRef, {
           authorId: currentUser.uid,
           text,
-          attachmentType: selectedAttachment ? selectedAttachment.type : "",
-          attachmentUrl: selectedAttachment ? selectedAttachment.dataUrl : "",
-          attachmentName: selectedAttachment ? (selectedAttachment.name || "") : "",
+          imageUrls,
+          pdfUrl: pdf ? pdf.dataUrl : "",
+          pdfName: pdf ? pdf.name : "",
           createdAt: Date.now()
         });
 
         postText.value = "";
-        postFileInput.value = "";
-        selectedAttachment = null;
-        composerPreview.innerHTML = "";
+        clearComposerAttachment();
         showPublishMsg("Publication ajoutée avec succès.", true);
       } catch (e) {
         console.error(e);
@@ -1749,6 +1949,10 @@ ${post.text || "[aucun texte]"}
     reportModal.addEventListener("click", (e) => {
       if (e.target === reportModal) closeReportModal();
     });
+
+    hidePresenceToggle.addEventListener("change", updatePrivacySettings);
+    hideEmailToggle.addEventListener("change", updatePrivacySettings);
+    hideBioToggle.addEventListener("change", updatePrivacySettings);
 
     signupBtn.addEventListener("click", async () => {
       const firstName = signupFirstName.value.trim();
@@ -1879,13 +2083,11 @@ ${post.text || "[aucun texte]"}
 
       const myData = await ensureUserRecord(user);
       renderMyBox(myData);
-      setupPresence(user);
+      await setupPresence(user, myData.displayName || user.displayName || "Utilisateur");
 
       onValue(ref(db, "users"), snap => {
         usersMap = snap.val() || {};
-        if (currentUser && usersMap[currentUser.uid]) {
-          renderMyBox(usersMap[currentUser.uid]);
-        }
+        if (currentUser && usersMap[currentUser.uid]) renderMyBox(usersMap[currentUser.uid]);
         rerenderFeed();
       });
 
