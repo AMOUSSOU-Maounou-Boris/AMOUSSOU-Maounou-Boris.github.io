@@ -1152,6 +1152,7 @@
     let currentTab = "all";
     let usersCache = {};
     let blockedUsersCache = {};
+    let allBlocksCache = {};
     let replyTarget = null;
     let forwardPayload = null;
     let selectedAttachment = null;
@@ -1195,12 +1196,50 @@
       return [uid1, uid2].sort().join("_");
     }
 
+    function getPrivacy(profile = {}) {
+      return profile?.privacy || {
+        hidePresence: false,
+        hideEmail: true,
+        hideBio: false
+      };
+    }
+
+    function canSeePresence(profile = {}) {
+      if (!profile?.uid) return false;
+      if (currentUser && profile.uid === currentUser.uid) return true;
+      return !getPrivacy(profile).hidePresence;
+    }
+
+    function canSeeEmail(profile = {}) {
+      if (!profile?.uid) return false;
+      if (currentUser && profile.uid === currentUser.uid) return true;
+      return !getPrivacy(profile).hideEmail;
+    }
+
+    function canSeeBio(profile = {}) {
+      if (!profile?.uid) return false;
+      if (currentUser && profile.uid === currentUser.uid) return true;
+      return !getPrivacy(profile).hideBio;
+    }
+
     function isOnline(uid) {
-      return !!usersCache[uid]?.presence?.online;
+      const profile = usersCache[uid] || {};
+      if (!canSeePresence(profile)) return false;
+      return !!profile?.presence?.online;
     }
 
     function presenceText(uid) {
-      const data = usersCache[uid]?.presence || {};
+      const profile = usersCache[uid] || {};
+      const privacy = getPrivacy(profile);
+      const data = profile?.presence || {};
+
+      if (currentUser && uid === currentUser.uid) {
+        if (data.online) return "En ligne";
+        if (data.lastSeen) return "Vu : " + formatDate(data.lastSeen);
+        return "Hors ligne";
+      }
+
+      if (privacy.hidePresence) return "Visibilité masquée";
       if (data.online) return "En ligne";
       if (data.lastSeen) return "Vu : " + formatDate(data.lastSeen);
       return "Hors ligne";
@@ -1208,6 +1247,35 @@
 
     function isBlocked(uid) {
       return !!blockedUsersCache[uid];
+    }
+
+    function amIBlockedBy(uid) {
+      return !!allBlocksCache?.[uid]?.[currentUser?.uid];
+    }
+
+    function isConversationBlocked(uid) {
+      return isBlocked(uid) || amIBlockedBy(uid);
+    }
+
+    function visibleEmail(profile = {}) {
+      if (canSeeEmail(profile)) return profile.email || "";
+      return "";
+    }
+
+    function visibleBio(profile = {}) {
+      if (canSeeBio(profile)) return profile.bio || "";
+      return "";
+    }
+
+    function searchableText(profile = {}) {
+      return [
+        profile.displayName || "",
+        profile.firstName || "",
+        profile.lastName || "",
+        profile.country || "",
+        profile.email || "",
+        profile.bio || ""
+      ].join(" ").toLowerCase();
     }
 
     function setStatus(text = "", isError = false) {
@@ -1340,39 +1408,69 @@
         return;
       }
 
+      const blockedByMe = isBlocked(selectedUserId);
+      const blockedByThem = amIBlockedBy(selectedUserId);
+
       chatAvatar.innerHTML = avatarMarkup(selectedUserProfile);
       chatTitle.textContent = selectedUserProfile.displayName || "Membre";
-      chatSubtitle.textContent = selectedUserProfile.bio || selectedUserProfile.email || "Conversation privée";
-      chatPresence.textContent = isBlocked(selectedUserId) ? "Tu as bloqué cet utilisateur" : presenceText(selectedUserId);
+      chatSubtitle.textContent =
+        visibleBio(selectedUserProfile) ||
+        visibleEmail(selectedUserProfile) ||
+        "Conversation privée";
+
+      if (blockedByMe) {
+        chatPresence.textContent = "Tu as bloqué cet utilisateur";
+      } else if (blockedByThem) {
+        chatPresence.textContent = "Cet utilisateur ne peut pas recevoir tes messages";
+      } else {
+        chatPresence.textContent = presenceText(selectedUserId);
+      }
+
       chatOptionsBtn.style.display = "inline-flex";
     }
 
     function updateComposerState() {
-      if (selectedUserId && isBlocked(selectedUserId)) {
-        messageInput.disabled = true;
-        sendBtn.disabled = true;
-        togglePanelBtn.disabled = true;
-        messageInput.placeholder = "Tu as bloqué cet utilisateur. Débloque-le pour écrire.";
-      } else {
+      if (!selectedUserId) {
         messageInput.disabled = false;
         sendBtn.disabled = false;
         togglePanelBtn.disabled = false;
         messageInput.placeholder = "Écris un message privé...";
+        return;
       }
+
+      if (isBlocked(selectedUserId)) {
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        togglePanelBtn.disabled = true;
+        messageInput.placeholder = "Tu as bloqué cet utilisateur. Débloque-le pour écrire.";
+        return;
+      }
+
+      if (amIBlockedBy(selectedUserId)) {
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        togglePanelBtn.disabled = true;
+        messageInput.placeholder = "Message impossible : l'un d'entre vous a bloqué l'autre.";
+        return;
+      }
+
+      messageInput.disabled = false;
+      sendBtn.disabled = false;
+      togglePanelBtn.disabled = false;
+      messageInput.placeholder = "Écris un message privé...";
     }
 
     function renderMembers() {
       if (!currentUser) return;
 
       const q = memberSearch.value.trim().toLowerCase();
-      let list = Object.values(usersCache).filter(u => u.uid !== currentUser.uid);
+      let list = Object.values(usersCache).filter(u => u && u.uid && u.uid !== currentUser.uid);
 
-      if (currentTab === "online") list = list.filter(u => isOnline(u.uid));
+      if (currentTab === "online") {
+        list = list.filter(u => isOnline(u.uid));
+      }
 
-      list = list.filter(u => {
-        const txt = `${u.displayName || ""} ${u.email || ""} ${u.bio || ""}`.toLowerCase();
-        return txt.includes(q);
-      });
+      list = list.filter(u => searchableText(u).includes(q));
 
       list.sort((a, b) => {
         const aOnline = isOnline(a.uid) ? 1 : 0;
@@ -1386,20 +1484,30 @@
         return;
       }
 
-      membersList.innerHTML = list.map(profile => `
-        <div class="member-card" data-uid="${profile.uid}">
-          <div class="avatar small">${avatarMarkup(profile)}</div>
-          <div class="member-main">
-            <div class="member-name">${escapeHtml(profile.displayName || "Membre")}</div>
-            <div class="member-sub">${escapeHtml(profile.bio || profile.email || "")}</div>
-            <div class="member-status">
-              <span class="status-dot ${isOnline(profile.uid) ? "online" : ""}"></span>
-              <span>${isBlocked(profile.uid) ? "Bloqué" : escapeHtml(presenceText(profile.uid))}</span>
+      membersList.innerHTML = list.map(profile => {
+        const blockedByMe = isBlocked(profile.uid);
+        const blockedByThem = amIBlockedBy(profile.uid);
+        const subLine = visibleBio(profile) || visibleEmail(profile) || "Informations masquées";
+
+        let statusLine = presenceText(profile.uid);
+        if (blockedByMe) statusLine = "Bloqué";
+        if (blockedByThem) statusLine = "Cet utilisateur t'a bloqué";
+
+        return `
+          <div class="member-card" data-uid="${profile.uid}">
+            <div class="avatar small">${avatarMarkup(profile)}</div>
+            <div class="member-main">
+              <div class="member-name">${escapeHtml(profile.displayName || "Membre")}</div>
+              <div class="member-sub">${escapeHtml(subLine)}</div>
+              <div class="member-status">
+                <span class="status-dot ${isOnline(profile.uid) ? "online" : ""}"></span>
+                <span>${escapeHtml(statusLine)}</span>
+              </div>
             </div>
+            <button class="profile-btn" type="button" data-profile-uid="${profile.uid}">Profil</button>
           </div>
-          <button class="profile-btn" type="button" data-profile-uid="${profile.uid}">Profil</button>
-        </div>
-      `).join("");
+        `;
+      }).join("");
 
       document.querySelectorAll(".member-card").forEach(card => {
         card.addEventListener("click", (e) => {
@@ -1483,9 +1591,9 @@
       const q = forwardSearch.value.trim().toLowerCase();
 
       const list = Object.values(usersCache)
-        .filter(u => u.uid !== currentUser.uid)
-        .filter(u => !isBlocked(u.uid))
-        .filter(u => `${u.displayName || ""} ${u.email || ""}`.toLowerCase().includes(q))
+        .filter(u => u && u.uid && u.uid !== currentUser.uid)
+        .filter(u => !isConversationBlocked(u.uid))
+        .filter(u => searchableText(u).includes(q))
         .sort((a, b) => (a.displayName || "").localeCompare(b.displayName || ""));
 
       if (!list.length) {
@@ -1498,7 +1606,7 @@
           <div class="avatar small">${avatarMarkup(u)}</div>
           <div class="forward-member-text">
             <strong>${escapeHtml(u.displayName || "Membre")}</strong>
-            <span>${escapeHtml(u.email || "")}</span>
+            <span>${escapeHtml(visibleEmail(u) || "Email masqué")}</span>
           </div>
           <button class="main-btn" type="button" data-forward-uid="${u.uid}">Transférer</button>
         </div>
@@ -1511,6 +1619,10 @@
 
     async function forwardMessageToUser(targetUid) {
       if (!currentUser || !forwardPayload || !targetUid) return;
+      if (isConversationBlocked(targetUid)) {
+        setStatus("Message impossible : l'un d'entre vous a bloqué l'autre.", true);
+        return;
+      }
 
       try {
         const chatId = makeChatId(currentUser.uid, targetUid);
@@ -1545,7 +1657,13 @@
       renderReplyPreview();
       renderChatHeader();
       updateComposerState();
-      setStatus("");
+
+      if (isConversationBlocked(uid)) {
+        setStatus("Message impossible : l'un d'entre vous a bloqué l'autre.", true);
+      } else {
+        setStatus("");
+      }
+
       listenMessages();
     }
 
@@ -1661,7 +1779,6 @@
       });
     }
 
-    let unsubscribeMessages = null;
     function listenMessages() {
       if (!currentChatId) return;
       onValue(ref(db, "privateMessages/" + currentChatId), (snap) => {
@@ -1796,12 +1913,15 @@
 
     async function sendMessage() {
       if (!currentUser) return;
+
       if (!selectedUserId) {
         alert("Choisis d’abord un membre.");
         return;
       }
-      if (isBlocked(selectedUserId)) {
-        setStatus("Impossible d’écrire à cet utilisateur car tu l’as bloqué.", true);
+
+      if (isConversationBlocked(selectedUserId)) {
+        setStatus("Message impossible : l'un d'entre vous a bloqué l'autre.", true);
+        updateComposerState();
         return;
       }
 
@@ -2007,6 +2127,19 @@
       });
     }
 
+    function subscribeAllBlocks() {
+      onValue(ref(db, "blockedUsers"), (snap) => {
+        allBlocksCache = snap.val() || {};
+        renderMembers();
+        renderChatHeader();
+        updateComposerState();
+
+        if (selectedUserId && isConversationBlocked(selectedUserId)) {
+          setStatus("Message impossible : l'un d'entre vous a bloqué l'autre.", true);
+        }
+      });
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "insights.html";
@@ -2032,6 +2165,7 @@
       renderChatHeader();
       subscribeUsers();
       subscribeBlockedUsers();
+      subscribeAllBlocks();
       bindActivityEvents();
       resetActivityTimer();
 
