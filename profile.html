@@ -4,7 +4,461 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profil</title>
-  <link rel="stylesheet" href="profile.css" />
+  <style>
+    * { box-sizing: border-box; }
+
+    :root{
+      --bg:#eaf5ff;
+      --card:#ffffff;
+      --nav:#082e5b;
+      --text:#0b2340;
+      --muted:#6b7d93;
+      --blue:#2f8cff;
+      --blue-dark:#0f4d92;
+      --green:#18c34a;
+      --red:#df4b4b;
+      --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
+      --line:#d9e5f2;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .topbar{
+      background:var(--nav);
+      padding:18px 20px;
+      position:sticky;
+      top:0;
+      z-index:20;
+      box-shadow:0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .topbar nav{
+      display:flex;
+      gap:18px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .topbar a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+      font-size:17px;
+      padding:4px 2px;
+      border-bottom:3px solid transparent;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .topbar a.active{
+      border-bottom-color:#fff;
+    }
+
+    .nav-online-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green);
+      display:inline-block;
+      box-shadow:0 0 0 2px rgba(255,255,255,0.18);
+    }
+
+    .profile-page{
+      max-width:1450px;
+      margin:26px auto;
+      padding:0 18px 40px;
+      display:grid;
+      gap:24px;
+    }
+
+    .profile-card{
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:24px;
+      background:var(--card);
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      padding:26px;
+    }
+
+    .profile-left{
+      background:linear-gradient(180deg, #0d376d 0%, #032750 100%);
+      border-radius:28px;
+      padding:24px;
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .profile-left::before{
+      content:"";
+      position:absolute;
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.05);
+      right:-60px;
+      top:-60px;
+    }
+
+    .big-avatar{
+      width:150px;
+      height:150px;
+      border-radius:50%;
+      background:#184684;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:56px;
+      font-weight:800;
+      color:#fff;
+      overflow:hidden;
+      border:4px solid rgba(255,255,255,0.18);
+      position:relative;
+      margin-bottom:18px;
+    }
+
+    .big-avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .profile-right{
+      min-width:0;
+    }
+
+    .profile-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+    }
+
+    .profile-top h1{
+      margin:0 0 8px;
+      font-size:38px;
+      line-height:1.12;
+    }
+
+    .profile-top p{
+      margin:0 0 8px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:16px;
+    }
+
+    .status-line{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:14px;
+      font-weight:700;
+      color:#14854b;
+      margin-top:8px;
+    }
+
+    .status-dot{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:#a6b7c9;
+      display:inline-block;
+      flex:0 0 12px;
+    }
+
+    .status-dot.online{
+      background:var(--green);
+    }
+
+    .profile-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn{
+      border:none;
+      border-radius:16px;
+      padding:13px 18px;
+      font-weight:800;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+
+    .primary-btn{
+      background:var(--blue-dark);
+      color:#fff;
+    }
+
+    .secondary-btn{
+      background:#eef4fb;
+      color:var(--text);
+    }
+
+    .danger-btn{
+      background:var(--red);
+      color:#fff;
+    }
+
+    .editor-block,
+    .bio-block,
+    .posts-section{
+      background:#fff;
+      border:1px solid #e4edf7;
+      border-radius:24px;
+      padding:20px;
+      box-shadow:0 8px 18px rgba(8, 33, 64, 0.05);
+    }
+
+    .editor-block{
+      margin-bottom:18px;
+    }
+
+    .editor-block label{
+      display:block;
+      font-weight:800;
+      margin-bottom:8px;
+      margin-top:12px;
+      font-size:14px;
+    }
+
+    .editor-block label:first-child{
+      margin-top:0;
+    }
+
+    .editor-block input,
+    .editor-block textarea{
+      width:100%;
+      border:1px solid #d3ddea;
+      border-radius:16px;
+      padding:13px 14px;
+      font-size:15px;
+      outline:none;
+      font-family:inherit;
+      background:#fcfdff;
+    }
+
+    .editor-block input:focus,
+    .editor-block textarea:focus{
+      border-color:#7fb5ff;
+      box-shadow:0 0 0 3px rgba(47, 140, 255, 0.13);
+    }
+
+    .info-text{
+      margin-top:12px;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    .bio-block h3{
+      margin:0 0 10px;
+      font-size:22px;
+    }
+
+    .bio-block p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:28px;
+    }
+
+    .posts-grid{
+      display:grid;
+      gap:16px;
+    }
+
+    .post-preview{
+      background:#fff;
+      border-radius:22px;
+      border:1px solid #e3ebf5;
+      box-shadow:0 8px 18px rgba(8, 33, 64, 0.05);
+      overflow:hidden;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .post-preview:hover{
+      transform:translateY(-2px);
+    }
+
+    .post-preview-img{
+      width:100%;
+      max-height:420px;
+      object-fit:cover;
+      display:block;
+      border-bottom:1px solid #e6eef8;
+    }
+
+    .post-preview-body{
+      padding:16px 18px 18px;
+    }
+
+    .post-preview-body p{
+      margin:0 0 10px;
+      line-height:1.6;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-size:16px;
+    }
+
+    .post-preview-body small{
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .pdf-card{
+      margin-top:6px;
+      padding:14px;
+      border:1px solid #dce6f3;
+      border-radius:18px;
+      background:#f8fbff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .pdf-info{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .pdf-icon{
+      width:44px;
+      height:44px;
+      border-radius:12px;
+      background:#e53e3e;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      flex:0 0 44px;
+    }
+
+    .pdf-title{
+      font-weight:800;
+      word-break:break-word;
+    }
+
+    .pdf-sub{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:3px;
+    }
+
+    .pdf-open{
+      text-decoration:none;
+      background:var(--blue-dark);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:800;
+      font-size:14px;
+      white-space:nowrap;
+    }
+
+    .empty-card{
+      background:#fff;
+      border-radius:22px;
+      padding:18px;
+      font-weight:700;
+      color:var(--muted);
+      box-shadow:var(--shadow);
+    }
+
+    .avatar-note{
+      margin-top:12px;
+      text-align:center;
+      color:rgba(255,255,255,0.9);
+      line-height:1.5;
+      font-size:13px;
+      position:relative;
+      z-index:1;
+    }
+
+    .preview-image-box{
+      margin-top:14px;
+      width:100%;
+      position:relative;
+      z-index:1;
+    }
+
+    .preview-image-box img{
+      width:100%;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,0.14);
+      display:block;
+    }
+
+    .preview-meta{
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(255,255,255,0.92);
+      font-weight:700;
+      line-height:1.45;
+    }
+
+    .session-note{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    @media (max-width: 980px){
+      .profile-card{
+        grid-template-columns:1fr;
+      }
+
+      .profile-top{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="topbar">
@@ -16,7 +470,7 @@
       <a href="contact.html">Contact</a>
       <a href="insights.html">Insights</a>
       <a href="messages.html">Messages</a>
-      <a href="profile.html" class="active">Mon compte</a>
+      <a href="profile.html" class="active"><span class="nav-online-dot"></span> Mon compte</a>
     </nav>
   </header>
 
@@ -25,7 +479,11 @@
       <div class="profile-left">
         <div class="big-avatar" id="bigAvatar">MB</div>
         <input type="file" id="avatarInput" accept="image/*" class="hidden" />
-        <button class="secondary-btn" id="changeAvatarBtn">Changer la photo</button>
+        <button class="secondary-btn" id="changeAvatarBtn" type="button">Changer la photo</button>
+        <div class="avatar-note">
+          Photo de profil légère et compressée automatiquement.
+        </div>
+        <div class="preview-image-box hidden" id="avatarPreviewMount"></div>
       </div>
 
       <div class="profile-right">
@@ -37,7 +495,9 @@
               <span class="status-dot" id="statusDot"></span>
               <span id="statusText">Chargement...</span>
             </div>
+            <div class="session-note">Les publications de ce profil sont cliquables et ouvrent directement Insights.</div>
           </div>
+
           <div class="profile-actions">
             <a class="secondary-btn" id="messageBtn" href="messages.html">Message</a>
           </div>
@@ -50,7 +510,7 @@
           <label for="bioInput">Bio</label>
           <textarea id="bioInput" rows="5" placeholder="Présente-toi en quelques lignes..."></textarea>
 
-          <button class="primary-btn" id="saveProfileBtn">Enregistrer le profil</button>
+          <button class="primary-btn" id="saveProfileBtn" type="button">Enregistrer le profil</button>
           <div class="info-text" id="profileMsg"></div>
         </div>
 
@@ -70,14 +530,14 @@
   </main>
 
   <script type="module">
-    import { auth, db, storage } from "./firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
     const bigAvatar = document.getElementById("bigAvatar");
     const changeAvatarBtn = document.getElementById("changeAvatarBtn");
     const avatarInput = document.getElementById("avatarInput");
+    const avatarPreviewMount = document.getElementById("avatarPreviewMount");
     const profileName = document.getElementById("profileName");
     const profileEmail = document.getElementById("profileEmail");
     const statusDot = document.getElementById("statusDot");
@@ -89,6 +549,7 @@
     const bioText = document.getElementById("bioText");
     const editorBlock = document.getElementById("editorBlock");
     const userPosts = document.getElementById("userPosts");
+    const messageBtn = document.getElementById("messageBtn");
 
     const params = new URLSearchParams(window.location.search);
     const requestedUid = params.get("uid");
@@ -96,6 +557,32 @@
     let currentUser = null;
     let viewedUid = null;
     let viewedUser = null;
+    let usersCache = {};
+    let activityTimeout = null;
+
+    const INACTIVITY_LIMIT = 15 * 60 * 1000;
+    const LAST_ACTIVITY_KEY = "insights_last_activity";
+    const MAX_INPUT_FILE_SIZE = 10 * 1024 * 1024;
+    const MAX_WIDTH = 900;
+    const MAX_HEIGHT = 900;
+    const JPEG_QUALITY = 0.72;
+
+    function resetActivityTimer() {
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+      clearTimeout(activityTimeout);
+      activityTimeout = setTimeout(async () => {
+        try { await signOut(auth); } catch (e) {}
+        window.location.href = "insights.html";
+      }, INACTIVITY_LIMIT);
+    }
+
+    function bindActivityEvents() {
+      ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
+        window.addEventListener(evt, () => {
+          if (auth.currentUser) resetActivityTimer();
+        }, { passive: true });
+      });
+    }
 
     function initials(name = "", email = "") {
       const s = (name || email || "U").trim();
@@ -121,6 +608,19 @@
       });
     }
 
+    function formatBytes(bytes) {
+      if (!bytes || bytes < 1024) return `${bytes || 0} o`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
+      return `${(bytes / (1024 * 1024)).toFixed(2)} Mo`;
+    }
+
+    function bytesFromDataURL(dataURL) {
+      if (!dataURL || !dataURL.includes(",")) return 0;
+      const base64 = dataURL.split(",")[1] || "";
+      const padding = (base64.match(/=*$/) || [""])[0].length;
+      return Math.floor((base64.length * 3) / 4) - padding;
+    }
+
     function showAvatar(photoURL, name, email) {
       if (photoURL) bigAvatar.innerHTML = `<img src="${photoURL}" alt="avatar">`;
       else bigAvatar.textContent = initials(name, email);
@@ -131,11 +631,75 @@
       profileMsg.style.color = ok ? "#12824b" : "#c0392b";
     }
 
+    function loadImageFromFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function drawResizedToCanvas(img, maxWidth, maxHeight) {
+      let { width, height } = img;
+      const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+      const newWidth = Math.round(width * ratio);
+      const newHeight = Math.round(height * ratio);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+      return { canvas, width: newWidth, height: newHeight };
+    }
+
+    function canvasToDataURL(canvas, type, quality) {
+      return canvas.toDataURL(type, quality);
+    }
+
+    async function compressImageFile(file) {
+      const img = await loadImageFromFile(file);
+      const { canvas, width, height } = drawResizedToCanvas(img, MAX_WIDTH, MAX_HEIGHT);
+
+      const originalType = file.type === "image/png" ? "image/png" : "image/jpeg";
+      let bestDataUrl = canvasToDataURL(canvas, originalType, JPEG_QUALITY);
+
+      if (originalType === "image/png") {
+        const jpegVersion = canvasToDataURL(canvas, "image/jpeg", 0.78);
+        if (bytesFromDataURL(jpegVersion) < bytesFromDataURL(bestDataUrl)) {
+          bestDataUrl = jpegVersion;
+        }
+      } else {
+        const lighter = canvasToDataURL(canvas, "image/jpeg", 0.64);
+        if (bytesFromDataURL(lighter) < bytesFromDataURL(bestDataUrl)) {
+          bestDataUrl = lighter;
+        }
+      }
+
+      return {
+        dataUrl: bestDataUrl,
+        width,
+        height,
+        originalSize: file.size,
+        compressedSize: bytesFromDataURL(bestDataUrl)
+      };
+    }
+
     async function loadUserProfile(uid) {
       const snap = await get(ref(db, "users/" + uid));
       if (!snap.exists()) {
         profileName.textContent = "Profil introuvable";
+        profileEmail.textContent = "";
+        bioText.textContent = "Ce profil n'existe pas.";
         editorBlock.style.display = "none";
+        changeAvatarBtn.style.display = "none";
         return;
       }
 
@@ -150,19 +714,53 @@
       changeAvatarBtn.style.display = isMine ? "inline-flex" : "none";
       nameInput.value = viewedUser.displayName || "";
       bioInput.value = viewedUser.bio || "";
+
+      if (isMine) {
+        messageBtn.style.display = "none";
+      } else {
+        messageBtn.style.display = "inline-flex";
+        messageBtn.href = `messages.html?user=${encodeURIComponent(uid)}`;
+      }
     }
 
     function listenPresence(uid) {
-      onValue(ref(db, "presence/" + uid), (snap) => {
+      onValue(ref(db, "users/" + uid + "/presence"), (snap) => {
         const data = snap.val() || {};
         if (data.online) {
           statusDot.classList.add("online");
           statusText.textContent = "En ligne";
+          statusText.style.color = "#14854b";
         } else {
           statusDot.classList.remove("online");
           statusText.textContent = data.lastSeen ? "Dernière activité : " + formatDate(data.lastSeen) : "Hors ligne";
+          statusText.style.color = "#6b7d93";
         }
       });
+    }
+
+    function renderPostAttachment(post) {
+      if (!post.attachmentUrl) return "";
+
+      if (post.attachmentType === "image") {
+        return `<img src="${post.attachmentUrl}" class="post-preview-img" alt="post image">`;
+      }
+
+      if (post.attachmentType === "pdf") {
+        return `
+          <div class="pdf-card">
+            <div class="pdf-info">
+              <div class="pdf-icon">PDF</div>
+              <div>
+                <div class="pdf-title">${escapeHtml(post.attachmentName || "Document PDF")}</div>
+                <div class="pdf-sub">Pièce jointe PDF</div>
+              </div>
+            </div>
+            <a class="pdf-open" href="${post.attachmentUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Ouvrir</a>
+          </div>
+        `;
+      }
+
+      return "";
     }
 
     function loadUserPosts(uid) {
@@ -179,14 +777,20 @@
         }
 
         userPosts.innerHTML = posts.map(post => `
-          <article class="post-preview">
-            ${post.imageUrl ? `<img src="${post.imageUrl}" class="post-preview-img" alt="post image">` : ""}
+          <article class="post-preview" data-post-id="${post.id}">
+            ${renderPostAttachment(post)}
             <div class="post-preview-body">
               <p>${escapeHtml(post.text || "")}</p>
               <small>${escapeHtml(formatDate(post.createdAt))}</small>
             </div>
           </article>
         `).join("");
+
+        document.querySelectorAll("[data-post-id]").forEach(card => {
+          card.addEventListener("click", () => {
+            window.location.href = `insights.html?postId=${encodeURIComponent(card.dataset.postId)}`;
+          });
+        });
       });
     }
 
@@ -208,6 +812,7 @@
         });
         showMsg("Profil mis à jour avec succès.", true);
       } catch (error) {
+        console.error(error);
         showMsg("Erreur de mise à jour.");
       }
     });
@@ -219,31 +824,66 @@
       const file = avatarInput.files[0];
       if (!file) return;
 
+      if (!file.type.startsWith("image/")) {
+        showMsg("Choisis uniquement une image.");
+        avatarInput.value = "";
+        return;
+      }
+
+      if (file.size > MAX_INPUT_FILE_SIZE) {
+        showMsg("Image trop lourde. Maximum 10 Mo.");
+        avatarInput.value = "";
+        return;
+      }
+
       try {
-        const fileRef = storageRef(storage, `profilePictures/${currentUser.uid}/avatar_${Date.now()}_${file.name}`);
-        await uploadBytes(fileRef, file);
-        const url = await getDownloadURL(fileRef);
+        showMsg("Compression de la photo en cours...", true);
+
+        const result = await compressImageFile(file);
+
+        avatarPreviewMount.classList.remove("hidden");
+        avatarPreviewMount.innerHTML = `
+          <img src="${result.dataUrl}" alt="preview avatar">
+          <div class="preview-meta">
+            Photo compressée : ${result.width} × ${result.height} —
+            avant ${formatBytes(result.originalSize)} —
+            après ${formatBytes(result.compressedSize)}
+          </div>
+        `;
 
         await update(ref(db, "users/" + currentUser.uid), {
-          photoURL: url,
+          photoURL: result.dataUrl,
           updatedAt: Date.now()
         });
 
-        showAvatar(url, nameInput.value, currentUser.email);
+        showAvatar(result.dataUrl, nameInput.value, currentUser.email);
         showMsg("Photo de profil mise à jour.", true);
       } catch (error) {
-        showMsg("Erreur lors de l’envoi de la photo.");
+        console.error(error);
+        showMsg("Erreur lors de la mise à jour de la photo.");
+      } finally {
+        avatarInput.value = "";
       }
     });
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        window.location.href = "login.html";
+        window.location.href = "insights.html";
+        return;
+      }
+
+      const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
+      if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
+        try { await signOut(auth); } catch (e) {}
+        window.location.href = "insights.html";
         return;
       }
 
       currentUser = user;
       viewedUid = requestedUid || user.uid;
+
+      bindActivityEvents();
+      resetActivityTimer();
 
       await loadUserProfile(viewedUid);
       listenPresence(viewedUid);
