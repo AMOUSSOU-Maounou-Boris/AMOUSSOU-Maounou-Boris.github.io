@@ -3,330 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home | Boris Research Hub</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="home.css" />
-
-  <style>
-    .login-btn,
-    .nav-account-btn,
-    .nav-logout-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 8px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-    }
-
-    .login-btn {
-      background: #0a66c2;
-      color: white !important;
-    }
-
-    .login-btn:hover {
-      background: #084a94;
-    }
-
-    .nav-account-btn {
-      background: #e8f1fb;
-      color: #0b2239 !important;
-    }
-
-    .nav-account-btn:hover {
-      background: #d6e8fa;
-    }
-
-    .nav-logout-btn {
-      background: #f7dede;
-      color: #8a1f1f !important;
-    }
-
-    .nav-logout-btn:hover {
-      background: #efcaca;
-    }
-
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      background: #00ff66;
-      border-radius: 50%;
-      display: inline-block;
-      box-shadow: 0 0 8px #00ff66;
-      animation: blink 1.2s infinite;
-      flex-shrink: 0;
-    }
-
-    .auth-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0.3; }
-      100% { opacity: 1; }
-    }
-  </style>
+  <title>Home - Boris AMOUSSOU</title>
+  <link rel="stylesheet" href="public.css" />
 </head>
 <body>
+  <header class="topbar">
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="about.html">About</a>
+      <a href="research.html">Research</a>
+      <a href="cv.html">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html">Insights</a>
+      <a href="insights.html" class="login-link">Login</a>
+    </nav>
+  </header>
 
-  <nav class="home-nav">
-    <ul id="nav-menu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="research.html">Research</a></li>
-      <li><a href="cv.html">Resume</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="insights.html">Insights</a></li>
-      <li id="auth-section"></li>
-    </ul>
-  </nav>
+  <main class="public-layout">
+    <aside class="sidebar">
+      <div class="profile-pic">
+        <img src="images/profile.jpg" alt="Photo de profil" />
+      </div>
 
-  <div class="home-container">
-    <aside class="home-sidebar">
-      <img src="profile.jpg" class="profile-img" alt="Profile photo">
+      <h1>Maounou Boris<br />AMOUSSOU</h1>
+      <div class="subtitle">
+        Chemical Engineer<br />
+        Green Chemistry & Environment
+      </div>
 
-      <h2>Maounou Boris AMOUSSOU</h2>
-      <p>Chemical Engineer<br>Green Chemistry &amp; Environment</p>
-
-      <div class="search-box">
-        <h3>Quick Search</h3>
-        <input type="text" id="site-search" placeholder="Search page..." class="search-input">
-        <button class="search-btn" id="searchBtn">Search</button>
+      <div class="quick-search-title">Quick Search</div>
+      <div class="quick-search">
+        <input type="text" placeholder="Search page..." />
+        <button type="button">Search</button>
       </div>
     </aside>
 
-    <main class="home-main">
-      <section class="card hero-card">
-        <h1>Welcome to my scientific world</h1>
-        <p class="hero-text">
+    <section class="content">
+      <div class="hero-card">
+        <h2>Welcome to my scientific world</h2>
+        <p>
           Explore my academic path, laboratory experience, scientific activities,
           conferences, collaborations, and research interests in green chemistry,
           catalysis, environment, and sustainable energy.
         </p>
-      </section>
+      </div>
 
-      <section class="card slider-card">
-        <h3>Highlights</h3>
+      <div class="section-card">
+        <h2>Highlights</h2>
 
-        <div class="hero-slider">
-          <div class="slides-wrapper">
-            <div class="slide active">
-              <img src="stage1.jpg" alt="stage 1">
-            </div>
-            <div class="slide">
-              <img src="stage2.jpg" alt="stage 2">
-            </div>
-            <div class="slide">
-              <img src="stage3.jpg" alt="stage 3">
-            </div>
+        <div class="carousel-box">
+          <button class="carousel-arrow left" type="button">&#8249;</button>
+          <img src="images/highlight1.jpg" alt="Highlight" />
+          <button class="carousel-arrow right" type="button">&#8250;</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h2>Overview</h2>
+        <div class="two-col">
+          <div class="mini-card">
+            <h3>Academic Path</h3>
+            <p>
+              Discover my training, laboratory practice, engineering background,
+              and current scientific progression.
+            </p>
           </div>
 
-          <button class="slider-btn prev" id="prevSlideBtn">❮</button>
-          <button class="slider-btn next" id="nextSlideBtn">❯</button>
-
-          <div class="slider-dots">
-            <span class="dot active" data-slide="0"></span>
-            <span class="dot" data-slide="1"></span>
-            <span class="dot" data-slide="2"></span>
+          <div class="mini-card">
+            <h3>Research Interests</h3>
+            <p>
+              My work focuses on green chemistry, environmental chemistry,
+              catalysis, photoelectrochemistry, and sustainable energy systems.
+            </p>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section class="home-info-grid">
-        <div class="card info-card">
-          <h3>Research Focus</h3>
-          <p>
-            My work explores materials chemistry, photocatalysis, electrocatalysis,
-            environmental treatment, and clean energy production strategies.
-          </p>
-        </div>
-
-        <div class="card info-card">
-          <h3>Academic Journey</h3>
-          <p>
-            This platform presents my training, scientific development,
-            projects, and future academic ambitions in chemistry and environment.
-          </p>
-        </div>
-
-        <div class="card info-card">
-          <h3>Scientific Activities</h3>
-          <p>
-            You can discover my conferences, collaborations, lab activities,
-            and communication work through this academic website.
-          </p>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import {
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    import {
-      ref,
-      get
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    let currentSlide = 0;
-    const slides = document.querySelectorAll(".slide");
-    const dots = document.querySelectorAll(".dot");
-    let autoSlide = null;
-
-    const authSection = document.getElementById("auth-section");
-    const searchBtn = document.getElementById("searchBtn");
-    const prevSlideBtn = document.getElementById("prevSlideBtn");
-    const nextSlideBtn = document.getElementById("nextSlideBtn");
-
-    function showSlide(index) {
-      if (!slides.length) return;
-
-      if (index >= slides.length) currentSlide = 0;
-      else if (index < 0) currentSlide = slides.length - 1;
-      else currentSlide = index;
-
-      slides.forEach((slide, i) => {
-        slide.classList.toggle("active", i === currentSlide);
-      });
-
-      dots.forEach((dot, i) => {
-        dot.classList.toggle("active", i === currentSlide);
-      });
-    }
-
-    function changeSlide(step) {
-      showSlide(currentSlide + step);
-      restartAutoSlide();
-    }
-
-    function goToSlide(index) {
-      showSlide(index);
-      restartAutoSlide();
-    }
-
-    function startAutoSlide() {
-      autoSlide = setInterval(() => {
-        showSlide(currentSlide + 1);
-      }, 4000);
-    }
-
-    function restartAutoSlide() {
-      clearInterval(autoSlide);
-      startAutoSlide();
-    }
-
-    function searchSite() {
-      const q = document.getElementById("site-search").value.trim().toLowerCase();
-      if (!q) return;
-
-      if (q.includes("about")) window.location.href = "about.html";
-      else if (q.includes("research")) window.location.href = "research.html";
-      else if (q.includes("resume") || q.includes("cv")) window.location.href = "cv.html";
-      else if (q.includes("contact")) window.location.href = "contact.html";
-      else if (q.includes("insight")) window.location.href = "insights.html";
-      else if (q.includes("message")) window.location.href = "messages.html";
-      else if (q.includes("profile") || q.includes("account") || q.includes("compte")) window.location.href = "profile.html";
-      else if (q.includes("home")) window.location.href = "index.html";
-      else alert("No direct result found.");
-    }
-
-    async function renderNavbarForUser(user) {
-      try {
-        const snap = await get(ref(db, "users/" + user.uid));
-        const profile = snap.exists() ? snap.val() : null;
-        const name = profile?.displayName || user.displayName || user.email?.split("@")[0] || "Mon compte";
-
-        authSection.innerHTML = `
-          <div class="auth-actions">
-            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
-            <a href="profile.html" class="nav-account-btn">
-              👤 ${name}
-              <span class="status-dot"></span>
-            </a>
-            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
-          </div>
-        `;
-
-        const logoutNavBtn = document.getElementById("logoutNavBtn");
-        logoutNavBtn.addEventListener("click", async () => {
-          try {
-            await signOut(auth);
-            window.location.href = "index.html";
-          } catch (error) {
-            console.error("Logout error:", error);
-            alert("Impossible de se déconnecter.");
-          }
-        });
-      } catch (error) {
-        console.error("Navbar profile load error:", error);
-        authSection.innerHTML = `
-          <div class="auth-actions">
-            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
-            <a href="profile.html" class="nav-account-btn">
-              👤 Mon compte
-              <span class="status-dot"></span>
-            </a>
-            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
-          </div>
-        `;
-
-        const logoutNavBtn = document.getElementById("logoutNavBtn");
-        logoutNavBtn.addEventListener("click", async () => {
-          try {
-            await signOut(auth);
-            window.location.href = "index.html";
-          } catch (err) {
-            console.error(err);
-          }
-        });
-      }
-    }
-
-    function renderNavbarGuest() {
-      authSection.innerHTML = `
-        <a href="login.html" class="login-btn">Login</a>
-      `;
-    }
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        await renderNavbarForUser(user);
-      } else {
-        renderNavbarGuest();
-      }
-    });
-
-    searchBtn.addEventListener("click", searchSite);
-
-    document.getElementById("site-search").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        searchSite();
-      }
-    });
-
-    prevSlideBtn.addEventListener("click", () => changeSlide(-1));
-    nextSlideBtn.addEventListener("click", () => changeSlide(1));
-
-    dots.forEach(dot => {
-      dot.addEventListener("click", () => {
-        goToSlide(Number(dot.dataset.slide));
-      });
-    });
-
-    showSlide(0);
-    startAutoSlide();
-  </script>
+      <div class="footer-note">
+        Public website interface — private access available through Login / Insights.
+      </div>
+    </section>
+  </main>
 </body>
 </html>
