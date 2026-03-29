@@ -4,7 +4,966 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Messages | Boris Research Hub</title>
-  <link rel="stylesheet" href="messages.css" />
+  <style>
+    * { box-sizing: border-box; }
+
+    :root{
+      --bg:#eaf5ff;
+      --card:#ffffff;
+      --nav:#082e5b;
+      --text:#0b2340;
+      --muted:#6b7d93;
+      --line:#d9e5f2;
+      --blue:#2f8cff;
+      --blue-dark:#0f4d92;
+      --green:#18c34a;
+      --red:#df4b4b;
+      --soft:#f4f8fc;
+      --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
+      --bubble-me:#dfeeff;
+      --bubble-other:#ffffff;
+      --gold:#fff8cc;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .topbar{
+      background:var(--nav);
+      padding:18px 20px;
+      position:sticky;
+      top:0;
+      z-index:20;
+      box-shadow:0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .topbar nav{
+      display:flex;
+      gap:18px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .topbar a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+      font-size:17px;
+      padding:4px 2px;
+      border-bottom:3px solid transparent;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .topbar a.active{
+      border-bottom-color:#fff;
+    }
+
+    .nav-online-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green);
+      display:inline-block;
+      box-shadow:0 0 0 2px rgba(255,255,255,0.18);
+    }
+
+    .page{
+      max-width:1500px;
+      margin:24px auto;
+      padding:0 18px 30px;
+      display:grid;
+      grid-template-columns:340px 1fr;
+      gap:22px;
+      min-height:calc(100vh - 110px);
+    }
+
+    .sidebar{
+      background:linear-gradient(180deg, #0d376d 0%, #032750 100%);
+      border-radius:28px;
+      color:#fff;
+      padding:22px;
+      box-shadow:var(--shadow);
+      position:sticky;
+      top:96px;
+      align-self:start;
+      overflow:hidden;
+    }
+
+    .sidebar::before{
+      content:"";
+      position:absolute;
+      right:-60px;
+      top:-60px;
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.05);
+    }
+
+    .sidebar-top{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      margin-bottom:18px;
+      position:relative;
+      z-index:1;
+    }
+
+    .sidebar-top h2{
+      margin:0 0 4px;
+      font-size:28px;
+    }
+
+    .sidebar-top p{
+      margin:0;
+      color:rgba(255,255,255,0.95);
+      line-height:1.5;
+    }
+
+    .avatar{
+      width:54px;
+      height:54px;
+      border-radius:50%;
+      background:#184684;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      font-weight:800;
+      color:#fff;
+      overflow:hidden;
+      position:relative;
+      flex:0 0 54px;
+    }
+
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .avatar.large{
+      width:74px;
+      height:74px;
+      font-size:28px;
+      flex:0 0 74px;
+    }
+
+    .avatar.small{
+      width:48px;
+      height:48px;
+      font-size:16px;
+      flex:0 0 48px;
+    }
+
+    .status-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#9fb3c8;
+      display:inline-block;
+      flex:0 0 10px;
+    }
+
+    .status-dot.online{
+      background:var(--green);
+    }
+
+    .logout-btn{
+      width:100%;
+      border:none;
+      background:var(--red);
+      color:#fff;
+      padding:14px;
+      border-radius:16px;
+      font-size:17px;
+      font-weight:800;
+      cursor:pointer;
+      margin-bottom:16px;
+      position:relative;
+      z-index:1;
+    }
+
+    .search-input{
+      width:100%;
+      border:none;
+      outline:none;
+      padding:13px 14px;
+      border-radius:14px;
+      font-size:15px;
+      margin-bottom:14px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      margin-bottom:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .tab-btn{
+      flex:1;
+      border:none;
+      border-radius:14px;
+      padding:12px;
+      font-weight:800;
+      cursor:pointer;
+      background:rgba(255,255,255,0.12);
+      color:#fff;
+    }
+
+    .tab-btn.active{
+      background:#fff;
+      color:var(--nav);
+    }
+
+    .members-list{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      max-height:calc(100vh - 320px);
+      overflow:auto;
+      padding-right:4px;
+      position:relative;
+      z-index:1;
+    }
+
+    .member-card{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.05);
+      border-radius:18px;
+      cursor:pointer;
+    }
+
+    .member-card:hover{
+      background:rgba(255,255,255,0.16);
+    }
+
+    .member-main{
+      min-width:0;
+      flex:1;
+    }
+
+    .member-name{
+      font-weight:800;
+      font-size:16px;
+      margin-bottom:4px;
+    }
+
+    .member-sub{
+      color:rgba(255,255,255,0.88);
+      font-size:13px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      margin-bottom:5px;
+    }
+
+    .member-status{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      color:rgba(255,255,255,0.9);
+    }
+
+    .profile-btn{
+      border:none;
+      background:#fff;
+      color:var(--nav);
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+      font-size:13px;
+    }
+
+    .empty-text{
+      color:#fff;
+      opacity:0.9;
+      text-align:center;
+      padding:16px;
+      font-weight:700;
+    }
+
+    .main{
+      display:grid;
+      grid-template-rows:auto 1fr;
+      gap:18px;
+      min-width:0;
+    }
+
+    .chat-header{
+      background:#fff;
+      border-radius:26px;
+      padding:18px 20px;
+      box-shadow:var(--shadow);
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+
+    .chat-header-main{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex:1;
+      min-width:0;
+    }
+
+    .chat-header h3{
+      margin:0 0 4px;
+      font-size:24px;
+    }
+
+    .chat-header p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    #chatPresence{
+      margin-top:6px;
+      font-size:13px;
+      color:#14854b;
+      font-weight:700;
+    }
+
+    .chat-options-btn{
+      border:none;
+      background:#eef4fb;
+      color:var(--text);
+      border-radius:14px;
+      padding:12px 16px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .chat-box{
+      background:#fff;
+      border-radius:26px;
+      box-shadow:var(--shadow);
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      min-height:620px;
+      overflow:hidden;
+    }
+
+    .chat-status-bar{
+      min-height:24px;
+      padding:14px 20px 0;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    .chat-messages{
+      padding:18px 20px 8px;
+      overflow:auto;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      background:linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
+    }
+
+    .empty-state{
+      margin:auto;
+      color:var(--muted);
+      font-weight:700;
+      background:#fff;
+      padding:16px 18px;
+      border-radius:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .message-row{
+      display:flex;
+      justify-content:flex-start;
+    }
+
+    .message-row.me{
+      justify-content:flex-end;
+    }
+
+    .message-wrap{
+      max-width:78%;
+      min-width:220px;
+    }
+
+    .message-card{
+      background:var(--bubble-other);
+      border-radius:20px;
+      padding:14px 14px 12px;
+      box-shadow:0 6px 16px rgba(8, 33, 64, 0.06);
+      position:relative;
+      border:1px solid #edf2f8;
+    }
+
+    .message-row.me .message-card{
+      background:var(--bubble-me);
+    }
+
+    .message-card.message-selected{
+      outline:2px solid #7db5ff;
+      background:#eef6ff;
+    }
+
+    .message-head{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+      margin-bottom:8px;
+    }
+
+    .message-author{
+      font-weight:800;
+      font-size:14px;
+    }
+
+    .message-time{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:right;
+    }
+
+    .message-text{
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-size:15px;
+      line-height:1.55;
+    }
+
+    .reply-box{
+      background:#f7fbff;
+      border-left:4px solid #86b8ff;
+      border-radius:12px;
+      padding:8px 10px;
+      margin-bottom:8px;
+      color:#47617f;
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .message-menu-wrap{
+      position:relative;
+    }
+
+    .message-menu-btn{
+      border:none;
+      background:#eef4fb;
+      color:#223a58;
+      border-radius:12px;
+      width:34px;
+      height:34px;
+      font-size:18px;
+      cursor:pointer;
+      font-weight:800;
+    }
+
+    .message-menu{
+      position:absolute;
+      top:40px;
+      right:0;
+      min-width:150px;
+      background:#fff;
+      border:1px solid #e3ebf5;
+      border-radius:14px;
+      box-shadow:0 14px 34px rgba(7, 31, 66, 0.12);
+      padding:8px;
+      display:none;
+      z-index:30;
+    }
+
+    .message-menu.open{
+      display:block;
+    }
+
+    .message-menu button{
+      width:100%;
+      text-align:left;
+      border:none;
+      background:#fff;
+      padding:10px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700;
+      color:var(--text);
+    }
+
+    .message-menu button:hover{
+      background:#f1f6fc;
+    }
+
+    .message-menu button.danger{
+      color:#c63737;
+    }
+
+    .attachment-box{
+      margin-top:10px;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid #dce6f3;
+      background:#fff;
+    }
+
+    .attachment-box img{
+      width:100%;
+      max-width:340px;
+      display:block;
+      object-fit:cover;
+    }
+
+    .attachment-pdf{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      background:#f8fbff;
+      border:1px solid #dce6f3;
+      border-radius:16px;
+    }
+
+    .pdf-icon{
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      background:#df4b4b;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      flex:0 0 42px;
+    }
+
+    .attachment-pdf-main{
+      min-width:0;
+      flex:1;
+    }
+
+    .attachment-pdf-title{
+      font-weight:800;
+      word-break:break-word;
+      margin-bottom:4px;
+    }
+
+    .attachment-pdf-sub{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .pdf-open{
+      text-decoration:none;
+      background:var(--blue-dark);
+      color:#fff;
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:800;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    .sticker-bubble{
+      font-size:44px;
+      line-height:1.2;
+      padding:4px 2px;
+    }
+
+    .composer{
+      border-top:1px solid #edf2f8;
+      padding:14px 18px 18px;
+      background:#fff;
+    }
+
+    .reply-preview{
+      background:#f7fbff;
+      border:1px solid #d9e6f6;
+      border-radius:16px;
+      padding:12px 14px;
+      margin-bottom:12px;
+    }
+
+    .reply-preview-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
+
+    .reply-preview-title{
+      font-weight:800;
+      color:#0f4d92;
+      font-size:14px;
+    }
+
+    .reply-preview-text{
+      color:#4d6480;
+      font-size:14px;
+      line-height:1.45;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .cancel-reply-btn{
+      border:none;
+      background:#e9f2ff;
+      color:#0b2340;
+      border-radius:12px;
+      padding:8px 12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    #messageInput{
+      width:100%;
+      min-height:96px;
+      border:1px solid #d6e1ef;
+      border-radius:18px;
+      padding:14px;
+      outline:none;
+      resize:vertical;
+      font-size:15px;
+      background:#fcfdff;
+      font-family:inherit;
+    }
+
+    .composer-actions{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .composer-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .emoji-btn,
+    .toggle-panel-btn,
+    .send-btn,
+    .chip-btn{
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:800;
+    }
+
+    .toggle-panel-btn{
+      background:#eef4fb;
+      color:var(--text);
+      padding:11px 14px;
+      font-size:14px;
+    }
+
+    .emoji-btn{
+      background:#f3f7fc;
+      width:40px;
+      height:40px;
+      font-size:20px;
+    }
+
+    .send-btn{
+      background:var(--blue-dark);
+      color:#fff;
+      padding:12px 18px;
+      font-size:16px;
+    }
+
+    .composer-panel{
+      margin-top:12px;
+      border:1px solid #e1eaf5;
+      border-radius:18px;
+      background:#f8fbff;
+      padding:14px;
+      display:none;
+    }
+
+    .composer-panel.open{
+      display:block;
+    }
+
+    .panel-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+
+    .panel-title{
+      font-weight:800;
+      font-size:15px;
+    }
+
+    .panel-note{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .panel-block{
+      margin-bottom:14px;
+    }
+
+    .panel-block:last-child{
+      margin-bottom:0;
+    }
+
+    .panel-label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:800;
+      font-size:14px;
+    }
+
+    .file-label{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#eef4fb;
+      color:#0b2340;
+      font-weight:700;
+      cursor:pointer;
+      border:1px solid #d9e6f5;
+    }
+
+    .file-label input{
+      display:none;
+    }
+
+    .sticker-grid{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .chip-btn{
+      background:#fff;
+      border:1px solid #dce7f4;
+      padding:10px 12px;
+      font-size:28px;
+      min-width:54px;
+      min-height:54px;
+    }
+
+    .attachment-preview{
+      margin-top:12px;
+      display:none;
+    }
+
+    .attachment-preview.show{
+      display:block;
+    }
+
+    .preview-card{
+      border:1px solid #dce6f3;
+      border-radius:18px;
+      background:#fff;
+      padding:12px;
+    }
+
+    .preview-card img{
+      width:100%;
+      max-width:260px;
+      border-radius:14px;
+      display:block;
+      border:1px solid #e4ecf6;
+    }
+
+    .preview-meta{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.45;
+    }
+
+    .remove-attachment-btn{
+      margin-top:10px;
+      border:none;
+      background:#fff4f4;
+      color:#b82d2d;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:2000;
+      padding:20px;
+    }
+
+    .modal.open{
+      display:flex;
+    }
+
+    .modal-content{
+      width:100%;
+      max-width:460px;
+      background:#fff;
+      border-radius:24px;
+      padding:22px;
+      box-shadow:0 20px 50px rgba(0,0,0,0.2);
+      position:relative;
+    }
+
+    .modal-content.large{
+      max-width:620px;
+    }
+
+    .modal-close{
+      position:absolute;
+      top:12px;
+      right:12px;
+      border:none;
+      background:#eef4fb;
+      color:#203855;
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      font-size:22px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .modal-content h3{
+      margin:0 0 8px;
+      font-size:24px;
+    }
+
+    .modal-note{
+      margin:0 0 16px;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .modal-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .main-btn,
+    .secondary-btn{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .main-btn{
+      background:var(--blue-dark);
+      color:#fff;
+    }
+
+    .secondary-btn{
+      background:#eef4fb;
+      color:var(--text);
+    }
+
+    .forward-preview-box{
+      padding:14px;
+      background:#f7fbff;
+      border:1px solid #d8e5f3;
+      border-radius:16px;
+      margin-bottom:14px;
+      white-space:pre-wrap;
+      word-break:break-word;
+      line-height:1.5;
+    }
+
+    .forward-members{
+      display:grid;
+      gap:10px;
+      max-height:280px;
+      overflow:auto;
+      margin-top:14px;
+    }
+
+    .forward-member{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      background:#f8fbff;
+      border:1px solid #dce7f4;
+      border-radius:16px;
+      padding:12px;
+    }
+
+    .forward-member-text{
+      flex:1;
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+
+    .forward-member-text strong{
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .forward-member-text span{
+      color:var(--muted);
+      font-size:13px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    @media (max-width: 980px){
+      .page{
+        grid-template-columns:1fr;
+      }
+
+      .sidebar{
+        position:static;
+      }
+
+      .message-wrap{
+        max-width:100%;
+        min-width:unset;
+      }
+
+      .chat-header-main{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="topbar">
@@ -16,7 +975,7 @@
       <a href="contact.html">Contact</a>
       <a href="insights.html">Insights</a>
       <a href="messages.html" class="active">Messages</a>
-      <a href="profile.html">Mon compte</a>
+      <a href="profile.html"><span class="nav-online-dot"></span> Mon compte</a>
     </nav>
   </header>
 
@@ -30,13 +989,13 @@
         </div>
       </div>
 
-      <button class="logout-btn" id="logoutBtn">Déconnexion</button>
+      <button class="logout-btn" id="logoutBtn" type="button">Déconnexion</button>
 
       <input type="text" id="memberSearch" class="search-input" placeholder="Rechercher un membre...">
 
       <div class="tabs">
-        <button class="tab-btn active" data-tab="all">Tous</button>
-        <button class="tab-btn" data-tab="online">En ligne</button>
+        <button class="tab-btn active" data-tab="all" type="button">Tous</button>
+        <button class="tab-btn" data-tab="online" type="button">En ligne</button>
       </div>
 
       <div class="members-list" id="membersList"></div>
@@ -51,12 +1010,13 @@
             <p id="chatSubtitle">Tes messages privés vont apparaître ici.</p>
             <p id="chatPresence"></p>
           </div>
-          <button class="chat-options-btn" id="chatOptionsBtn" style="display:none;">Options</button>
+          <button class="chat-options-btn" id="chatOptionsBtn" style="display:none;" type="button">Options</button>
         </div>
       </section>
 
       <section class="chat-box">
         <div class="chat-status-bar" id="chatStatusBar"></div>
+
         <div class="chat-messages" id="chatMessages">
           <div class="empty-state">Aucune conversation sélectionnée.</div>
         </div>
@@ -66,14 +1026,52 @@
 
           <textarea id="messageInput" placeholder="Écris un message privé..."></textarea>
 
+          <div class="attachment-preview" id="attachmentPreview"></div>
+
           <div class="composer-actions">
-            <button class="emoji-btn" type="button" data-emoji="😀">😀</button>
-            <button class="emoji-btn" type="button" data-emoji="👍">👍</button>
-            <button class="emoji-btn" type="button" data-emoji="❤️">❤️</button>
-            <button class="emoji-btn" type="button" data-emoji="🔥">🔥</button>
-            <button class="emoji-btn" type="button" data-emoji="🧪">🧪</button>
-            <button class="emoji-btn" type="button" data-emoji="💡">💡</button>
+            <div class="composer-left">
+              <button class="toggle-panel-btn" type="button" id="togglePanelBtn">📎 Fichiers / Stickers</button>
+              <button class="emoji-btn" type="button" data-emoji="😀">😀</button>
+              <button class="emoji-btn" type="button" data-emoji="👍">👍</button>
+              <button class="emoji-btn" type="button" data-emoji="❤️">❤️</button>
+              <button class="emoji-btn" type="button" data-emoji="🔥">🔥</button>
+              <button class="emoji-btn" type="button" data-emoji="🧪">🧪</button>
+              <button class="emoji-btn" type="button" data-emoji="💡">💡</button>
+            </div>
             <button class="send-btn" type="button" id="sendBtn">Envoyer</button>
+          </div>
+
+          <div class="composer-panel" id="composerPanel">
+            <div class="panel-head">
+              <div class="panel-title">Pièces jointes et stickers</div>
+              <div class="panel-note">Images compressées, PDF légers, stickers rapides</div>
+            </div>
+
+            <div class="panel-block">
+              <div class="panel-label">Joindre une image ou un PDF</div>
+              <label class="file-label">
+                <span>📎 Choisir un fichier</span>
+                <input type="file" id="attachmentInput" accept="image/*,application/pdf">
+              </label>
+            </div>
+
+            <div class="panel-block">
+              <div class="panel-label">Stickers</div>
+              <div class="sticker-grid">
+                <button class="chip-btn" type="button" data-sticker="😀">😀</button>
+                <button class="chip-btn" type="button" data-sticker="😂">😂</button>
+                <button class="chip-btn" type="button" data-sticker="😍">😍</button>
+                <button class="chip-btn" type="button" data-sticker="😎">😎</button>
+                <button class="chip-btn" type="button" data-sticker="🥳">🥳</button>
+                <button class="chip-btn" type="button" data-sticker="😢">😢</button>
+                <button class="chip-btn" type="button" data-sticker="😡">😡</button>
+                <button class="chip-btn" type="button" data-sticker="🙏">🙏</button>
+                <button class="chip-btn" type="button" data-sticker="💯">💯</button>
+                <button class="chip-btn" type="button" data-sticker="🎉">🎉</button>
+                <button class="chip-btn" type="button" data-sticker="📚">📚</button>
+                <button class="chip-btn" type="button" data-sticker="🧪">🧪</button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -87,7 +1085,7 @@
       <p class="modal-note" id="optionsModalName"></p>
 
       <div class="modal-actions">
-        <button class="main-btn" id="blockToggleBtn">Bloquer</button>
+        <button class="main-btn" id="blockToggleBtn" type="button">Bloquer</button>
         <button class="secondary-btn" type="button" id="cancelOptionsBtn">Fermer</button>
       </div>
     </div>
@@ -120,6 +1118,7 @@
     const logoutBtn = document.getElementById("logoutBtn");
     const memberSearch = document.getElementById("memberSearch");
     const membersList = document.getElementById("membersList");
+    const chatAvatar = document.getElementById("chatAvatar");
     const chatTitle = document.getElementById("chatTitle");
     const chatSubtitle = document.getElementById("chatSubtitle");
     const chatPresence = document.getElementById("chatPresence");
@@ -140,6 +1139,10 @@
     const forwardPreview = document.getElementById("forwardPreview");
     const forwardSearch = document.getElementById("forwardSearch");
     const forwardMembers = document.getElementById("forwardMembers");
+    const togglePanelBtn = document.getElementById("togglePanelBtn");
+    const composerPanel = document.getElementById("composerPanel");
+    const attachmentInput = document.getElementById("attachmentInput");
+    const attachmentPreview = document.getElementById("attachmentPreview");
 
     let currentUser = null;
     let currentUserProfile = null;
@@ -148,10 +1151,19 @@
     let currentChatId = null;
     let currentTab = "all";
     let usersCache = {};
-    let presenceCache = {};
     let blockedUsersCache = {};
     let replyTarget = null;
     let forwardPayload = null;
+    let selectedAttachment = null;
+    let activityTimeout = null;
+
+    const INACTIVITY_LIMIT = 15 * 60 * 1000;
+    const LAST_ACTIVITY_KEY = "insights_last_activity";
+    const MAX_INPUT_FILE_SIZE = 10 * 1024 * 1024;
+    const MAX_PDF_SIZE = 2 * 1024 * 1024;
+    const MAX_WIDTH = 1280;
+    const MAX_HEIGHT = 1280;
+    const JPEG_QUALITY = 0.70;
 
     function escapeHtml(text = "") {
       const div = document.createElement("div");
@@ -184,11 +1196,11 @@
     }
 
     function isOnline(uid) {
-      return !!presenceCache[uid]?.online;
+      return !!usersCache[uid]?.presence?.online;
     }
 
     function presenceText(uid) {
-      const data = presenceCache[uid] || {};
+      const data = usersCache[uid]?.presence || {};
       if (data.online) return "En ligne";
       if (data.lastSeen) return "Vu : " + formatDate(data.lastSeen);
       return "Hors ligne";
@@ -210,6 +1222,36 @@
       return (Date.now() - msg.createdAt) <= 30 * 60 * 1000;
     }
 
+    function formatBytes(bytes) {
+      if (!bytes || bytes < 1024) return `${bytes || 0} o`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
+      return `${(bytes / (1024 * 1024)).toFixed(2)} Mo`;
+    }
+
+    function bytesFromDataURL(dataURL) {
+      if (!dataURL || !dataURL.includes(",")) return 0;
+      const base64 = dataURL.split(",")[1] || "";
+      const padding = (base64.match(/=*$/) || [""])[0].length;
+      return Math.floor((base64.length * 3) / 4) - padding;
+    }
+
+    function resetActivityTimer() {
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+      clearTimeout(activityTimeout);
+      activityTimeout = setTimeout(async () => {
+        try { await signOut(auth); } catch (e) {}
+        window.location.href = "insights.html";
+      }, INACTIVITY_LIMIT);
+    }
+
+    function bindActivityEvents() {
+      ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
+        window.addEventListener(evt, () => {
+          if (auth.currentUser) resetActivityTimer();
+        }, { passive: true });
+      });
+    }
+
     async function ensureMyProfile(user) {
       const userRef = ref(db, "users/" + user.uid);
       const snap = await get(userRef);
@@ -220,6 +1262,7 @@
         displayName: user.displayName || user.email?.split("@")[0] || "Utilisateur",
         photoURL: snap.exists() ? (snap.val().photoURL || "") : "",
         bio: snap.exists() ? (snap.val().bio || "") : "",
+        verifiedEmail: !!user.emailVerified,
         updatedAt: Date.now()
       };
 
@@ -230,7 +1273,7 @@
 
     async function setupPresence(user, displayName) {
       const connectedRef = ref(db, ".info/connected");
-      const presenceRef = ref(db, "presence/" + user.uid);
+      const presenceRef = ref(db, "users/" + user.uid + "/presence");
 
       onValue(connectedRef, async (snap) => {
         if (snap.val() === true) {
@@ -288,8 +1331,6 @@
     }
 
     function renderChatHeader() {
-      const chatAvatar = document.getElementById("chatAvatar");
-
       if (!selectedUserId || !selectedUserProfile) {
         chatAvatar.innerHTML = "MB";
         chatTitle.textContent = "Sélectionne une conversation";
@@ -310,10 +1351,12 @@
       if (selectedUserId && isBlocked(selectedUserId)) {
         messageInput.disabled = true;
         sendBtn.disabled = true;
+        togglePanelBtn.disabled = true;
         messageInput.placeholder = "Tu as bloqué cet utilisateur. Débloque-le pour écrire.";
       } else {
         messageInput.disabled = false;
         sendBtn.disabled = false;
+        togglePanelBtn.disabled = false;
         messageInput.placeholder = "Écris un message privé...";
       }
     }
@@ -354,7 +1397,7 @@
               <span>${isBlocked(profile.uid) ? "Bloqué" : escapeHtml(presenceText(profile.uid))}</span>
             </div>
           </div>
-          <button class="profile-btn" type="button" data-profile-uid="${profile.uid}">Profile</button>
+          <button class="profile-btn" type="button" data-profile-uid="${profile.uid}">Profil</button>
         </div>
       `).join("");
 
@@ -407,9 +1450,23 @@
       }
     }
 
-    function openForwardModal(text, senderName) {
-      forwardPayload = { text, senderName };
-      forwardPreview.textContent = `${senderName} : ${text}`;
+    function openForwardModal(msg) {
+      const sender = usersCache[msg.senderId] || {};
+      forwardPayload = {
+        text: msg.text || "",
+        senderName: sender.displayName || "Membre",
+        attachmentType: msg.attachmentType || "",
+        attachmentUrl: msg.attachmentUrl || "",
+        attachmentName: msg.attachmentName || "",
+        sticker: msg.sticker || ""
+      };
+
+      let preview = `${forwardPayload.senderName} : ${forwardPayload.text}`;
+      if (forwardPayload.sticker) preview += `\nSticker : ${forwardPayload.sticker}`;
+      if (forwardPayload.attachmentType === "pdf") preview += `\nPDF : ${forwardPayload.attachmentName || "Document PDF"}`;
+      if (forwardPayload.attachmentType === "image") preview += `\nImage jointe`;
+
+      forwardPreview.textContent = preview;
       forwardSearch.value = "";
       forwardModal.classList.add("open");
       renderForwardMembers();
@@ -432,7 +1489,7 @@
         .sort((a, b) => (a.displayName || "").localeCompare(b.displayName || ""));
 
       if (!list.length) {
-        forwardMembers.innerHTML = `<div class="empty-text">Aucun membre disponible.</div>`;
+        forwardMembers.innerHTML = `<div class="empty-text" style="color:#0b2340;">Aucun membre disponible.</div>`;
         return;
       }
 
@@ -462,8 +1519,12 @@
         await set(msgRef, {
           senderId: currentUser.uid,
           receiverId: targetUid,
-          text: "Message transféré :\n" + forwardPayload.text,
+          text: forwardPayload.text ? "Message transféré :\n" + forwardPayload.text : "Message transféré",
           replyTo: null,
+          attachmentType: forwardPayload.attachmentType || "",
+          attachmentUrl: forwardPayload.attachmentUrl || "",
+          attachmentName: forwardPayload.attachmentName || "",
+          sticker: forwardPayload.sticker || "",
           createdAt: Date.now()
         });
 
@@ -486,6 +1547,37 @@
       updateComposerState();
       setStatus("");
       listenMessages();
+    }
+
+    function renderAttachment(msg) {
+      if (msg.sticker) {
+        return `<div class="sticker-bubble">${escapeHtml(msg.sticker)}</div>`;
+      }
+
+      if (!msg.attachmentType || !msg.attachmentUrl) return "";
+
+      if (msg.attachmentType === "image") {
+        return `
+          <div class="attachment-box">
+            <img src="${msg.attachmentUrl}" alt="image jointe">
+          </div>
+        `;
+      }
+
+      if (msg.attachmentType === "pdf") {
+        return `
+          <div class="attachment-pdf">
+            <div class="pdf-icon">PDF</div>
+            <div class="attachment-pdf-main">
+              <div class="attachment-pdf-title">${escapeHtml(msg.attachmentName || "Document PDF")}</div>
+              <div class="attachment-pdf-sub">Pièce jointe PDF</div>
+            </div>
+            <a class="pdf-open" href="${msg.attachmentUrl}" target="_blank" rel="noopener">Ouvrir</a>
+          </div>
+        `;
+      }
+
+      return "";
     }
 
     function renderMessages(messagesObj) {
@@ -511,14 +1603,15 @@
                     <button class="message-menu-btn" type="button" data-menu-btn="${msg.id}">⋯</button>
                     <div class="message-menu" id="menu-${msg.id}">
                       <button type="button" data-reply-id="${msg.id}" data-reply-text="${encodeURIComponent(msg.text || "")}">Reply</button>
-                      <button type="button" data-forward-text="${encodeURIComponent(msg.text || "")}" data-forward-sender="${encodeURIComponent(sender.displayName || "Membre")}">Transfer</button>
+                      <button type="button" data-forward-id="${msg.id}">Transfer</button>
                       ${canDeleteMessage(msg) ? `<button class="danger" type="button" data-delete-id="${msg.id}">Delete</button>` : ""}
                     </div>
                   </div>
                 </div>
 
                 ${msg.replyTo && msg.replyTo.text ? `<div class="reply-box">${escapeHtml(msg.replyTo.text)}</div>` : ""}
-                <div class="message-text">${escapeHtml(msg.text || "")}</div>
+                ${msg.text ? `<div class="message-text">${escapeHtml(msg.text || "")}</div>` : ""}
+                ${renderAttachment(msg)}
                 <div class="message-time">${escapeHtml(formatDate(msg.createdAt))}</div>
               </div>
             </div>
@@ -552,12 +1645,10 @@
         });
       });
 
-      document.querySelectorAll("[data-forward-text]").forEach(btn => {
+      document.querySelectorAll("[data-forward-id]").forEach(btn => {
         btn.addEventListener("click", () => {
-          openForwardModal(
-            decodeURIComponent(btn.dataset.forwardText || ""),
-            decodeURIComponent(btn.dataset.forwardSender || "")
-          );
+          const msg = messages.find(m => m.id === btn.dataset.forwardId);
+          if (msg) openForwardModal(msg);
           closeAllMenus();
         });
       });
@@ -570,11 +1661,137 @@
       });
     }
 
+    let unsubscribeMessages = null;
     function listenMessages() {
       if (!currentChatId) return;
       onValue(ref(db, "privateMessages/" + currentChatId), (snap) => {
         renderMessages(snap.val());
       }, () => setStatus("Impossible de charger les messages.", true));
+    }
+
+    function loadImageFromFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function drawResizedToCanvas(img, maxWidth, maxHeight) {
+      let { width, height } = img;
+      const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+      const newWidth = Math.round(width * ratio);
+      const newHeight = Math.round(height * ratio);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+      return { canvas, width: newWidth, height: newHeight };
+    }
+
+    function canvasToDataURL(canvas, type, quality) {
+      return canvas.toDataURL(type, quality);
+    }
+
+    async function compressImageFile(file) {
+      const img = await loadImageFromFile(file);
+      const { canvas, width, height } = drawResizedToCanvas(img, MAX_WIDTH, MAX_HEIGHT);
+
+      const originalType = file.type === "image/png" ? "image/png" : "image/jpeg";
+      let bestDataUrl = canvasToDataURL(canvas, originalType, JPEG_QUALITY);
+
+      if (originalType === "image/png") {
+        const jpegVersion = canvasToDataURL(canvas, "image/jpeg", 0.76);
+        if (bytesFromDataURL(jpegVersion) < bytesFromDataURL(bestDataUrl)) {
+          bestDataUrl = jpegVersion;
+        }
+      } else {
+        const lighter = canvasToDataURL(canvas, "image/jpeg", 0.62);
+        if (bytesFromDataURL(lighter) < bytesFromDataURL(bestDataUrl)) {
+          bestDataUrl = lighter;
+        }
+      }
+
+      return {
+        dataUrl: bestDataUrl,
+        width,
+        height,
+        originalSize: file.size,
+        compressedSize: bytesFromDataURL(bestDataUrl)
+      };
+    }
+
+    function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderSelectedAttachmentPreview() {
+      if (!selectedAttachment) {
+        attachmentPreview.classList.remove("show");
+        attachmentPreview.innerHTML = "";
+        return;
+      }
+
+      attachmentPreview.classList.add("show");
+
+      if (selectedAttachment.type === "image") {
+        attachmentPreview.innerHTML = `
+          <div class="preview-card">
+            <img src="${selectedAttachment.dataUrl}" alt="preview image">
+            <div class="preview-meta">
+              Image compressée : ${selectedAttachment.width} × ${selectedAttachment.height} —
+              avant ${formatBytes(selectedAttachment.originalSize)} —
+              après ${formatBytes(selectedAttachment.compressedSize)}
+            </div>
+            <button class="remove-attachment-btn" type="button" id="removeAttachmentBtn">Retirer le fichier</button>
+          </div>
+        `;
+      } else if (selectedAttachment.type === "pdf") {
+        attachmentPreview.innerHTML = `
+          <div class="preview-card">
+            <div class="attachment-pdf">
+              <div class="pdf-icon">PDF</div>
+              <div class="attachment-pdf-main">
+                <div class="attachment-pdf-title">${escapeHtml(selectedAttachment.name)}</div>
+                <div class="attachment-pdf-sub">Taille : ${formatBytes(selectedAttachment.size)}</div>
+              </div>
+              <a class="pdf-open" href="${selectedAttachment.dataUrl}" target="_blank" rel="noopener">Ouvrir</a>
+            </div>
+            <button class="remove-attachment-btn" type="button" id="removeAttachmentBtn">Retirer le fichier</button>
+          </div>
+        `;
+      } else if (selectedAttachment.type === "sticker") {
+        attachmentPreview.innerHTML = `
+          <div class="preview-card">
+            <div class="sticker-bubble">${escapeHtml(selectedAttachment.value)}</div>
+            <div class="preview-meta">Sticker prêt à être envoyé</div>
+            <button class="remove-attachment-btn" type="button" id="removeAttachmentBtn">Retirer le sticker</button>
+          </div>
+        `;
+      }
+
+      document.getElementById("removeAttachmentBtn").addEventListener("click", clearSelectedAttachment);
+    }
+
+    function clearSelectedAttachment() {
+      selectedAttachment = null;
+      attachmentInput.value = "";
+      renderSelectedAttachmentPreview();
     }
 
     async function sendMessage() {
@@ -589,16 +1806,21 @@
       }
 
       const text = messageInput.value.trim();
-      if (!text) return;
+      if (!text && !selectedAttachment) return;
 
       try {
         sendBtn.disabled = true;
         const msgRef = push(ref(db, "privateMessages/" + currentChatId));
+
         await set(msgRef, {
           senderId: currentUser.uid,
           receiverId: selectedUserId,
           text,
           replyTo: replyTarget ? { messageId: replyTarget.id || "", text: replyTarget.text || "" } : null,
+          attachmentType: selectedAttachment ? selectedAttachment.type : "",
+          attachmentUrl: selectedAttachment && (selectedAttachment.type === "image" || selectedAttachment.type === "pdf") ? selectedAttachment.dataUrl : "",
+          attachmentName: selectedAttachment ? (selectedAttachment.name || "") : "",
+          sticker: selectedAttachment && selectedAttachment.type === "sticker" ? selectedAttachment.value : "",
           createdAt: Date.now()
         });
 
@@ -606,8 +1828,10 @@
         replyTarget = null;
         renderReplyPreview();
         clearReplyHighlight();
+        clearSelectedAttachment();
         setStatus("");
       } catch (error) {
+        console.error(error);
         setStatus("Impossible d’envoyer le message.", true);
       } finally {
         sendBtn.disabled = false;
@@ -626,7 +1850,7 @@
     async function logout() {
       if (currentUser) {
         try {
-          await set(ref(db, "presence/" + currentUser.uid), {
+          await set(ref(db, "users/" + currentUser.uid + "/presence"), {
             online: false,
             lastSeen: Date.now(),
             displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur"
@@ -657,7 +1881,78 @@
         });
       });
 
+      togglePanelBtn.addEventListener("click", () => {
+        composerPanel.classList.toggle("open");
+      });
+
+      document.querySelectorAll("[data-sticker]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          selectedAttachment = {
+            type: "sticker",
+            value: btn.dataset.sticker
+          };
+          renderSelectedAttachmentPreview();
+        });
+      });
+
+      attachmentInput.addEventListener("change", async () => {
+        const file = attachmentInput.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
+          setStatus("Choisis uniquement une image ou un PDF.", true);
+          attachmentInput.value = "";
+          return;
+        }
+
+        if (file.size > MAX_INPUT_FILE_SIZE) {
+          setStatus("Fichier trop lourd. Maximum 10 Mo.", true);
+          attachmentInput.value = "";
+          return;
+        }
+
+        try {
+          if (file.type === "application/pdf") {
+            if (file.size > MAX_PDF_SIZE) {
+              setStatus("PDF trop lourd. 2 Mo maximum.", true);
+              attachmentInput.value = "";
+              return;
+            }
+
+            const dataUrl = await readFileAsDataURL(file);
+            selectedAttachment = {
+              type: "pdf",
+              dataUrl,
+              name: file.name,
+              size: file.size
+            };
+            renderSelectedAttachmentPreview();
+            setStatus("PDF prêt à être envoyé.");
+            return;
+          }
+
+          setStatus("Compression de l'image en cours...");
+          const result = await compressImageFile(file);
+          selectedAttachment = {
+            type: "image",
+            dataUrl: result.dataUrl,
+            width: result.width,
+            height: result.height,
+            originalSize: result.originalSize,
+            compressedSize: result.compressedSize,
+            name: file.name
+          };
+          renderSelectedAttachmentPreview();
+          setStatus("Image prête à être envoyée.");
+        } catch (error) {
+          console.error(error);
+          setStatus("Impossible de traiter ce fichier.", true);
+          attachmentInput.value = "";
+        }
+      });
+
       sendBtn.addEventListener("click", sendMessage);
+
       messageInput.addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
@@ -701,14 +1996,6 @@
       });
     }
 
-    function subscribePresence() {
-      onValue(ref(db, "presence"), (snap) => {
-        presenceCache = snap.val() || {};
-        renderMembers();
-        renderChatHeader();
-      });
-    }
-
     function subscribeBlockedUsers() {
       if (!currentUser) return;
 
@@ -722,7 +2009,14 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        window.location.href = "login.html";
+        window.location.href = "insights.html";
+        return;
+      }
+
+      const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
+      if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
+        try { await signOut(auth); } catch (e) {}
+        window.location.href = "insights.html";
         return;
       }
 
@@ -737,8 +2031,9 @@
       renderReplyPreview();
       renderChatHeader();
       subscribeUsers();
-      subscribePresence();
       subscribeBlockedUsers();
+      bindActivityEvents();
+      resetActivityTimer();
 
       const params = new URLSearchParams(window.location.search);
       const preselected = params.get("user");
