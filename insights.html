@@ -11,33 +11,30 @@
       --bg:#eaf5ff;
       --card:#ffffff;
       --nav:#082e5b;
-      --nav2:#0f4d92;
       --text:#0b2340;
       --muted:#6b7d93;
-      --line:#d9e5f2;
       --blue:#2f8cff;
       --blue-dark:#0f4d92;
       --green:#18c34a;
       --red:#df4b4b;
-      --soft:#f4f8fc;
       --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
       --highlight:#fff8cc;
     }
 
     body{
       margin:0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
 
     .topbar{
-      background: var(--nav);
+      background:var(--nav);
       padding:18px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      position:sticky;
+      top:0;
+      z-index:20;
+      box-shadow:0 4px 16px rgba(0,0,0,0.08);
     }
 
     .topbar nav{
@@ -45,6 +42,7 @@
       gap:18px;
       justify-content:center;
       flex-wrap:wrap;
+      align-items:center;
     }
 
     .topbar a{
@@ -54,10 +52,29 @@
       font-size:17px;
       padding:4px 2px;
       border-bottom:3px solid transparent;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
     }
 
     .topbar a.active{
       border-bottom-color:#fff;
+    }
+
+    .login-link{
+      background:#1678e5;
+      padding:10px 14px !important;
+      border-radius:12px;
+      border-bottom:none !important;
+    }
+
+    .nav-online-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green);
+      display:inline-block;
+      box-shadow:0 0 0 2px rgba(255,255,255,0.18);
     }
 
     .page{
@@ -76,11 +93,11 @@
     }
 
     .profile-box{
-      background: linear-gradient(180deg, #0d376d 0%, #032750 100%);
+      background:linear-gradient(180deg, #0d376d 0%, #032750 100%);
       color:#fff;
       border-radius:28px;
       padding:24px;
-      box-shadow: var(--shadow);
+      box-shadow:var(--shadow);
       overflow:hidden;
       position:relative;
     }
@@ -93,7 +110,7 @@
       right:-60px;
       top:-60px;
       border-radius:50%;
-      background: rgba(255,255,255,0.06);
+      background:rgba(255,255,255,0.06);
     }
 
     .avatar{
@@ -109,7 +126,7 @@
       overflow:hidden;
       margin-bottom:18px;
       position:relative;
-      border: 3px solid rgba(255,255,255,0.12);
+      border:3px solid rgba(255,255,255,0.12);
     }
 
     .avatar img{
@@ -134,7 +151,7 @@
       position:absolute;
       bottom:6px;
       right:6px;
-      box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
+      box-shadow:0 0 0 2px rgba(0,0,0,0.05);
     }
 
     .small-avatar .status-dot{
@@ -157,7 +174,7 @@
       margin:0 0 20px;
       font-size:16px;
       line-height:1.5;
-      color: rgba(255,255,255,0.95);
+      color:rgba(255,255,255,0.95);
       position:relative;
       z-index:1;
     }
@@ -187,7 +204,7 @@
     }
 
     .panel-btn.logout-btn{
-      background: var(--red);
+      background:var(--red);
       color:#fff;
     }
 
@@ -199,7 +216,7 @@
       background:var(--card);
       border-radius:28px;
       padding:24px;
-      box-shadow: var(--shadow);
+      box-shadow:var(--shadow);
       margin-bottom:20px;
     }
 
@@ -224,8 +241,8 @@
     .comment-form input:focus,
     .auth-row input:focus,
     .report-textarea:focus{
-      border-color: #7fb5ff;
-      box-shadow: 0 0 0 3px rgba(47, 140, 255, 0.13);
+      border-color:#7fb5ff;
+      box-shadow:0 0 0 3px rgba(47, 140, 255, 0.13);
     }
 
     .composer-actions{
@@ -258,7 +275,7 @@
       cursor:pointer;
       border-radius:16px;
       font-weight:800;
-      transition: .18s ease;
+      transition:.18s ease;
     }
 
     .primary-btn:hover,
@@ -267,8 +284,8 @@
     .report-btn:hover,
     .panel-btn:hover,
     .auth-submit:hover{
-      transform: translateY(-1px);
-      filter: brightness(1.02);
+      transform:translateY(-1px);
+      filter:brightness(1.02);
     }
 
     .primary-btn{
@@ -384,14 +401,14 @@
       background:var(--card);
       border-radius:24px;
       padding:20px;
-      box-shadow: var(--shadow);
+      box-shadow:var(--shadow);
       margin-bottom:18px;
-      scroll-margin-top: 110px;
+      scroll-margin-top:110px;
     }
 
     .post-card.highlight-post{
-      background: var(--highlight);
-      border: 1px solid #f2d763;
+      background:var(--highlight);
+      border:1px solid #f2d763;
     }
 
     .post-head{
@@ -472,11 +489,11 @@
       padding:10px 16px;
       font-weight:800;
       cursor:pointer;
-      transition: .18s ease;
+      transition:.18s ease;
     }
 
     .react-btn:hover{
-      transform: translateY(-1px);
+      transform:translateY(-1px);
     }
 
     .react-btn.liked{
@@ -538,14 +555,14 @@
       background:#fff;
       border-radius:20px;
       padding:18px;
-      box-shadow: var(--shadow);
+      box-shadow:var(--shadow);
     }
 
     /* AUTH */
     .auth-overlay{
       position:fixed;
       inset:0;
-      background: linear-gradient(135deg, #dff2ff 0%, #c6e8ff 100%);
+      background:linear-gradient(135deg, #dff2ff 0%, #c6e8ff 100%);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -557,10 +574,10 @@
       width:100%;
       max-width:420px;
       background:rgba(255,255,255,0.22);
-      backdrop-filter: blur(8px);
+      backdrop-filter:blur(8px);
       border:1px solid rgba(255,255,255,0.45);
       border-radius:28px;
-      box-shadow: 0 24px 60px rgba(8, 33, 64, 0.14);
+      box-shadow:0 24px 60px rgba(8, 33, 64, 0.14);
       padding:30px 24px;
     }
 
@@ -572,11 +589,11 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      background: linear-gradient(135deg, #2f8cff 0%, #0f4d92 100%);
+      background:linear-gradient(135deg, #2f8cff 0%, #0f4d92 100%);
       color:#fff;
       font-size:30px;
       font-weight:800;
-      box-shadow: 0 14px 28px rgba(15,77,146,0.18);
+      box-shadow:0 14px 28px rgba(15,77,146,0.18);
     }
 
     .auth-title{
@@ -619,7 +636,7 @@
       color:#2d3c49;
       font-size:18px;
       border-right:1px solid #e5edf7;
-      flex: 0 0 54px;
+      flex:0 0 54px;
     }
 
     .auth-row input{
@@ -634,7 +651,7 @@
     .auth-submit{
       width:100%;
       border:none;
-      background: linear-gradient(135deg, #2f8cff 0%, #0f4d92 100%);
+      background:linear-gradient(135deg, #2f8cff 0%, #0f4d92 100%);
       color:#fff;
       font-size:17px;
       font-weight:800;
@@ -642,7 +659,7 @@
       border-radius:16px;
       cursor:pointer;
       margin-top:6px;
-      box-shadow: 0 10px 22px rgba(15, 77, 146, 0.18);
+      box-shadow:0 10px 22px rgba(15, 77, 146, 0.18);
       transition:.18s ease;
     }
 
@@ -691,7 +708,7 @@
       background:#fff;
       border-radius:24px;
       padding:22px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      box-shadow:0 20px 50px rgba(0,0,0,0.2);
     }
 
     .modal-title{
@@ -772,7 +789,22 @@
   </style>
 </head>
 <body>
-  <header class="topbar">
+
+  <!-- NAV PUBLIC -->
+  <header class="topbar" id="publicTopbar">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="research.html">Research</a>
+      <a href="cv.html">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html" class="active">Insights</a>
+      <a href="insights.html" class="login-link">Login</a>
+    </nav>
+  </header>
+
+  <!-- NAV PRIVÉ -->
+  <header class="topbar hidden" id="privateTopbar">
     <nav>
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
@@ -781,10 +813,11 @@
       <a href="contact.html">Contact</a>
       <a href="insights.html" class="active">Insights</a>
       <a href="messages.html">Messages</a>
-      <a href="profile.html">Mon compte</a>
+      <a href="profile.html"><span class="nav-online-dot"></span> Mon compte</a>
     </nav>
   </header>
 
+  <!-- LOGIN -->
   <div class="auth-overlay" id="authOverlay">
     <div class="auth-card">
       <div class="auth-logo">I</div>
@@ -872,6 +905,7 @@
     </div>
   </div>
 
+  <!-- PAGE PRIVÉE -->
   <main class="page hidden" id="appContent">
     <aside class="left-panel">
       <div class="profile-box">
@@ -905,6 +939,7 @@
     </section>
   </main>
 
+  <!-- REPORT -->
   <div class="modal-overlay hidden" id="reportModal">
     <div class="modal-card">
       <h3 class="modal-title">Signaler cette publication</h3>
@@ -969,8 +1004,10 @@
       onDisconnect
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const CONTACT_EMAIL = "maounou-boris.amoussou@cnrs.fr";
+    const CONTACT_EMAIL = "contact@tonsite.fr";
 
+    const publicTopbar = document.getElementById("publicTopbar");
+    const privateTopbar = document.getElementById("privateTopbar");
     const authOverlay = document.getElementById("authOverlay");
     const appContent = document.getElementById("appContent");
     const authMsg = document.getElementById("authMsg");
@@ -1099,8 +1136,17 @@
     }
 
     function setUIConnected(connected) {
-      authOverlay.classList.toggle("hidden", connected);
-      appContent.classList.toggle("hidden", !connected);
+      if (connected) {
+        publicTopbar.classList.add("hidden");
+        privateTopbar.classList.remove("hidden");
+        authOverlay.classList.add("hidden");
+        appContent.classList.remove("hidden");
+      } else {
+        publicTopbar.classList.remove("hidden");
+        privateTopbar.classList.add("hidden");
+        authOverlay.classList.remove("hidden");
+        appContent.classList.add("hidden");
+      }
     }
 
     async function forceSessionCloseWithMessage(message) {
@@ -1861,6 +1907,7 @@ ${post.text || "[aucun texte]"}
 
     bindActivityEvents();
     showView("login");
+    setUIConnected(false);
   </script>
 </body>
 </html>
