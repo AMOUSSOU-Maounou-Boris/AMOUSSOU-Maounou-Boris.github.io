@@ -1450,7 +1450,7 @@
         return "Hors ligne";
       }
 
-      if (privacy.hidePresence) return "Visibilité masquée";
+      if (privacy.hidePresence) return "";
       if (data.online) return "En ligne";
       if (data.lastSeen) return "Vu : " + formatDate(data.lastSeen);
       return "Hors ligne";
