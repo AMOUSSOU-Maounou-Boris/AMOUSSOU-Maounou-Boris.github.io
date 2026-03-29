@@ -3,78 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Research | Boris Research Hub</title>
-  <link rel="stylesheet" href="research.css" />
-  <style>
-    .login-btn,.nav-account-btn,.nav-logout-btn{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;font-weight:700;text-decoration:none;cursor:pointer;border:none}
-    .login-btn{background:#0a66c2;color:#fff!important}
-    .nav-account-btn{background:#e8f1fb;color:#0b2239!important}
-    .nav-logout-btn{background:#f7dede;color:#8a1f1f!important}
-    .status-dot{width:10px;height:10px;background:#00ff66;border-radius:50%;display:inline-block;box-shadow:0 0 8px #00ff66;animation:blink 1.2s infinite}
-    .auth-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    @keyframes blink{0%{opacity:1}50%{opacity:.3}100%{opacity:1}}
-  </style>
+  <title>Research - Boris AMOUSSOU</title>
+  <link rel="stylesheet" href="public.css" />
 </head>
 <body>
-  <nav class="research-nav">
-    <ul id="nav-menu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="research.html" class="active-link">Research</a></li>
-      <li><a href="cv.html">Resume</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="insights.html">Insights</a></li>
-      <li id="auth-section"></li>
-    </ul>
-  </nav>
+  <header class="topbar">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="research.html" class="active">Research</a>
+      <a href="cv.html">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html">Insights</a>
+      <a href="insights.html" class="login-link">Login</a>
+    </nav>
+  </header>
 
-  <main class="research-container">
-    <section class="research-card">
-      <h2>Research Interests</h2>
-      <p>My research focuses on sustainable energy and environmental technologies, with particular interest in:</p>
-      <ul>
-        <li>Electrochemical processes for energy applications</li>
-        <li>Photocatalytic systems</li>
-        <li>Green hydrogen production</li>
-        <li>Environmental remediation technologies</li>
-        <li>Advanced functional materials</li>
-      </ul>
-    </section>
+  <main class="public-layout">
+    <aside class="sidebar">
+      <div class="profile-pic">
+        <img src="images/profile.jpg" alt="Photo de profil" />
+      </div>
 
-    <section class="research-card">
-      <h2>Research Experience</h2>
-      <p>I have been involved in academic research projects related to energy transition and environmental sustainability, including international research experience in Canada and current work in France.</p>
-      <p>My work contributes to the development of innovative approaches for clean energy production and environmental protection.</p>
+      <h1>Maounou Boris<br />AMOUSSOU</h1>
+      <div class="subtitle">
+        Chemical Engineer<br />
+        Green Chemistry & Environment
+      </div>
+
+      <div class="quick-search-title">Quick Search</div>
+      <div class="quick-search">
+        <input type="text" placeholder="Search page..." />
+        <button type="button">Search</button>
+      </div>
+    </aside>
+
+    <section class="content">
+      <div class="hero-card">
+        <h2>Research</h2>
+        <p>
+          This section presents my scientific interests, laboratory topics,
+          and research directions related to chemistry and sustainable development.
+        </p>
+      </div>
+
+      <div class="section-card">
+        <h2>Main topics</h2>
+
+        <div class="research-list">
+          <div class="line-card">
+            <strong>Green Chemistry</strong>
+            <p>
+              Development of cleaner approaches and responsible chemical processes.
+            </p>
+          </div>
+
+          <div class="line-card">
+            <strong>Catalysis</strong>
+            <p>
+              Understanding catalytic systems and their efficiency in transformation processes.
+            </p>
+          </div>
+
+          <div class="line-card">
+            <strong>Environment</strong>
+            <p>
+              Scientific approaches linked to pollution control, sustainability,
+              and environmentally relevant chemistry.
+            </p>
+          </div>
+
+          <div class="line-card">
+            <strong>Sustainable Energy</strong>
+            <p>
+              Interest in chemical and material systems connected to energy conversion
+              and clean energy technologies.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
-
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const authSection = document.getElementById("auth-section");
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const snap = await get(ref(db, "users/" + user.uid));
-        const profile = snap.exists() ? snap.val() : null;
-        const name = profile?.displayName || user.displayName || "Mon compte";
-        authSection.innerHTML = `
-          <div class="auth-actions">
-            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
-            <a href="profile.html" class="nav-account-btn">👤 ${name}<span class="status-dot"></span></a>
-            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
-          </div>
-        `;
-        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
-          await signOut(auth);
-          window.location.href = "research.html";
-        });
-      } else {
-        authSection.innerHTML = `<a href="login.html" class="login-btn">Login</a>`;
-      }
-    });
-  </script>
 </body>
 </html>
