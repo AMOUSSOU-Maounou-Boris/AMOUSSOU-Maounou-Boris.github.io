@@ -1206,11 +1206,11 @@
 
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
     const LAST_ACTIVITY_KEY = "insights_last_activity";
-    const MAX_INPUT_FILE_SIZE = 10 * 1024 * 1024;
-    const MAX_PDF_SIZE = 2 * 1024 * 1024;
-    const MAX_WIDTH = 1280;
-    const MAX_HEIGHT = 1280;
-    const JPEG_QUALITY = 0.70;
+    const MAX_INPUT_FILE_SIZE = 2 * 1024 * 1024;
+    const MAX_PDF_SIZE = 300 * 1024;
+    const MAX_WIDTH = 900;
+    const MAX_HEIGHT = 900;
+    const JPEG_QUALITY = 0.50;
 
     function escapeHtml(text = "") {
       const div = document.createElement("div");
@@ -2125,7 +2125,7 @@
         }
 
         if (file.size > MAX_INPUT_FILE_SIZE) {
-          setStatus("Fichier trop lourd. Maximum 10 Mo.", true);
+          setStatus("Fichier trop lourd. Maximum 2 Mo.", true);
           attachmentInput.value = "";
           return;
         }
@@ -2133,7 +2133,7 @@
         try {
           if (file.type === "application/pdf") {
             if (file.size > MAX_PDF_SIZE) {
-              setStatus("PDF trop lourd. 2 Mo maximum.", true);
+              setStatus("PDF trop lourd. 300 Ko maximum.", true);
               attachmentInput.value = "";
               return;
             }
