@@ -1423,12 +1423,12 @@
 
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
     const LAST_ACTIVITY_KEY = "insights_last_activity";
-    const MAX_INPUT_FILE_SIZE = 2 * 1024 * 1024;
-    const MAX_PDF_SIZE = 300 * 1024;
-    const MAX_AUDIO_SIZE = 1500 * 1024;
-    const MAX_WIDTH = 900;
-    const MAX_HEIGHT = 900;
-    const JPEG_QUALITY = 0.50;
+    const MAX_INPUT_FILE_SIZE = 1200 * 1024;
+    const MAX_PDF_SIZE = 200 * 1024;
+    const MAX_AUDIO_SIZE = 700 * 1024;
+    const MAX_WIDTH = 800;
+    const MAX_HEIGHT = 800;
+    const JPEG_QUALITY = 0.42;
     const MEDIA_TTL = 24 * 60 * 60 * 1000;
 
     let mediaRecorder = null;
@@ -2097,7 +2097,7 @@
       if (msg.attachmentType === "audio") {
         return `
           <div class="audio-box">
-            <audio controls src="${msg.attachmentUrl}"></audio>
+            <audio controls preload="none" src="${msg.attachmentUrl}"></audio>
           </div>
           <div class="ephemeral-note">Cet audio vocal disparaît automatiquement après 24h.</div>
         `;
@@ -2255,12 +2255,12 @@
       let bestDataUrl = canvasToDataURL(canvas, originalType, JPEG_QUALITY);
 
       if (originalType === "image/png") {
-        const jpegVersion = canvasToDataURL(canvas, "image/jpeg", 0.76);
+        const jpegVersion = canvasToDataURL(canvas, "image/jpeg", 0.54);
         if (bytesFromDataURL(jpegVersion) < bytesFromDataURL(bestDataUrl)) {
           bestDataUrl = jpegVersion;
         }
       } else {
-        const lighter = canvasToDataURL(canvas, "image/jpeg", 0.62);
+        const lighter = canvasToDataURL(canvas, "image/jpeg", 0.38);
         if (bytesFromDataURL(lighter) < bytesFromDataURL(bestDataUrl)) {
           bestDataUrl = lighter;
         }
@@ -2340,7 +2340,7 @@
                 <div class="attachment-pdf-sub">Taille : ${formatBytes(selectedAttachment.size)}</div>
               </div>
             </div>
-            <audio controls src="${selectedAttachment.dataUrl}"></audio>
+            <audio controls preload="none" src="${selectedAttachment.dataUrl}"></audio>
             <div class="ephemeral-note">Cet audio vocal disparaîtra automatiquement après 24h.</div>
             <button class="remove-attachment-btn" type="button" id="removeAttachmentBtn">Retirer l'audio</button>
           </div>
@@ -2373,7 +2373,7 @@
       try {
         recordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         recordedChunks = [];
-        mediaRecorder = new MediaRecorder(recordingStream);
+        mediaRecorder = new MediaRecorder(recordingStream, { mimeType: "audio/webm" });
 
         mediaRecorder.ondataavailable = (event) => {
           if (event.data.size > 0) recordedChunks.push(event.data);
@@ -2383,7 +2383,7 @@
           try {
             const blob = new Blob(recordedChunks, { type: "audio/webm" });
             if (blob.size > MAX_AUDIO_SIZE) {
-              setStatus("Audio trop lourd. Maximum 1.5 Mo.", true);
+              setStatus("Audio trop lourd. Maximum 700 Ko.", true);
               stopRecordingTracks();
               isRecording = false;
               recordAudioBtn.classList.remove("recording");
@@ -2940,7 +2940,7 @@
         }
 
         if (file.size > MAX_INPUT_FILE_SIZE) {
-          setStatus("Fichier trop lourd. Maximum 2 Mo.", true);
+          setStatus("Fichier trop lourd. Maximum 1.2 Mo.", true);
           attachmentInput.value = "";
           return;
         }
@@ -2948,7 +2948,7 @@
         try {
           if (file.type === "application/pdf") {
             if (file.size > MAX_PDF_SIZE) {
-              setStatus("PDF trop lourd. 300 Ko maximum.", true);
+              setStatus("PDF trop lourd. 200 Ko maximum.", true);
               attachmentInput.value = "";
               return;
             }
