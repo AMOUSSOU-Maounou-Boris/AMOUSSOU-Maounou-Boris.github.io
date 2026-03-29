@@ -531,7 +531,7 @@
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const bigAvatar = document.getElementById("bigAvatar");
@@ -557,7 +557,6 @@
     let currentUser = null;
     let viewedUid = null;
     let viewedUser = null;
-    let usersCache = {};
     let activityTimeout = null;
 
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
@@ -629,6 +628,55 @@
     function showMsg(text, ok = false) {
       profileMsg.textContent = text;
       profileMsg.style.color = ok ? "#12824b" : "#c0392b";
+    }
+
+    function userPrivacy(userData = {}) {
+      return userData.privacy || {
+        hidePresence: false,
+        hideEmail: true,
+        hideBio: false
+      };
+    }
+
+    function canSeeEmail(userData = {}) {
+      if (!userData?.uid) return false;
+      if (currentUser && userData.uid === currentUser.uid) return true;
+      return !userPrivacy(userData).hideEmail;
+    }
+
+    function canSeeBio(userData = {}) {
+      if (!userData?.uid) return false;
+      if (currentUser && userData.uid === currentUser.uid) return true;
+      return !userPrivacy(userData).hideBio;
+    }
+
+    function canSeePresence(userData = {}) {
+      if (!userData?.uid) return false;
+      if (currentUser && userData.uid === currentUser.uid) return true;
+      return !userPrivacy(userData).hidePresence;
+    }
+
+    function visibleEmail(userData = {}) {
+      return canSeeEmail(userData) ? (userData.email || "") : "Email masqué";
+    }
+
+    function visibleBio(userData = {}) {
+      return canSeeBio(userData) ? (userData.bio || "Aucune bio pour le moment.") : "Bio masquée";
+    }
+
+    function normalizePostImages(post = {}) {
+      if (Array.isArray(post.imageUrls) && post.imageUrls.length) return post.imageUrls;
+      if (post.imageUrl) return [post.imageUrl];
+      if (post.attachmentType === "image" && post.attachmentUrl) return [post.attachmentUrl];
+      return [];
+    }
+
+    function normalizePostPdf(post = {}) {
+      if (post.pdfUrl) return { url: post.pdfUrl, name: post.pdfName || "Document PDF" };
+      if (post.attachmentType === "pdf" && post.attachmentUrl) {
+        return { url: post.attachmentUrl, name: post.attachmentName || "Document PDF" };
+      }
+      return null;
     }
 
     function loadImageFromFile(file) {
@@ -703,13 +751,14 @@
         return;
       }
 
-      viewedUser = snap.val();
+      viewedUser = { uid, ...snap.val() };
+      const isMine = currentUser && currentUser.uid === uid;
+
       profileName.textContent = viewedUser.displayName || "Sans nom";
-      profileEmail.textContent = viewedUser.email || "";
-      bioText.textContent = viewedUser.bio || "Aucune bio pour le moment.";
+      profileEmail.textContent = visibleEmail(viewedUser);
+      bioText.textContent = visibleBio(viewedUser);
       showAvatar(viewedUser.photoURL, viewedUser.displayName, viewedUser.email);
 
-      const isMine = currentUser && currentUser.uid === uid;
       editorBlock.style.display = isMine ? "block" : "none";
       changeAvatarBtn.style.display = isMine ? "inline-flex" : "none";
       nameInput.value = viewedUser.displayName || "";
@@ -724,8 +773,24 @@
     }
 
     function listenPresence(uid) {
-      onValue(ref(db, "users/" + uid + "/presence"), (snap) => {
-        const data = snap.val() || {};
+      onValue(ref(db, "users/" + uid), (snap) => {
+        const userData = snap.val() || {};
+        viewedUser = { uid, ...userData };
+
+        profileName.textContent = viewedUser.displayName || "Sans nom";
+        profileEmail.textContent = visibleEmail(viewedUser);
+        bioText.textContent = visibleBio(viewedUser);
+        showAvatar(viewedUser.photoURL, viewedUser.displayName, viewedUser.email);
+
+        const data = viewedUser.presence || {};
+
+        if (!canSeePresence(viewedUser)) {
+          statusDot.classList.remove("online");
+          statusText.textContent = "Visibilité masquée";
+          statusText.style.color = "#6b7d93";
+          return;
+        }
+
         if (data.online) {
           statusDot.classList.add("online");
           statusText.textContent = "En ligne";
@@ -739,23 +804,24 @@
     }
 
     function renderPostAttachment(post) {
-      if (!post.attachmentUrl) return "";
+      const images = normalizePostImages(post);
+      const pdf = normalizePostPdf(post);
 
-      if (post.attachmentType === "image") {
-        return `<img src="${post.attachmentUrl}" class="post-preview-img" alt="post image">`;
+      if (images.length) {
+        return `<img src="${images[0]}" class="post-preview-img" alt="post image">`;
       }
 
-      if (post.attachmentType === "pdf") {
+      if (pdf) {
         return `
           <div class="pdf-card">
             <div class="pdf-info">
               <div class="pdf-icon">PDF</div>
               <div>
-                <div class="pdf-title">${escapeHtml(post.attachmentName || "Document PDF")}</div>
+                <div class="pdf-title">${escapeHtml(pdf.name || "Document PDF")}</div>
                 <div class="pdf-sub">Pièce jointe PDF</div>
               </div>
             </div>
-            <a class="pdf-open" href="${post.attachmentUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Ouvrir</a>
+            <a class="pdf-open" href="${pdf.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Ouvrir</a>
           </div>
         `;
       }
@@ -805,11 +871,16 @@
       }
 
       try {
+        await updateProfile(currentUser, { displayName: newName });
+
         await update(ref(db, "users/" + currentUser.uid), {
           displayName: newName,
           bio: newBio,
           updatedAt: Date.now()
         });
+
+        profileName.textContent = newName;
+        bioText.textContent = newBio || "Aucune bio pour le moment.";
         showMsg("Profil mis à jour avec succès.", true);
       } catch (error) {
         console.error(error);
