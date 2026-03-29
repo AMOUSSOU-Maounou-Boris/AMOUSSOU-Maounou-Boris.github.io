@@ -3,117 +3,84 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About | Boris Research Hub</title>
-  <link rel="stylesheet" href="about.css" />
-  <style>
-    .login-btn,.nav-account-btn,.nav-logout-btn{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;font-weight:700;text-decoration:none;cursor:pointer;border:none}
-    .login-btn{background:#0a66c2;color:#fff!important}
-    .nav-account-btn{background:#e8f1fb;color:#0b2239!important}
-    .nav-logout-btn{background:#f7dede;color:#8a1f1f!important}
-    .status-dot{width:10px;height:10px;background:#00ff66;border-radius:50%;display:inline-block;box-shadow:0 0 8px #00ff66;animation:blink 1.2s infinite}
-    .auth-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    @keyframes blink{0%{opacity:1}50%{opacity:.3}100%{opacity:1}}
-  </style>
+  <title>About - Boris AMOUSSOU</title>
+  <link rel="stylesheet" href="public.css" />
 </head>
 <body>
-  <nav class="about-nav">
-    <ul id="nav-menu">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="about.html" class="active-link">About</a></li>
-      <li><a href="research.html">Research</a></li>
-      <li><a href="cv.html">Resume</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="insights.html">Insights</a></li>
-      <li id="auth-section"></li>
-    </ul>
-  </nav>
+  <header class="topbar">
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html" class="active">About</a>
+      <a href="research.html">Research</a>
+      <a href="cv.html">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html">Insights</a>
+      <a href="insights.html" class="login-link">Login</a>
+    </nav>
+  </header>
 
-  <div class="about-container">
-    <aside class="about-sidebar">
-      <div class="profile-avatar">MBA</div>
-      <h2>Maounou Boris AMOUSSOU</h2>
-      <p>Chemical Engineer<br>Green Chemistry &amp; Environment</p>
-
-      <div class="sidebar-card">
-        <h3>Profile</h3>
-        <p>Master’s student in chemistry with a strong interest in sustainable development, catalysis, environmental processes, and clean energy systems.</p>
+  <main class="public-layout">
+    <aside class="sidebar">
+      <div class="profile-pic">
+        <img src="images/profile.jpg" alt="Photo de profil" />
       </div>
 
-      <div class="sidebar-card">
-        <h3>Focus Areas</h3>
-        <ul>
-          <li>Green chemistry</li>
-          <li>Catalysis</li>
-          <li>Environmental treatment</li>
-          <li>Electrochemistry</li>
-          <li>Photocatalysis</li>
-        </ul>
+      <h1>Maounou Boris<br />AMOUSSOU</h1>
+      <div class="subtitle">
+        Chemical Engineer<br />
+        Green Chemistry & Environment
+      </div>
+
+      <div class="quick-search-title">Quick Search</div>
+      <div class="quick-search">
+        <input type="text" placeholder="Search page..." />
+        <button type="button">Search</button>
       </div>
     </aside>
 
-    <main class="about-main">
-      <section class="about-card hero-card">
-        <span class="section-label">About Me</span>
-        <h1>Academic identity and scientific direction</h1>
-        <p>I am a Chemical Engineer specialized in Green Chemistry, Catalysis, and Environmental Processes, currently completing a Master's degree at the University of Poitiers, France.</p>
-      </section>
+    <section class="content">
+      <div class="hero-card">
+        <h2>About me</h2>
+        <p>
+          I am a chemical engineer interested in green chemistry, environment,
+          catalysis, scientific innovation, and sustainable technologies.
+        </p>
+      </div>
 
-      <section class="about-grid">
-        <div class="about-card">
-          <h3>Academic journey</h3>
-          <p>My academic path has been strongly oriented toward sustainable development, energy transition, and innovative solutions for environmental challenges.</p>
+      <div class="section-card">
+        <h2>Profile</h2>
+        <p>
+          This page presents my background, scientific orientation, values,
+          motivations, and the major directions of my academic and research journey.
+        </p>
+
+        <div class="highlight-box">
+          I aim to contribute to scientific research that supports cleaner processes,
+          efficient catalysis, and environmentally responsible innovation.
         </div>
+      </div>
 
-        <div class="about-card">
-          <h3>Research experience</h3>
-          <p>I gained international research experience in Montreal, Canada, where I worked on advanced electrochemical and photocatalytic approaches for sustainable energy production.</p>
-        </div>
-
-        <div class="about-card">
-          <h3>Scientific interests</h3>
-          <p>I am particularly interested in developing efficient and environmentally friendly technologies for future energy systems.</p>
-        </div>
-
-        <div class="about-card">
-          <h3>Core values</h3>
-          <p>I value scientific rigor, curiosity, collaboration, and the design of practical solutions for environmental and societal needs.</p>
-        </div>
-      </section>
-
-      <section class="about-card">
-        <h3>Professional vision</h3>
-        <p>My objective is to contribute to scientific research and technological innovation in the fields of green chemistry, energy conversion, and environmental remediation, while building strong international collaborations and impactful academic work.</p>
-      </section>
-    </main>
-  </div>
-
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const authSection = document.getElementById("auth-section");
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const snap = await get(ref(db, "users/" + user.uid));
-        const profile = snap.exists() ? snap.val() : null;
-        const name = profile?.displayName || user.displayName || "Mon compte";
-        authSection.innerHTML = `
-          <div class="auth-actions">
-            <a href="messages.html" class="nav-account-btn">💬 Messages</a>
-            <a href="profile.html" class="nav-account-btn">👤 ${name}<span class="status-dot"></span></a>
-            <button id="logoutNavBtn" class="nav-logout-btn">Logout</button>
+      <div class="section-card">
+        <h2>What defines my path</h2>
+        <div class="two-col">
+          <div class="mini-card">
+            <h3>Scientific Curiosity</h3>
+            <p>
+              Continuous interest in understanding chemical systems and their
+              applications to real environmental and energy challenges.
+            </p>
           </div>
-        `;
-        document.getElementById("logoutNavBtn").addEventListener("click", async () => {
-          await signOut(auth);
-          window.location.href = "about.html";
-        });
-      } else {
-        authSection.innerHTML = `<a href="login.html" class="login-btn">Login</a>`;
-      }
-    });
-  </script>
+
+          <div class="mini-card">
+            <h3>Commitment</h3>
+            <p>
+              Strong motivation to build meaningful scientific collaborations
+              and contribute to practical and useful research.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
