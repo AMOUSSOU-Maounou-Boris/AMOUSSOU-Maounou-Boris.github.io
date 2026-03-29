@@ -52,9 +52,9 @@
         <h2>Highlights</h2>
 
         <div class="carousel-box">
-          <button class="carousel-arrow left" type="button">&#8249;</button>
-          <img src="stage2.jpg" alt="Highlight" />
-          <button class="carousel-arrow right" type="button">&#8250;</button>
+          <button class="carousel-arrow left" type="button" id="prevSlide">&#8249;</button>
+          <img src="stage1.jpg" alt="Highlight" id="highlightSlide" />
+          <button class="carousel-arrow right" type="button" id="nextSlide">&#8250;</button>
         </div>
       </div>
 
@@ -84,5 +84,40 @@
       </div>
     </section>
   </main>
+
+  <script>
+    const slideImages = [
+      "stage1.jpg",
+      "stage2.jpg",
+      "stage3.jpg",
+      "stage4.jpg",
+      "stage5.jpg"
+    ];
+
+    let currentSlide = 0;
+    const highlightSlide = document.getElementById("highlightSlide");
+    const prevSlide = document.getElementById("prevSlide");
+    const nextSlide = document.getElementById("nextSlide");
+
+    function showSlide(index) {
+      currentSlide = (index + slideImages.length) % slideImages.length;
+      highlightSlide.src = slideImages[currentSlide];
+      highlightSlide.alt = "Highlight " + (currentSlide + 1);
+    }
+
+    function nextImage() {
+      showSlide(currentSlide + 1);
+    }
+
+    function prevImage() {
+      showSlide(currentSlide - 1);
+    }
+
+    prevSlide.addEventListener("click", prevImage);
+    nextSlide.addEventListener("click", nextImage);
+
+    // Défilement automatique toutes les 3 secondes
+    setInterval(nextImage, 3000);
+  </script>
 </body>
 </html>
