@@ -23,6 +23,7 @@
       --bubble-me:#dfeeff;
       --bubble-other:#ffffff;
       --gold:#fff8cc;
+      --orange:#f7a600;
     }
 
     body{
@@ -279,6 +280,7 @@
       gap:8px;
       min-width:0;
       margin-bottom:4px;
+      flex-wrap:wrap;
     }
 
     .member-name{
@@ -288,6 +290,34 @@
       overflow:hidden;
       text-overflow:ellipsis;
       white-space:nowrap;
+    }
+
+    .member-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:10px;
+      font-weight:800;
+      padding:4px 7px;
+      border-radius:999px;
+      background:#ffffff20;
+      color:#fff;
+      border:1px solid rgba(255,255,255,0.12);
+    }
+
+    .member-pill.contact{
+      background:rgba(24,195,74,0.18);
+      border-color:rgba(24,195,74,0.30);
+    }
+
+    .member-pill.pending{
+      background:rgba(247,166,0,0.18);
+      border-color:rgba(247,166,0,0.30);
+    }
+
+    .member-pill.incoming{
+      background:rgba(47,140,255,0.18);
+      border-color:rgba(47,140,255,0.30);
     }
 
     .member-unread-badge{
@@ -323,15 +353,43 @@
       color:rgba(255,255,255,0.9);
     }
 
-    .profile-btn{
+    .member-actions{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      flex:0 0 auto;
+    }
+
+    .profile-btn,
+    .invite-btn{
       border:none;
-      background:#fff;
-      color:var(--nav);
       border-radius:12px;
       padding:10px 12px;
       font-weight:800;
       cursor:pointer;
       font-size:13px;
+      white-space:nowrap;
+    }
+
+    .profile-btn{
+      background:#fff;
+      color:var(--nav);
+    }
+
+    .invite-btn{
+      background:#dcecff;
+      color:#08315f;
+    }
+
+    .invite-btn.accept{
+      background:#fff;
+      color:#0f4d92;
+    }
+
+    .invite-btn.pending{
+      background:rgba(255,255,255,0.14);
+      color:#fff;
+      cursor:default;
     }
 
     .empty-text{
@@ -395,7 +453,8 @@
     }
 
     .chat-call-btn,
-    .chat-options-btn{
+    .chat-options-btn,
+    .chat-invite-btn{
       border:none;
       background:#eef4fb;
       color:var(--text);
@@ -409,6 +468,17 @@
       min-width:54px;
       padding:12px 14px;
       font-size:18px;
+    }
+
+    .chat-invite-btn.accept{
+      background:#e7f2ff;
+      color:#0f4d92;
+    }
+
+    .chat-invite-btn.pending{
+      background:#f7f8fa;
+      color:#6b7d93;
+      cursor:default;
     }
 
     .chat-box{
@@ -445,6 +515,9 @@
       padding:16px 18px;
       border-radius:16px;
       box-shadow:var(--shadow);
+      text-align:center;
+      line-height:1.55;
+      max-width:520px;
     }
 
     .message-row{
@@ -1150,6 +1223,10 @@
         align-items:flex-start;
       }
 
+      .member-actions{
+        flex-direction:row;
+      }
+
       .call-videos{
         grid-template-columns:1fr;
       }
@@ -1202,6 +1279,7 @@
             <p id="chatPresence"></p>
           </div>
           <div class="chat-header-actions">
+            <button class="chat-invite-btn" id="chatInviteBtn" style="display:none;" type="button">Inviter</button>
             <button class="chat-call-btn" id="voiceCallBtn" style="display:none;" type="button" title="Appel vocal">📞</button>
             <button class="chat-call-btn" id="videoCallBtn" style="display:none;" type="button" title="Appel vidéo">🎥</button>
             <button class="chat-options-btn" id="chatOptionsBtn" style="display:none;" type="button">Options</button>
@@ -1240,7 +1318,7 @@
           <div class="composer-panel" id="composerPanel">
             <div class="panel-head">
               <div class="panel-title">Pièces jointes et stickers</div>
-              <div class="panel-note">Images compressées, PDF légers, audio vocal et fichiers éphémères 24h</div>
+              <div class="panel-note">Invitation requise avant discussion, médias compressés et éphémères 24h</div>
             </div>
 
             <div class="panel-block">
@@ -1362,6 +1440,7 @@
     const chatSubtitle = document.getElementById("chatSubtitle");
     const chatPresence = document.getElementById("chatPresence");
     const chatOptionsBtn = document.getElementById("chatOptionsBtn");
+    const chatInviteBtn = document.getElementById("chatInviteBtn");
     const voiceCallBtn = document.getElementById("voiceCallBtn");
     const videoCallBtn = document.getElementById("videoCallBtn");
     const chatStatusBar = document.getElementById("chatStatusBar");
@@ -1414,21 +1493,26 @@
     let usersCache = {};
     let blockedUsersCache = {};
     let allBlocksCache = {};
+    let contactsCache = {};
+    let incomingInvitesCache = {};
+    let outgoingInvitesCache = {};
     let replyTarget = null;
     let forwardPayload = null;
     let selectedAttachment = null;
     let activityTimeout = null;
     let unreadCounts = {};
-    let messageListenerBoundChatId = null;
+    let detachMessagesListener = null;
 
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
     const LAST_ACTIVITY_KEY = "insights_last_activity";
-    const MAX_INPUT_FILE_SIZE = 1200 * 1024;
-    const MAX_PDF_SIZE = 200 * 1024;
-    const MAX_AUDIO_SIZE = 700 * 1024;
-    const MAX_WIDTH = 800;
-    const MAX_HEIGHT = 800;
-    const JPEG_QUALITY = 0.42;
+
+    /* Très économique */
+    const MAX_INPUT_FILE_SIZE = 900 * 1024;
+    const MAX_PDF_SIZE = 150 * 1024;
+    const MAX_AUDIO_SIZE = 450 * 1024;
+    const MAX_WIDTH = 720;
+    const MAX_HEIGHT = 720;
+    const JPEG_QUALITY = 0.34;
     const MEDIA_TTL = 24 * 60 * 60 * 1000;
 
     let mediaRecorder = null;
@@ -1447,7 +1531,6 @@
     let answerListenerInitialized = false;
     let sessionMetaListenerInitialized = false;
     let incomingCallsListenerInitialized = false;
-    let remoteCandidatesListenerPath = "";
     let isMicMuted = false;
     let isCamOff = false;
 
@@ -1544,6 +1627,18 @@
 
     function isConversationBlocked(uid) {
       return isBlocked(uid) || amIBlockedBy(uid);
+    }
+
+    function areContacts(uid) {
+      return !!contactsCache?.[uid];
+    }
+
+    function hasIncomingInvite(uid) {
+      return !!incomingInvitesCache?.[uid];
+    }
+
+    function hasOutgoingInvite(uid) {
+      return !!outgoingInvitesCache?.[uid];
     }
 
     function visibleEmail(profile = {}) {
@@ -1747,10 +1842,34 @@
       }
     }
 
-    async function markConversationAsRead(chatId) {
+    async function incrementUnreadCount(receiverUid, senderUid) {
+      if (!receiverUid || !senderUid) return;
+      try {
+        const countRef = ref(db, `unreadCountsByUser/${receiverUid}/${senderUid}`);
+        const snap = await get(countRef);
+        const currentCount = Number(snap.val() || 0);
+        await set(countRef, currentCount + 1);
+      } catch (e) {
+        console.error("incrementUnreadCount error:", e);
+      }
+    }
+
+    async function resetUnreadCountForUser(otherUid) {
+      if (!currentUser || !otherUid) return;
+      try {
+        await set(ref(db, `unreadCountsByUser/${currentUser.uid}/${otherUid}`), 0);
+      } catch (e) {
+        console.error("resetUnreadCountForUser error:", e);
+      }
+    }
+
+    async function markConversationAsRead(chatId, otherUid = null) {
       if (!currentUser || !chatId) return;
       const snap = await get(ref(db, "privateMessages/" + chatId));
-      if (!snap.exists()) return;
+      if (!snap.exists()) {
+        if (otherUid) await resetUnreadCountForUser(otherUid);
+        return;
+      }
 
       const messages = snap.val() || {};
       const updates = {};
@@ -1771,6 +1890,38 @@
       if (hasUpdates) {
         await update(ref(db, "privateMessages/" + chatId), updates);
       }
+
+      if (otherUid) {
+        await resetUnreadCountForUser(otherUid);
+      }
+    }
+
+    function updateChatInviteButton() {
+      if (!selectedUserId || !selectedUserProfile) {
+        chatInviteBtn.style.display = "none";
+        return;
+      }
+
+      if (areContacts(selectedUserId)) {
+        chatInviteBtn.style.display = "none";
+        return;
+      }
+
+      chatInviteBtn.style.display = "inline-flex";
+      chatInviteBtn.className = "chat-invite-btn";
+
+      if (hasIncomingInvite(selectedUserId)) {
+        chatInviteBtn.textContent = "Accepter l’invitation";
+        chatInviteBtn.classList.add("accept");
+        chatInviteBtn.disabled = false;
+      } else if (hasOutgoingInvite(selectedUserId)) {
+        chatInviteBtn.textContent = "Invitation envoyée";
+        chatInviteBtn.classList.add("pending");
+        chatInviteBtn.disabled = true;
+      } else {
+        chatInviteBtn.textContent = "Inviter";
+        chatInviteBtn.disabled = false;
+      }
     }
 
     function renderChatHeader() {
@@ -1782,6 +1933,7 @@
         chatOptionsBtn.style.display = "none";
         voiceCallBtn.style.display = "none";
         videoCallBtn.style.display = "none";
+        chatInviteBtn.style.display = "none";
         return;
       }
 
@@ -1799,13 +1951,20 @@
         chatPresence.textContent = "Tu as bloqué cet utilisateur";
       } else if (blockedByThem) {
         chatPresence.textContent = "Cet utilisateur ne peut pas recevoir tes messages";
-      } else {
+      } else if (areContacts(selectedUserId)) {
         chatPresence.textContent = presenceText(selectedUserId);
+      } else if (hasIncomingInvite(selectedUserId)) {
+        chatPresence.textContent = "Invitation reçue : accepte pour ouvrir la discussion";
+      } else if (hasOutgoingInvite(selectedUserId)) {
+        chatPresence.textContent = "Invitation envoyée : en attente d’acceptation";
+      } else {
+        chatPresence.textContent = "Invitation nécessaire avant de discuter";
       }
 
       chatOptionsBtn.style.display = "inline-flex";
-      voiceCallBtn.style.display = "inline-flex";
-      videoCallBtn.style.display = "inline-flex";
+      voiceCallBtn.style.display = areContacts(selectedUserId) ? "inline-flex" : "none";
+      videoCallBtn.style.display = areContacts(selectedUserId) ? "inline-flex" : "none";
+      updateChatInviteButton();
     }
 
     function updateComposerState() {
@@ -1815,6 +1974,21 @@
         togglePanelBtn.disabled = false;
         recordAudioBtn.disabled = false;
         messageInput.placeholder = "Écris un message privé...";
+        return;
+      }
+
+      if (!areContacts(selectedUserId)) {
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        togglePanelBtn.disabled = true;
+        recordAudioBtn.disabled = true;
+        if (hasIncomingInvite(selectedUserId)) {
+          messageInput.placeholder = "Accepte l’invitation pour commencer à discuter.";
+        } else if (hasOutgoingInvite(selectedUserId)) {
+          messageInput.placeholder = "Invitation envoyée. Attends son acceptation.";
+        } else {
+          messageInput.placeholder = "Envoie d’abord une invitation pour ouvrir la messagerie.";
+        }
         return;
       }
 
@@ -1856,6 +2030,14 @@
       list = list.filter(u => searchableText(u).includes(q));
 
       list.sort((a, b) => {
+        const aContact = areContacts(a.uid) ? 1 : 0;
+        const bContact = areContacts(b.uid) ? 1 : 0;
+        if (bContact !== aContact) return bContact - aContact;
+
+        const aIncoming = hasIncomingInvite(a.uid) ? 1 : 0;
+        const bIncoming = hasIncomingInvite(b.uid) ? 1 : 0;
+        if (bIncoming !== aIncoming) return bIncoming - aIncoming;
+
         const aUnread = unreadCounts[a.uid] || 0;
         const bUnread = unreadCounts[b.uid] || 0;
         if (bUnread !== aUnread) return bUnread - aUnread;
@@ -1863,6 +2045,7 @@
         const aOnline = isOnline(a.uid) ? 1 : 0;
         const bOnline = isOnline(b.uid) ? 1 : 0;
         if (bOnline !== aOnline) return bOnline - aOnline;
+
         return (a.displayName || "").localeCompare(b.displayName || "");
       });
 
@@ -1876,10 +2059,18 @@
         const blockedByThem = amIBlockedBy(profile.uid);
         const subLine = visibleBio(profile) || visibleEmail(profile) || "Informations masquées";
         const unread = unreadCounts[profile.uid] || 0;
+        const contact = areContacts(profile.uid);
+        const incomingInvite = hasIncomingInvite(profile.uid);
+        const outgoingInvite = hasOutgoingInvite(profile.uid);
 
         let statusLine = presenceText(profile.uid);
         if (blockedByMe) statusLine = "Bloqué";
         if (blockedByThem) statusLine = "Cet utilisateur t'a bloqué";
+        if (!contact && !blockedByMe && !blockedByThem) {
+          if (incomingInvite) statusLine = "Invitation reçue";
+          else if (outgoingInvite) statusLine = "Invitation envoyée";
+          else statusLine = "Invite nécessaire";
+        }
 
         return `
           <div class="member-card" data-uid="${profile.uid}">
@@ -1887,6 +2078,7 @@
             <div class="member-main">
               <div class="member-name-row">
                 <div class="member-name">${escapeHtml(profile.displayName || "Membre")}</div>
+                ${contact ? `<span class="member-pill contact">Contact</span>` : incomingInvite ? `<span class="member-pill incoming">Invitation reçue</span>` : outgoingInvite ? `<span class="member-pill pending">En attente</span>` : ""}
                 ${unread > 0 ? `<span class="member-unread-badge">${unread > 99 ? "99+" : unread}</span>` : ""}
               </div>
               <div class="member-sub">${escapeHtml(subLine)}</div>
@@ -1895,14 +2087,20 @@
                 <span>${escapeHtml(statusLine)}</span>
               </div>
             </div>
-            <button class="profile-btn" type="button" data-profile-uid="${profile.uid}">Profil</button>
+            <div class="member-actions">
+              ${contact ? `<button class="invite-btn pending" type="button" disabled>Discussion ouverte</button>` :
+                incomingInvite ? `<button class="invite-btn accept" type="button" data-accept-uid="${profile.uid}">Accepter</button>` :
+                outgoingInvite ? `<button class="invite-btn pending" type="button" disabled>En attente</button>` :
+                `<button class="invite-btn" type="button" data-invite-uid="${profile.uid}">Inviter</button>`}
+              <button class="profile-btn" type="button" data-profile-uid="${profile.uid}">Profil</button>
+            </div>
           </div>
         `;
       }).join("");
 
       document.querySelectorAll(".member-card").forEach(card => {
         card.addEventListener("click", (e) => {
-          if (e.target.closest(".profile-btn")) return;
+          if (e.target.closest(".profile-btn") || e.target.closest("[data-invite-uid]") || e.target.closest("[data-accept-uid]")) return;
           selectConversation(card.dataset.uid);
         });
       });
@@ -1913,140 +2111,100 @@
           window.location.href = `profile.html?uid=${encodeURIComponent(btn.dataset.profileUid)}`;
         });
       });
-    }
 
-    function openOptionsModal() {
-      if (!selectedUserId || !selectedUserProfile) return;
-      optionsModal.classList.add("open");
-      optionsModalName.textContent = selectedUserProfile.displayName || "Membre";
-      blockToggleBtn.textContent = isBlocked(selectedUserId) ? "Débloquer cet utilisateur" : "Bloquer cet utilisateur";
-    }
+      document.querySelectorAll("[data-invite-uid]").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          await sendInviteToUser(btn.dataset.inviteUid);
+        });
+      });
 
-    function closeOptionsModalFn() {
-      optionsModal.classList.remove("open");
-    }
-
-    async function toggleBlockSelectedUser() {
-      if (!currentUser || !selectedUserId) return;
-
-      const blockRef = ref(db, "blockedUsers/" + currentUser.uid + "/" + selectedUserId);
-
-      try {
-        if (isBlocked(selectedUserId)) {
-          await remove(blockRef);
-          setStatus("Utilisateur débloqué.");
-        } else {
-          await set(blockRef, {
-            uid: selectedUserId,
-            displayName: selectedUserProfile?.displayName || "Membre",
-            createdAt: Date.now()
-          });
-          setStatus("Utilisateur bloqué.");
-        }
-        closeOptionsModalFn();
-      } catch (error) {
-        setStatus("Impossible de modifier le blocage.", true);
-      }
-    }
-
-    function openForwardModal(msg) {
-      const sender = usersCache[msg.senderId] || {};
-      forwardPayload = {
-        text: msg.text || "",
-        senderName: sender.displayName || "Membre",
-        attachmentType: msg.attachmentType || "",
-        attachmentUrl: msg.attachmentUrl || "",
-        attachmentName: msg.attachmentName || "",
-        sticker: msg.sticker || ""
-      };
-
-      let preview = `${forwardPayload.senderName} : ${forwardPayload.text}`;
-      if (forwardPayload.sticker) preview += `\nSticker : ${forwardPayload.sticker}`;
-      if (forwardPayload.attachmentType === "pdf") preview += `\nPDF : ${forwardPayload.attachmentName || "Document PDF"}`;
-      if (forwardPayload.attachmentType === "image") preview += `\nImage jointe`;
-      if (forwardPayload.attachmentType === "audio") preview += `\nAudio vocal`;
-
-      forwardPreview.textContent = preview;
-      forwardSearch.value = "";
-      forwardModal.classList.add("open");
-      renderForwardMembers();
-    }
-
-    function closeForwardModalFn() {
-      forwardPayload = null;
-      forwardModal.classList.remove("open");
-    }
-
-    function renderForwardMembers() {
-      if (!currentUser) return;
-
-      const q = forwardSearch.value.trim().toLowerCase();
-
-      const list = Object.values(usersCache)
-        .filter(u => u && u.uid && u.uid !== currentUser.uid)
-        .filter(u => !isConversationBlocked(u.uid))
-        .filter(u => searchableText(u).includes(q))
-        .sort((a, b) => (a.displayName || "").localeCompare(b.displayName || ""));
-
-      if (!list.length) {
-        forwardMembers.innerHTML = `<div class="empty-text" style="color:#0b2340;">Aucun membre disponible.</div>`;
-        return;
-      }
-
-      forwardMembers.innerHTML = list.map(u => `
-        <div class="forward-member">
-          <div class="avatar small">${avatarMarkup(u)}</div>
-          <div class="forward-member-text">
-            <strong>${escapeHtml(u.displayName || "Membre")}</strong>
-            <span>${escapeHtml(visibleEmail(u) || "Email masqué")}</span>
-          </div>
-          <button class="main-btn" type="button" data-forward-uid="${u.uid}">Transférer</button>
-        </div>
-      `).join("");
-
-      document.querySelectorAll("[data-forward-uid]").forEach(btn => {
-        btn.addEventListener("click", () => forwardMessageToUser(btn.dataset.forwardUid));
+      document.querySelectorAll("[data-accept-uid]").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          await acceptInviteFromUser(btn.dataset.acceptUid);
+        });
       });
     }
 
-    async function forwardMessageToUser(targetUid) {
-      if (!currentUser || !forwardPayload || !targetUid) return;
-      if (isConversationBlocked(targetUid)) {
-        setStatus("Message impossible : l'un d'entre vous a bloqué l'autre.", true);
+    async function sendInviteToUser(uid) {
+      if (!currentUser || !uid || uid === currentUser.uid) return;
+      if (areContacts(uid) || hasOutgoingInvite(uid)) return;
+      if (isConversationBlocked(uid)) {
+        setStatus("Invitation impossible : l'un d'entre vous a bloqué l'autre.", true);
         return;
       }
 
+      const payload = {
+        from: currentUser.uid,
+        to: uid,
+        displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
+        createdAt: Date.now(),
+        status: "pending"
+      };
+
       try {
-        const chatId = makeChatId(currentUser.uid, targetUid);
-        const msgRef = push(ref(db, "privateMessages/" + chatId));
-
-        await set(msgRef, {
-          senderId: currentUser.uid,
-          receiverId: targetUid,
-          text: forwardPayload.text ? "Message transféré :\n" + forwardPayload.text : "Message transféré",
-          replyTo: null,
-          attachmentType: forwardPayload.attachmentType || "",
-          attachmentUrl: forwardPayload.attachmentUrl || "",
-          attachmentName: forwardPayload.attachmentName || "",
-          sticker: forwardPayload.sticker || "",
-          createdAt: Date.now(),
-          readBy: {
-            [currentUser.uid]: true
-          }
-        });
-
-        closeForwardModalFn();
-        setStatus("Message transféré.");
-      } catch (error) {
-        setStatus("Impossible de transférer le message.", true);
+        await set(ref(db, `messageInvitesIncoming/${uid}/${currentUser.uid}`), payload);
+        await set(ref(db, `messageInvitesOutgoing/${currentUser.uid}/${uid}`), payload);
+        setStatus("Invitation envoyée.");
+      } catch (e) {
+        console.error(e);
+        setStatus("Impossible d'envoyer l'invitation.", true);
       }
+    }
+
+    async function acceptInviteFromUser(uid) {
+      if (!currentUser || !uid) return;
+      if (!hasIncomingInvite(uid)) return;
+
+      try {
+        const now = Date.now();
+        const myContactPayload = {
+          uid,
+          acceptedAt: now
+        };
+        const theirContactPayload = {
+          uid: currentUser.uid,
+          acceptedAt: now
+        };
+
+        await set(ref(db, `messageContacts/${currentUser.uid}/${uid}`), myContactPayload);
+        await set(ref(db, `messageContacts/${uid}/${currentUser.uid}`), theirContactPayload);
+
+        await remove(ref(db, `messageInvitesIncoming/${currentUser.uid}/${uid}`));
+        await remove(ref(db, `messageInvitesOutgoing/${uid}/${currentUser.uid}`));
+
+        setStatus("Invitation acceptée. La discussion est ouverte.");
+        if (selectedUserId === uid) {
+          await selectConversation(uid);
+        }
+      } catch (e) {
+        console.error(e);
+        setStatus("Impossible d'accepter l'invitation.", true);
+      }
+    }
+
+    function renderAccessLockedState() {
+      if (!selectedUserId) {
+        chatMessages.innerHTML = `<div class="empty-state">Aucune conversation sélectionnée.</div>`;
+        return;
+      }
+
+      let text = "Invitation nécessaire pour ouvrir cette messagerie.";
+      if (hasIncomingInvite(selectedUserId)) {
+        text = "Cette personne t’a envoyé une invitation. Accepte-la pour ouvrir la discussion.";
+      } else if (hasOutgoingInvite(selectedUserId)) {
+        text = "Invitation envoyée. La conversation sera disponible dès qu’elle sera acceptée.";
+      }
+
+      chatMessages.innerHTML = `<div class="empty-state">${escapeHtml(text)}</div>`;
     }
 
     async function selectConversation(uid) {
       if (!currentUser) return;
       selectedUserId = uid;
       selectedUserProfile = usersCache[uid] || null;
-      currentChatId = makeChatId(currentUser.uid, uid);
+      currentChatId = areContacts(uid) ? makeChatId(currentUser.uid, uid) : null;
       replyTarget = null;
 
       renderReplyPreview();
@@ -2059,8 +2217,17 @@
         setStatus("");
       }
 
+      if (!areContacts(uid)) {
+        if (detachMessagesListener) {
+          detachMessagesListener();
+          detachMessagesListener = null;
+        }
+        renderAccessLockedState();
+        return;
+      }
+
       await cleanupExpiredMediaInChat(currentChatId);
-      await markConversationAsRead(currentChatId);
+      await markConversationAsRead(currentChatId, uid);
       listenMessages();
     }
 
@@ -2203,13 +2370,18 @@
 
     function listenMessages() {
       if (!currentChatId) return;
-      if (messageListenerBoundChatId === currentChatId) return;
-      messageListenerBoundChatId = currentChatId;
 
-      onValue(ref(db, "privateMessages/" + currentChatId), async (snap) => {
+      if (detachMessagesListener) {
+        detachMessagesListener();
+        detachMessagesListener = null;
+      }
+
+      detachMessagesListener = onValue(ref(db, "privateMessages/" + currentChatId), async (snap) => {
         await cleanupExpiredMediaInChat(currentChatId);
         renderMessages(snap.val());
-        await markConversationAsRead(currentChatId);
+        if (selectedUserId) {
+          await markConversationAsRead(currentChatId, selectedUserId);
+        }
       }, () => setStatus("Impossible de charger les messages.", true));
     }
 
@@ -2255,12 +2427,12 @@
       let bestDataUrl = canvasToDataURL(canvas, originalType, JPEG_QUALITY);
 
       if (originalType === "image/png") {
-        const jpegVersion = canvasToDataURL(canvas, "image/jpeg", 0.54);
+        const jpegVersion = canvasToDataURL(canvas, "image/jpeg", 0.42);
         if (bytesFromDataURL(jpegVersion) < bytesFromDataURL(bestDataUrl)) {
           bestDataUrl = jpegVersion;
         }
       } else {
-        const lighter = canvasToDataURL(canvas, "image/jpeg", 0.38);
+        const lighter = canvasToDataURL(canvas, "image/jpeg", 0.28);
         if (bytesFromDataURL(lighter) < bytesFromDataURL(bestDataUrl)) {
           bestDataUrl = lighter;
         }
@@ -2370,6 +2542,11 @@
         return;
       }
 
+      if (!selectedUserId || !areContacts(selectedUserId)) {
+        setStatus("Accepte ou envoie une invitation avant d'enregistrer un audio.", true);
+        return;
+      }
+
       try {
         recordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         recordedChunks = [];
@@ -2383,7 +2560,7 @@
           try {
             const blob = new Blob(recordedChunks, { type: "audio/webm" });
             if (blob.size > MAX_AUDIO_SIZE) {
-              setStatus("Audio trop lourd. Maximum 700 Ko.", true);
+              setStatus("Audio trop lourd. Maximum 450 Ko.", true);
               stopRecordingTracks();
               isRecording = false;
               recordAudioBtn.classList.remove("recording");
@@ -2444,6 +2621,11 @@
         return;
       }
 
+      if (!areContacts(selectedUserId)) {
+        setStatus("Invitation nécessaire avant de discuter.", true);
+        return;
+      }
+
       if (isConversationBlocked(selectedUserId)) {
         setStatus("Message impossible : l'un d'entre vous a bloqué l'autre.", true);
         updateComposerState();
@@ -2456,8 +2638,7 @@
       try {
         sendBtn.disabled = true;
         const msgRef = push(ref(db, "privateMessages/" + currentChatId));
-
-        await set(msgRef, {
+        const payload = {
           senderId: currentUser.uid,
           receiverId: selectedUserId,
           text,
@@ -2470,7 +2651,10 @@
           readBy: {
             [currentUser.uid]: true
           }
-        });
+        };
+
+        await set(msgRef, payload);
+        await incrementUnreadCount(selectedUserId, currentUser.uid);
 
         messageInput.value = "";
         replyTarget = null;
@@ -2495,6 +2679,105 @@
       }
     }
 
+    async function forwardMessageToUser(targetUid) {
+      if (!currentUser || !forwardPayload || !targetUid) return;
+      if (!areContacts(targetUid)) {
+        setStatus("Transfert impossible : invitation non acceptée.", true);
+        return;
+      }
+      if (isConversationBlocked(targetUid)) {
+        setStatus("Message impossible : l'un d'entre vous a bloqué l'autre.", true);
+        return;
+      }
+
+      try {
+        const chatId = makeChatId(currentUser.uid, targetUid);
+        const msgRef = push(ref(db, "privateMessages/" + chatId));
+
+        await set(msgRef, {
+          senderId: currentUser.uid,
+          receiverId: targetUid,
+          text: forwardPayload.text ? "Message transféré :\n" + forwardPayload.text : "Message transféré",
+          replyTo: null,
+          attachmentType: forwardPayload.attachmentType || "",
+          attachmentUrl: forwardPayload.attachmentUrl || "",
+          attachmentName: forwardPayload.attachmentName || "",
+          sticker: forwardPayload.sticker || "",
+          createdAt: Date.now(),
+          readBy: {
+            [currentUser.uid]: true
+          }
+        });
+
+        await incrementUnreadCount(targetUid, currentUser.uid);
+        closeForwardModalFn();
+        setStatus("Message transféré.");
+      } catch (error) {
+        setStatus("Impossible de transférer le message.", true);
+      }
+    }
+
+    function openForwardModal(msg) {
+      const sender = usersCache[msg.senderId] || {};
+      forwardPayload = {
+        text: msg.text || "",
+        senderName: sender.displayName || "Membre",
+        attachmentType: msg.attachmentType || "",
+        attachmentUrl: msg.attachmentUrl || "",
+        attachmentName: msg.attachmentName || "",
+        sticker: msg.sticker || ""
+      };
+
+      let preview = `${forwardPayload.senderName} : ${forwardPayload.text}`;
+      if (forwardPayload.sticker) preview += `\nSticker : ${forwardPayload.sticker}`;
+      if (forwardPayload.attachmentType === "pdf") preview += `\nPDF : ${forwardPayload.attachmentName || "Document PDF"}`;
+      if (forwardPayload.attachmentType === "image") preview += `\nImage jointe`;
+      if (forwardPayload.attachmentType === "audio") preview += `\nAudio vocal`;
+
+      forwardPreview.textContent = preview;
+      forwardSearch.value = "";
+      forwardModal.classList.add("open");
+      renderForwardMembers();
+    }
+
+    function closeForwardModalFn() {
+      forwardPayload = null;
+      forwardModal.classList.remove("open");
+    }
+
+    function renderForwardMembers() {
+      if (!currentUser) return;
+
+      const q = forwardSearch.value.trim().toLowerCase();
+
+      const list = Object.values(usersCache)
+        .filter(u => u && u.uid && u.uid !== currentUser.uid)
+        .filter(u => areContacts(u.uid))
+        .filter(u => !isConversationBlocked(u.uid))
+        .filter(u => searchableText(u).includes(q))
+        .sort((a, b) => (a.displayName || "").localeCompare(b.displayName || ""));
+
+      if (!list.length) {
+        forwardMembers.innerHTML = `<div class="empty-text" style="color:#0b2340;">Aucun contact disponible.</div>`;
+        return;
+      }
+
+      forwardMembers.innerHTML = list.map(u => `
+        <div class="forward-member">
+          <div class="avatar small">${avatarMarkup(u)}</div>
+          <div class="forward-member-text">
+            <strong>${escapeHtml(u.displayName || "Membre")}</strong>
+            <span>${escapeHtml(visibleEmail(u) || "Email masqué")}</span>
+          </div>
+          <button class="main-btn" type="button" data-forward-uid="${u.uid}">Transférer</button>
+        </div>
+      `).join("");
+
+      document.querySelectorAll("[data-forward-uid]").forEach(btn => {
+        btn.addEventListener("click", () => forwardMessageToUser(btn.dataset.forwardUid));
+      });
+    }
+
     async function logout() {
       if (currentUser) {
         try {
@@ -2509,6 +2792,11 @@
       try {
         await fullyEndCall(false);
       } catch (_) {}
+
+      if (detachMessagesListener) {
+        detachMessagesListener();
+        detachMessagesListener = null;
+      }
 
       await signOut(auth);
       window.location.href = "insights.html";
@@ -2590,6 +2878,10 @@
 
     async function startOutgoingCall(type) {
       if (!selectedUserId || !currentUser) return;
+      if (!areContacts(selectedUserId)) {
+        setStatus("Appel impossible : invitation non acceptée.", true);
+        return;
+      }
       if (isConversationBlocked(selectedUserId)) {
         setStatus("Appel impossible : l'un d'entre vous a bloqué l'autre.", true);
         return;
@@ -2667,9 +2959,8 @@
 
     function subscribeRemoteCandidates(remoteUid) {
       if (!currentCallId || !remoteUid) return;
-      remoteCandidatesListenerPath = `callCandidates/${currentCallId}/${remoteUid}`;
 
-      onValue(ref(db, remoteCandidatesListenerPath), async (snap) => {
+      onValue(ref(db, `callCandidates/${currentCallId}/${remoteUid}`), async (snap) => {
         if (!peerConnection) return;
         const data = snap.val() || {};
 
@@ -2722,6 +3013,7 @@
         const latest = list[0];
 
         if (currentCallId && currentCallId === latest.chatId) return;
+        if (!areContacts(latest.from)) return;
 
         incomingCallData = latest;
         const caller = usersCache[latest.from] || {};
@@ -2857,7 +3149,6 @@
       processedRemoteCandidateIds = new Set();
       answerListenerInitialized = false;
       sessionMetaListenerInitialized = false;
-      remoteCandidatesListenerPath = "";
       isMicMuted = false;
       isCamOff = false;
       closeCallModal();
@@ -2905,12 +3196,14 @@
 
       document.querySelectorAll(".emoji-btn").forEach(btn => {
         btn.addEventListener("click", () => {
+          if (messageInput.disabled) return;
           messageInput.value += btn.dataset.emoji;
           messageInput.focus();
         });
       });
 
       togglePanelBtn.addEventListener("click", () => {
+        if (togglePanelBtn.disabled) return;
         composerPanel.classList.toggle("open");
       });
 
@@ -2919,8 +3212,18 @@
       voiceCallBtn.addEventListener("click", () => startOutgoingCall("audio"));
       videoCallBtn.addEventListener("click", () => startOutgoingCall("video"));
 
+      chatInviteBtn.addEventListener("click", async () => {
+        if (!selectedUserId) return;
+        if (hasIncomingInvite(selectedUserId)) {
+          await acceptInviteFromUser(selectedUserId);
+        } else if (!hasOutgoingInvite(selectedUserId) && !areContacts(selectedUserId)) {
+          await sendInviteToUser(selectedUserId);
+        }
+      });
+
       document.querySelectorAll("[data-sticker]").forEach(btn => {
         btn.addEventListener("click", () => {
+          if (togglePanelBtn.disabled) return;
           selectedAttachment = {
             type: "sticker",
             value: btn.dataset.sticker
@@ -2933,6 +3236,12 @@
         const file = attachmentInput.files[0];
         if (!file) return;
 
+        if (!areContacts(selectedUserId)) {
+          setStatus("Invitation nécessaire avant d’envoyer un fichier.", true);
+          attachmentInput.value = "";
+          return;
+        }
+
         if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
           setStatus("Choisis uniquement une image ou un PDF.", true);
           attachmentInput.value = "";
@@ -2940,7 +3249,7 @@
         }
 
         if (file.size > MAX_INPUT_FILE_SIZE) {
-          setStatus("Fichier trop lourd. Maximum 1.2 Mo.", true);
+          setStatus("Fichier trop lourd. Maximum 900 Ko.", true);
           attachmentInput.value = "";
           return;
         }
@@ -2948,7 +3257,7 @@
         try {
           if (file.type === "application/pdf") {
             if (file.size > MAX_PDF_SIZE) {
-              setStatus("PDF trop lourd. 200 Ko maximum.", true);
+              setStatus("PDF trop lourd. 150 Ko maximum.", true);
               attachmentInput.value = "";
               return;
             }
@@ -3021,6 +3330,40 @@
       });
     }
 
+    function openOptionsModal() {
+      if (!selectedUserId || !selectedUserProfile) return;
+      optionsModal.classList.add("open");
+      optionsModalName.textContent = selectedUserProfile.displayName || "Membre";
+      blockToggleBtn.textContent = isBlocked(selectedUserId) ? "Débloquer cet utilisateur" : "Bloquer cet utilisateur";
+    }
+
+    function closeOptionsModalFn() {
+      optionsModal.classList.remove("open");
+    }
+
+    async function toggleBlockSelectedUser() {
+      if (!currentUser || !selectedUserId) return;
+
+      const blockRef = ref(db, "blockedUsers/" + currentUser.uid + "/" + selectedUserId);
+
+      try {
+        if (isBlocked(selectedUserId)) {
+          await remove(blockRef);
+          setStatus("Utilisateur débloqué.");
+        } else {
+          await set(blockRef, {
+            uid: selectedUserId,
+            displayName: selectedUserProfile?.displayName || "Membre",
+            createdAt: Date.now()
+          });
+          setStatus("Utilisateur bloqué.");
+        }
+        closeOptionsModalFn();
+      } catch (error) {
+        setStatus("Impossible de modifier le blocage.", true);
+      }
+    }
+
     function subscribeUsers() {
       onValue(ref(db, "users"), (snap) => {
         usersCache = snap.val() || {};
@@ -3065,27 +3408,49 @@
       });
     }
 
+    function subscribeContacts() {
+      if (!currentUser) return;
+
+      onValue(ref(db, `messageContacts/${currentUser.uid}`), (snap) => {
+        contactsCache = snap.val() || {};
+        renderMembers();
+        renderChatHeader();
+        updateComposerState();
+        if (selectedUserId && areContacts(selectedUserId)) {
+          currentChatId = makeChatId(currentUser.uid, selectedUserId);
+        }
+      });
+    }
+
+    function subscribeInvites() {
+      if (!currentUser) return;
+
+      onValue(ref(db, `messageInvitesIncoming/${currentUser.uid}`), (snap) => {
+        incomingInvitesCache = snap.val() || {};
+        renderMembers();
+        renderChatHeader();
+        updateComposerState();
+        if (selectedUserId && !areContacts(selectedUserId)) {
+          renderAccessLockedState();
+        }
+      });
+
+      onValue(ref(db, `messageInvitesOutgoing/${currentUser.uid}`), (snap) => {
+        outgoingInvitesCache = snap.val() || {};
+        renderMembers();
+        renderChatHeader();
+        updateComposerState();
+        if (selectedUserId && !areContacts(selectedUserId)) {
+          renderAccessLockedState();
+        }
+      });
+    }
+
     function subscribeUnreadCounts() {
-      onValue(ref(db, "privateMessages"), (snap) => {
-        const data = snap.val() || {};
-        const nextUnreadCounts = {};
+      if (!currentUser) return;
 
-        Object.entries(data).forEach(([chatId, messagesObj]) => {
-          if (!messagesObj) return;
-
-          Object.values(messagesObj).forEach((msg) => {
-            if (!msg || typeof msg !== "object") return;
-            if (msg.receiverId !== currentUser.uid) return;
-            if (msg.senderId === currentUser.uid) return;
-
-            const isRead = !!(msg.readBy && msg.readBy[currentUser.uid]);
-            if (isRead) return;
-
-            nextUnreadCounts[msg.senderId] = (nextUnreadCounts[msg.senderId] || 0) + 1;
-          });
-        });
-
-        unreadCounts = nextUnreadCounts;
+      onValue(ref(db, `unreadCountsByUser/${currentUser.uid}`), (snap) => {
+        unreadCounts = snap.val() || {};
         updateUnreadBadges();
         renderMembers();
       });
@@ -3117,6 +3482,8 @@
       subscribeUsers();
       subscribeBlockedUsers();
       subscribeAllBlocks();
+      subscribeContacts();
+      subscribeInvites();
       subscribeUnreadCounts();
       await subscribeIncomingCalls();
       bindActivityEvents();
