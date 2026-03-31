@@ -1607,12 +1607,34 @@
     let lastTypingState = false;
     let lastNotifiedMessageKey = "";
 
-    const rtcConfig = {
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" }
-      ]
-    };
+   const rtcConfig = {
+  iceServers: [
+    {
+      urls: "stun:stun.relay.metered.ca:80"
+    },
+    {
+      urls: "turn:standard.relay.metered.ca:80",
+      username: "5ff54ce1d293fa306e56fe05",
+      credential: "xzI7qJDBCvqPJt7e"
+    },
+    {
+      urls: "turn:standard.relay.metered.ca:80?transport=tcp",
+      username: "5ff54ce1d293fa306e56fe05",
+      credential: "xzI7qJDBCvqPJt7e"
+    },
+    {
+      urls: "turn:standard.relay.metered.ca:443",
+      username: "5ff54ce1d293fa306e56fe05",
+      credential: "xzI7qJDBCvqPJt7e"
+    },
+    {
+      urls: "turns:standard.relay.metered.ca:443?transport=tcp",
+      username: "5ff54ce1d293fa306e56fe05",
+      credential: "xzI7qJDBCvqPJt7e"
+    }
+  ],
+  iceCandidatePoolSize: 10
+};
 
     function escapeHtml(text = "") {
       const div = document.createElement("div");
@@ -3024,62 +3046,100 @@
     }
 
     async function createPeerConnection(remoteUid) {
-      peerConnection = new RTCPeerConnection(rtcConfig);
-      processedRemoteCandidateIds = new Set();
+  if (peerConnection) {
+    try { peerConnection.close(); } catch (_) {}
+    peerConnection = null;
+  }
 
-      remoteStream = new MediaStream();
+  peerConnection = new RTCPeerConnection(rtcConfig);
+  processedRemoteCandidateIds = new Set();
+
+  remoteStream = new MediaStream();
+  remoteVideo.srcObject = remoteStream;
+
+  peerConnection.ontrack = (event) => {
+    console.log("TRACK reçu");
+
+    if (event.streams && event.streams[0]) {
+      remoteVideo.srcObject = event.streams[0];
+      remoteStream = event.streams[0];
+    } else {
+      event.track && remoteStream.addTrack(event.track);
       remoteVideo.srcObject = remoteStream;
-
-      peerConnection.ontrack = (event) => {
-        console.log("TRACK reçu");
-        event.streams[0].getTracks().forEach(track => {
-          remoteStream.addTrack(track);
-        });
-      };
-
-      peerConnection.onicecandidate = async (event) => {
-        if (!event.candidate || !currentCallId || !currentUser) return;
-
-        const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
-
-        await set(candidateRef, {
-          candidate: event.candidate.candidate,
-          sdpMid: event.candidate.sdpMid,
-          sdpMLineIndex: event.candidate.sdpMLineIndex,
-          createdAt: Date.now()
-        });
-      };
-
-      peerConnection.oniceconnectionstatechange = () => {
-        const state = peerConnection.iceConnectionState;
-        console.log("ICE STATE:", state);
-
-        if (state === "connected" || state === "completed") {
-          callModalStatus.textContent = "Appel connecté";
-        }
-
-        if (state === "failed" || state === "disconnected") {
-          callModalStatus.textContent = "Connexion perdue";
-        }
-
-        if (state === "closed") {
-          callModalStatus.textContent = "Appel terminé";
-        }
-      };
-
-      peerConnection.onconnectionstatechange = () => {
-        const state = peerConnection.connectionState;
-        console.log("PEER STATE:", state);
-        if (state === "connected") callModalStatus.textContent = "Appel connecté";
-      };
-
-      localStream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, localStream);
-      });
-
-      subscribeRemoteCandidates(remoteUid);
-      subscribeSessionMeta();
     }
+
+    if (currentCallType === "audio") {
+      remoteAudioOnlyBox.style.display = "flex";
+    }
+  };
+
+  peerConnection.onicecandidate = async (event) => {
+    if (!event.candidate || !currentCallId || !currentUser) return;
+
+    try {
+      const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
+      await set(candidateRef, {
+        candidate: event.candidate.candidate,
+        sdpMid: event.candidate.sdpMid,
+        sdpMLineIndex: event.candidate.sdpMLineIndex,
+        createdAt: Date.now()
+      });
+    } catch (e) {
+      console.error("Erreur envoi ICE:", e);
+    }
+  };
+
+  peerConnection.onicegatheringstatechange = () => {
+    console.log("ICE GATHERING:", peerConnection.iceGatheringState);
+  };
+
+  peerConnection.oniceconnectionstatechange = () => {
+    const state = peerConnection.iceConnectionState;
+    console.log("ICE STATE:", state);
+
+    if (state === "checking") {
+      callModalStatus.textContent = "Connexion en cours...";
+    } else if (state === "connected" || state === "completed") {
+      callModalStatus.textContent = "Appel connecté";
+    } else if (state === "failed") {
+      callModalStatus.textContent = "Échec de connexion";
+    } else if (state === "disconnected") {
+      callModalStatus.textContent = "Connexion perdue";
+    } else if (state === "closed") {
+      callModalStatus.textContent = "Appel terminé";
+    }
+  };
+
+  peerConnection.onconnectionstatechange = () => {
+    const state = peerConnection.connectionState;
+    console.log("PEER STATE:", state);
+
+    if (state === "connecting") {
+      callModalStatus.textContent = "Connexion à l'appel...";
+    } else if (state === "connected") {
+      callModalStatus.textContent = "Appel connecté";
+    } else if (state === "failed") {
+      callModalStatus.textContent = "Connexion échouée";
+    } else if (state === "disconnected") {
+      callModalStatus.textContent = "Connexion interrompue";
+    } else if (state === "closed") {
+      callModalStatus.textContent = "Appel terminé";
+    }
+  };
+
+  if (localStream) {
+    localStream.getTracks().forEach(track => {
+      try {
+        peerConnection.addTrack(track, localStream);
+      } catch (e) {
+        console.error("Erreur addTrack:", e);
+      }
+    });
+  }
+
+  subscribeRemoteCandidates(remoteUid);
+  subscribeSessionMeta();
+}
 
     function updateCallMediaUI() {
       const isVideoCall = currentCallType === "video";
