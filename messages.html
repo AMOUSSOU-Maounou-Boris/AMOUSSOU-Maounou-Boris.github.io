@@ -1565,7 +1565,6 @@
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
     const LAST_ACTIVITY_KEY = "insights_last_activity";
 
-    /* Très économique */
     const MAX_INPUT_FILE_SIZE = 900 * 1024;
     const MAX_PDF_SIZE = 150 * 1024;
     const MAX_AUDIO_SIZE = 450 * 1024;
@@ -1587,9 +1586,10 @@
     let currentCallDirection = null;
     let incomingCallData = null;
     let processedRemoteCandidateIds = new Set();
-    let answerListenerInitialized = false;
-    let sessionMetaListenerInitialized = false;
+    let answerListenerUnsub = null;
+    let sessionMetaListenerUnsub = null;
     let incomingCallsListenerInitialized = false;
+    let remoteCandidatesUnsub = null;
     let isMicMuted = false;
     let isCamOff = false;
 
@@ -1598,7 +1598,10 @@
     let lastNotifiedMessageKey = "";
 
     const rtcConfig = {
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" }
+      ]
     };
 
     function escapeHtml(text = "") {
@@ -2995,6 +2998,21 @@
       window.location.href = "insights.html";
     }
 
+    function cleanupCallListeners() {
+      if (answerListenerUnsub) {
+        answerListenerUnsub();
+        answerListenerUnsub = null;
+      }
+      if (sessionMetaListenerUnsub) {
+        sessionMetaListenerUnsub();
+        sessionMetaListenerUnsub = null;
+      }
+      if (remoteCandidatesUnsub) {
+        remoteCandidatesUnsub();
+        remoteCandidatesUnsub = null;
+      }
+    }
+
     async function createPeerConnection(remoteUid) {
       peerConnection = new RTCPeerConnection(rtcConfig);
       processedRemoteCandidateIds = new Set();
@@ -3003,12 +3021,17 @@
       remoteVideo.srcObject = remoteStream;
 
       peerConnection.ontrack = (event) => {
-        event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+        console.log("TRACK reçu");
+        event.streams[0].getTracks().forEach(track => {
+          remoteStream.addTrack(track);
+        });
       };
 
       peerConnection.onicecandidate = async (event) => {
         if (!event.candidate || !currentCallId || !currentUser) return;
+
         const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
+
         await set(candidateRef, {
           candidate: event.candidate.candidate,
           sdpMid: event.candidate.sdpMid,
@@ -3017,13 +3040,27 @@
         });
       };
 
-      peerConnection.onconnectionstatechange = () => {
-        const state = peerConnection?.connectionState || "";
-        if (state === "connected") {
+      peerConnection.oniceconnectionstatechange = () => {
+        const state = peerConnection.iceConnectionState;
+        console.log("ICE STATE:", state);
+
+        if (state === "connected" || state === "completed") {
           callModalStatus.textContent = "Appel connecté";
-        } else if (["failed", "disconnected", "closed"].includes(state)) {
+        }
+
+        if (state === "failed" || state === "disconnected") {
+          callModalStatus.textContent = "Connexion perdue";
+        }
+
+        if (state === "closed") {
           callModalStatus.textContent = "Appel terminé";
         }
+      };
+
+      peerConnection.onconnectionstatechange = () => {
+        const state = peerConnection.connectionState;
+        console.log("PEER STATE:", state);
+        if (state === "connected") callModalStatus.textContent = "Appel connecté";
       };
 
       localStream.getTracks().forEach(track => {
@@ -3056,7 +3093,9 @@
         video: callType === "video"
       });
 
+      localVideo.srcObject = null;
       localVideo.srcObject = localStream;
+
       updateCallMediaUI();
     }
 
@@ -3084,12 +3123,12 @@
         currentCallDirection = "outgoing";
         currentCallId = currentChatId || makeChatId(currentUser.uid, selectedUserId);
 
-        await prepareLocalMedia(type);
-        openCallModal();
-        callModalStatus.textContent = "Appel en cours de lancement...";
-
         await remove(ref(db, `callSessions/${currentCallId}`)).catch(() => {});
         await remove(ref(db, `callCandidates/${currentCallId}`)).catch(() => {});
+        await remove(ref(db, `callInvites/${selectedUserId}/${currentCallId}`)).catch(() => {});
+
+        await prepareLocalMedia(type);
+        openCallModal();
 
         await set(ref(db, `callInvites/${selectedUserId}/${currentCallId}`), {
           from: currentUser.uid,
@@ -3120,19 +3159,19 @@
           createdAt: Date.now()
         });
 
+        callModalStatus.textContent = "Appel en cours...";
         subscribeAnswerListener();
       } catch (e) {
         console.error(e);
-        setStatus("Impossible de lancer l'appel.", true);
+        setStatus("Erreur appel", true);
         await fullyEndCall(true);
       }
     }
 
     function subscribeAnswerListener() {
-      if (!currentCallId || answerListenerInitialized) return;
-      answerListenerInitialized = true;
+      if (!currentCallId || answerListenerUnsub) return;
 
-      onValue(ref(db, `callSessions/${currentCallId}/answer`), async (snap) => {
+      answerListenerUnsub = onValue(ref(db, `callSessions/${currentCallId}/answer`), async (snap) => {
         const answer = snap.val();
         if (!answer || !peerConnection) return;
         if (peerConnection.currentRemoteDescription) return;
@@ -3152,8 +3191,14 @@
     function subscribeRemoteCandidates(remoteUid) {
       if (!currentCallId || !remoteUid) return;
 
-      onValue(ref(db, `callCandidates/${currentCallId}/${remoteUid}`), async (snap) => {
+      if (remoteCandidatesUnsub) {
+        remoteCandidatesUnsub();
+        remoteCandidatesUnsub = null;
+      }
+
+      remoteCandidatesUnsub = onValue(ref(db, `callCandidates/${currentCallId}/${remoteUid}`), async (snap) => {
         if (!peerConnection) return;
+
         const data = snap.val() || {};
 
         for (const [id, cand] of Object.entries(data)) {
@@ -3167,17 +3212,16 @@
               sdpMLineIndex: cand.sdpMLineIndex
             }));
           } catch (e) {
-            console.error("ice add error:", e);
+            console.error("Erreur ICE:", e);
           }
         }
       });
     }
 
     function subscribeSessionMeta() {
-      if (!currentCallId || sessionMetaListenerInitialized) return;
-      sessionMetaListenerInitialized = true;
+      if (!currentCallId || sessionMetaListenerUnsub) return;
 
-      onValue(ref(db, `callSessions/${currentCallId}/meta`), (snap) => {
+      sessionMetaListenerUnsub = onValue(ref(db, `callSessions/${currentCallId}/meta`), (snap) => {
         const meta = snap.val();
         if (!meta) return;
 
@@ -3187,6 +3231,8 @@
         } else if (meta.status === "rejected") {
           callModalStatus.textContent = "Appel refusé";
           setTimeout(() => fullyEndCall(false), 700);
+        } else if (meta.status === "connected") {
+          callModalStatus.textContent = "Appel connecté";
         }
       });
     }
@@ -3216,27 +3262,28 @@
 
     async function acceptIncomingCall() {
       if (!incomingCallData || !currentUser) return;
+
       try {
         const callerUid = incomingCallData.from;
         await selectConversation(callerUid);
 
         currentCallDirection = "incoming";
         currentCallId = incomingCallData.chatId;
+
         await prepareLocalMedia(incomingCallData.type);
         openCallModal();
         callModalStatus.textContent = "Connexion à l'appel...";
 
         const offerSnap = await get(ref(db, `callSessions/${currentCallId}/offer`));
         if (!offerSnap.exists()) {
-          setStatus("Offre d'appel introuvable.", true);
-          incomingCallModal.classList.remove("open");
-          await fullyEndCall(true);
+          setStatus("Offre introuvable", true);
           return;
         }
 
         await createPeerConnection(callerUid);
 
         const offer = offerSnap.val();
+
         await peerConnection.setRemoteDescription(new RTCSessionDescription({
           type: offer.type,
           sdp: offer.sdp
@@ -3256,16 +3303,12 @@
           status: "connected"
         });
 
-        await update(ref(db, `callInvites/${currentUser.uid}/${currentCallId}`), {
-          status: "accepted"
-        });
-
+        callModalStatus.textContent = "Connexion établie...";
         incomingCallModal.classList.remove("open");
         incomingCallData = null;
       } catch (e) {
         console.error(e);
-        setStatus("Impossible d'accepter l'appel.", true);
-        await fullyEndCall(true);
+        setStatus("Erreur appel", true);
       }
     }
 
@@ -3293,6 +3336,7 @@
           peerConnection.ontrack = null;
           peerConnection.onicecandidate = null;
           peerConnection.onconnectionstatechange = null;
+          peerConnection.oniceconnectionstatechange = null;
           peerConnection.close();
         }
       } catch (_) {}
@@ -3310,6 +3354,8 @@
       remoteStream = null;
       localVideo.srcObject = null;
       remoteVideo.srcObject = null;
+
+      cleanupCallListeners();
 
       if (currentCallId) {
         try {
@@ -3339,8 +3385,6 @@
       currentCallType = null;
       currentCallDirection = null;
       processedRemoteCandidateIds = new Set();
-      answerListenerInitialized = false;
-      sessionMetaListenerInitialized = false;
       isMicMuted = false;
       isCamOff = false;
       closeCallModal();
@@ -3535,6 +3579,10 @@
         if (e.target === forwardModal) closeForwardModalFn();
         if (e.target === incomingCallModal) rejectIncomingCall();
         if (e.target === callModal) endCall();
+      });
+
+      window.addEventListener("beforeunload", () => {
+        try { fullyEndCall(false); } catch (_) {}
       });
     }
 
