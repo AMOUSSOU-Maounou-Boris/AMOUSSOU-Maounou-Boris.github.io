@@ -1072,10 +1072,6 @@
 
     .modal-content.large{
       max-width:620px;
-    }
-
-    .modal-content.call-large{
-      max-width:920px;
       padding:18px;
       background:#071c39;
       color:#fff;
@@ -1304,7 +1300,6 @@
       <span class="top-unread-badge" id="topUnreadBadge"></span>
       </a>
 
-      <!-- 🔥 NOUVEAU BOUTON APPELS -->
       <a href="calls.html">📞 Calls</a>
 
       <a href="profile.html">
@@ -1607,34 +1602,33 @@
     let lastTypingState = false;
     let lastNotifiedMessageKey = "";
 
-   const rtcConfig = {
-  iceServers: [
-    {
-      urls: "stun:stun.relay.metered.ca:80"
-    },
-    {
-      urls: "turn:standard.relay.metered.ca:80",
-      username: "5ff54ce1d293fa306e56fe05",
-      credential: "xzI7qJDBCvqPJt7e"
-    },
-    {
-      urls: "turn:standard.relay.metered.ca:80?transport=tcp",
-      username: "5ff54ce1d293fa306e56fe05",
-      credential: "xzI7qJDBCvqPJt7e"
-    },
-    {
-      urls: "turn:standard.relay.metered.ca:443",
-      username: "5ff54ce1d293fa306e56fe05",
-      credential: "xzI7qJDBCvqPJt7e"
-    },
-    {
-      urls: "turns:standard.relay.metered.ca:443?transport=tcp",
-      username: "5ff54ce1d293fa306e56fe05",
-      credential: "xzI7qJDBCvqPJt7e"
-    }
-  ],
-  iceCandidatePoolSize: 10
-};
+    const rtcConfig = {
+      iceServers: [
+        {
+          urls: "stun:stun.relay.metered.ca:80",
+        },
+        {
+          urls: "turn:standard.relay.metered.ca:80",
+          username: "5ff54ce1d293fa306e56fe05",
+          credential: "xzI7qJDBCvqPJt7e",
+        },
+        {
+          urls: "turn:standard.relay.metered.ca:80?transport=tcp",
+          username: "5ff54ce1d293fa306e56fe05",
+          credential: "xzI7qJDBCvqPJt7e",
+        },
+        {
+          urls: "turn:standard.relay.metered.ca:443",
+          username: "5ff54ce1d293fa306e56fe05",
+          credential: "xzI7qJDBCvqPJt7e",
+        },
+        {
+          urls: "turns:standard.relay.metered.ca:443?transport=tcp",
+          username: "5ff54ce1d293fa306e56fe05",
+          credential: "xzI7qJDBCvqPJt7e",
+        }
+      ]
+    };
 
     function escapeHtml(text = "") {
       const div = document.createElement("div");
@@ -3046,100 +3040,83 @@
     }
 
     async function createPeerConnection(remoteUid) {
-  if (peerConnection) {
-    try { peerConnection.close(); } catch (_) {}
-    peerConnection = null;
-  }
+      peerConnection = new RTCPeerConnection(rtcConfig);
+      processedRemoteCandidateIds = new Set();
 
-  peerConnection = new RTCPeerConnection(rtcConfig);
-  processedRemoteCandidateIds = new Set();
-
-  remoteStream = new MediaStream();
-  remoteVideo.srcObject = remoteStream;
-
-  peerConnection.ontrack = (event) => {
-    console.log("TRACK reçu");
-
-    if (event.streams && event.streams[0]) {
-      remoteVideo.srcObject = event.streams[0];
-      remoteStream = event.streams[0];
-    } else {
-      event.track && remoteStream.addTrack(event.track);
+      remoteStream = new MediaStream();
       remoteVideo.srcObject = remoteStream;
-    }
 
-    if (currentCallType === "audio") {
-      remoteAudioOnlyBox.style.display = "flex";
-    }
-  };
+      peerConnection.ontrack = (event) => {
+        console.log("TRACK reçu");
+        event.streams[0].getTracks().forEach(track => {
+          if (!remoteStream.getTracks().some(t => t.id === track.id)) {
+            remoteStream.addTrack(track);
+          }
+        });
+      };
 
-  peerConnection.onicecandidate = async (event) => {
-    if (!event.candidate || !currentCallId || !currentUser) return;
+      peerConnection.onicecandidate = async (event) => {
+        if (!event.candidate || !currentCallId || !currentUser) return;
 
-    try {
-      const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
-      await set(candidateRef, {
-        candidate: event.candidate.candidate,
-        sdpMid: event.candidate.sdpMid,
-        sdpMLineIndex: event.candidate.sdpMLineIndex,
-        createdAt: Date.now()
-      });
-    } catch (e) {
-      console.error("Erreur envoi ICE:", e);
-    }
-  };
+        const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
 
-  peerConnection.onicegatheringstatechange = () => {
-    console.log("ICE GATHERING:", peerConnection.iceGatheringState);
-  };
+        await set(candidateRef, {
+          candidate: event.candidate.candidate,
+          sdpMid: event.candidate.sdpMid,
+          sdpMLineIndex: event.candidate.sdpMLineIndex,
+          createdAt: Date.now()
+        });
+      };
 
-  peerConnection.oniceconnectionstatechange = () => {
-    const state = peerConnection.iceConnectionState;
-    console.log("ICE STATE:", state);
+      peerConnection.onicecandidateerror = (event) => {
+        console.warn("ICE candidate error:", event);
+      };
 
-    if (state === "checking") {
-      callModalStatus.textContent = "Connexion en cours...";
-    } else if (state === "connected" || state === "completed") {
-      callModalStatus.textContent = "Appel connecté";
-    } else if (state === "failed") {
-      callModalStatus.textContent = "Échec de connexion";
-    } else if (state === "disconnected") {
-      callModalStatus.textContent = "Connexion perdue";
-    } else if (state === "closed") {
-      callModalStatus.textContent = "Appel terminé";
-    }
-  };
+      peerConnection.oniceconnectionstatechange = () => {
+        const state = peerConnection.iceConnectionState;
+        console.log("ICE STATE:", state);
 
-  peerConnection.onconnectionstatechange = () => {
-    const state = peerConnection.connectionState;
-    console.log("PEER STATE:", state);
+        if (state === "checking") {
+          callModalStatus.textContent = "Recherche de connexion...";
+        }
 
-    if (state === "connecting") {
-      callModalStatus.textContent = "Connexion à l'appel...";
-    } else if (state === "connected") {
-      callModalStatus.textContent = "Appel connecté";
-    } else if (state === "failed") {
-      callModalStatus.textContent = "Connexion échouée";
-    } else if (state === "disconnected") {
-      callModalStatus.textContent = "Connexion interrompue";
-    } else if (state === "closed") {
-      callModalStatus.textContent = "Appel terminé";
-    }
-  };
+        if (state === "connected" || state === "completed") {
+          callModalStatus.textContent = "Appel connecté";
+        }
 
-  if (localStream) {
-    localStream.getTracks().forEach(track => {
-      try {
+        if (state === "failed" || state === "disconnected") {
+          callModalStatus.textContent = "Connexion perdue";
+        }
+
+        if (state === "closed") {
+          callModalStatus.textContent = "Appel terminé";
+        }
+      };
+
+      peerConnection.onconnectionstatechange = () => {
+        const state = peerConnection.connectionState;
+        console.log("PEER STATE:", state);
+
+        if (state === "connecting") {
+          callModalStatus.textContent = "Connexion à l'appel...";
+        }
+
+        if (state === "connected") {
+          callModalStatus.textContent = "Appel connecté";
+        }
+
+        if (state === "failed") {
+          callModalStatus.textContent = "Échec de connexion";
+        }
+      };
+
+      localStream.getTracks().forEach(track => {
         peerConnection.addTrack(track, localStream);
-      } catch (e) {
-        console.error("Erreur addTrack:", e);
-      }
-    });
-  }
+      });
 
-  subscribeRemoteCandidates(remoteUid);
-  subscribeSessionMeta();
-}
+      subscribeRemoteCandidates(remoteUid);
+      subscribeSessionMeta();
+    }
 
     function updateCallMediaUI() {
       const isVideoCall = currentCallType === "video";
@@ -3219,7 +3196,10 @@
 
         await createPeerConnection(selectedUserId);
 
-        const offer = await peerConnection.createOffer();
+        const offer = await peerConnection.createOffer({
+          offerToReceiveAudio: true,
+          offerToReceiveVideo: type === "video"
+        });
         await peerConnection.setLocalDescription(offer);
 
         await set(ref(db, `callSessions/${currentCallId}/offer`), {
@@ -3540,7 +3520,7 @@
 
       attachmentInput.addEventListener("change", async () => {
         const file = attachmentInput.files[0];
-        if (!file) return;
+                if (!file) return;
 
         if (!areContacts(selectedUserId)) {
           setStatus("Invitation nécessaire avant d’envoyer un fichier.", true);
@@ -3742,6 +3722,7 @@
         renderMembers();
         renderChatHeader();
         updateComposerState();
+
         if (selectedUserId && areContacts(selectedUserId)) {
           currentChatId = makeChatId(currentUser.uid, selectedUserId);
         }
