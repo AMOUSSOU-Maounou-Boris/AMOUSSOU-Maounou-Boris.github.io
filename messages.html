@@ -3806,5 +3806,27 @@
       if (preselected) setTimeout(() => selectConversation(preselected), 300);
     });
   </script>
+  ...
+<script type="module">
+  // ton grand script de la page
+</script>
+
+<script type="module">
+  import { auth } from "./firebase-config.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  const meetingNavLink = document.getElementById("meetingNavLink");
+  const OWNER_EMAIL = "borisamoussou01@gmail.com";
+
+  onAuthStateChanged(auth, (user) => {
+    if (!meetingNavLink) return;
+
+    if (user && (user.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase()) {
+      meetingNavLink.style.display = "inline-flex";
+    } else {
+      meetingNavLink.style.display = "none";
+    }
+  });
+</script>
 </body>
 </html>
