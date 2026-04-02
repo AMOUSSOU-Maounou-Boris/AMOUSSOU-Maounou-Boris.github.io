@@ -288,7 +288,9 @@
     .status-bad{ color:#ffd0d0; font-weight:800; }
 
     .participants-list,
-    .requests-list{
+    .requests-list,
+    .guest-accounts-list,
+    .reset-requests-list{
       display:flex;
       flex-direction:column;
       gap:10px;
@@ -298,7 +300,9 @@
     }
 
     .participant-card,
-    .request-card{
+    .request-card,
+    .guest-account-card,
+    .reset-request-card{
       display:flex;
       align-items:center;
       gap:12px;
@@ -309,13 +313,17 @@
     }
 
     .participant-main,
-    .request-main{
+    .request-main,
+    .guest-account-main,
+    .reset-request-main{
       min-width:0;
       flex:1;
     }
 
     .participant-name,
-    .request-name{
+    .request-name,
+    .guest-account-name,
+    .reset-request-name{
       font-weight:800;
       white-space:nowrap;
       overflow:hidden;
@@ -324,7 +332,9 @@
     }
 
     .participant-sub,
-    .request-sub{
+    .request-sub,
+    .guest-account-sub,
+    .reset-request-sub{
       font-size:12px;
       opacity:0.92;
       white-space:nowrap;
@@ -411,6 +421,7 @@
       display:grid;
       grid-template-rows:auto 1fr;
       min-height:700px;
+      position:relative;
     }
 
     .stage-controls{
@@ -594,6 +605,79 @@
       display:none !important;
     }
 
+    .guest-gate{
+      position:absolute;
+      inset:0;
+      background:rgba(255,255,255,0.98);
+      z-index:30;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .guest-gate-card{
+      width:100%;
+      max-width:560px;
+      background:#ffffff;
+      border:1px solid #e3ebf5;
+      border-radius:26px;
+      box-shadow:0 14px 34px rgba(7,31,66,0.10);
+      padding:28px;
+    }
+
+    .guest-gate-title{
+      font-size:28px;
+      font-weight:800;
+      margin:0 0 8px;
+      color:#082e5b;
+    }
+
+    .guest-gate-note{
+      margin:0 0 18px;
+      color:#6b7d93;
+      line-height:1.6;
+      font-size:15px;
+    }
+
+    .guest-switch{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .guest-switch button{
+      border:none;
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:800;
+      cursor:pointer;
+      background:#eef4fb;
+      color:#0b2340;
+    }
+
+    .guest-switch button.active{
+      background:#0f4d92;
+      color:#fff;
+    }
+
+    .guest-small-note{
+      color:#6b7d93;
+      font-size:13px;
+      line-height:1.5;
+      margin-top:6px;
+    }
+
+    .guest-inline-status{
+      margin-top:10px;
+      font-size:13px;
+      font-weight:800;
+    }
+
+    .guest-inline-status.ok{ color:#14854b; }
+    .guest-inline-status.bad{ color:#b00020; }
+
     @media (max-width: 1280px){
       .page{
         grid-template-columns:1fr;
@@ -606,17 +690,17 @@
 </head>
 <body>
   <header class="topbar">
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="research.html">Research</a>
-      <a href="cv.html">Resume</a>
-      <a href="contact.html">Contact</a>
-      <a href="insights.html">Insights</a>
-      <a href="messages.html">Messages</a>
-      <a href="calls.html">Appels</a>
+    <nav id="mainNav">
+      <a href="index.html" data-nav="public">Home</a>
+      <a href="about.html" data-nav="public">About</a>
+      <a href="research.html" data-nav="public">Research</a>
+      <a href="cv.html" data-nav="public">Resume</a>
+      <a href="contact.html" data-nav="public">Contact</a>
+      <a href="insights.html" data-nav="site">Insights</a>
+      <a href="messages.html" data-nav="site">Messages</a>
+      <a href="calls.html" data-nav="site">Appels</a>
       <a href="meeting-room.html" id="meetingNavLink" class="active hidden">Salle de réunion</a>
-      <a href="profile.html"><span class="nav-online-dot"></span> Mon compte</a>
+      <a href="profile.html" id="profileNavLink" data-nav="site"><span class="nav-online-dot"></span> Mon compte</a>
     </nav>
   </header>
 
@@ -671,7 +755,7 @@
       <div class="section-card" id="guestInfoPanel">
         <h3>Accès invité</h3>
         <div class="helper-note">
-          Les invités ne peuvent pas créer de salle. Ils peuvent rejoindre uniquement via un lien direct envoyé par le propriétaire.
+          Les invités n’ouvrent ni <strong>messages</strong>, ni <strong>insights</strong>. Ils ont un accès dédié à cette salle uniquement, avec leur email et leur mot de passe de réunion.
         </div>
       </div>
 
@@ -686,6 +770,13 @@
         <h3>Participants</h3>
         <div class="participants-list" id="participantsList">
           <div style="opacity:.92;">Aucun participant pour le moment.</div>
+        </div>
+      </div>
+
+      <div class="section-card hidden" id="guestAccountsPanel">
+        <h3>Comptes invités</h3>
+        <div class="guest-accounts-list" id="guestAccountsList">
+          <div style="opacity:.92;">Aucun compte invité.</div>
         </div>
       </div>
     </aside>
@@ -709,6 +800,60 @@
       </section>
 
       <section class="stage">
+        <div class="guest-gate hidden" id="guestGate">
+          <div class="guest-gate-card">
+            <h2 class="guest-gate-title">Accès réunion</h2>
+            <p class="guest-gate-note" id="guestGateNote">
+              Entre avec un accès spécifique à cette salle. Cet accès ne donne aucun droit au reste du site.
+            </p>
+
+            <div class="guest-switch">
+              <button type="button" id="modeLoginBtn" class="active">Se connecter</button>
+              <button type="button" id="modeRegisterBtn">Créer mon accès</button>
+              <button type="button" id="modeForgotBtn">Mot de passe oublié</button>
+            </div>
+
+            <label class="label" for="guestEmailInput" style="color:#082e5b;">Email</label>
+            <input id="guestEmailInput" class="text-input" type="email" placeholder="Entrer ton email">
+
+            <div id="registerExtraFields" class="hidden">
+              <label class="label" for="guestDisplayNameInput" style="color:#082e5b;">Nom affiché</label>
+              <input id="guestDisplayNameInput" class="text-input" type="text" placeholder="Ex. Maman / Papa / Prénom">
+
+              <label class="label" for="guestPasswordCreateInput" style="color:#082e5b;">Créer un mot de passe</label>
+              <input id="guestPasswordCreateInput" class="password-input" type="password" placeholder="Créer un mot de passe">
+
+              <label class="label" for="guestPasswordConfirmInput" style="color:#082e5b;">Confirmer le mot de passe</label>
+              <input id="guestPasswordConfirmInput" class="password-input" type="password" placeholder="Confirmer le mot de passe">
+            </div>
+
+            <div id="loginFields">
+              <label class="label" for="guestPasswordLoginInput" style="color:#082e5b;">Mot de passe</label>
+              <input id="guestPasswordLoginInput" class="password-input" type="password" placeholder="Entrer le mot de passe">
+            </div>
+
+            <div id="forgotFields" class="hidden">
+              <p class="guest-small-note">
+                Le propriétaire doit autoriser la réinitialisation pour cet email. Dès qu’il l’autorise, tu peux revenir ici et définir un nouveau mot de passe.
+              </p>
+
+              <div id="forgotResetBox" class="hidden">
+                <label class="label" for="guestPasswordResetInput" style="color:#082e5b;">Nouveau mot de passe</label>
+                <input id="guestPasswordResetInput" class="password-input" type="password" placeholder="Nouveau mot de passe">
+
+                <label class="label" for="guestPasswordResetConfirmInput" style="color:#082e5b;">Confirmer le nouveau mot de passe</label>
+                <input id="guestPasswordResetConfirmInput" class="password-input" type="password" placeholder="Confirmer le nouveau mot de passe">
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="main-btn" id="guestSubmitBtn" type="button">Continuer</button>
+            </div>
+
+            <div class="guest-inline-status" id="guestInlineStatus"></div>
+          </div>
+        </div>
+
         <div class="stage-controls">
           <button class="control-btn" id="joinRoomBtn" type="button">Entrer dans la réunion</button>
           <button class="control-btn" id="toggleMicBtn" type="button">Micro ON</button>
@@ -744,6 +889,13 @@
         </div>
       </div>
 
+      <div class="section-card hidden" id="resetRequestsPanel">
+        <h3>Réinitialisations mot de passe</h3>
+        <div class="reset-requests-list" id="resetRequestsList">
+          <div style="opacity:.92;">Aucune demande.</div>
+        </div>
+      </div>
+
       <div class="section-card">
         <h3>Chat de réunion</h3>
         <div class="chat-box">
@@ -769,7 +921,10 @@
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      onAuthStateChanged,
+      signInAnonymously
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       ref,
       set,
@@ -789,7 +944,13 @@
     const ownerPanel = document.getElementById("ownerPanel");
     const guestInfoPanel = document.getElementById("guestInfoPanel");
     const waitingRoomPanel = document.getElementById("waitingRoomPanel");
+    const guestAccountsPanel = document.getElementById("guestAccountsPanel");
+    const guestAccountsList = document.getElementById("guestAccountsList");
+    const resetRequestsPanel = document.getElementById("resetRequestsPanel");
+    const resetRequestsList = document.getElementById("resetRequestsList");
     const meetingNavLink = document.getElementById("meetingNavLink");
+    const profileNavLink = document.getElementById("profileNavLink");
+    const mainNav = document.getElementById("mainNav");
 
     const roomTitleInput = document.getElementById("roomTitleInput");
     const roomExpiryInput = document.getElementById("roomExpiryInput");
@@ -815,11 +976,30 @@
     const leaveRoomBtn = document.getElementById("leaveRoomBtn");
     const videoGrid = document.getElementById("videoGrid");
 
+    const guestGate = document.getElementById("guestGate");
+    const guestGateNote = document.getElementById("guestGateNote");
+    const modeLoginBtn = document.getElementById("modeLoginBtn");
+    const modeRegisterBtn = document.getElementById("modeRegisterBtn");
+    const modeForgotBtn = document.getElementById("modeForgotBtn");
+    const guestEmailInput = document.getElementById("guestEmailInput");
+    const guestDisplayNameInput = document.getElementById("guestDisplayNameInput");
+    const guestPasswordCreateInput = document.getElementById("guestPasswordCreateInput");
+    const guestPasswordConfirmInput = document.getElementById("guestPasswordConfirmInput");
+    const guestPasswordLoginInput = document.getElementById("guestPasswordLoginInput");
+    const guestPasswordResetInput = document.getElementById("guestPasswordResetInput");
+    const guestPasswordResetConfirmInput = document.getElementById("guestPasswordResetConfirmInput");
+    const registerExtraFields = document.getElementById("registerExtraFields");
+    const loginFields = document.getElementById("loginFields");
+    const forgotFields = document.getElementById("forgotFields");
+    const forgotResetBox = document.getElementById("forgotResetBox");
+    const guestSubmitBtn = document.getElementById("guestSubmitBtn");
+    const guestInlineStatus = document.getElementById("guestInlineStatus");
+
     const chatMessages = document.getElementById("chatMessages");
     const chatInput = document.getElementById("chatInput");
     const sendChatBtn = document.getElementById("sendChatBtn");
 
-    let currentUser = null;
+    let currentAuthUser = null;
     let currentUserProfile = null;
     let usersCache = {};
 
@@ -827,6 +1007,8 @@
     let roomMetaCache = null;
     let participantsCache = {};
     let requestsCache = {};
+    let guestAccountsCache = {};
+    let resetRequestsCache = {};
     let joinedRoom = false;
     let accessRequested = false;
 
@@ -835,6 +1017,10 @@
     let isMicMuted = false;
     let isCamOff = false;
     let isScreenSharing = false;
+
+    let guestMode = "login";
+    let currentGuestAccess = null; // { guestKey, email, displayName }
+    let guestInitialized = false;
 
     const peerConnections = new Map();
     const remoteStreams = new Map();
@@ -910,17 +1096,42 @@
       statusBar.style.color = isError ? "#b00020" : "#14854b";
     }
 
+    function setGuestInlineStatus(text = "", isError = false) {
+      guestInlineStatus.textContent = text;
+      guestInlineStatus.className = "guest-inline-status " + (isError ? "bad" : "ok");
+    }
+
     function isOwnerEmail() {
-      return (currentUser?.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase();
+      return !!(currentAuthUser && !currentAuthUser.isAnonymous && (currentAuthUser.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase());
     }
 
     function isRoomOwner() {
-      return roomMetaCache?.ownerId === currentUser?.uid;
+      return roomMetaCache?.ownerId === currentParticipantId();
     }
 
-    function getDisplayName(uid) {
-      if (uid === currentUser?.uid) return currentUserProfile?.displayName || "Moi";
-      return usersCache[uid]?.displayName || participantsCache?.[uid]?.displayName || requestsCache?.[uid]?.displayName || "Participant";
+    function hasGuestAccess() {
+      return !!currentGuestAccess;
+    }
+
+    function currentParticipantId() {
+      if (isOwnerEmail()) return currentAuthUser?.uid || "";
+      if (currentGuestAccess?.guestKey) return `guest__${currentGuestAccess.guestKey}`;
+      return currentAuthUser?.uid || "";
+    }
+
+    function currentDisplayName() {
+      if (isOwnerEmail()) return currentUserProfile?.displayName || currentAuthUser?.displayName || "Propriétaire";
+      return currentGuestAccess?.displayName || "Invité";
+    }
+
+    function currentEmail() {
+      if (isOwnerEmail()) return currentAuthUser?.email || "";
+      return currentGuestAccess?.email || "";
+    }
+
+    function currentPhotoURL() {
+      if (isOwnerEmail()) return currentUserProfile?.photoURL || "";
+      return "";
     }
 
     function makeRoomLink(id) {
@@ -930,6 +1141,116 @@
     function getRoomQueryParam() {
       const params = new URLSearchParams(window.location.search);
       return params.get("room");
+    }
+
+    function guestEmailToKey(email) {
+      return normalizeEmail(email).replace(/[^a-z0-9]/g, "_");
+    }
+
+    function normalizeEmail(email = "") {
+      return String(email || "").trim().toLowerCase();
+    }
+
+    function guestSessionStorageKey() {
+      return roomId ? `meeting_guest_session_${roomId}` : "";
+    }
+
+    function guestRememberEmailKey() {
+      return roomId ? `meeting_guest_email_${roomId}` : "";
+    }
+
+    function readGuestSession() {
+      const key = guestSessionStorageKey();
+      if (!key) return null;
+      try {
+        const raw = sessionStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function saveGuestSession(data) {
+      const key = guestSessionStorageKey();
+      if (!key) return;
+      sessionStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function clearGuestSession() {
+      const key = guestSessionStorageKey();
+      if (!key) return;
+      sessionStorage.removeItem(key);
+    }
+
+    function saveRememberedGuestEmail(email) {
+      const key = guestRememberEmailKey();
+      if (!key) return;
+      localStorage.setItem(key, normalizeEmail(email));
+    }
+
+    function readRememberedGuestEmail() {
+      const key = guestRememberEmailKey();
+      if (!key) return "";
+      return localStorage.getItem(key) || "";
+    }
+
+    function hideGuestGate() {
+      guestGate.classList.add("hidden");
+    }
+
+    function showGuestGate() {
+      guestGate.classList.remove("hidden");
+    }
+
+    function setGuestMode(mode) {
+      guestMode = mode;
+      modeLoginBtn.classList.toggle("active", mode === "login");
+      modeRegisterBtn.classList.toggle("active", mode === "register");
+      modeForgotBtn.classList.toggle("active", mode === "forgot");
+
+      registerExtraFields.classList.toggle("hidden", mode !== "register");
+      loginFields.classList.toggle("hidden", mode !== "login");
+      forgotFields.classList.toggle("hidden", mode !== "forgot");
+
+      guestGateNote.textContent =
+        mode === "login"
+          ? "Connecte-toi avec ton accès réunion. Cet accès ne permet pas d’ouvrir le reste du site."
+          : mode === "register"
+          ? "Crée ton accès réunion avec ton email et un mot de passe dédié à cette salle."
+          : "Le propriétaire doit autoriser la réinitialisation. Ensuite tu pourras définir un nouveau mot de passe.";
+
+      refreshForgotResetBox();
+      setGuestInlineStatus("");
+    }
+
+    function refreshForgotResetBox() {
+      if (guestMode !== "forgot") {
+        forgotResetBox.classList.add("hidden");
+        return;
+      }
+
+      const email = normalizeEmail(guestEmailInput.value);
+      const key = email ? guestEmailToKey(email) : "";
+      const account = key ? guestAccountsCache[key] : null;
+      const canReset = !!(account && account.allowPasswordReset);
+
+      forgotResetBox.classList.toggle("hidden", !canReset);
+    }
+
+    function applyNavForGuest() {
+      document.querySelectorAll('#mainNav a[data-nav="site"], #mainNav a[data-nav="public"]').forEach(a => {
+        a.classList.add("hidden");
+      });
+      if (profileNavLink) profileNavLink.classList.add("hidden");
+      meetingNavLink.classList.remove("hidden");
+    }
+
+    function applyNavForOwner() {
+      document.querySelectorAll('#mainNav a[data-nav="site"], #mainNav a[data-nav="public"]').forEach(a => {
+        a.classList.remove("hidden");
+      });
+      if (profileNavLink) profileNavLink.classList.remove("hidden");
+      meetingNavLink.classList.remove("hidden");
     }
 
     function showExpiredPage(message = "Lien expiré") {
@@ -987,18 +1308,22 @@
     }
 
     function updateVisibilityByRole() {
-      if (isOwnerEmail()) {
-        meetingNavLink.classList.remove("hidden");
+      const owner = isOwnerEmail();
+
+      if (owner) {
+        applyNavForOwner();
         ownerPanel.classList.remove("hidden");
         guestInfoPanel.classList.add("hidden");
+        guestAccountsPanel.classList.remove("hidden");
+        resetRequestsPanel.classList.remove("hidden");
+        meetingNavLink.classList.remove("hidden");
       } else {
+        applyNavForGuest();
         ownerPanel.classList.add("hidden");
         guestInfoPanel.classList.remove("hidden");
-        if (getRoomQueryParam()) {
-          meetingNavLink.classList.remove("hidden");
-        } else {
-          meetingNavLink.classList.add("hidden");
-        }
+        guestAccountsPanel.classList.add("hidden");
+        resetRequestsPanel.classList.add("hidden");
+        meetingNavLink.classList.remove("hidden");
       }
 
       waitingRoomPanel.classList.toggle("hidden", !isRoomOwner());
@@ -1008,19 +1333,18 @@
     }
 
     function updateButtons() {
-      toggleMicBtn.disabled = !joinedRoom || !localStream;
-      toggleCamBtn.disabled = !joinedRoom || !localStream;
-      shareScreenBtn.disabled = !joinedRoom || !localStream;
+      const gateVisible = !isOwnerEmail() && !hasGuestAccess();
+      toggleMicBtn.disabled = gateVisible || !joinedRoom || !localStream;
+      toggleCamBtn.disabled = gateVisible || !joinedRoom || !localStream;
+      shareScreenBtn.disabled = gateVisible || !joinedRoom || !localStream;
       leaveRoomBtn.disabled = !joinedRoom;
-      joinRoomBtn.disabled = !roomId;
+      joinRoomBtn.disabled = !roomId || gateVisible;
 
       toggleMicBtn.textContent = isMicMuted ? "Micro OFF" : "Micro ON";
       toggleCamBtn.textContent = isCamOff ? "Caméra OFF" : "Caméra ON";
       shareScreenBtn.textContent = isScreenSharing ? "Arrêter le partage" : "Partager l’écran";
 
-      if (isScreenSharing) shareScreenBtn.classList.add("active");
-      else shareScreenBtn.classList.remove("active");
-
+      shareScreenBtn.classList.toggle("active", isScreenSharing);
       muteAllBtn.style.display = isRoomOwner() ? "inline-flex" : "none";
       updateVisibilityByRole();
     }
@@ -1039,15 +1363,15 @@
       meetingTitle.textContent = roomMetaCache.title || "Salle de réunion";
       meetingSubtitle.textContent = isRoomOwner()
         ? "Tu es le propriétaire de cette salle."
-        : `Salle créée par ${getDisplayName(roomMetaCache.ownerId)}.`;
+        : `Salle créée par ${roomMetaCache.ownerName || "Propriétaire"}.`;
 
       roomMeta.innerHTML = `
         <div class="meta-line"><strong>Titre :</strong> ${escapeHtml(roomMetaCache.title || "Salle de réunion")}</div>
-        <div class="meta-line"><strong>Créateur :</strong> ${escapeHtml(roomMetaCache.ownerName || getDisplayName(roomMetaCache.ownerId))}</div>
+        <div class="meta-line"><strong>Créateur :</strong> ${escapeHtml(roomMetaCache.ownerName || "Propriétaire")}</div>
         <div class="meta-line"><strong>Créée le :</strong> ${escapeHtml(formatDate(roomMetaCache.createdAt))}</div>
         <div class="meta-line"><strong>Expire le :</strong> ${escapeHtml(formatDate(roomMetaCache.expiresAt))}</div>
         <div class="meta-line"><strong>Temps restant :</strong> ${escapeHtml(formatRemaining((roomMetaCache.expiresAt || 0) - Date.now()))}</div>
-        <div class="meta-line"><strong>Mot de passe :</strong> ${roomMetaCache.hasPassword ? "Oui" : "Non"}</div>
+        <div class="meta-line"><strong>Mot de passe salle :</strong> ${roomMetaCache.hasPassword ? "Oui" : "Non"}</div>
         <div class="meta-line"><strong>Salle d’attente :</strong> ${roomMetaCache.waitingRoom ? "Oui" : "Non"}</div>
         <div class="meta-line"><strong>État :</strong>
           <span class="${closed ? "status-bad" : expired ? "status-warn" : "status-ok"}">
@@ -1069,19 +1393,18 @@
       entries.sort((a, b) => (a[1]?.joinedAt || 0) - (b[1]?.joinedAt || 0));
 
       participantsList.innerHTML = entries.map(([uid, p]) => {
-        const profile = usersCache[uid] || {};
         const owner = roomMetaCache?.ownerId === uid;
         const sharing = !!p.isScreenSharing;
         return `
           <div class="participant-card">
-            <div class="avatar small">${avatarMarkup(profile.uid ? profile : {displayName:p.displayName,email:p.email,photoURL:p.photoURL})}</div>
+            <div class="avatar small">${avatarMarkup({displayName:p.displayName,email:p.email,photoURL:p.photoURL})}</div>
             <div class="participant-main">
-              <div class="participant-name">${escapeHtml(profile.displayName || p.displayName || "Participant")}</div>
-              <div class="participant-sub">${escapeHtml(uid === currentUser?.uid ? "Toi" : (p.email || "Participant"))}</div>
+              <div class="participant-name">${escapeHtml(p.displayName || "Participant")}</div>
+              <div class="participant-sub">${escapeHtml(uid === currentParticipantId() ? "Toi" : (p.email || "Participant"))}</div>
             </div>
             ${sharing ? `<span class="share-pill">Écran</span>` : ``}
             ${owner ? `<span class="owner-pill">Owner</span>` : ``}
-            ${isRoomOwner() && uid !== currentUser?.uid ? `<button class="mini-btn danger" type="button" data-remove-uid="${uid}">Retirer</button>` : ``}
+            ${isRoomOwner() && uid !== currentParticipantId() ? `<button class="mini-btn danger" type="button" data-remove-uid="${uid}">Retirer</button>` : ``}
           </div>
         `;
       }).join("");
@@ -1123,6 +1446,66 @@
 
       document.querySelectorAll("[data-reject-uid]").forEach(btn => {
         btn.addEventListener("click", () => rejectRequest(btn.dataset.rejectUid));
+      });
+    }
+
+    function renderGuestAccounts() {
+      if (!isOwnerEmail()) return;
+
+      const entries = Object.entries(guestAccountsCache || {});
+      if (!entries.length) {
+        guestAccountsList.innerHTML = `<div style="opacity:.92;">Aucun compte invité.</div>`;
+        return;
+      }
+
+      guestAccountsList.innerHTML = entries
+        .sort((a, b) => (b[1]?.updatedAt || 0) - (a[1]?.updatedAt || 0))
+        .map(([guestKey, acc]) => `
+          <div class="guest-account-card">
+            <div class="avatar small">${avatarMarkup({displayName:acc.displayName,email:acc.email})}</div>
+            <div class="guest-account-main">
+              <div class="guest-account-name">${escapeHtml(acc.displayName || acc.email || "Invité")}</div>
+              <div class="guest-account-sub">${escapeHtml(acc.email || "")}</div>
+            </div>
+            ${acc.allowPasswordReset ? `<span class="share-pill">Reset OK</span>` : ``}
+            <button class="mini-btn danger" type="button" data-delete-guest="${guestKey}">Supprimer</button>
+          </div>
+        `).join("");
+
+      document.querySelectorAll("[data-delete-guest]").forEach(btn => {
+        btn.addEventListener("click", () => deleteGuestAccount(btn.dataset.deleteGuest));
+      });
+    }
+
+    function renderResetRequests() {
+      if (!isOwnerEmail()) return;
+
+      const entries = Object.entries(resetRequestsCache || {});
+      if (!entries.length) {
+        resetRequestsList.innerHTML = `<div style="opacity:.92;">Aucune demande.</div>`;
+        return;
+      }
+
+      resetRequestsList.innerHTML = entries
+        .sort((a, b) => (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0))
+        .map(([guestKey, req]) => `
+          <div class="reset-request-card">
+            <div class="avatar small">${avatarMarkup({displayName:req.displayName,email:req.email})}</div>
+            <div class="reset-request-main">
+              <div class="reset-request-name">${escapeHtml(req.displayName || req.email || "Invité")}</div>
+              <div class="reset-request-sub">${escapeHtml(req.email || "")}</div>
+            </div>
+            <button class="mini-btn" type="button" data-approve-reset="${guestKey}">Autoriser</button>
+            <button class="mini-btn danger" type="button" data-reject-reset="${guestKey}">Refuser</button>
+          </div>
+        `).join("");
+
+      document.querySelectorAll("[data-approve-reset]").forEach(btn => {
+        btn.addEventListener("click", () => approvePasswordReset(btn.dataset.approveReset));
+      });
+
+      document.querySelectorAll("[data-reject-reset]").forEach(btn => {
+        btn.addEventListener("click", () => rejectPasswordReset(btn.dataset.rejectReset));
       });
     }
 
@@ -1175,7 +1558,7 @@
       `);
 
       const entries = Object.entries(participantsCache || {})
-        .filter(([uid]) => uid !== currentUser?.uid)
+        .filter(([uid]) => uid !== currentParticipantId())
         .sort((a, b) => (a[1]?.joinedAt || 0) - (b[1]?.joinedAt || 0));
 
       entries.forEach(([uid, p]) => {
@@ -1184,7 +1567,7 @@
         tiles.push(`
           <div class="video-tile">
             <div class="video-head">
-              <div class="video-name">${escapeHtml(p.displayName || getDisplayName(uid))}</div>
+              <div class="video-name">${escapeHtml(p.displayName || "Participant")}</div>
               <div class="video-badges">
                 ${p.isScreenSharing ? `<span class="tiny-pill share">Écran</span>` : ``}
                 ${owner ? `<span class="tiny-pill owner">Owner</span>` : ``}
@@ -1252,13 +1635,15 @@
     function subscribeUsers() {
       onValue(ref(db, "users"), snap => {
         usersCache = snap.val() || {};
-        if (currentUser) {
-          currentUserProfile = usersCache[currentUser.uid] || currentUserProfile;
+        if (currentAuthUser && isOwnerEmail()) {
+          currentUserProfile = usersCache[currentAuthUser.uid] || currentUserProfile;
           myAvatar.innerHTML = avatarMarkup(currentUserProfile);
           myName.textContent = currentUserProfile?.displayName || "Utilisateur";
         }
         renderParticipants();
         renderRequests();
+        renderGuestAccounts();
+        renderResetRequests();
         renderRoomMeta();
         renderVideoGrid();
       });
@@ -1269,7 +1654,7 @@
     }
 
     async function createRoom() {
-      if (!currentUser || !isOwnerEmail()) {
+      if (!currentAuthUser || !isOwnerEmail()) {
         setStatus("Seul le compte autorisé peut créer une salle.", true);
         return;
       }
@@ -1284,9 +1669,9 @@
       const payload = {
         id: newRoomId,
         title,
-        ownerId: currentUser.uid,
-        ownerEmail: currentUser.email || "",
-        ownerName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
+        ownerId: currentAuthUser.uid,
+        ownerEmail: currentAuthUser.email || "",
+        ownerName: currentUserProfile?.displayName || currentAuthUser.displayName || "Utilisateur",
         createdAt: Date.now(),
         updatedAt: Date.now(),
         expiresAt,
@@ -1360,6 +1745,8 @@
           );
           return;
         }
+
+        refreshForgotResetBox();
       });
 
       onValue(ref(db, `meetingRooms/${id}/participants`), async snap => {
@@ -1367,18 +1754,18 @@
         renderParticipants();
         renderVideoGrid();
 
-        if (!joinedRoom || !currentUser) return;
+        if (!joinedRoom || !currentParticipantId()) return;
 
-        const others = Object.entries(participantsCache).filter(([uid]) => uid !== currentUser.uid);
+        const others = Object.entries(participantsCache).filter(([uid]) => uid !== currentParticipantId());
 
         for (const [remoteUid, p] of others) {
           if (peerConnections.has(remoteUid)) continue;
-          const mine = participantsCache[currentUser.uid];
+          const mine = participantsCache[currentParticipantId()];
           if (!mine || !p) continue;
 
           const iStart =
             (mine.joinedAt || 0) < (p.joinedAt || 0) ||
-            ((mine.joinedAt || 0) === (p.joinedAt || 0) && currentUser.uid < remoteUid);
+            ((mine.joinedAt || 0) === (p.joinedAt || 0) && currentParticipantId() < remoteUid);
 
           if (iStart) {
             await createPeerForUser(remoteUid, true);
@@ -1398,11 +1785,22 @@
         renderRequests();
       });
 
+      onValue(ref(db, `meetingRooms/${id}/guestAccounts`), snap => {
+        guestAccountsCache = snap.val() || {};
+        renderGuestAccounts();
+        refreshForgotResetBox();
+      });
+
+      onValue(ref(db, `meetingRooms/${id}/guestResetRequests`), snap => {
+        resetRequestsCache = snap.val() || {};
+        renderResetRequests();
+      });
+
       onValue(ref(db, `meetingRooms/${id}/chat`), snap => {
         renderChat(snap.val() || {});
       });
 
-      onChildAdded(ref(db, `meetingRooms/${id}/signals/${currentUser.uid}`), async snap => {
+      onChildAdded(ref(db, `meetingRooms/${id}/signals/${currentParticipantId()}`), async snap => {
         const signalId = snap.key;
         if (!signalId || processedSignalIds.has(signalId)) return;
         processedSignalIds.add(signalId);
@@ -1412,7 +1810,7 @@
 
         try {
           await handleSignal(signal);
-          await remove(ref(db, `meetingRooms/${id}/signals/${currentUser.uid}/${signalId}`)).catch(() => {});
+          await remove(ref(db, `meetingRooms/${id}/signals/${currentParticipantId()}/${signalId}`)).catch(() => {});
         } catch (e) {
           console.error("handleSignal error:", e);
         }
@@ -1466,12 +1864,24 @@
         roomLinkBox.textContent = makeRoomLink(roomId);
         copyRoomLinkBtn.style.display = isOwnerEmail() ? "inline-flex" : "none";
 
+        const rememberedEmail = readRememberedGuestEmail();
+        if (rememberedEmail && !isOwnerEmail()) {
+          guestEmailInput.value = rememberedEmail;
+        }
+
+        const session = readGuestSession();
+        if (session && !isOwnerEmail()) {
+          currentGuestAccess = session;
+        }
+
         subscribeRoom(roomId);
         renderRoomMeta();
         updateVisibilityByRole();
 
         if (!isOwnerEmail()) {
           meetingNavLink.classList.remove("hidden");
+          if (!currentGuestAccess) showGuestGate();
+          else hideGuestGate();
         }
 
         setStatus("Salle chargée.");
@@ -1500,18 +1910,18 @@
     }
 
     async function sendSignal(toUid, data) {
-      if (!roomId || !currentUser || !toUid) return;
+      if (!roomId || !currentParticipantId() || !toUid) return;
       const signalRef = push(ref(db, `meetingRooms/${roomId}/signals/${toUid}`));
       await set(signalRef, {
         ...data,
-        from: currentUser.uid,
+        from: currentParticipantId(),
         to: toUid,
         createdAt: Date.now()
       });
     }
 
     async function createPeerForUser(remoteUid, initiator = false) {
-      if (!localStream || !roomId || !currentUser) return;
+      if (!localStream || !roomId || !currentParticipantId()) return;
       if (peerConnections.has(remoteUid)) return;
 
       const pc = new RTCPeerConnection(rtcConfig);
@@ -1566,7 +1976,7 @@
       if (!signal || !signal.type) return;
 
       if (signal.type === "mute_all") {
-        if (signal.to === currentUser.uid) {
+        if (signal.to === currentParticipantId()) {
           const tracks = localStream?.getAudioTracks?.() || [];
           tracks.forEach(t => t.enabled = false);
           isMicMuted = true;
@@ -1578,7 +1988,7 @@
       }
 
       if (signal.type === "remove_participant") {
-        if (signal.to === currentUser.uid) {
+        if (signal.to === currentParticipantId()) {
           setStatus("Tu as été retiré de la salle.", true);
           await leaveRoom(true);
         }
@@ -1586,7 +1996,7 @@
       }
 
       const remoteUid = signal.from;
-      if (!remoteUid || remoteUid === currentUser?.uid) return;
+      if (!remoteUid || remoteUid === currentParticipantId()) return;
 
       let pc = peerConnections.get(remoteUid);
 
@@ -1646,8 +2056,14 @@
     }
 
     async function joinRoom() {
-      if (!currentUser || !roomId || !roomMetaCache) {
+      if (!roomId || !roomMetaCache) {
         setStatus("Aucune salle sélectionnée.", true);
+        return;
+      }
+
+      if (!isOwnerEmail() && !hasGuestAccess()) {
+        showGuestGate();
+        setStatus("Authentifie-toi d’abord pour entrer dans la salle.", true);
         return;
       }
 
@@ -1666,25 +2082,25 @@
           const entered = prompt("Mot de passe de la réunion :");
           if (entered === null) return;
           if ((entered || "").trim() !== (roomMetaCache.password || "")) {
-            setStatus("Mot de passe incorrect.", true);
+            setStatus("Mot de passe de salle incorrect.", true);
             return;
           }
         }
 
         if (roomMetaCache.waitingRoom) {
           if (!accessRequested) {
-            await set(ref(db, `meetingRooms/${roomId}/joinRequests/${currentUser.uid}`), {
-              uid: currentUser.uid,
-              displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
-              email: currentUser.email || "",
-              photoURL: currentUserProfile?.photoURL || "",
+            await set(ref(db, `meetingRooms/${roomId}/joinRequests/${currentParticipantId()}`), {
+              uid: currentParticipantId(),
+              displayName: currentDisplayName(),
+              email: currentEmail(),
+              photoURL: currentPhotoURL(),
               createdAt: Date.now()
             });
             accessRequested = true;
             setStatus("Demande envoyée. Attends l’acceptation du propriétaire.");
           }
 
-          const allowedSnap = await get(ref(db, `meetingRooms/${roomId}/approved/${currentUser.uid}`));
+          const allowedSnap = await get(ref(db, `meetingRooms/${roomId}/approved/${currentParticipantId()}`));
           if (!allowedSnap.exists()) {
             setStatus("Tu es encore en salle d’attente.", true);
             return;
@@ -1695,19 +2111,21 @@
       try {
         await prepareLocalMedia();
 
-        const participantRef = ref(db, `meetingRooms/${roomId}/participants/${currentUser.uid}`);
+        const participantRef = ref(db, `meetingRooms/${roomId}/participants/${currentParticipantId()}`);
         await set(participantRef, {
-          uid: currentUser.uid,
-          displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
-          email: currentUser.email || "",
-          photoURL: currentUserProfile?.photoURL || "",
+          uid: currentParticipantId(),
+          displayName: currentDisplayName(),
+          email: currentEmail(),
+          photoURL: currentPhotoURL(),
           joinedAt: Date.now(),
-          isScreenSharing: false
+          isScreenSharing: false,
+          participantType: isOwnerEmail() ? "owner" : "guest"
         });
 
         await onDisconnect(participantRef).remove();
-        await remove(ref(db, `meetingRooms/${roomId}/joinRequests/${currentUser.uid}`)).catch(() => {});
-        await set(ref(db, `meetingRooms/${roomId}/approved/${currentUser.uid}`), true).catch(() => {});
+
+        await remove(ref(db, `meetingRooms/${roomId}/joinRequests/${currentParticipantId()}`)).catch(() => {});
+        await set(ref(db, `meetingRooms/${roomId}/approved/${currentParticipantId()}`), true).catch(() => {});
 
         joinedRoom = true;
         renderVideoGrid();
@@ -1760,7 +2178,7 @@
     async function muteAll() {
       if (!isRoomOwner() || !roomId) return;
       try {
-        const targets = Object.keys(participantsCache || {}).filter(uid => uid !== currentUser.uid);
+        const targets = Object.keys(participantsCache || {}).filter(uid => uid !== currentParticipantId());
         for (const uid of targets) {
           await sendSignal(uid, { type:"mute_all", to:uid });
         }
@@ -1800,8 +2218,8 @@
         await replaceVideoTrackForAllPeers(screenTrack, displayStream);
         isScreenSharing = true;
 
-        if (roomId && currentUser) {
-          await update(ref(db, `meetingRooms/${roomId}/participants/${currentUser.uid}`), {
+        if (roomId && currentParticipantId()) {
+          await update(ref(db, `meetingRooms/${roomId}/participants/${currentParticipantId()}`), {
             isScreenSharing: true
           }).catch(() => {});
         }
@@ -1835,8 +2253,8 @@
         await replaceVideoTrackForAllPeers(camTrack, localStream);
       }
 
-      if (roomId && currentUser) {
-        await update(ref(db, `meetingRooms/${roomId}/participants/${currentUser.uid}`), {
+      if (roomId && currentParticipantId()) {
+        await update(ref(db, `meetingRooms/${roomId}/participants/${currentParticipantId()}`), {
           isScreenSharing: false
         }).catch(() => {});
       }
@@ -1884,8 +2302,8 @@
         closePeer(uid);
       }
 
-      if (removeParticipant && roomId && currentUser) {
-        try { await remove(ref(db, `meetingRooms/${roomId}/participants/${currentUser.uid}`)); } catch (_) {}
+      if (removeParticipant && roomId && currentParticipantId()) {
+        try { await remove(ref(db, `meetingRooms/${roomId}/participants/${currentParticipantId()}`)); } catch (_) {}
       }
 
       if (localStream) {
@@ -1917,15 +2335,15 @@
     }
 
     async function sendChatMessage() {
-      if (!roomId || !currentUser) return;
+      if (!roomId || !currentParticipantId()) return;
       const text = chatInput.value.trim();
       if (!text) return;
 
       try {
         const msgRef = push(ref(db, `meetingRooms/${roomId}/chat`));
         await set(msgRef, {
-          uid: currentUser.uid,
-          displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
+          uid: currentParticipantId(),
+          displayName: currentDisplayName(),
           text,
           createdAt: Date.now()
         });
@@ -1934,6 +2352,275 @@
         console.error(e);
         setStatus("Impossible d'envoyer le message.", true);
       }
+    }
+
+    function randomSalt() {
+      const arr = new Uint8Array(16);
+      crypto.getRandomValues(arr);
+      return Array.from(arr).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function sha256Hex(text) {
+      const data = new TextEncoder().encode(text);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function buildPasswordHash(password, salt) {
+      return sha256Hex(`${salt}::${password}`);
+    }
+
+    async function createGuestAccess() {
+      if (!roomId) {
+        setGuestInlineStatus("Aucune salle chargée.", true);
+        return;
+      }
+
+      const email = normalizeEmail(guestEmailInput.value);
+      const displayName = guestDisplayNameInput.value.trim();
+      const password = guestPasswordCreateInput.value;
+      const confirm = guestPasswordConfirmInput.value;
+
+      if (!email) {
+        setGuestInlineStatus("Entre un email.", true);
+        return;
+      }
+      if (!displayName) {
+        setGuestInlineStatus("Entre un nom affiché.", true);
+        return;
+      }
+      if (!password || password.length < 6) {
+        setGuestInlineStatus("Choisis un mot de passe d’au moins 6 caractères.", true);
+        return;
+      }
+      if (password !== confirm) {
+        setGuestInlineStatus("Les mots de passe ne correspondent pas.", true);
+        return;
+      }
+
+      const guestKey = guestEmailToKey(email);
+      const accountRef = ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`);
+      const existing = await get(accountRef);
+
+      if (existing.exists()) {
+        setGuestInlineStatus("Cet email possède déjà un accès réunion. Utilise “Se connecter”.", true);
+        setGuestMode("login");
+        guestEmailInput.value = email;
+        guestPasswordLoginInput.focus();
+        return;
+      }
+
+      const salt = randomSalt();
+      const passwordHash = await buildPasswordHash(password, salt);
+
+      const payload = {
+        guestKey,
+        email,
+        displayName,
+        salt,
+        passwordHash,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        lastLoginAt: Date.now(),
+        allowPasswordReset: false
+      };
+
+      await set(accountRef, payload);
+
+      currentGuestAccess = {
+        guestKey,
+        email,
+        displayName
+      };
+
+      saveGuestSession(currentGuestAccess);
+      saveRememberedGuestEmail(email);
+      myAvatar.innerHTML = avatarMarkup({ displayName, email });
+      myName.textContent = displayName;
+      hideGuestGate();
+      updateButtons();
+      setGuestInlineStatus("Accès créé.");
+      setStatus("Accès réunion créé. Tu peux maintenant entrer dans la salle.");
+    }
+
+    async function loginGuestAccess() {
+      if (!roomId) {
+        setGuestInlineStatus("Aucune salle chargée.", true);
+        return;
+      }
+
+      const email = normalizeEmail(guestEmailInput.value);
+      const password = guestPasswordLoginInput.value;
+
+      if (!email || !password) {
+        setGuestInlineStatus("Entre ton email et ton mot de passe.", true);
+        return;
+      }
+
+      const guestKey = guestEmailToKey(email);
+      const accountSnap = await get(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`));
+
+      if (!accountSnap.exists()) {
+        setGuestInlineStatus("Aucun accès réunion trouvé pour cet email.", true);
+        return;
+      }
+
+      const account = accountSnap.val();
+      const candidateHash = await buildPasswordHash(password, account.salt || "");
+
+      if (candidateHash !== account.passwordHash) {
+        setGuestInlineStatus("Mot de passe incorrect.", true);
+        return;
+      }
+
+      currentGuestAccess = {
+        guestKey,
+        email: account.email,
+        displayName: account.displayName || account.email
+      };
+
+      await update(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`), {
+        lastLoginAt: Date.now(),
+        updatedAt: Date.now()
+      }).catch(() => {});
+
+      saveGuestSession(currentGuestAccess);
+      saveRememberedGuestEmail(account.email);
+      myAvatar.innerHTML = avatarMarkup({ displayName: currentGuestAccess.displayName, email: currentGuestAccess.email });
+      myName.textContent = currentGuestAccess.displayName;
+      hideGuestGate();
+      updateButtons();
+      setGuestInlineStatus("Connexion réussie.");
+      setStatus("Accès réunion reconnu.");
+    }
+
+    async function forgotPasswordFlow() {
+      if (!roomId) {
+        setGuestInlineStatus("Aucune salle chargée.", true);
+        return;
+      }
+
+      const email = normalizeEmail(guestEmailInput.value);
+      if (!email) {
+        setGuestInlineStatus("Entre l’email utilisé pour la salle.", true);
+        return;
+      }
+
+      const guestKey = guestEmailToKey(email);
+      const accountSnap = await get(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`));
+
+      if (!accountSnap.exists()) {
+        setGuestInlineStatus("Aucun accès réunion trouvé pour cet email.", true);
+        return;
+      }
+
+      const account = accountSnap.val();
+
+      if (account.allowPasswordReset) {
+        const newPassword = guestPasswordResetInput.value;
+        const confirm = guestPasswordResetConfirmInput.value;
+
+        if (!newPassword || newPassword.length < 6) {
+          setGuestInlineStatus("Nouveau mot de passe trop court.", true);
+          return;
+        }
+        if (newPassword !== confirm) {
+          setGuestInlineStatus("Les nouveaux mots de passe ne correspondent pas.", true);
+          return;
+        }
+
+        const salt = randomSalt();
+        const passwordHash = await buildPasswordHash(newPassword, salt);
+
+        await update(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`), {
+          salt,
+          passwordHash,
+          updatedAt: Date.now(),
+          allowPasswordReset: false
+        });
+
+        await remove(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`)).catch(() => {});
+
+        setGuestInlineStatus("Mot de passe réinitialisé. Tu peux te connecter.", false);
+        setGuestMode("login");
+        guestEmailInput.value = email;
+        guestPasswordLoginInput.value = "";
+        return;
+      }
+
+      await set(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`), {
+        guestKey,
+        email: account.email,
+        displayName: account.displayName || account.email,
+        createdAt: Date.now()
+      });
+
+      setGuestInlineStatus("Demande envoyée au propriétaire. Reviens ici après son autorisation.", false);
+      refreshForgotResetBox();
+    }
+
+    async function approvePasswordReset(guestKey) {
+      if (!isOwnerEmail() || !roomId || !guestKey) return;
+      await update(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`), {
+        allowPasswordReset: true,
+        updatedAt: Date.now()
+      }).catch(() => {});
+      await remove(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`)).catch(() => {});
+      setStatus("Réinitialisation autorisée.");
+    }
+
+    async function rejectPasswordReset(guestKey) {
+      if (!isOwnerEmail() || !roomId || !guestKey) return;
+      await remove(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`)).catch(() => {});
+      setStatus("Demande de réinitialisation refusée.");
+    }
+
+    async function deleteGuestAccount(guestKey) {
+      if (!isOwnerEmail() || !roomId || !guestKey) return;
+      await remove(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`)).catch(() => {});
+      await remove(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`)).catch(() => {});
+      const participantId = `guest__${guestKey}`;
+      await remove(ref(db, `meetingRooms/${roomId}/participants/${participantId}`)).catch(() => {});
+      await remove(ref(db, `meetingRooms/${roomId}/approved/${participantId}`)).catch(() => {});
+      setStatus("Compte invité supprimé.");
+    }
+
+    function bindGuestAccessUI() {
+      modeLoginBtn.addEventListener("click", () => setGuestMode("login"));
+      modeRegisterBtn.addEventListener("click", () => setGuestMode("register"));
+      modeForgotBtn.addEventListener("click", () => setGuestMode("forgot"));
+
+      guestEmailInput.addEventListener("input", refreshForgotResetBox);
+
+      guestSubmitBtn.addEventListener("click", async () => {
+        try {
+          if (guestMode === "register") await createGuestAccess();
+          else if (guestMode === "login") await loginGuestAccess();
+          else await forgotPasswordFlow();
+        } catch (e) {
+          console.error(e);
+          setGuestInlineStatus("Opération impossible pour le moment.", true);
+        }
+      });
+    }
+
+    async function ensureAnonymousIfNeeded() {
+      if (currentAuthUser) return;
+      try {
+        await signInAnonymously(auth);
+      } catch (e) {
+        console.error(e);
+        setStatus("Impossible d'initialiser l'accès invité.", true);
+      }
+    }
+
+    function restoreGuestIdentityIfSessionExists() {
+      const session = readGuestSession();
+      if (!session) return;
+      currentGuestAccess = session;
+      myAvatar.innerHTML = avatarMarkup({ displayName: session.displayName, email: session.email });
+      myName.textContent = session.displayName;
+      hideGuestGate();
     }
 
     function attachEvents() {
@@ -1946,7 +2633,16 @@
       toggleMicBtn.addEventListener("click", toggleMic);
       toggleCamBtn.addEventListener("click", toggleCam);
       shareScreenBtn.addEventListener("click", toggleScreenShare);
-      leaveRoomBtn.addEventListener("click", () => leaveRoom(true));
+      leaveRoomBtn.addEventListener("click", async () => {
+        await leaveRoom(true);
+        if (!isOwnerEmail()) {
+          clearGuestSession();
+          currentGuestAccess = null;
+          showGuestGate();
+          setGuestMode("login");
+          updateButtons();
+        }
+      });
       sendChatBtn.addEventListener("click", sendChatMessage);
 
       chatInput.addEventListener("keydown", e => {
@@ -1959,24 +2655,53 @@
       window.addEventListener("beforeunload", () => {
         try { leaveRoom(false); } catch (_) {}
       });
+
+      bindGuestAccessUI();
     }
 
     onAuthStateChanged(auth, async user => {
+      currentAuthUser = user;
+
+      const roomInUrl = getRoomQueryParam();
+
       if (!user) {
+        if (roomInUrl) {
+          await ensureAnonymousIfNeeded();
+          return;
+        }
         window.location.href = "insights.html";
         return;
       }
 
-      currentUser = user;
-      currentUserProfile = await ensureMyProfile(user);
+      if (isOwnerEmail()) {
+        currentUserProfile = await ensureMyProfile(user);
 
-      myAvatar.innerHTML = avatarMarkup(currentUserProfile);
-      myName.textContent = currentUserProfile.displayName || "Utilisateur";
+        myAvatar.innerHTML = avatarMarkup(currentUserProfile);
+        myName.textContent = currentUserProfile.displayName || "Utilisateur";
 
-      await setupPresence(user, currentUserProfile.displayName || user.displayName || "Utilisateur");
+        await setupPresence(user, currentUserProfile.displayName || user.displayName || "Utilisateur");
 
-      subscribeUsers();
-      attachEvents();
+        applyNavForOwner();
+        hideGuestGate();
+      } else {
+        applyNavForGuest();
+        if (!guestInitialized) {
+          restoreGuestIdentityIfSessionExists();
+        }
+
+        if (roomInUrl && !currentGuestAccess) {
+          const rememberedEmail = readRememberedGuestEmail();
+          if (rememberedEmail) guestEmailInput.value = rememberedEmail;
+          showGuestGate();
+        }
+      }
+
+      if (!guestInitialized) {
+        subscribeUsers();
+        attachEvents();
+        guestInitialized = true;
+      }
+
       updateButtons();
       renderVideoGrid();
       updateVisibilityByRole();
