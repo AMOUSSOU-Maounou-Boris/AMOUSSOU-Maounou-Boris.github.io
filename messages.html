@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -1072,6 +1072,10 @@
 
     .modal-content.large{
       max-width:620px;
+    }
+
+    .modal-content.call-large{
+      max-width:920px;
       padding:18px;
       background:#071c39;
       color:#fff;
@@ -1297,14 +1301,14 @@
       <a href="meeting-room.html" id="meetingNavLink" style="display:none;">Salle de réunion</a>
 
       <a href="messages.html" class="active">
-      Messages 
-      <span class="top-unread-badge" id="topUnreadBadge"></span>
+        Messages
+        <span class="top-unread-badge" id="topUnreadBadge"></span>
       </a>
 
       <a href="calls.html">📞 Calls</a>
 
       <a href="profile.html">
-      <span class="nav-online-dot"></span> Mon compte
+        <span class="nav-online-dot"></span> Mon compte
       </a>
     </nav>
   </header>
@@ -1493,11 +1497,15 @@
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { ref, set, update, get, push, remove, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+    const OWNER_EMAIL = "borisamoussou01@gmail.com";
+
     const myAvatar = document.getElementById("myAvatar");
     const myName = document.getElementById("myName");
     const logoutBtn = document.getElementById("logoutBtn");
     const memberSearch = document.getElementById("memberSearch");
     const membersList = document.getElementById("membersList");
+    const meetingNavLink = document.getElementById("meetingNavLink");
+
     const chatAvatar = document.getElementById("chatAvatar");
     const chatTitle = document.getElementById("chatTitle");
     const chatSubtitle = document.getElementById("chatSubtitle");
@@ -1512,17 +1520,20 @@
     const messageInput = document.getElementById("messageInput");
     const sendBtn = document.getElementById("sendBtn");
     const replyPreviewMount = document.getElementById("replyPreviewMount");
+
     const optionsModal = document.getElementById("optionsModal");
     const closeOptionsModal = document.getElementById("closeOptionsModal");
     const cancelOptionsBtn = document.getElementById("cancelOptionsBtn");
     const optionsModalName = document.getElementById("optionsModalName");
     const blockToggleBtn = document.getElementById("blockToggleBtn");
+
     const forwardModal = document.getElementById("forwardModal");
     const closeForwardModalBtn = document.getElementById("closeForwardModal");
     const cancelForwardBtn = document.getElementById("cancelForwardBtn");
     const forwardPreview = document.getElementById("forwardPreview");
     const forwardSearch = document.getElementById("forwardSearch");
     const forwardMembers = document.getElementById("forwardMembers");
+
     const togglePanelBtn = document.getElementById("togglePanelBtn");
     const composerPanel = document.getElementById("composerPanel");
     const attachmentInput = document.getElementById("attachmentInput");
@@ -1606,27 +1617,27 @@
     const rtcConfig = {
       iceServers: [
         {
-          urls: "stun:stun.relay.metered.ca:80",
+          urls: "stun:stun.relay.metered.ca:80"
         },
         {
           urls: "turn:standard.relay.metered.ca:80",
           username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          credential: "xzI7qJDBCvqPJt7e"
         },
         {
           urls: "turn:standard.relay.metered.ca:80?transport=tcp",
           username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          credential: "xzI7qJDBCvqPJt7e"
         },
         {
           urls: "turn:standard.relay.metered.ca:443",
           username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          credential: "xzI7qJDBCvqPJt7e"
         },
         {
           urls: "turns:standard.relay.metered.ca:443?transport=tcp",
           username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          credential: "xzI7qJDBCvqPJt7e"
         }
       ]
     };
@@ -1653,7 +1664,11 @@
     function formatDate(ts) {
       if (!ts) return "";
       return new Date(ts).toLocaleString("fr-FR", {
-        day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
       });
     }
 
@@ -2971,8 +2986,7 @@
         .filter(u => !isConversationBlocked(u.uid))
         .filter(u => searchableText(u).includes(q))
         .sort((a, b) => (a.displayName || "").localeCompare(b.displayName || ""));
-
-      if (!list.length) {
+            if (!list.length) {
         forwardMembers.innerHTML = `<div class="empty-text" style="color:#0b2340;">Aucun contact disponible.</div>`;
         return;
       }
@@ -3041,6 +3055,11 @@
     }
 
     async function createPeerConnection(remoteUid) {
+      if (peerConnection) {
+        try { peerConnection.close(); } catch (_) {}
+        peerConnection = null;
+      }
+
       peerConnection = new RTCPeerConnection(rtcConfig);
       processedRemoteCandidateIds = new Set();
 
@@ -3049,24 +3068,32 @@
 
       peerConnection.ontrack = (event) => {
         console.log("TRACK reçu");
-        event.streams[0].getTracks().forEach(track => {
-          if (!remoteStream.getTracks().some(t => t.id === track.id)) {
-            remoteStream.addTrack(track);
+
+        if (event.streams && event.streams[0]) {
+          remoteVideo.srcObject = event.streams[0];
+          remoteStream = event.streams[0];
+        } else if (event.track) {
+          if (!remoteStream.getTracks().some(t => t.id === event.track.id)) {
+            remoteStream.addTrack(event.track);
           }
-        });
+          remoteVideo.srcObject = remoteStream;
+        }
       };
 
       peerConnection.onicecandidate = async (event) => {
         if (!event.candidate || !currentCallId || !currentUser) return;
 
-        const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
-
-        await set(candidateRef, {
-          candidate: event.candidate.candidate,
-          sdpMid: event.candidate.sdpMid,
-          sdpMLineIndex: event.candidate.sdpMLineIndex,
-          createdAt: Date.now()
-        });
+        try {
+          const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
+          await set(candidateRef, {
+            candidate: event.candidate.candidate,
+            sdpMid: event.candidate.sdpMid,
+            sdpMLineIndex: event.candidate.sdpMLineIndex,
+            createdAt: Date.now()
+          });
+        } catch (e) {
+          console.error("Erreur envoi ICE:", e);
+        }
       };
 
       peerConnection.onicecandidateerror = (event) => {
@@ -3079,17 +3106,13 @@
 
         if (state === "checking") {
           callModalStatus.textContent = "Recherche de connexion...";
-        }
-
-        if (state === "connected" || state === "completed") {
+        } else if (state === "connected" || state === "completed") {
           callModalStatus.textContent = "Appel connecté";
-        }
-
-        if (state === "failed" || state === "disconnected") {
+        } else if (state === "failed") {
+          callModalStatus.textContent = "Échec de connexion";
+        } else if (state === "disconnected") {
           callModalStatus.textContent = "Connexion perdue";
-        }
-
-        if (state === "closed") {
+        } else if (state === "closed") {
           callModalStatus.textContent = "Appel terminé";
         }
       };
@@ -3100,20 +3123,26 @@
 
         if (state === "connecting") {
           callModalStatus.textContent = "Connexion à l'appel...";
-        }
-
-        if (state === "connected") {
+        } else if (state === "connected") {
           callModalStatus.textContent = "Appel connecté";
-        }
-
-        if (state === "failed") {
+        } else if (state === "failed") {
           callModalStatus.textContent = "Échec de connexion";
+        } else if (state === "disconnected") {
+          callModalStatus.textContent = "Connexion interrompue";
+        } else if (state === "closed") {
+          callModalStatus.textContent = "Appel terminé";
         }
       };
 
-      localStream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, localStream);
-      });
+      if (localStream) {
+        localStream.getTracks().forEach(track => {
+          try {
+            peerConnection.addTrack(track, localStream);
+          } catch (e) {
+            console.error("Erreur addTrack:", e);
+          }
+        });
+      }
 
       subscribeRemoteCandidates(remoteUid);
       subscribeSessionMeta();
@@ -3521,7 +3550,7 @@
 
       attachmentInput.addEventListener("change", async () => {
         const file = attachmentInput.files[0];
-                if (!file) return;
+        if (!file) return;
 
         if (!areContacts(selectedUserId)) {
           setStatus("Invitation nécessaire avant d’envoyer un fichier.", true);
@@ -3688,6 +3717,11 @@
 
         renderMembers();
         renderForwardMembers();
+
+        if (meetingNavLink) {
+          const userEmail = (currentUser?.email || "").toLowerCase();
+          meetingNavLink.style.display = userEmail === OWNER_EMAIL.toLowerCase() ? "inline-flex" : "none";
+        }
       });
     }
 
@@ -3723,7 +3757,6 @@
         renderMembers();
         renderChatHeader();
         updateComposerState();
-
         if (selectedUserId && areContacts(selectedUserId)) {
           currentChatId = makeChatId(currentUser.uid, selectedUserId);
         }
@@ -3786,6 +3819,11 @@
       myAvatar.innerHTML = avatarMarkup(currentUserProfile);
       myName.textContent = currentUserProfile.displayName || "Utilisateur";
 
+      if (meetingNavLink) {
+        const userEmail = (user.email || "").toLowerCase();
+        meetingNavLink.style.display = userEmail === OWNER_EMAIL.toLowerCase() ? "inline-flex" : "none";
+      }
+
       await setupPresence(user, currentUserProfile.displayName || user.displayName || "Utilisateur");
 
       attachEvents();
@@ -3805,24 +3843,6 @@
       const preselected = params.get("user");
       if (preselected) setTimeout(() => selectConversation(preselected), 300);
     });
-<!-- ton contenu -->
-</script>
-<script type="module">
-  import { auth } from "./firebase-config.js";
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-  const meetingNavLink = document.getElementById("meetingNavLink");
-  const OWNER_EMAIL = "borisamoussou01@gmail.com";
-
-  onAuthStateChanged(auth, (user) => {
-    if (!meetingNavLink) return;
-
-    if (user && (user.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase()) {
-      meetingNavLink.style.display = "inline-flex";
-    } else {
-      meetingNavLink.style.display = "none";
-    }
-  });
-</script>
+  </script>
 </body>
 </html>
