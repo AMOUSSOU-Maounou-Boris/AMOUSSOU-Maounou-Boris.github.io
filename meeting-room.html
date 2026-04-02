@@ -932,6 +932,60 @@
       return params.get("room");
     }
 
+    function showExpiredPage(message = "Lien expiré") {
+      document.title = "Lien expiré | Boris Research Hub";
+
+      document.body.innerHTML = `
+        <div style="
+          min-height:100vh;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          background:#eaf5ff;
+          font-family:Arial, Helvetica, sans-serif;
+          padding:24px;
+        ">
+          <div style="
+            max-width:620px;
+            width:100%;
+            background:#ffffff;
+            border-radius:24px;
+            box-shadow:0 14px 34px rgba(7,31,66,0.10);
+            padding:34px 28px;
+            text-align:center;
+          ">
+            <div style="font-size:54px;margin-bottom:14px;">⏳</div>
+            <h1 style="margin:0 0 10px;color:#082e5b;font-size:30px;">Lien expiré</h1>
+            <p style="margin:0 0 18px;color:#6b7d93;font-size:16px;line-height:1.6;">${escapeHtml(message)}</p>
+            <p style="margin:0 0 24px;color:#6b7d93;font-size:14px;line-height:1.5;">
+              Ce lien de réunion n’est plus valide. Même en rechargeant, cette salle ne sera plus ouverte avec ce lien.
+            </p>
+            <button id="goNeutralPageBtn" style="
+              border:none;
+              background:#0f4d92;
+              color:#fff;
+              padding:14px 18px;
+              border-radius:14px;
+              font-weight:800;
+              cursor:pointer;
+              font-size:15px;
+            ">Aller vers une page neutre</button>
+          </div>
+        </div>
+      `;
+
+      try {
+        history.replaceState({}, "", "meeting-room.html?expired=1");
+      } catch (_) {}
+
+      const btn = document.getElementById("goNeutralPageBtn");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          window.location.replace("messages.html");
+        });
+      }
+    }
+
     function updateVisibilityByRole() {
       if (isOwnerEmail()) {
         meetingNavLink.classList.remove("hidden");
@@ -948,7 +1002,7 @@
       }
 
       waitingRoomPanel.classList.toggle("hidden", !isRoomOwner());
-      muteAllBtn.style.display = isRoomOwner() ? "inline-flex" : "inline-flex";
+      muteAllBtn.style.display = isRoomOwner() ? "inline-flex" : "none";
       closeRoomBtn.style.display = isRoomOwner() ? "inline-flex" : "none";
       joinCurrentRoomBtn.style.display = isRoomOwner() ? "inline-flex" : "none";
     }
@@ -1283,7 +1337,7 @@
         updateVisibilityByRole();
 
         if (!roomMetaCache) {
-          setStatus("Salle introuvable.", true);
+          showExpiredPage("Cette salle n’existe plus ou a été supprimée.");
           return;
         }
 
@@ -1292,13 +1346,19 @@
         if (expired && roomMetaCache.status !== "closed" && isRoomOwner()) {
           await update(ref(db, `meetingRooms/${id}/meta`), {
             status: "closed",
-            updatedAt: Date.now()
+            updatedAt: Date.now(),
+            closedAt: Date.now()
           }).catch(() => {});
         }
 
-        if (roomMetaCache.status === "closed" && joinedRoom) {
-          setStatus("La salle a été fermée.", true);
+        if ((roomMetaCache.status === "closed" || expired) && joinedRoom) {
           await leaveRoom(false);
+          showExpiredPage(
+            roomMetaCache.status === "closed"
+              ? "La salle a été fermée. Ce lien ne permet plus d’y revenir."
+              : "Le temps défini pour cette salle est écoulé. Ce lien n’est plus utilisable."
+          );
+          return;
         }
       });
 
@@ -1360,7 +1420,14 @@
     }
 
     async function loadRoomFromUrl() {
-      const queryRoom = getRoomQueryParam();
+      const params = new URLSearchParams(window.location.search);
+      const expiredFlag = params.get("expired");
+      const queryRoom = params.get("room");
+
+      if (expiredFlag === "1") {
+        showExpiredPage("Ce lien de réunion a déjà expiré ou a été neutralisé.");
+        return;
+      }
 
       if (!queryRoom) {
         if (!isOwnerEmail()) {
@@ -1375,16 +1442,26 @@
 
       try {
         const snap = await get(ref(db, `meetingRooms/${roomId}/meta`));
+
         if (!snap.exists()) {
-          setStatus("Cette salle n'existe pas.", true);
-          roomId = null;
-          if (!isOwnerEmail()) {
-            setTimeout(() => { window.location.href = "messages.html"; }, 1200);
-          }
+          showExpiredPage("Cette salle n’existe plus ou le lien n’est plus valide.");
           return;
         }
 
         roomMetaCache = snap.val();
+
+        const isExpired = Date.now() > (roomMetaCache.expiresAt || 0);
+        const isClosed = roomMetaCache.status === "closed";
+
+        if (isExpired || isClosed) {
+          showExpiredPage(
+            isClosed
+              ? "Cette salle a été fermée par le propriétaire."
+              : "La durée de validité de cette salle est terminée."
+          );
+          return;
+        }
+
         roomLinkBox.style.display = "block";
         roomLinkBox.textContent = makeRoomLink(roomId);
         copyRoomLinkBtn.style.display = isOwnerEmail() ? "inline-flex" : "none";
@@ -1400,7 +1477,7 @@
         setStatus("Salle chargée.");
       } catch (e) {
         console.error(e);
-        setStatus("Impossible de charger la salle.", true);
+        showExpiredPage("Impossible de charger cette salle. Le lien peut être devenu invalide.");
       }
     }
 
@@ -1575,12 +1652,12 @@
       }
 
       if (roomMetaCache.status === "closed") {
-        setStatus("Cette salle est fermée.", true);
+        showExpiredPage("Cette salle est fermée.");
         return;
       }
 
       if (Date.now() > (roomMetaCache.expiresAt || 0)) {
-        setStatus("Cette salle a expiré.", true);
+        showExpiredPage("Cette salle a expiré.");
         return;
       }
 
@@ -1831,7 +1908,8 @@
           updatedAt:Date.now(),
           closedAt:Date.now()
         });
-        setStatus("Salle fermée.");
+        await leaveRoom(false);
+        showExpiredPage("La salle a été fermée. Ce lien ne permet plus d’ouvrir la réunion.");
       } catch (e) {
         console.error(e);
         setStatus("Impossible de fermer la salle.", true);
