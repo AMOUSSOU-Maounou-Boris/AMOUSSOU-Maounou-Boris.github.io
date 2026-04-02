@@ -950,6 +950,7 @@
     const resetRequestsList = document.getElementById("resetRequestsList");
     const meetingNavLink = document.getElementById("meetingNavLink");
     const profileNavLink = document.getElementById("profileNavLink");
+    const mainNav = document.getElementById("mainNav");
 
     const roomTitleInput = document.getElementById("roomTitleInput");
     const roomExpiryInput = document.getElementById("roomExpiryInput");
@@ -1018,7 +1019,7 @@
     let isScreenSharing = false;
 
     let guestMode = "login";
-    let currentGuestAccess = null;
+    let currentGuestAccess = null; // { guestKey, email, displayName }
     let guestInitialized = false;
 
     const peerConnections = new Map();
@@ -1222,43 +1223,31 @@
       setGuestInlineStatus("");
     }
 
-    async function refreshForgotResetBox() {
+    function refreshForgotResetBox() {
       if (guestMode !== "forgot") {
         forgotResetBox.classList.add("hidden");
         return;
       }
 
       const email = normalizeEmail(guestEmailInput.value);
-      if (!email || !roomId) {
-        forgotResetBox.classList.add("hidden");
-        return;
-      }
+      const key = email ? guestEmailToKey(email) : "";
+      const account = key ? guestAccountsCache[key] : null;
+      const canReset = !!(account && account.allowPasswordReset);
 
-      const guestKey = guestEmailToKey(email);
-
-      try {
-        const snap = await get(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`));
-        const req = snap.val();
-        const canReset = !!req?.approved;
-        forgotResetBox.classList.toggle("hidden", !canReset);
-      } catch (_) {
-        forgotResetBox.classList.add("hidden");
-      }
+      forgotResetBox.classList.toggle("hidden", !canReset);
     }
 
     function applyNavForGuest() {
-      const hideSelectors = ['a[data-nav="site"]', 'a[data-nav="public"]'];
-      hideSelectors.forEach(sel => {
-        document.querySelectorAll(sel).forEach(a => a.classList.add("hidden"));
+      document.querySelectorAll('#mainNav a[data-nav="site"], #mainNav a[data-nav="public"]').forEach(a => {
+        a.classList.add("hidden");
       });
       if (profileNavLink) profileNavLink.classList.add("hidden");
       meetingNavLink.classList.remove("hidden");
     }
 
     function applyNavForOwner() {
-      const showSelectors = ['a[data-nav="site"]', 'a[data-nav="public"]'];
-      showSelectors.forEach(sel => {
-        document.querySelectorAll(sel).forEach(a => a.classList.remove("hidden"));
+      document.querySelectorAll('#mainNav a[data-nav="site"], #mainNav a[data-nav="public"]').forEach(a => {
+        a.classList.remove("hidden");
       });
       if (profileNavLink) profileNavLink.classList.remove("hidden");
       meetingNavLink.classList.remove("hidden");
@@ -1437,6 +1426,8 @@
         return;
       }
 
+      entries.sort((a, b) => (a[1]?.createdAt || 0) - (b[1]?.createdAt || 0));
+
       requestsList.innerHTML = entries.map(([uid, r]) => `
         <div class="request-card">
           <div class="avatar small">${avatarMarkup({displayName:r.displayName,email:r.email,photoURL:r.photoURL})}</div>
@@ -1467,16 +1458,19 @@
         return;
       }
 
-      guestAccountsList.innerHTML = entries.map(([guestKey, acc]) => `
-        <div class="guest-account-card">
-          <div class="avatar small">${avatarMarkup({displayName:acc.displayName,email:acc.email})}</div>
-          <div class="guest-account-main">
-            <div class="guest-account-name">${escapeHtml(acc.displayName || acc.email || "Invité")}</div>
-            <div class="guest-account-sub">${escapeHtml(acc.email || "")}</div>
+      guestAccountsList.innerHTML = entries
+        .sort((a, b) => (b[1]?.updatedAt || 0) - (a[1]?.updatedAt || 0))
+        .map(([guestKey, acc]) => `
+          <div class="guest-account-card">
+            <div class="avatar small">${avatarMarkup({displayName:acc.displayName,email:acc.email})}</div>
+            <div class="guest-account-main">
+              <div class="guest-account-name">${escapeHtml(acc.displayName || acc.email || "Invité")}</div>
+              <div class="guest-account-sub">${escapeHtml(acc.email || "")}</div>
+            </div>
+            ${acc.allowPasswordReset ? `<span class="share-pill">Reset OK</span>` : ``}
+            <button class="mini-btn danger" type="button" data-delete-guest="${guestKey}">Supprimer</button>
           </div>
-          <button class="mini-btn danger" type="button" data-delete-guest="${guestKey}">Supprimer</button>
-        </div>
-      `).join("");
+        `).join("");
 
       document.querySelectorAll("[data-delete-guest]").forEach(btn => {
         btn.addEventListener("click", () => deleteGuestAccount(btn.dataset.deleteGuest));
@@ -1492,17 +1486,19 @@
         return;
       }
 
-      resetRequestsList.innerHTML = entries.map(([guestKey, req]) => `
-        <div class="reset-request-card">
-          <div class="avatar small">${avatarMarkup({displayName:req.displayName,email:req.email})}</div>
-          <div class="reset-request-main">
-            <div class="reset-request-name">${escapeHtml(req.displayName || req.email || "Invité")}</div>
-            <div class="reset-request-sub">${escapeHtml(req.email || "")}</div>
+      resetRequestsList.innerHTML = entries
+        .sort((a, b) => (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0))
+        .map(([guestKey, req]) => `
+          <div class="reset-request-card">
+            <div class="avatar small">${avatarMarkup({displayName:req.displayName,email:req.email})}</div>
+            <div class="reset-request-main">
+              <div class="reset-request-name">${escapeHtml(req.displayName || req.email || "Invité")}</div>
+              <div class="reset-request-sub">${escapeHtml(req.email || "")}</div>
+            </div>
+            <button class="mini-btn" type="button" data-approve-reset="${guestKey}">Autoriser</button>
+            <button class="mini-btn danger" type="button" data-reject-reset="${guestKey}">Refuser</button>
           </div>
-          <button class="mini-btn" type="button" data-approve-reset="${guestKey}">Autoriser</button>
-          <button class="mini-btn danger" type="button" data-reject-reset="${guestKey}">Refuser</button>
-        </div>
-      `).join("");
+        `).join("");
 
       document.querySelectorAll("[data-approve-reset]").forEach(btn => {
         btn.addEventListener("click", () => approvePasswordReset(btn.dataset.approveReset));
@@ -1562,7 +1558,8 @@
       `);
 
       const entries = Object.entries(participantsCache || {})
-        .filter(([uid]) => uid !== currentParticipantId());
+        .filter(([uid]) => uid !== currentParticipantId())
+        .sort((a, b) => (a[1]?.joinedAt || 0) - (b[1]?.joinedAt || 0));
 
       entries.forEach(([uid, p]) => {
         const stream = remoteStreams.get(uid);
@@ -1643,6 +1640,12 @@
           myAvatar.innerHTML = avatarMarkup(currentUserProfile);
           myName.textContent = currentUserProfile?.displayName || "Utilisateur";
         }
+        renderParticipants();
+        renderRequests();
+        renderGuestAccounts();
+        renderResetRequests();
+        renderRoomMeta();
+        renderVideoGrid();
       });
     }
 
@@ -1715,6 +1718,8 @@
     function subscribeRoom(id) {
       onValue(ref(db, `meetingRooms/${id}/meta`), async snap => {
         roomMetaCache = snap.val() || null;
+        renderRoomMeta();
+        updateVisibilityByRole();
 
         if (!roomMetaCache) {
           showExpiredPage("Cette salle n’existe plus ou a été supprimée.");
@@ -1731,8 +1736,8 @@
           }).catch(() => {});
         }
 
-        if (roomMetaCache.status === "closed" || expired) {
-          if (joinedRoom) await leaveRoom(false);
+        if ((roomMetaCache.status === "closed" || expired) && joinedRoom) {
+          await leaveRoom(false);
           showExpiredPage(
             roomMetaCache.status === "closed"
               ? "La salle a été fermée. Ce lien ne permet plus d’y revenir."
@@ -1741,8 +1746,6 @@
           return;
         }
 
-        renderRoomMeta();
-        updateVisibilityByRole();
         refreshForgotResetBox();
       });
 
@@ -1782,17 +1785,15 @@
         renderRequests();
       });
 
-      if (isOwnerEmail()) {
-        onValue(ref(db, `meetingRooms/${id}/guestAccountsPublic`), snap => {
-          guestAccountsCache = snap.val() || {};
-          renderGuestAccounts();
-        });
-      }
+      onValue(ref(db, `meetingRooms/${id}/guestAccounts`), snap => {
+        guestAccountsCache = snap.val() || {};
+        renderGuestAccounts();
+        refreshForgotResetBox();
+      });
 
       onValue(ref(db, `meetingRooms/${id}/guestResetRequests`), snap => {
         resetRequestsCache = snap.val() || {};
         renderResetRequests();
-        refreshForgotResetBox();
       });
 
       onValue(ref(db, `meetingRooms/${id}/chat`), snap => {
@@ -1871,9 +1872,6 @@
         const session = readGuestSession();
         if (session && !isOwnerEmail()) {
           currentGuestAccess = session;
-          myAvatar.innerHTML = avatarMarkup({ displayName: session.displayName, email: session.email });
-          myName.textContent = session.displayName;
-          hideGuestGate();
         }
 
         subscribeRoom(roomId);
@@ -1883,6 +1881,7 @@
         if (!isOwnerEmail()) {
           meetingNavLink.classList.remove("hidden");
           if (!currentGuestAccess) showGuestGate();
+          else hideGuestGate();
         }
 
         setStatus("Salle chargée.");
@@ -2124,6 +2123,7 @@
         });
 
         await onDisconnect(participantRef).remove();
+
         await remove(ref(db, `meetingRooms/${roomId}/joinRequests/${currentParticipantId()}`)).catch(() => {});
         await set(ref(db, `meetingRooms/${roomId}/approved/${currentParticipantId()}`), true).catch(() => {});
 
@@ -2399,8 +2399,8 @@
       }
 
       const guestKey = guestEmailToKey(email);
-      const secureRef = ref(db, `meetingRooms/${roomId}/guestAccountsSecure/${guestKey}`);
-      const existing = await get(secureRef);
+      const accountRef = ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`);
+      const existing = await get(accountRef);
 
       if (existing.exists()) {
         setGuestInlineStatus("Cet email possède déjà un accès réunion. Utilise “Se connecter”.", true);
@@ -2413,7 +2413,7 @@
       const salt = randomSalt();
       const passwordHash = await buildPasswordHash(password, salt);
 
-      await set(secureRef, {
+      const payload = {
         guestKey,
         email,
         displayName,
@@ -2421,16 +2421,11 @@
         passwordHash,
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        lastLoginAt: Date.now()
-      });
+        lastLoginAt: Date.now(),
+        allowPasswordReset: false
+      };
 
-      await set(ref(db, `meetingRooms/${roomId}/guestAccountsPublic/${guestKey}`), {
-        guestKey,
-        email,
-        displayName,
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      });
+      await set(accountRef, payload);
 
       currentGuestAccess = {
         guestKey,
@@ -2463,7 +2458,7 @@
       }
 
       const guestKey = guestEmailToKey(email);
-      const accountSnap = await get(ref(db, `meetingRooms/${roomId}/guestAccountsSecure/${guestKey}`));
+      const accountSnap = await get(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`));
 
       if (!accountSnap.exists()) {
         setGuestInlineStatus("Aucun accès réunion trouvé pour cet email.", true);
@@ -2484,12 +2479,7 @@
         displayName: account.displayName || account.email
       };
 
-      await update(ref(db, `meetingRooms/${roomId}/guestAccountsSecure/${guestKey}`), {
-        lastLoginAt: Date.now(),
-        updatedAt: Date.now()
-      }).catch(() => {});
-
-      await update(ref(db, `meetingRooms/${roomId}/guestAccountsPublic/${guestKey}`), {
+      await update(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`), {
         lastLoginAt: Date.now(),
         updatedAt: Date.now()
       }).catch(() => {});
@@ -2517,18 +2507,16 @@
       }
 
       const guestKey = guestEmailToKey(email);
+      const accountSnap = await get(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`));
 
-      const publicSnap = await get(ref(db, `meetingRooms/${roomId}/guestAccountsPublic/${guestKey}`));
-      if (!publicSnap.exists()) {
+      if (!accountSnap.exists()) {
         setGuestInlineStatus("Aucun accès réunion trouvé pour cet email.", true);
         return;
       }
 
-      const reqRef = ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`);
-      const reqSnap = await get(reqRef);
-      const req = reqSnap.val();
+      const account = accountSnap.val();
 
-      if (req?.approved) {
+      if (account.allowPasswordReset) {
         const newPassword = guestPasswordResetInput.value;
         const confirm = guestPasswordResetConfirmInput.value;
 
@@ -2544,13 +2532,14 @@
         const salt = randomSalt();
         const passwordHash = await buildPasswordHash(newPassword, salt);
 
-        await update(ref(db, `meetingRooms/${roomId}/guestAccountsSecure/${guestKey}`), {
+        await update(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`), {
           salt,
           passwordHash,
-          updatedAt: Date.now()
+          updatedAt: Date.now(),
+          allowPasswordReset: false
         });
 
-        await remove(reqRef).catch(() => {});
+        await remove(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`)).catch(() => {});
 
         setGuestInlineStatus("Mot de passe réinitialisé. Tu peux te connecter.", false);
         setGuestMode("login");
@@ -2559,14 +2548,11 @@
         return;
       }
 
-      const publicData = publicSnap.val();
-
-      await set(reqRef, {
+      await set(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`), {
         guestKey,
-        email: publicData.email,
-        displayName: publicData.displayName || publicData.email,
-        createdAt: Date.now(),
-        approved: false
+        email: account.email,
+        displayName: account.displayName || account.email,
+        createdAt: Date.now()
       });
 
       setGuestInlineStatus("Demande envoyée au propriétaire. Reviens ici après son autorisation.", false);
@@ -2575,16 +2561,11 @@
 
     async function approvePasswordReset(guestKey) {
       if (!isOwnerEmail() || !roomId || !guestKey) return;
-      const reqRef = ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`);
-      const reqSnap = await get(reqRef);
-      if (!reqSnap.exists()) return;
-
-      const req = reqSnap.val();
-      await set(reqRef, {
-        ...req,
-        approved: true,
-        approvedAt: Date.now()
-      });
+      await update(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`), {
+        allowPasswordReset: true,
+        updatedAt: Date.now()
+      }).catch(() => {});
+      await remove(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`)).catch(() => {});
       setStatus("Réinitialisation autorisée.");
     }
 
@@ -2596,8 +2577,7 @@
 
     async function deleteGuestAccount(guestKey) {
       if (!isOwnerEmail() || !roomId || !guestKey) return;
-      await remove(ref(db, `meetingRooms/${roomId}/guestAccountsSecure/${guestKey}`)).catch(() => {});
-      await remove(ref(db, `meetingRooms/${roomId}/guestAccountsPublic/${guestKey}`)).catch(() => {});
+      await remove(ref(db, `meetingRooms/${roomId}/guestAccounts/${guestKey}`)).catch(() => {});
       await remove(ref(db, `meetingRooms/${roomId}/guestResetRequests/${guestKey}`)).catch(() => {});
       const participantId = `guest__${guestKey}`;
       await remove(ref(db, `meetingRooms/${roomId}/participants/${participantId}`)).catch(() => {});
@@ -2610,7 +2590,7 @@
       modeRegisterBtn.addEventListener("click", () => setGuestMode("register"));
       modeForgotBtn.addEventListener("click", () => setGuestMode("forgot"));
 
-      guestEmailInput.addEventListener("input", () => refreshForgotResetBox());
+      guestEmailInput.addEventListener("input", refreshForgotResetBox);
 
       guestSubmitBtn.addEventListener("click", async () => {
         try {
@@ -2632,6 +2612,15 @@
         console.error(e);
         setStatus("Impossible d'initialiser l'accès invité.", true);
       }
+    }
+
+    function restoreGuestIdentityIfSessionExists() {
+      const session = readGuestSession();
+      if (!session) return;
+      currentGuestAccess = session;
+      myAvatar.innerHTML = avatarMarkup({ displayName: session.displayName, email: session.email });
+      myName.textContent = session.displayName;
+      hideGuestGate();
     }
 
     function attachEvents() {
@@ -2696,22 +2685,14 @@
         hideGuestGate();
       } else {
         applyNavForGuest();
-
-        const session = readGuestSession();
-        if (session) {
-          currentGuestAccess = session;
-          myAvatar.innerHTML = avatarMarkup({ displayName: session.displayName, email: session.email });
-          myName.textContent = session.displayName;
-          hideGuestGate();
+        if (!guestInitialized) {
+          restoreGuestIdentityIfSessionExists();
         }
 
         if (roomInUrl && !currentGuestAccess) {
           const rememberedEmail = readRememberedGuestEmail();
           if (rememberedEmail) guestEmailInput.value = rememberedEmail;
           showGuestGate();
-        } else {
-          myAvatar.innerHTML = "IN";
-          myName.textContent = currentGuestAccess?.displayName || "Invité réunion";
         }
       }
 
