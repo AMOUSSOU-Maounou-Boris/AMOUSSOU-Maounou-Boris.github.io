@@ -1942,11 +1942,18 @@
     });
 
     onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        currentUser = null;
-        currentUserData = null;
-        setUIConnected(false);
-        showView("login");
+      if (isAdminEmail(user.email || "")) {
+        await ensureAdminProfile(user);
+        currentUser = user;
+        await loadCurrentUserData();
+        setUIConnected(true);
+        bindActivityEvents();
+        resetInactivityTimer();
+        await updatePresenceOnline();
+        listenUsers();
+        listenPosts();
+        listenLikes();
+        listenComments();
         parseInviteToken();
         return;
       }
