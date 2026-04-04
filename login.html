@@ -2,118 +2,111 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Connexion</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    * { box-sizing: border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #07294d, #0b3f76);
-      padding: 20px;
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#07294d,#0b3f76);
+      padding:20px;
     }
 
-    .card {
-      width: 100%;
-      max-width: 500px;
-      background: #fff;
-      border-radius: 22px;
-      padding: 28px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    .card{
+      width:100%;
+      max-width:520px;
+      background:#fff;
+      border-radius:24px;
+      padding:28px;
+      box-shadow:0 20px 50px rgba(0,0,0,0.2);
     }
 
-    h1 {
-      font-size: 32px;
-      color: #082c53;
-      margin-bottom: 10px;
+    h1{
+      font-size:32px;
+      color:#082c53;
+      margin-bottom:10px;
+      text-align:center;
     }
 
-    .sub {
-      color: #5e738b;
-      margin-bottom: 22px;
-      line-height: 1.5;
+    .sub{
+      color:#5e738b;
+      margin-bottom:18px;
+      line-height:1.5;
+      text-align:center;
     }
 
-    .field { margin-bottom: 14px; }
+    .field{ margin-bottom:14px; }
 
-    .field label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 700;
-      color: #0b2f57;
+    .field label{
+      display:block;
+      margin-bottom:6px;
+      font-weight:700;
+      color:#0b2f57;
     }
 
-    .field input {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1px solid #d6e0ea;
-      border-radius: 14px;
-      outline: none;
-      font-size: 15px;
+    .field input{
+      width:100%;
+      padding:13px;
+      border:1px solid #d6e0ea;
+      border-radius:14px;
+      outline:none;
+      font-size:15px;
     }
 
-    .field input:focus {
-      border-color: #7fb5ff;
-      box-shadow: 0 0 0 3px rgba(47,140,255,0.12);
+    .field input:focus{
+      border-color:#7fb5ff;
+      box-shadow:0 0 0 3px rgba(47,140,255,0.12);
     }
 
-    .btn {
-      width: 100%;
-      border: none;
-      border-radius: 14px;
-      padding: 14px;
-      font-weight: 800;
-      font-size: 15px;
-      cursor: pointer;
-      margin-top: 8px;
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      font-weight:800;
+      cursor:pointer;
+      margin-top:8px;
+      font-size:15px;
     }
 
-    .btn-primary {
-      background: #0c3d73;
-      color: #fff;
+    .btn-primary{
+      background:#0c3d73;
+      color:#fff;
     }
 
-    .btn-secondary {
-      background: #eef4fb;
-      color: #0b2f57;
+    .btn-secondary{
+      background:#eef4fb;
+      color:#0b2f57;
     }
 
-    .msg {
-      margin-top: 14px;
-      min-height: 24px;
-      font-size: 14px;
-      text-align: center;
-      color: #b42318;
-      line-height: 1.5;
-      white-space: pre-wrap;
-      word-break: break-word;
+    .msg{
+      margin-top:14px;
+      text-align:center;
+      font-size:14px;
+      color:#b42318;
+      line-height:1.5;
+      min-height:24px;
+      white-space:pre-wrap;
+      word-break:break-word;
     }
 
-    .msg.success { color: #15803d; }
+    .msg.success{ color:#15803d; }
 
-    .links {
-      text-align: center;
-      margin-top: 16px;
-      color: #4e6278;
-      font-size: 14px;
-      line-height: 1.6;
+    .links{
+      text-align:center;
+      margin-top:16px;
+      font-size:14px;
+      line-height:1.6;
     }
 
-    .links a {
-      color: #0c3d73;
-      text-decoration: none;
-      font-weight: 700;
-    }
-
-    .small-note {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #5e738b;
-      text-align: center;
-      line-height: 1.5;
+    .links a{
+      color:#0c3d73;
+      font-weight:700;
+      text-decoration:none;
     }
   </style>
 </head>
@@ -133,16 +126,12 @@
     </div>
 
     <button class="btn btn-primary" id="loginBtn">Se connecter</button>
-    <button class="btn btn-secondary" id="forgotBtn">Mot de passe oublié</button>
+    <button class="btn btn-secondary" id="forgotBtn">Mot de passe oublié ?</button>
 
     <div class="msg" id="messageBox"></div>
 
     <div class="links">
       Première visite avec invitation ? <a href="signup.html">Créer un compte</a>
-    </div>
-
-    <div class="small-note">
-      Le compte <strong>borisamoussou01@gmail.com</strong> est administrateur et peut entrer librement.
     </div>
   </div>
 
@@ -178,6 +167,13 @@
       return String(mail).trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
     }
 
+    function goToInsights() {
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+      setTimeout(() => {
+        window.location.replace("./insights.html");
+      }, 600);
+    }
+
     async function ensureAdminProfile(user) {
       const userRef = ref(db, "users/" + user.uid);
       const snap = await get(userRef);
@@ -209,30 +205,23 @@
 
       if (!snap.exists()) {
         await set(userRef, baseData);
-        return baseData;
+        return;
       }
 
       const existing = snap.val() || {};
-      const merged = {
+      await set(userRef, {
+        ...baseData,
         ...existing,
         uid: user.uid,
-        displayName: existing.displayName || baseData.displayName,
         email: user.email || ADMIN_EMAIL,
-        photoURL: existing.photoURL || "",
-        bio: existing.bio || "",
-        updatedAt: Date.now(),
         role: "admin",
         accountStatus: "approved",
         approvedBy: ADMIN_EMAIL,
         approvedAt: existing.approvedAt || Date.now(),
         rejectedAt: 0,
         emailVerifiedAtSignup: true,
-        privacy: existing.privacy || baseData.privacy,
-        presence: existing.presence || baseData.presence
-      };
-
-      await set(userRef, merged);
-      return merged;
+        updatedAt: Date.now()
+      });
     }
 
     async function loginUser() {
@@ -251,19 +240,14 @@
       try {
         const cred = await signInWithEmailAndPassword(auth, mail, pass);
         const user = cred.user;
-
         await reload(user);
 
         if (isAdminEmail(user.email || mail)) {
           await ensureAdminProfile(user);
-          localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
           showMessage("Connexion administrateur réussie.", true);
-
-          setTimeout(() => {
-          window.location.replace("./insights.html");
-          }, 600);
-
+          goToInsights();
           return;
+        }
 
         if (!user.emailVerified) {
           showMessage("Vérifie d’abord ton adresse e-mail avant de te connecter.");
@@ -286,14 +270,9 @@
             updatedAt: Date.now(),
             emailVerifiedAtSignup: true
           });
-          localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
           showMessage("Connexion réussie.", true);
-
-          setTimeout(() => {
-          window.location.replace("./insights.html");
-          }, 600);
-
-          return;;
+          goToInsights();
+          return;
         }
 
         if (status === "rejected") {
@@ -308,12 +287,13 @@
             status: "pending_admin_approval"
           });
         } catch (e) {
-          console.error("accountApprovals update error:", e);
+          console.error(e);
         }
 
         showMessage("Ton compte est encore en attente d’approbation.");
       } catch (error) {
         console.error("LOGIN ERROR:", error);
+
         if (
           error.code === "auth/invalid-credential" ||
           error.code === "auth/wrong-password" ||
@@ -349,7 +329,7 @@
         await sendPasswordResetEmail(auth, mail);
         showMessage("Lien de réinitialisation envoyé par e-mail.", true);
       } catch (error) {
-        console.error("RESET ERROR:", error);
+        console.error(error);
         if (error.code === "auth/invalid-email") {
           showMessage("Adresse e-mail invalide.");
         } else {
