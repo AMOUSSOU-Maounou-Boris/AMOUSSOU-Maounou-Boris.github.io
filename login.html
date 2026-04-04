@@ -88,6 +88,8 @@
       text-align: center;
       color: #b42318;
       line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
     .msg.success { color: #15803d; }
@@ -149,7 +151,6 @@
     import {
       signInWithEmailAndPassword,
       sendPasswordResetEmail,
-      onAuthStateChanged,
       signOut,
       reload
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -157,18 +158,18 @@
     import {
       ref,
       get,
+      set,
       update
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+    const LAST_ACTIVITY_KEY = "insights_last_activity";
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
     const loginBtn = document.getElementById("loginBtn");
     const forgotBtn = document.getElementById("forgotBtn");
     const messageBox = document.getElementById("messageBox");
-
-    const LAST_ACTIVITY_KEY = "insights_last_activity";
-    const INACTIVITY_LIMIT = 15 * 60 * 1000;
-    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
 
     function showMessage(text, ok = false) {
       messageBox.textContent = text;
@@ -179,20 +180,66 @@
       return String(mail).trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
     }
 
-    async function redirectApprovedUser(userData = {}) {
-      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+    async function ensureAdminProfile(user) {
+      const userRef = ref(db, "users/" + user.uid);
+      const snap = await get(userRef);
 
-      if ((userData.role || "") === "admin" || isAdminEmail(userData.email || auth.currentUser?.email || "")) {
-        window.location.href = "insights.html";
-        return;
+      const baseData = {
+        uid: user.uid,
+        displayName: user.displayName || "Maounou Boris AMOUSSOU",
+        email: user.email || ADMIN_EMAIL,
+        photoURL: user.photoURL || "",
+        bio: "",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        role: "admin",
+        accountStatus: "approved",
+        approvedBy: ADMIN_EMAIL,
+        approvedAt: Date.now(),
+        rejectedAt: 0,
+        emailVerifiedAtSignup: true,
+        privacy: {
+          hideEmail: true,
+          hideBio: false,
+          hidePresence: false
+        },
+        presence: {
+          online: false,
+          lastSeen: Date.now()
+        }
+      };
+
+      if (!snap.exists()) {
+        await set(userRef, baseData);
+        return baseData;
       }
 
-      window.location.href = "insights.html";
+      const existing = snap.val() || {};
+      const merged = {
+        ...existing,
+        uid: user.uid,
+        displayName: existing.displayName || baseData.displayName,
+        email: user.email || ADMIN_EMAIL,
+        photoURL: existing.photoURL || baseData.photoURL,
+        bio: existing.bio || "",
+        updatedAt: Date.now(),
+        role: "admin",
+        accountStatus: "approved",
+        approvedBy: ADMIN_EMAIL,
+        approvedAt: existing.approvedAt || Date.now(),
+        rejectedAt: 0,
+        emailVerifiedAtSignup: true,
+        privacy: existing.privacy || baseData.privacy,
+        presence: existing.presence || baseData.presence
+      };
+
+      await set(userRef, merged);
+      return merged;
     }
 
     async function loginUser() {
-      const mail = email.value.trim().toLowerCase();
-      const pass = password.value;
+      const mail = emailInput.value.trim().toLowerCase();
+      const pass = passwordInput.value;
 
       if (!mail || !pass) {
         showMessage("Remplis ton e-mail et ton mot de passe.");
@@ -206,16 +253,21 @@
       try {
         const cred = await signInWithEmailAndPassword(auth, mail, pass);
         const user = cred.user;
-
         await reload(user);
 
         const adminLogin = isAdminEmail(user.email || mail);
 
-        if (!adminLogin && !user.emailVerified) {
-          try { await signOut(auth); } catch (e) {}
+        if (adminLogin) {
+          await ensureAdminProfile(user);
+          localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+          showMessage("Connexion administrateur réussie.", true);
+          window.location.href = "insights.html";
+          return;
+        }
+
+        if (!user.emailVerified) {
+          await signOut(auth);
           showMessage("Vérifie d’abord ton adresse e-mail avant de te connecter.");
-          loginBtn.disabled = false;
-          forgotBtn.disabled = false;
           return;
         }
 
@@ -223,67 +275,13 @@
         const userSnap = await get(userRef);
 
         if (!userSnap.exists()) {
-          if (adminLogin) {
-            await update(userRef, {
-              uid: user.uid,
-              displayName: user.displayName || "Administrateur",
-              email: user.email || ADMIN_EMAIL,
-              photoURL: user.photoURL || "",
-              bio: "",
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-              accountStatus: "approved",
-              emailVerifiedAtSignup: true,
-              approvedBy: ADMIN_EMAIL,
-              approvedAt: Date.now(),
-              rejectedAt: 0,
-              role: "admin",
-              privacy: {
-                hideEmail: true,
-                hideBio: false,
-                hidePresence: false
-              }
-            });
-
-            showMessage("Connexion administrateur réussie.", true);
-            await redirectApprovedUser({
-              role: "admin",
-              email: user.email || ADMIN_EMAIL
-            });
-            return;
-          }
-
-          try { await signOut(auth); } catch (e) {}
+          await signOut(auth);
           showMessage("Compte introuvable dans la base de données.");
-          loginBtn.disabled = false;
-          forgotBtn.disabled = false;
           return;
         }
 
         const userData = userSnap.val() || {};
         const accountStatus = userData.accountStatus || "pending_admin_approval";
-
-        if (adminLogin) {
-          await update(userRef, {
-            email: user.email || ADMIN_EMAIL,
-            displayName: userData.displayName || user.displayName || "Administrateur",
-            updatedAt: Date.now(),
-            accountStatus: "approved",
-            emailVerifiedAtSignup: true,
-            approvedBy: ADMIN_EMAIL,
-            approvedAt: userData.approvedAt || Date.now(),
-            rejectedAt: 0,
-            role: "admin"
-          });
-
-          showMessage("Connexion administrateur réussie.", true);
-          await redirectApprovedUser({
-            ...userData,
-            role: "admin",
-            email: user.email || ADMIN_EMAIL
-          });
-          return;
-        }
 
         if (accountStatus === "approved") {
           await update(userRef, {
@@ -291,16 +289,15 @@
             updatedAt: Date.now()
           });
 
+          localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
           showMessage("Connexion réussie.", true);
-          await redirectApprovedUser(userData);
+          window.location.href = "insights.html";
           return;
         }
 
         if (accountStatus === "rejected") {
-          try { await signOut(auth); } catch (e) {}
+          await signOut(auth);
           showMessage("Ton compte a été refusé par l’administrateur.");
-          loginBtn.disabled = false;
-          forgotBtn.disabled = false;
           return;
         }
 
@@ -316,16 +313,13 @@
             status: "pending_admin_approval"
           });
         } catch (e) {
-          console.error(e);
+          console.error("accountApprovals update error:", e);
         }
 
-        try { await signOut(auth); } catch (e) {}
-        showMessage("Ton e-mail est vérifié, mais ton compte est encore en attente d’approbation par l’administrateur.");
-        loginBtn.disabled = false;
-        forgotBtn.disabled = false;
-
+        await signOut(auth);
+        showMessage("Ton e-mail est vérifié, mais ton compte est encore en attente d’approbation.");
       } catch (error) {
-        console.error(error);
+        console.error("LOGIN ERROR:", error);
 
         if (
           error.code === "auth/invalid-credential" ||
@@ -338,16 +332,16 @@
         } else if (error.code === "auth/too-many-requests") {
           showMessage("Trop de tentatives. Réessaie plus tard.");
         } else {
-          showMessage("Connexion impossible pour le moment.");
+          showMessage(`Erreur réelle : ${error.code || "inconnue"}\n${error.message || ""}`);
         }
-
+      } finally {
         loginBtn.disabled = false;
         forgotBtn.disabled = false;
       }
     }
 
     async function forgotPassword() {
-      const mail = email.value.trim().toLowerCase();
+      const mail = emailInput.value.trim().toLowerCase();
 
       if (!mail) {
         showMessage("Entre d’abord ton adresse e-mail.");
@@ -362,113 +356,26 @@
         await sendPasswordResetEmail(auth, mail);
         showMessage("Lien de réinitialisation envoyé par e-mail.", true);
       } catch (error) {
-        console.error(error);
+        console.error("RESET ERROR:", error);
 
         if (error.code === "auth/invalid-email") {
           showMessage("Adresse e-mail invalide.");
         } else {
-          showMessage("Impossible d’envoyer le lien de réinitialisation.");
+          showMessage(`Erreur réelle : ${error.code || "inconnue"}\n${error.message || ""}`);
         }
+      } finally {
+        forgotBtn.disabled = false;
+        loginBtn.disabled = false;
       }
-
-      forgotBtn.disabled = false;
-      loginBtn.disabled = false;
     }
 
     loginBtn.addEventListener("click", loginUser);
     forgotBtn.addEventListener("click", forgotPassword);
 
-    [email, password].forEach(input => {
+    [emailInput, passwordInput].forEach(input => {
       input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") loginUser();
       });
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return;
-
-      try {
-        await reload(user);
-
-        const adminLogin = isAdminEmail(user.email || "");
-        if (!adminLogin && !user.emailVerified) {
-          try { await signOut(auth); } catch (e) {}
-          return;
-        }
-
-        const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
-        if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
-          try { await signOut(auth); } catch (e) {}
-          return;
-        }
-
-        const userSnap = await get(ref(db, "users/" + user.uid));
-
-        if (!userSnap.exists()) {
-          if (adminLogin) {
-            await update(ref(db, "users/" + user.uid), {
-              uid: user.uid,
-              displayName: user.displayName || "Administrateur",
-              email: user.email || ADMIN_EMAIL,
-              photoURL: user.photoURL || "",
-              bio: "",
-              createdAt: Date.now(),
-              updatedAt: Date.now(),
-              accountStatus: "approved",
-              emailVerifiedAtSignup: true,
-              approvedBy: ADMIN_EMAIL,
-              approvedAt: Date.now(),
-              rejectedAt: 0,
-              role: "admin",
-              privacy: {
-                hideEmail: true,
-                hideBio: false,
-                hidePresence: false
-              }
-            });
-
-            await redirectApprovedUser({
-              role: "admin",
-              email: user.email || ADMIN_EMAIL
-            });
-            return;
-          }
-
-          try { await signOut(auth); } catch (e) {}
-          return;
-        }
-
-        const userData = userSnap.val() || {};
-
-        if (adminLogin) {
-          await update(ref(db, "users/" + user.uid), {
-            updatedAt: Date.now(),
-            accountStatus: "approved",
-            emailVerifiedAtSignup: true,
-            approvedBy: ADMIN_EMAIL,
-            approvedAt: userData.approvedAt || Date.now(),
-            rejectedAt: 0,
-            role: "admin"
-          });
-
-          await redirectApprovedUser({
-            ...userData,
-            role: "admin",
-            email: user.email || ADMIN_EMAIL
-          });
-          return;
-        }
-
-        if ((userData.accountStatus || "") === "approved") {
-          await redirectApprovedUser(userData);
-          return;
-        }
-
-        try { await signOut(auth); } catch (e) {}
-      } catch (e) {
-        console.error(e);
-        try { await signOut(auth); } catch (err) {}
-      }
     });
   </script>
 </body>
