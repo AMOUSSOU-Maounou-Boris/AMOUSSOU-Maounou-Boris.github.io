@@ -935,7 +935,7 @@
 
       <div id="signupView" class="hidden">
         <h2 class="auth-title">Créer un compte</h2>
-        <p class="auth-subtitle">Création réservée aux personnes disposant d’un lien d’invitation valide.</p>
+        <p class="auth-subtitle">Création réservée aux personnes disposant d’un lien d’invitation valide, sauf administrateur.</p>
 
         <div class="invite-status-box" id="inviteStatusBox">
           Vérification du lien d’invitation...
@@ -1228,6 +1228,7 @@
 
     const myAvatar = document.getElementById("myAvatar");
     const myName = document.getElementById("myName");
+    const myPresenceBox = document.getElementById("myPresenceBox");
     const myPresenceDot = document.getElementById("myPresenceDot");
     const myPresenceText = document.getElementById("myPresenceText");
     const navOnlineDot = document.getElementById("navOnlineDot");
@@ -1374,34 +1375,46 @@
     async function verifyInviteToken() {
       parseInviteToken();
 
+      const typedEmail = (signupEmail.value || "").trim().toLowerCase();
+
+      if (typedEmail === OWNER_EMAIL) {
+        inviteOk = true;
+        inviteData = null;
+        signupBtn.disabled = false;
+        showInviteStatus("Compte administrateur : création autorisée sans invitation.", "ok");
+        return;
+      }
+
       if (!inviteToken) {
         inviteOk = false;
-        showInviteStatus("Lien d’invitation absent. Demande un lien valide à l’administrateur.", "bad");
         signupBtn.disabled = true;
+        showInviteStatus("Lien d’invitation absent. Demande un lien valide à l’administrateur.", "bad");
         return;
       }
 
       try {
         const snap = await get(ref(db, "signupInvites/" + inviteToken));
+
         if (!snap.exists()) {
           inviteOk = false;
-          showInviteStatus("Ce lien d’invitation est introuvable ou invalide.", "bad");
           signupBtn.disabled = true;
+          showInviteStatus("Ce lien d’invitation est introuvable ou invalide.", "bad");
           return;
         }
 
         inviteData = snap.val() || {};
+
         if (inviteData.used === true) {
           inviteOk = false;
-          showInviteStatus("Ce lien d’invitation a déjà été utilisé.", "bad");
           signupBtn.disabled = true;
+          showInviteStatus("Ce lien d’invitation a déjà été utilisé.", "bad");
           return;
         }
 
         if (!inviteData.expiresAt || Date.now() > Number(inviteData.expiresAt)) {
           inviteOk = false;
-          showInviteStatus("Ce lien d’invitation a expiré.", "bad");
           signupBtn.disabled = true;
+          showInviteStatus("Ce lien d’invitation a expiré.", "bad");
           return;
         }
 
@@ -1533,7 +1546,8 @@
       attachmentPreview.innerHTML = html;
       postInfoText.textContent = "Pièces jointes prêtes. Tu peux publier maintenant.";
     }
-        function renderPrivacyStatus() {
+
+    function renderPrivacyStatus() {
       if (!currentUserData) {
         privacyStatusText.textContent = "";
         return;
@@ -1577,10 +1591,7 @@
       const password = signupPassword.value;
       const confirmPassword = signupConfirmPassword.value;
 
-      if (!inviteOk) {
-        showAuthMessage("Lien d’invitation invalide ou expiré.");
-        return;
-      }
+      const isAdmin = email === OWNER_EMAIL;
 
       if (!firstName || !lastName || !country || !email || !password || !confirmPassword) {
         showAuthMessage("Remplis tous les champs.");
@@ -1597,7 +1608,12 @@
         return;
       }
 
-      if (inviteData?.email && email !== String(inviteData.email).toLowerCase()) {
+      if (!isAdmin && !inviteOk) {
+        showAuthMessage("Lien d’invitation invalide ou expiré.");
+        return;
+      }
+
+      if (!isAdmin && inviteData?.email && email !== String(inviteData.email).toLowerCase()) {
         showAuthMessage("Tu dois utiliser l’adresse email prévue dans l’invitation.");
         return;
       }
@@ -1611,7 +1627,10 @@
         const fullName = `${firstName} ${lastName}`.trim();
 
         await updateProfile(user, { displayName: fullName });
-        await sendEmailVerification(user);
+
+        if (!isAdmin) {
+          await sendEmailVerification(user);
+        }
 
         await set(ref(db, "users/" + user.uid), {
           uid: user.uid,
@@ -1624,13 +1643,13 @@
           bio: "",
           createdAt: Date.now(),
           updatedAt: Date.now(),
-          signupInviteToken: inviteToken,
-          accountStatus: "pending_admin_approval",
-          emailVerifiedAtSignup: false,
-          approvedBy: "",
-          approvedAt: 0,
+          signupInviteToken: isAdmin ? "" : inviteToken,
+          accountStatus: isAdmin ? "approved" : "pending_admin_approval",
+          emailVerifiedAtSignup: isAdmin,
+          approvedBy: isAdmin ? OWNER_EMAIL : "",
+          approvedAt: isAdmin ? Date.now() : 0,
           rejectedAt: 0,
-          role: "member",
+          role: isAdmin ? "admin" : "member",
           privacy: {
             hideEmail: true,
             hideBio: false,
@@ -1638,35 +1657,44 @@
           }
         });
 
-        await update(ref(db, "signupInvites/" + inviteToken), {
-          used: true,
-          usedByUid: user.uid,
-          usedByEmail: email,
-          usedAt: Date.now()
-        });
+        if (!isAdmin) {
+          await update(ref(db, "signupInvites/" + inviteToken), {
+            used: true,
+            usedByUid: user.uid,
+            usedByEmail: email,
+            usedAt: Date.now()
+          });
 
-        await set(ref(db, "accountApprovals/" + user.uid), {
-          uid: user.uid,
-          firstName,
-          lastName,
-          displayName: fullName,
-          email,
-          country,
-          status: "pending_admin_approval",
-          createdAt: Date.now(),
-          inviteToken,
-          inviteCreatedBy: inviteData?.createdBy || "",
-          emailVerified: false
-        });
+          await set(ref(db, "accountApprovals/" + user.uid), {
+            uid: user.uid,
+            firstName,
+            lastName,
+            displayName: fullName,
+            email,
+            country,
+            status: "pending_admin_approval",
+            createdAt: Date.now(),
+            inviteToken,
+            inviteCreatedBy: inviteData?.createdBy || "",
+            emailVerified: false
+          });
 
-        try { await signOut(auth); } catch (e) {}
+          try { await signOut(auth); } catch (e) {}
 
-        showAuthMessage("Compte créé. Vérifie ton email, puis attends l’approbation de l’administrateur.", true);
-        setTimeout(() => {
-          showView("login");
-        }, 2200);
+          showAuthMessage("Compte créé. Vérifie ton email, puis attends l’approbation de l’administrateur.", true);
+          setTimeout(() => {
+            showView("login");
+          }, 2200);
+        } else {
+          showAuthMessage("Compte administrateur créé avec succès. Tu peux te connecter directement.", true);
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1800);
+        }
+
       } catch (error) {
         console.error(error);
+
         if (error.code === "auth/email-already-in-use") {
           showAuthMessage("Cette adresse email est déjà utilisée.");
         } else if (error.code === "auth/invalid-email") {
@@ -1680,8 +1708,7 @@
         signupBtn.disabled = false;
       }
     }
-
-    async function loginToInsights() {
+        async function loginToInsights() {
       const email = loginEmail.value.trim().toLowerCase();
       const password = loginPassword.value;
 
@@ -1699,7 +1726,9 @@
 
         await reload(user);
 
-        if (!user.emailVerified) {
+        const isAdmin = (user.email || email).toLowerCase() === OWNER_EMAIL.toLowerCase();
+
+        if (!isAdmin && !user.emailVerified) {
           try { await signOut(auth); } catch (e) {}
           showAuthMessage("Vérifie d’abord ton adresse email avant de te connecter.");
           return;
@@ -1715,10 +1744,15 @@
         const userData = snap.val() || {};
         const status = userData.accountStatus || "pending_admin_approval";
 
-        if (status === "approved") {
+        if (isAdmin || status === "approved") {
           await update(ref(db, "users/" + user.uid), {
             emailVerifiedAtSignup: true,
-            updatedAt: Date.now()
+            updatedAt: Date.now(),
+            accountStatus: isAdmin ? "approved" : status,
+            role: isAdmin ? "admin" : (userData.role || "member"),
+            approvedBy: isAdmin ? OWNER_EMAIL : (userData.approvedBy || ""),
+            approvedAt: isAdmin ? (userData.approvedAt || Date.now()) : (userData.approvedAt || 0),
+            rejectedAt: 0
           });
           showAuthMessage("Connexion réussie.", true);
           return;
@@ -2370,6 +2404,8 @@
     signupBtn.addEventListener("click", createAccountFromInvite);
     resetBtn.addEventListener("click", sendResetLink);
 
+    signupEmail.addEventListener("input", verifyInviteToken);
+
     [loginEmail, loginPassword].forEach(el => {
       el.addEventListener("keydown", (e) => {
         if (e.key === "Enter") loginToInsights();
@@ -2461,7 +2497,9 @@
         console.error(e);
       }
 
-      if (!user.emailVerified) {
+      const isAdmin = (user.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase();
+
+      if (!isAdmin && !user.emailVerified) {
         try { await signOut(auth); } catch (e) {}
         setUIConnected(false);
         showView("login");
@@ -2481,7 +2519,7 @@
       const userData = snap.val() || {};
       const status = userData.accountStatus || "pending_admin_approval";
 
-      if (status !== "approved") {
+      if (!isAdmin && status !== "approved") {
         try { await signOut(auth); } catch (e) {}
         setUIConnected(false);
         showView("login");
@@ -2492,6 +2530,18 @@
           showAuthMessage("Ton compte est encore en attente d’approbation.");
         }
         return;
+      }
+
+      if (isAdmin) {
+        await update(ref(db, "users/" + user.uid), {
+          accountStatus: "approved",
+          role: "admin",
+          approvedBy: OWNER_EMAIL,
+          approvedAt: userData.approvedAt || Date.now(),
+          rejectedAt: 0,
+          emailVerifiedAtSignup: true,
+          updatedAt: Date.now()
+        });
       }
 
       currentUser = user;
