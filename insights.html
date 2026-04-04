@@ -16,7 +16,6 @@
       --blue-dark:#0f4d92;
       --green:#18c34a;
       --red:#df4b4b;
-      --orange:#f7a600;
       --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
       --line:#d9e5f2;
       --soft:#f4f8fc;
@@ -37,6 +36,7 @@
       z-index:20;
       box-shadow:0 4px 16px rgba(0,0,0,0.08);
     }
+
     .topbar nav{
       display:flex;
       gap:18px;
@@ -44,6 +44,7 @@
       align-items:center;
       flex-wrap:wrap;
     }
+
     .topbar a{
       color:#fff;
       text-decoration:none;
@@ -55,9 +56,11 @@
       align-items:center;
       gap:8px;
     }
+
     .topbar a.active{
       border-bottom-color:#fff;
     }
+
     .nav-online-dot{
       width:10px;
       height:10px;
@@ -896,7 +899,7 @@
       <a href="cv.html">Resume</a>
       <a href="contact.html">Contact</a>
       <a href="insights.html" class="active">Insights</a>
-      <a href="insights.html" class="login-link">Login</a>
+      <a href="insights.html">Login</a>
     </nav>
   </header>
 
@@ -1009,7 +1012,7 @@
   <main class="page hidden" id="privatePage">
     <aside class="left-panel">
       <div class="panel-card">
-        <div class="me-box" id="myBox">
+        <div class="me-box">
           <div class="avatar large" id="myAvatar">MB</div>
           <div>
             <h3 class="mini-title" style="margin:0 0 6px;font-size:24px;">Insights</h3>
@@ -1033,42 +1036,10 @@
       <div class="panel-card">
         <h3 class="mini-title">Academic Hub</h3>
         <div class="side-list">
-          <div class="side-item">
-            <div class="side-item-head">
-              <div class="side-item-title">Collaboration</div>
-            </div>
-            <div class="side-item-sub">Échanges scientifiques, co-idées, soutien académique et entraide.</div>
-          </div>
-          <div class="side-item">
-            <div class="side-item-head">
-              <div class="side-item-title">Communications</div>
-            </div>
-            <div class="side-item-sub">Partage de nouvelles, publications, conférences, appels et discussions.</div>
-          </div>
-          <div class="side-item">
-            <div class="side-item-head">
-              <div class="side-item-title">Lab Activity</div>
-            </div>
-            <div class="side-item-sub">Résultats, essais, supports PDF, photos et notes de travail.</div>
-          </div>
-          <div class="side-item">
-            <div class="side-item-head">
-              <div class="side-item-title">Scientific Interests</div>
-            </div>
-            <div class="side-item-sub">Catalyse, environnement, matériaux, énergie, chimie verte et plus.</div>
-          </div>
-          <div class="side-item">
-            <div class="side-item-head">
-              <div class="side-item-title">Opportunities</div>
-            </div>
-            <div class="side-item-sub">Stages, offres, collaborations, événements et opportunités de la communauté.</div>
-          </div>
-          <div class="side-item">
-            <div class="side-item-head">
-              <div class="side-item-title">Community Spirit</div>
-            </div>
-            <div class="side-item-sub">Un espace privé, humain, professionnel et respectueux.</div>
-          </div>
+          <div class="side-item"><div class="side-item-title">Collaboration</div><div class="side-item-sub">Échanges scientifiques et entraide.</div></div>
+          <div class="side-item"><div class="side-item-title">Communications</div><div class="side-item-sub">Publications, annonces et discussions.</div></div>
+          <div class="side-item"><div class="side-item-title">Lab Activity</div><div class="side-item-sub">Résultats, essais, supports PDF et photos.</div></div>
+          <div class="side-item"><div class="side-item-title">Scientific Interests</div><div class="side-item-sub">Catalyse, environnement, matériaux et énergie.</div></div>
         </div>
       </div>
     </aside>
@@ -1088,21 +1059,18 @@
           <button class="secondary-btn" id="addImagesBtn" type="button">Ajouter image(s)</button>
           <button class="secondary-btn" id="addPdfBtn" type="button">Ajouter PDF</button>
           <button class="secondary-btn" id="togglePrivacyBtn" type="button">Paramètres de confidentialité</button>
-
           <input type="file" id="imagesInput" class="hidden-file" accept="image/*" multiple />
           <input type="file" id="pdfInput" class="hidden-file" accept=".pdf,application/pdf" />
         </div>
 
         <div class="panel-card hidden" id="privacyPanel" style="margin-top:14px;margin-bottom:0;">
           <h3 class="mini-title" style="font-size:18px;">Paramètres de confidentialité</h3>
-          <p class="side-note" style="margin-bottom:14px;">Choisis quelles informations de ton profil restent visibles pour les autres membres.</p>
-
+          <p class="side-note" style="margin-bottom:14px;">Choisis quelles informations de ton profil restent visibles.</p>
           <div class="quick-actions">
             <button class="secondary-btn" id="toggleHideEmailBtn" type="button">Masquer / afficher l’email</button>
             <button class="secondary-btn" id="toggleHideBioBtn" type="button">Masquer / afficher la bio</button>
             <button class="secondary-btn" id="toggleHidePresenceBtn" type="button">Masquer / afficher la présence</button>
           </div>
-
           <div class="side-note" id="privacyStatusText" style="margin-top:14px;"></div>
         </div>
 
@@ -1143,27 +1111,14 @@
       <p class="modal-note">Choisis une raison puis ajoute un commentaire si nécessaire.</p>
 
       <div class="report-reasons">
-        <label class="reason-item">
-          <input type="radio" name="reportReason" value="Contenu inapproprié" checked />
-          <span>Contenu inapproprié</span>
-        </label>
-        <label class="reason-item">
-          <input type="radio" name="reportReason" value="Spam" />
-          <span>Spam</span>
-        </label>
-        <label class="reason-item">
-          <input type="radio" name="reportReason" value="Harcèlement" />
-          <span>Harcèlement</span>
-        </label>
-        <label class="reason-item">
-          <input type="radio" name="reportReason" value="Autre" />
-          <span>Autre</span>
-        </label>
+        <label class="reason-item"><input type="radio" name="reportReason" value="Contenu inapproprié" checked /><span>Contenu inapproprié</span></label>
+        <label class="reason-item"><input type="radio" name="reportReason" value="Spam" /><span>Spam</span></label>
+        <label class="reason-item"><input type="radio" name="reportReason" value="Harcèlement" /><span>Harcèlement</span></label>
+        <label class="reason-item"><input type="radio" name="reportReason" value="Autre" /><span>Autre</span></label>
       </div>
 
       <textarea class="report-textarea" id="reportText" placeholder="Ajoute un détail complémentaire..."></textarea>
-
-      <div class="modal-actions">
+      <div>
         <button class="ghost-btn" id="cancelReportBtn" type="button">Annuler</button>
         <button class="primary-btn" id="submitReportBtn" type="button">Envoyer</button>
       </div>
@@ -1205,7 +1160,6 @@
     const publicTopbar = document.getElementById("publicTopbar");
     const privateTopbar = document.getElementById("privateTopbar");
     const meetingNavLink = document.getElementById("meetingNavLink");
-
     const authOverlay = document.getElementById("authOverlay");
     const privatePage = document.getElementById("privatePage");
 
@@ -1271,16 +1225,13 @@
     let currentUser = null;
     let currentUserData = null;
     let activityTimeout = null;
-
     let usersMap = {};
     let postsMap = {};
     let likesMap = {};
     let commentsMap = {};
-
     let inviteToken = "";
     let inviteOk = false;
     let inviteData = null;
-
     let pendingImages = [];
     let pendingPdf = null;
     let currentReportPostId = null;
@@ -1307,12 +1258,18 @@
       privateTopbar.classList.toggle("hidden", !isConnected);
       authOverlay.classList.toggle("hidden", isConnected);
       privatePage.classList.toggle("hidden", !isConnected);
+      if (currentUser && isAdminEmail(currentUser.email || "")) meetingNavLink.classList.remove("hidden");
+      else meetingNavLink.classList.add("hidden");
+    }
 
-      if (currentUser && (currentUser.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase()) {
-        meetingNavLink.classList.remove("hidden");
-      } else {
-        meetingNavLink.classList.add("hidden");
-      }
+    function isAdminEmail(mail = "") {
+      return String(mail).trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
+    }
+
+    function goToSelfInsights() {
+      setTimeout(() => {
+        window.location.replace("./insights.html");
+      }, 400);
     }
 
     function resetInactivityTimer() {
@@ -1320,7 +1277,7 @@
       clearTimeout(activityTimeout);
       activityTimeout = setTimeout(async () => {
         try { await signOut(auth); } catch (e) {}
-        window.location.href = "insights.html";
+        window.location.replace("./insights.html");
       }, INACTIVITY_LIMIT);
     }
 
@@ -1382,7 +1339,6 @@
 
     async function verifyInviteToken() {
       parseInviteToken();
-
       const typedEmail = (signupEmail.value || "").trim().toLowerCase();
 
       if (typedEmail === OWNER_EMAIL) {
@@ -1402,7 +1358,6 @@
 
       try {
         const snap = await get(ref(db, "signupInvites/" + inviteToken));
-
         if (!snap.exists()) {
           inviteOk = false;
           signupBtn.disabled = true;
@@ -1411,7 +1366,6 @@
         }
 
         inviteData = snap.val() || {};
-
         if (inviteData.used === true) {
           inviteOk = false;
           signupBtn.disabled = true;
@@ -1430,9 +1384,7 @@
         signupBtn.disabled = false;
         showInviteStatus("Lien d’invitation valide. Tu peux créer ton compte.", "ok");
 
-        if (inviteData.email) {
-          signupEmail.value = inviteData.email;
-        }
+        if (inviteData.email) signupEmail.value = inviteData.email;
       } catch (e) {
         console.error(e);
         inviteOk = false;
@@ -1453,12 +1405,6 @@
       const privacy = ensurePrivacy(userData);
       if (viewerUid && viewerUid === userData.uid) return userData.email || "";
       return privacy.hideEmail ? "Email masqué" : (userData.email || "");
-    }
-
-    function visibleBio(viewerUid, userData = {}) {
-      const privacy = ensurePrivacy(userData);
-      if (viewerUid && viewerUid === userData.uid) return userData.bio || "Aucune bio.";
-      return privacy.hideBio ? "Bio masquée" : (userData.bio || "Aucune bio.");
     }
 
     function canSeePresence(viewerUid, userData = {}) {
@@ -1569,7 +1515,6 @@
 
     function updateMyHeader() {
       if (!currentUserData) return;
-
       myAvatar.innerHTML = avatarMarkup(currentUserData, currentUser?.email || "");
       myName.textContent = currentUserData.displayName || "Utilisateur";
 
@@ -1598,7 +1543,6 @@
       const email = signupEmail.value.trim().toLowerCase();
       const password = signupPassword.value;
       const confirmPassword = signupConfirmPassword.value;
-
       const isAdmin = email === OWNER_EMAIL;
 
       if (!firstName || !lastName || !country || !email || !password || !confirmPassword) {
@@ -1636,9 +1580,7 @@
 
         await updateProfile(user, { displayName: fullName });
 
-        if (!isAdmin) {
-          await sendEmailVerification(user);
-        }
+        if (!isAdmin) await sendEmailVerification(user);
 
         await set(ref(db, "users/" + user.uid), {
           uid: user.uid,
@@ -1662,6 +1604,10 @@
             hideEmail: true,
             hideBio: false,
             hidePresence: false
+          },
+          presence: {
+            online: false,
+            lastSeen: Date.now()
           }
         });
 
@@ -1687,8 +1633,6 @@
             emailVerified: false
           });
 
-          try { await signOut(auth); } catch (e) {}
-
           showAuthMessage("Compte créé. Vérifie ton email, puis attends l’approbation de l’administrateur.", true);
           setTimeout(() => {
             showView("login");
@@ -1696,27 +1640,575 @@
         } else {
           showAuthMessage("Compte administrateur créé avec succès. Tu peux te connecter directement.", true);
           setTimeout(() => {
-            window.location.href = "login.html";
+            window.location.replace("./login.html");
           }, 1800);
         }
 
       } catch (error) {
         console.error(error);
-
         if (error.code === "auth/email-already-in-use") {
-          showAuthMessage("Cette adresse email est déjà utilisée.");
+          showAuthMessage(isAdmin ? "Le compte admin existe déjà. Connecte-toi directement." : "Cette adresse email est déjà utilisée.");
         } else if (error.code === "auth/invalid-email") {
           showAuthMessage("Adresse email invalide.");
         } else if (error.code === "auth/weak-password") {
           showAuthMessage("Mot de passe trop faible.");
         } else {
-          showAuthMessage("Impossible de créer le compte.");
+          showAuthMessage(`Erreur réelle : ${error.code || "inconnue"} ${error.message || ""}`);
         }
       } finally {
         signupBtn.disabled = false;
       }
     }
-        async function ensureAdminProfile(user) {
+
+    function renderOnlineMembers() {
+      const items = Object.entries(usersMap || {})
+        .map(([uid, val]) => ({ uid, ...(val || {}) }))
+        .filter(user => user.uid !== currentUser?.uid)
+        .filter(user => canSeePresence(currentUser?.uid, user))
+        .sort((a, b) => {
+          const onlineA = a.presence?.online ? 1 : 0;
+          const onlineB = b.presence?.online ? 1 : 0;
+          if (onlineA !== onlineB) return onlineB - onlineA;
+          return (a.displayName || "").localeCompare(b.displayName || "");
+        })
+        .slice(0, 12);
+
+      if (!items.length) {
+        onlineMembersList.innerHTML = `<div class="empty-card">Aucun membre visible pour le moment.</div>`;
+        return;
+      }
+
+      onlineMembersList.innerHTML = items.map(user => {
+        const presence = user.presence || {};
+        const online = !!presence.online;
+        return `
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">${escapeHtml(user.displayName || "Sans nom")}</div>
+              <span class="pill ${online ? "online" : "offline"}">
+                <span class="dot ${online ? "online" : ""}"></span>
+                ${online ? "En ligne" : "Hors ligne"}
+              </span>
+            </div>
+            <div class="side-item-sub">
+              ${online ? "Disponible maintenant" : (presence.lastSeen ? `Dernière activité : ${escapeHtml(formatDate(presence.lastSeen))}` : "Pas d’activité récente")}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function getPostLikes(postId) {
+      return likesMap?.[postId] || {};
+    }
+
+    function getPostComments(postId) {
+      return commentsMap?.[postId] || {};
+    }
+
+    function normalizePostImages(post = {}) {
+      if (Array.isArray(post.imageUrls) && post.imageUrls.length) return post.imageUrls;
+      if (post.imageUrl) return [post.imageUrl];
+      if (post.attachmentType === "image" && post.attachmentUrl) return [post.attachmentUrl];
+      return [];
+    }
+
+    function normalizePostPdf(post = {}) {
+      if (post.pdfUrl) return { url: post.pdfUrl, name: post.pdfName || "Document PDF" };
+      if (post.attachmentType === "pdf" && post.attachmentUrl) return { url: post.attachmentUrl, name: post.attachmentName || "Document PDF" };
+      return null;
+    }
+
+    function renderPostAttachment(post = {}) {
+      const images = normalizePostImages(post);
+      const pdf = normalizePostPdf(post);
+      let html = "";
+
+      if (images.length) {
+        html += `<div class="post-images">`;
+        html += images.map(url => `<img class="post-image" src="${url}" alt="publication image">`).join("");
+        html += `</div>`;
+      }
+
+      if (pdf) {
+        html += `
+          <div class="post-pdf">
+            <div class="pdf-left">
+              <div class="pdf-icon">PDF</div>
+              <div>
+                <div class="pdf-name">${escapeHtml(pdf.name)}</div>
+                <div class="pdf-sub">Document joint à la publication</div>
+              </div>
+            </div>
+            <a class="pdf-open" href="${pdf.url}" target="_blank" rel="noopener">Ouvrir</a>
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
+    function renderCommentAttachment(comment = {}) {
+      if (comment.sticker) return `<div class="comment-sticker">${escapeHtml(comment.sticker)}</div>`;
+      return "";
+    }
+
+    function closeAllPostMenus() {
+      document.querySelectorAll(".post-menu.open").forEach(menu => menu.classList.remove("open"));
+    }
+
+    function postCanBeEdited(post = {}) {
+      return currentUser && post.authorId === currentUser.uid;
+    }
+
+    function renderPosts() {
+      const posts = Object.entries(postsMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}) }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      if (!posts.length) {
+        postGrid.innerHTML = `<div class="empty-card">Aucune publication pour le moment.</div>`;
+        return;
+      }
+
+      postGrid.innerHTML = posts.map(post => {
+        const author = usersMap?.[post.authorId] ? { uid:post.authorId, ...usersMap[post.authorId] } : {};
+        const likes = getPostLikes(post.id);
+        const comments = getPostComments(post.id);
+        const likeCount = Object.keys(likes || {}).length;
+        const commentCount = Object.keys(comments || {}).length;
+        const likedByMe = !!(currentUser && likes && likes[currentUser.uid]);
+
+        const commentsHtml = Object.entries(comments || {})
+          .map(([cid, val]) => ({ id:cid, ...(val || {}) }))
+          .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+          .map(comment => {
+            const cAuthor = usersMap?.[comment.authorId] ? { uid:comment.authorId, ...usersMap[comment.authorId] } : {};
+            return `
+              <div class="comment-card">
+                <div class="comment-head">
+                  <div>
+                    <div class="comment-author">${escapeHtml(cAuthor.displayName || "Utilisateur")}</div>
+                    <div class="comment-meta">${escapeHtml(formatDate(comment.createdAt))}</div>
+                  </div>
+                  ${currentUser && comment.authorId === currentUser.uid ? `<button class="mini-btn" type="button" data-delete-comment="${post.id}|${comment.id}">Supprimer</button>` : ""}
+                </div>
+                <div class="comment-text">${escapeHtml(comment.text || "")}</div>
+                ${renderCommentAttachment(comment)}
+              </div>
+            `;
+          }).join("");
+
+        return `
+          <article class="post-card" id="post-${post.id}">
+            <div class="post-head">
+              <div class="post-author">
+                <div class="avatar">${avatarMarkup(author, author.email || "")}</div>
+                <div>
+                  <div class="post-author-name">${escapeHtml(author.displayName || "Sans nom")}</div>
+                  <div class="post-author-meta">
+                    ${escapeHtml(visibleEmail(currentUser?.uid, author))}<br>
+                    ${escapeHtml(formatDate(post.createdAt))}
+                  </div>
+                </div>
+              </div>
+
+              <div class="post-menu-wrap">
+                <button class="post-menu-btn" type="button" data-post-menu-btn="${post.id}">⋯</button>
+                <div class="post-menu" data-post-menu="${post.id}">
+                  ${postCanBeEdited(post) ? `<button type="button" data-delete-post="${post.id}" class="danger">Supprimer</button>` : ""}
+                  <button type="button" data-report-post="${post.id}">Signaler</button>
+                  <button type="button" data-open-profile="${post.authorId}">Voir le profil</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="post-text">${escapeHtml(post.text || "")}</div>
+            ${renderPostAttachment(post)}
+
+            <div class="post-actions">
+              <button class="action-chip ${likedByMe ? "active" : ""}" type="button" data-like-post="${post.id}">👍 Like (${likeCount})</button>
+              <button class="action-chip" type="button" data-focus-comment="${post.id}">💬 Comment (${commentCount})</button>
+            </div>
+
+            <div class="comment-form">
+              <textarea class="comment-textarea" id="comment-input-${post.id}" placeholder="Écris un commentaire..."></textarea>
+              <div class="comment-tools">
+                <button class="secondary-btn" type="button" data-comment-sticker="${post.id}">Emoji / Sticker</button>
+                <button class="primary-btn" type="button" data-send-comment="${post.id}">Commenter</button>
+              </div>
+            </div>
+
+            <div class="comment-list">
+              ${commentsHtml || `<div class="empty-card">Aucun commentaire pour le moment.</div>`}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      bindPostActions();
+    }
+
+    function bindPostActions() {
+      closeAllPostMenus();
+
+      document.querySelectorAll("[data-post-menu-btn]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.postMenuBtn;
+          const menu = document.querySelector(`[data-post-menu="${id}"]`);
+          if (!menu) return;
+          const open = menu.classList.contains("open");
+          closeAllPostMenus();
+          if (!open) menu.classList.add("open");
+        });
+      });
+
+      document.querySelectorAll("[data-like-post]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await toggleLike(btn.dataset.likePost);
+        });
+      });
+
+      document.querySelectorAll("[data-send-comment]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await sendComment(btn.dataset.sendComment);
+        });
+      });
+
+      document.querySelectorAll("[data-comment-sticker]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const sticker = prompt("Entre un emoji ou un sticker texte :");
+          if (!sticker) return;
+          await sendComment(btn.dataset.commentSticker, sticker);
+        });
+      });
+
+      document.querySelectorAll("[data-delete-comment]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const [postId, commentId] = btn.dataset.deleteComment.split("|");
+          await deleteComment(postId, commentId);
+        });
+      });
+
+      document.querySelectorAll("[data-delete-post]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await deletePost(btn.dataset.deletePost);
+        });
+      });
+
+      document.querySelectorAll("[data-report-post]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentReportPostId = btn.dataset.reportPost;
+          reportText.value = "";
+          openModal(reportModal);
+        });
+      });
+
+      document.querySelectorAll("[data-open-profile]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          window.location.href = `profile.html?uid=${encodeURIComponent(btn.dataset.openProfile)}`;
+        });
+      });
+
+      document.querySelectorAll("[data-focus-comment]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const input = document.getElementById(`comment-input-${btn.dataset.focusComment}`);
+          if (input) input.focus();
+        });
+      });
+
+      document.addEventListener("click", closeAllPostMenus, { once:true });
+    }
+
+    async function toggleLike(postId) {
+      if (!currentUser || !postId) return;
+      const likeRef = ref(db, `likes/${postId}/${currentUser.uid}`);
+      const snap = await get(likeRef);
+      if (snap.exists()) await remove(likeRef);
+      else await set(likeRef, { uid: currentUser.uid, createdAt: Date.now() });
+    }
+
+    async function sendComment(postId, sticker = "") {
+      if (!currentUser || !postId) return;
+      const input = document.getElementById(`comment-input-${postId}`);
+      const text = input ? input.value.trim() : "";
+      if (!text && !sticker) return;
+
+      const newRef = push(ref(db, `comments/${postId}`));
+      await set(newRef, {
+        authorId: currentUser.uid,
+        text,
+        sticker: sticker || "",
+        createdAt: Date.now()
+      });
+
+      if (input) input.value = "";
+    }
+
+    async function deleteComment(postId, commentId) {
+      if (!currentUser || !postId || !commentId) return;
+      const commentRef = ref(db, `comments/${postId}/${commentId}`);
+      const snap = await get(commentRef);
+      if (!snap.exists()) return;
+      const val = snap.val() || {};
+      if (val.authorId !== currentUser.uid) return;
+      await remove(commentRef);
+    }
+
+    async function deletePost(postId) {
+      if (!currentUser || !postId) return;
+      const postRef = ref(db, `posts/${postId}`);
+      const snap = await get(postRef);
+      if (!snap.exists()) return;
+      const val = snap.val() || {};
+      if (val.authorId !== currentUser.uid) return;
+      await remove(postRef);
+      await remove(ref(db, `likes/${postId}`));
+      await remove(ref(db, `comments/${postId}`));
+    }
+
+    async function publishPost() {
+      if (!currentUser || !currentUserData) return;
+      const text = postText.value.trim();
+      if (!text && !pendingImages.length && !pendingPdf) {
+        alert("Écris un texte ou ajoute une pièce jointe avant de publier.");
+        return;
+      }
+
+      publishBtn.disabled = true;
+
+      try {
+        const newRef = push(ref(db, "posts"));
+        const payload = {
+          authorId: currentUser.uid,
+          text,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+
+        if (pendingImages.length) payload.imageUrls = pendingImages.map(img => img.url);
+        if (pendingPdf) {
+          payload.pdfUrl = pendingPdf.url;
+          payload.pdfName = pendingPdf.name;
+        }
+
+        await set(newRef, payload);
+        resetComposer();
+      } catch (e) {
+        console.error(e);
+        alert("Impossible de publier pour le moment.");
+      } finally {
+        publishBtn.disabled = false;
+      }
+    }
+
+    async function setPrivacyField(field) {
+      if (!currentUser || !currentUserData) return;
+      const current = ensurePrivacy(currentUserData);
+      const newVal = !current[field];
+      await update(ref(db, `users/${currentUser.uid}/privacy`), {
+        ...current,
+        [field]: newVal
+      });
+    }
+
+    function renderRecentActivities() {
+      const posts = Object.entries(postsMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}) }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+        .slice(0, 8);
+
+      if (!posts.length) {
+        recentActivityList.innerHTML = `<div class="empty-card">Aucune activité pour le moment.</div>`;
+        return;
+      }
+
+      recentActivityList.innerHTML = posts.map(post => {
+        const author = usersMap?.[post.authorId] ? { uid:post.authorId, ...usersMap[post.authorId] } : {};
+        return `
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">${escapeHtml(author.displayName || "Utilisateur")}</div>
+            </div>
+            <div class="side-item-sub">
+              ${escapeHtml((post.text || "Publication").slice(0, 90))}${(post.text || "").length > 90 ? "..." : ""}<br>
+              ${escapeHtml(formatDate(post.createdAt))}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function submitReport() {
+      if (!currentReportPostId || !currentUser) return;
+      const reasonNode = document.querySelector('input[name="reportReason"]:checked');
+      const reason = reasonNode ? reasonNode.value : "Autre";
+      const post = postsMap?.[currentReportPostId] || {};
+      const reportRef = push(ref(db, "reports"));
+      await set(reportRef, {
+        postId: currentReportPostId,
+        postAuthorId: post.authorId || "",
+        reportedByUid: currentUser.uid,
+        reportedByName: currentUserData?.displayName || currentUser.displayName || "",
+        destinationEmail: "maounou-boris.amoussou@cnrs.fr",
+        reason,
+        comment: reportText.value.trim(),
+        createdAt: Date.now()
+      });
+      closeModal(reportModal);
+      currentReportPostId = null;
+      reportText.value = "";
+      alert("Signalement envoyé.");
+    }
+
+    function focusPostFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const postId = params.get("postId");
+      if (!postId) return;
+      const postEl = document.getElementById(`post-${postId}`);
+      if (postEl) {
+        postEl.scrollIntoView({ behavior:"smooth", block:"center" });
+      }
+    }
+
+    async function handleImagesSelected(files) {
+      const arr = Array.from(files || []);
+      if (!arr.length) return;
+
+      const results = [];
+      for (const file of arr) {
+        if (!file.type.startsWith("image/")) continue;
+        if (file.size > MAX_IMAGE_SIZE) {
+          alert(`Image trop lourde : ${file.name}`);
+          continue;
+        }
+        try {
+          const compressed = await compressImage(file);
+          results.push(compressed);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      pendingImages = results;
+      renderAttachmentPreview();
+    }
+
+    async function handlePdfSelected(file) {
+      if (!file) return;
+      if (file.size > MAX_PDF_SIZE) {
+        alert("PDF trop lourd.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingPdf = {
+          type: "pdf",
+          name: file.name || "document.pdf",
+          url: reader.result
+        };
+        renderAttachmentPreview();
+      };
+      reader.readAsDataURL(file);
+    }
+        async function sendResetLink() {
+      const email = resetEmail.value.trim().toLowerCase();
+      if (!email) {
+        showAuthMessage("Entre d’abord ton adresse email.");
+        return;
+      }
+
+      resetBtn.disabled = true;
+      showAuthMessage("Envoi du lien...", true);
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        showAuthMessage("Lien de réinitialisation envoyé par email.", true);
+      } catch (error) {
+        console.error(error);
+        showAuthMessage(`Erreur réelle : ${error.code || "inconnue"} ${error.message || ""}`);
+      } finally {
+        resetBtn.disabled = false;
+      }
+    }
+
+    async function updatePresenceOnline() {
+      if (!currentUser) return;
+      try {
+        await update(ref(db, "users/" + currentUser.uid), {
+          presence: {
+            online: true,
+            lastSeen: Date.now()
+          },
+          updatedAt: Date.now()
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function updatePresenceOffline() {
+      if (!currentUser) return;
+      try {
+        await update(ref(db, "users/" + currentUser.uid), {
+          presence: {
+            online: false,
+            lastSeen: Date.now()
+          },
+          updatedAt: Date.now()
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function loadCurrentUserData() {
+      if (!currentUser) return;
+      const snap = await get(ref(db, "users/" + currentUser.uid));
+      if (!snap.exists()) return;
+      currentUserData = { uid: currentUser.uid, ...snap.val() };
+      updateMyHeader();
+    }
+
+    function listenUsers() {
+      onValue(ref(db, "users"), (snap) => {
+        usersMap = snap.val() || {};
+        if (currentUser && usersMap[currentUser.uid]) {
+          currentUserData = { uid: currentUser.uid, ...usersMap[currentUser.uid] };
+          updateMyHeader();
+        }
+        renderOnlineMembers();
+        renderPosts();
+        renderRecentActivities();
+      });
+    }
+
+    function listenPosts() {
+      onValue(ref(db, "posts"), (snap) => {
+        postsMap = snap.val() || {};
+        renderPosts();
+        renderRecentActivities();
+        focusPostFromUrl();
+      });
+    }
+
+    function listenLikes() {
+      onValue(ref(db, "likes"), (snap) => {
+        likesMap = snap.val() || {};
+        renderPosts();
+      });
+    }
+
+    function listenComments() {
+      onValue(ref(db, "comments"), (snap) => {
+        commentsMap = snap.val() || {};
+        renderPosts();
+      });
+    }
+
+    async function ensureAdminProfile(user) {
       const userRef = ref(db, "users/" + user.uid);
       const snap = await get(userRef);
 
@@ -1751,26 +2243,19 @@
       }
 
       const existing = snap.val() || {};
-      const merged = {
+      await set(userRef, {
+        ...baseData,
         ...existing,
         uid: user.uid,
-        displayName: existing.displayName || baseData.displayName,
         email: user.email || OWNER_EMAIL,
-        photoURL: existing.photoURL || "",
-        bio: existing.bio || "",
-        updatedAt: Date.now(),
         role: "admin",
         accountStatus: "approved",
         approvedBy: OWNER_EMAIL,
         approvedAt: existing.approvedAt || Date.now(),
         rejectedAt: 0,
         emailVerifiedAtSignup: true,
-        privacy: existing.privacy || baseData.privacy,
-        presence: existing.presence || baseData.presence
-      };
-
-      await set(userRef, merged);
-      return merged;
+        updatedAt: Date.now()
+      });
     }
 
     async function loginToInsights() {
@@ -1788,15 +2273,12 @@
       try {
         const cred = await signInWithEmailAndPassword(auth, email, password);
         const user = cred.user;
-
         await reload(user);
 
         if (isAdminEmail(user.email || email)) {
           await ensureAdminProfile(user);
           showAuthMessage("Connexion administrateur réussie.", true);
-          setTimeout(() => {
-            window.location.href = "insights.html";
-          }, 500);
+          goToSelfInsights();
           return;
         }
 
@@ -1821,11 +2303,8 @@
             emailVerifiedAtSignup: true,
             updatedAt: Date.now()
           });
-
           showAuthMessage("Connexion réussie.", true);
-          setTimeout(() => {
-            window.location.href = "insights.html";
-          }, 500);
+          goToSelfInsights();
           return;
         }
 
@@ -1860,16 +2339,10 @@
       }
     }
 
-    function isAdminEmail(mail = "") {
-      return String(mail).trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
-    }
-
     logoutBtn.addEventListener("click", async () => {
-      try {
-        await updatePresenceOffline();
-      } catch (e) {}
+      try { await updatePresenceOffline(); } catch (e) {}
       try { await signOut(auth); } catch (e) {}
-      window.location.href = "insights.html";
+      window.location.replace("./insights.html");
     });
 
     showResetBtn.addEventListener("click", () => showView("reset"));
@@ -1883,7 +2356,6 @@
     loginBtn.addEventListener("click", loginToInsights);
     signupBtn.addEventListener("click", createAccountFromInvite);
     resetBtn.addEventListener("click", sendResetLink);
-
     signupEmail.addEventListener("input", verifyInviteToken);
 
     [loginEmail, loginPassword].forEach(el => {
@@ -1942,27 +2414,16 @@
     });
 
     onAuthStateChanged(auth, async (user) => {
-      if (isAdminEmail(user.email || "")) {
-        await ensureAdminProfile(user);
-        currentUser = user;
-        await loadCurrentUserData();
-        setUIConnected(true);
-        bindActivityEvents();
-        resetInactivityTimer();
-        await updatePresenceOnline();
-        listenUsers();
-        listenPosts();
-        listenLikes();
-        listenComments();
+      if (!user) {
+        currentUser = null;
+        currentUserData = null;
+        setUIConnected(false);
+        showView("login");
         parseInviteToken();
         return;
       }
 
-      try {
-        await reload(user);
-      } catch (e) {
-        console.error(e);
-      }
+      try { await reload(user); } catch (e) { console.error(e); }
 
       if (isAdminEmail(user.email || "")) {
         await ensureAdminProfile(user);
@@ -2004,12 +2465,9 @@
         try { await signOut(auth); } catch (e) {}
         setUIConnected(false);
         showView("login");
-
-        if (status === "rejected") {
-          showAuthMessage("Ton compte a été refusé par l’administrateur.");
-        } else {
-          showAuthMessage("Ton compte est encore en attente d’approbation.");
-        }
+        showAuthMessage(status === "rejected"
+          ? "Ton compte a été refusé par l’administrateur."
+          : "Ton compte est encore en attente d’approbation.");
         return;
       }
 
