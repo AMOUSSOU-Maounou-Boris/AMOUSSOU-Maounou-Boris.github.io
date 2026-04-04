@@ -6,7 +6,6 @@
   <title>Salle de réunion | Boris Research Hub</title>
   <style>
     * { box-sizing:border-box; }
-
     :root{
       --bg:#eaf5ff;
       --card:#ffffff;
@@ -39,7 +38,6 @@
       z-index:50;
       box-shadow:0 4px 16px rgba(0,0,0,0.08);
     }
-
     .topbar nav{
       display:flex;
       gap:18px;
@@ -47,7 +45,6 @@
       align-items:center;
       flex-wrap:wrap;
     }
-
     .topbar a{
       color:#fff;
       text-decoration:none;
@@ -59,9 +56,9 @@
       align-items:center;
       gap:8px;
     }
-
-    .topbar a.active{ border-bottom-color:#fff; }
-
+    .topbar a.active{
+      border-bottom-color:#fff;
+    }
     .nav-online-dot{
       width:10px;
       height:10px;
@@ -72,488 +69,335 @@
     }
 
     .page{
-      max-width:1650px;
+      max-width:1500px;
       margin:24px auto;
       padding:0 18px 30px;
       display:grid;
-      grid-template-columns:390px 1fr 360px;
-      gap:22px;
-      min-height:calc(100vh - 110px);
+      grid-template-columns:340px 1fr 320px;
+      gap:20px;
+      align-items:start;
     }
 
     .sidebar,
+    .center,
     .rightbar{
-      background:linear-gradient(180deg, #0d376d 0%, #032750 100%);
-      border-radius:28px;
-      color:#fff;
-      padding:22px;
-      box-shadow:var(--shadow);
-      position:sticky;
-      top:96px;
-      align-self:start;
-      overflow:hidden;
+      min-width:0;
     }
 
-    .sidebar::before,
-    .rightbar::before{
-      content:"";
-      position:absolute;
-      right:-60px;
-      top:-60px;
-      width:180px;
-      height:180px;
-      border-radius:50%;
-      background:rgba(255,255,255,0.05);
+    .section-card{
+      background:var(--card);
+      border:1px solid #e3ebf5;
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:18px;
     }
 
     .sidebar-top{
       display:flex;
-      gap:14px;
       align-items:center;
+      gap:14px;
       margin-bottom:18px;
-      position:relative;
-      z-index:1;
-    }
-
-    .sidebar-top h2{
-      margin:0 0 4px;
-      font-size:28px;
-    }
-
-    .sidebar-top p{
-      margin:0;
-      color:rgba(255,255,255,0.95);
-      line-height:1.5;
     }
 
     .avatar{
-      width:54px;
-      height:54px;
+      width:52px;
+      height:52px;
       border-radius:50%;
-      background:#184684;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:20px;
-      font-weight:800;
+      background:#184684;
       color:#fff;
+      font-weight:800;
       overflow:hidden;
-      flex:0 0 54px;
+      flex:0 0 auto;
     }
-
+    .avatar.large{
+      width:72px;
+      height:72px;
+      font-size:26px;
+    }
     .avatar img{
       width:100%;
       height:100%;
       object-fit:cover;
     }
 
-    .avatar.large{
-      width:74px;
-      height:74px;
-      font-size:28px;
-      flex:0 0 74px;
-    }
-
-    .avatar.small{
-      width:44px;
-      height:44px;
-      font-size:14px;
-      flex:0 0 44px;
-    }
-
-    .section-card{
-      background:rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:22px;
-      padding:16px;
-      margin-bottom:14px;
-      position:relative;
-      z-index:1;
-    }
-
-    .section-card h3{
-      margin:0 0 10px;
-      font-size:17px;
-      color:#fff;
+    h1,h2,h3,p{
+      margin:0;
     }
 
     .label{
       display:block;
-      font-size:13px;
       font-weight:800;
-      margin-bottom:8px;
-      color:#fff;
+      margin:14px 0 8px;
+      font-size:14px;
     }
 
     .text-input,
+    .password-input,
     .select-input,
-    .password-input{
+    .textarea{
       width:100%;
-      border:none;
-      outline:none;
+      border:1px solid #d3ddea;
+      border-radius:16px;
       padding:13px 14px;
-      border-radius:14px;
       font-size:15px;
-      margin-bottom:12px;
-      background:#fff;
-      color:#0b2340;
+      outline:none;
+      background:#fcfdff;
+      font-family:inherit;
+    }
+    .textarea{
+      min-height:100px;
+      resize:vertical;
+    }
+    .text-input:focus,
+    .password-input:focus,
+    .select-input:focus,
+    .textarea:focus{
+      border-color:#7fb5ff;
+      box-shadow:0 0 0 3px rgba(47,140,255,0.13);
     }
 
     .check-row{
       display:flex;
       align-items:center;
       gap:10px;
-      margin-bottom:12px;
-      font-size:14px;
+      margin-top:14px;
       font-weight:700;
-      color:#fff;
+      color:var(--text);
+      flex-wrap:wrap;
     }
 
-    .btn-row{
+    .btn-row,
+    .action-row{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      margin-top:14px;
     }
 
     .main-btn,
     .secondary-btn,
     .danger-btn,
-    .mini-btn,
-    .control-btn{
+    .warn-btn{
       border:none;
-      border-radius:14px;
-      padding:12px 16px;
+      border-radius:16px;
+      padding:13px 16px;
+      font-size:14px;
       font-weight:800;
       cursor:pointer;
-      font-size:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-decoration:none;
     }
-
     .main-btn{
-      background:#fff;
-      color:#082e5b;
+      background:var(--blue-dark);
+      color:#fff;
     }
-
     .secondary-btn{
-      background:#dcecff;
-      color:#082e5b;
+      background:#eef4fb;
+      color:var(--text);
     }
-
     .danger-btn{
-      background:#df4b4b;
+      background:var(--red);
+      color:#fff;
+    }
+    .warn-btn{
+      background:var(--orange);
       color:#fff;
     }
 
-    .mini-btn{
-      padding:9px 12px;
-      font-size:12px;
-      background:#fff;
-      color:#082e5b;
-    }
-
-    .mini-btn.danger{
-      background:#fff1f1;
-      color:#b02121;
-    }
-
-    .room-link-box{
-      background:#fff;
+    .room-link-box,
+    .helper-note,
+    .meta-box,
+    .join-note{
+      margin-top:14px;
       border-radius:16px;
-      padding:12px;
-      word-break:break-all;
-      color:#0b2340;
+      padding:14px;
+      line-height:1.6;
       font-size:14px;
-      line-height:1.5;
-      margin-top:8px;
+    }
+    .room-link-box{
+      background:#f8fbff;
+      border:1px dashed #c9dcef;
+      word-break:break-all;
+      display:none;
+    }
+    .helper-note{
+      background:#fff9e8;
+      border:1px solid #f2dfa5;
+    }
+    .meta-box{
+      background:#f8fbff;
+      border:1px solid #d9e5f2;
+    }
+    .join-note{
+      background:#ecfdf3;
+      border:1px solid #b7ebc9;
+      color:#166534;
       display:none;
     }
 
-    .helper-note{
-      font-size:12px;
-      color:rgba(255,255,255,0.92);
-      line-height:1.5;
-      margin-top:8px;
+    .hidden{
+      display:none !important;
     }
 
-    .room-meta{
-      display:grid;
-      gap:8px;
+    .center-card{
+      background:linear-gradient(180deg, #0d376d 0%, #032750 100%);
       color:#fff;
-      font-size:14px;
-      line-height:1.5;
-    }
-
-    .meta-line strong{ color:#fff; }
-    .status-ok{ color:#c6ffd6; font-weight:800; }
-    .status-warn{ color:#fff3b0; font-weight:800; }
-    .status-bad{ color:#ffd0d0; font-weight:800; }
-
-    .participants-list,
-    .requests-list{
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:22px;
+      position:relative;
+      overflow:hidden;
+      min-height:620px;
       display:flex;
       flex-direction:column;
-      gap:10px;
-      max-height:280px;
-      overflow:auto;
-      padding-right:4px;
-    }
-
-    .participant-card,
-    .request-card{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      background:rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:16px;
-      padding:10px;
-    }
-
-    .participant-main,
-    .request-main{
-      min-width:0;
-      flex:1;
-    }
-
-    .participant-name,
-    .request-name{
-      font-weight:800;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      margin-bottom:4px;
-    }
-
-    .participant-sub,
-    .request-sub{
-      font-size:12px;
-      opacity:0.92;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .owner-pill,
-    .share-pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:4px 8px;
-      border-radius:999px;
-      font-size:10px;
-      font-weight:800;
-      color:#fff;
-    }
-
-    .owner-pill{
-      background:rgba(24,195,74,0.18);
-      border:1px solid rgba(24,195,74,0.30);
-    }
-
-    .share-pill{
-      background:rgba(247,166,0,0.18);
-      border:1px solid rgba(247,166,0,0.30);
-    }
-
-    .main{
-      display:grid;
-      grid-template-rows:auto auto 1fr;
       gap:18px;
-      min-width:0;
+    }
+    .center-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.05);
+      top:-80px;
+      right:-80px;
     }
 
-    .hero{
-      background:#fff;
-      border-radius:26px;
-      padding:18px 20px;
-      box-shadow:var(--shadow);
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      align-items:flex-start;
-      flex-wrap:wrap;
-    }
-
-    .hero h3{
-      margin:0 0 6px;
-      font-size:26px;
-    }
-
-    .hero p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.5;
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-
-    .status-bar{
-      background:#fff;
-      border-radius:22px;
-      padding:14px 18px;
-      box-shadow:var(--shadow);
-      font-weight:800;
-      min-height:54px;
-      display:flex;
-      align-items:center;
-      color:#14854b;
-    }
-
-    .stage{
-      background:#fff;
-      border-radius:26px;
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      display:grid;
-      grid-template-rows:auto 1fr;
-      min-height:700px;
-    }
-
-    .stage-controls{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      padding:16px 18px;
-      border-bottom:1px solid #edf2f8;
-      background:#fff;
-    }
-
-    .control-btn{
-      background:#eef4fb;
-      color:#0b2340;
-    }
-
-    .control-btn.danger{
-      background:#fff1f1;
-      color:#b02121;
-    }
-
-    .control-btn.active{
-      background:#0f4d92;
-      color:#fff;
-    }
-
-    .video-grid{
-      padding:18px;
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(270px, 1fr));
-      gap:16px;
-      background:linear-gradient(180deg, #fbfdff 0%, #f2f7fd 100%);
-      align-content:start;
-    }
-
-    .video-tile{
-      background:#fff;
-      border:1px solid #e3ebf5;
-      border-radius:22px;
-      overflow:hidden;
-      box-shadow:0 8px 20px rgba(8,33,64,0.06);
+    .meeting-head{
       position:relative;
-      min-height:250px;
-      display:flex;
-      flex-direction:column;
+      z-index:1;
+    }
+    .meeting-head h1{
+      font-size:32px;
+      margin-bottom:8px;
+    }
+    .meeting-head p{
+      color:rgba(255,255,255,0.88);
+      line-height:1.6;
     }
 
-    .video-head{
+    .video-stage{
+      position:relative;
+      z-index:1;
+      flex:1;
+      min-height:260px;
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:22px;
+      background:rgba(255,255,255,0.06);
+      display:grid;
+      place-items:center;
+      padding:20px;
+      text-align:center;
+    }
+    .video-placeholder{
+      max-width:680px;
+    }
+    .video-placeholder h3{
+      font-size:24px;
+      margin-bottom:10px;
+    }
+    .video-placeholder p{
+      color:rgba(255,255,255,0.9);
+      line-height:1.7;
+    }
+
+    .control-bar{
+      position:relative;
+      z-index:1;
       display:flex;
-      justify-content:space-between;
-      align-items:center;
       gap:10px;
-      padding:12px 14px;
-      border-bottom:1px solid #edf2f8;
-      background:#fff;
-    }
-
-    .video-name{
-      font-weight:800;
-      font-size:14px;
-      min-width:0;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-
-    .video-badges{
-      display:flex;
-      gap:6px;
       flex-wrap:wrap;
-      justify-content:flex-end;
     }
 
-    .tiny-pill{
+    .status-pill{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
+      gap:8px;
+      padding:8px 12px;
       border-radius:999px;
-      font-size:10px;
+      font-size:13px;
       font-weight:800;
-      padding:4px 7px;
-      background:#eef4fb;
-      color:#20405f;
+      background:rgba(255,255,255,0.12);
+      color:#fff;
+    }
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#b8c7d8;
+      display:inline-block;
+      flex:0 0 10px;
+    }
+    .dot.online{
+      background:var(--green);
+    }
+    .dot.warn{
+      background:#ffd166;
+    }
+    .dot.red{
+      background:#ff6b6b;
     }
 
-    .tiny-pill.share{
-      background:#fff8cc;
-      color:#835800;
+    .mini-list{
+      display:grid;
+      gap:12px;
+      margin-top:12px;
     }
-
-    .tiny-pill.owner{
-      background:#eaffee;
-      color:#14854b;
+    .mini-item{
+      border:1px solid #e1ebf7;
+      border-radius:18px;
+      background:#fbfdff;
+      padding:14px;
     }
-
-    .video-wrap{
-      position:relative;
-      background:#0b1d35;
-      flex:1;
-      min-height:190px;
+    .mini-item-head{
       display:flex;
-      align-items:center;
-      justify-content:center;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
     }
-
-    .video-wrap video{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      background:#000;
-    }
-
-    .video-empty{
-      color:#d9e7ff;
+    .mini-name{
       font-weight:800;
-      text-align:center;
-      padding:20px;
+      color:#082e5b;
+      font-size:15px;
+    }
+    .mini-sub{
+      color:var(--muted);
+      font-size:13px;
       line-height:1.5;
+      margin-top:4px;
+      word-break:break-word;
     }
 
     .chat-box{
-      background:rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.12);
       border-radius:20px;
       overflow:hidden;
+      background:rgba(255,255,255,0.06);
+      position:relative;
+      z-index:1;
     }
-
     .chat-messages{
-      max-height:260px;
+      max-height:250px;
       overflow:auto;
       padding:12px;
       display:flex;
       flex-direction:column;
       gap:10px;
-      background:rgba(255,255,255,0.04);
     }
-
     .chat-msg{
       background:rgba(255,255,255,0.12);
       border-radius:14px;
       padding:10px;
     }
-
     .chat-msg-head{
       font-size:12px;
       font-weight:800;
@@ -562,8 +406,8 @@
       display:flex;
       justify-content:space-between;
       gap:10px;
+      flex-wrap:wrap;
     }
-
     .chat-msg-body{
       font-size:13px;
       line-height:1.45;
@@ -571,15 +415,13 @@
       white-space:pre-wrap;
       word-break:break-word;
     }
-
     .chat-compose{
       padding:12px;
-      border-top:1px solid rgba(255,255,255,0.08);
+      border-top:1px solid rgba(255,255,255,0.10);
     }
-
     .chat-compose textarea{
       width:100%;
-      min-height:80px;
+      min-height:84px;
       resize:vertical;
       border:none;
       outline:none;
@@ -590,16 +432,15 @@
       margin-bottom:10px;
     }
 
-    .hidden{
-      display:none !important;
+    .empty-note{
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.6;
     }
 
     @media (max-width: 1280px){
       .page{
         grid-template-columns:1fr;
-      }
-      .sidebar, .rightbar{
-        position:static;
       }
     }
   </style>
@@ -622,130 +463,95 @@
 
   <div class="page">
     <aside class="sidebar">
-      <div class="sidebar-top">
-        <div class="avatar large" id="myAvatar">MB</div>
-        <div>
-          <h2>Salle de réunion</h2>
-          <p id="myName">Chargement...</p>
-        </div>
-      </div>
-
-      <div class="section-card" id="ownerPanel">
-        <h3>Créer une salle</h3>
-
-        <label class="label" for="roomTitleInput">Titre de la réunion</label>
-        <input id="roomTitleInput" class="text-input" type="text" placeholder="Ex. Réunion laboratoire / cours / soutenance">
-
-        <label class="label" for="roomExpiryInput">Durée avant expiration</label>
-        <select id="roomExpiryInput" class="select-input">
-          <option value="15">15 minutes</option>
-          <option value="30">30 minutes</option>
-          <option value="60" selected>1 heure</option>
-          <option value="120">2 heures</option>
-          <option value="180">3 heures</option>
-          <option value="360">6 heures</option>
-          <option value="720">12 heures</option>
-          <option value="1440">24 heures</option>
-        </select>
-
-        <label class="label" for="roomPasswordInput">Mot de passe de réunion (optionnel)</label>
-        <input id="roomPasswordInput" class="password-input" type="password" placeholder="Mot de passe facultatif">
-
-        <label class="check-row">
-          <input type="checkbox" id="waitingRoomInput">
-          <span>Activer la salle d’attente</span>
-        </label>
-
-        <div class="btn-row">
-          <button class="main-btn" id="createRoomBtn" type="button">Créer la salle</button>
-          <button class="secondary-btn" id="copyRoomLinkBtn" type="button" style="display:none;">Copier le lien</button>
+      <div class="section-card">
+        <div class="sidebar-top">
+          <div class="avatar large" id="myAvatar">MB</div>
+          <div>
+            <h2>Salle de réunion</h2>
+            <p id="myName" style="color:#6b7d93;margin-top:6px;">Chargement...</p>
+          </div>
         </div>
 
-        <div class="room-link-box" id="roomLinkBox"></div>
+        <div id="ownerPanel" class="hidden">
+          <h3>Créer une salle</h3>
 
-        <div class="helper-note">
-          Seul le compte <strong>borisamoussou01@gmail.com</strong> peut créer et administrer une réunion.
+          <label class="label" for="roomTitleInput">Titre de la réunion</label>
+          <input id="roomTitleInput" class="text-input" type="text" placeholder="Ex. Réunion laboratoire / cours / soutenance">
+
+          <label class="label" for="roomExpiryInput">Durée avant expiration</label>
+          <select id="roomExpiryInput" class="select-input">
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="60" selected>1 heure</option>
+            <option value="120">2 heures</option>
+            <option value="180">3 heures</option>
+            <option value="360">6 heures</option>
+            <option value="720">12 heures</option>
+            <option value="1440">24 heures</option>
+          </select>
+
+          <label class="label" for="roomPasswordInput">Mot de passe de réunion (optionnel)</label>
+          <input id="roomPasswordInput" class="password-input" type="password" placeholder="Mot de passe facultatif">
+
+          <label class="check-row">
+            <input type="checkbox" id="waitingRoomInput">
+            <span>Activer la salle d’attente</span>
+          </label>
+
+          <div class="btn-row">
+            <button class="main-btn" id="createRoomBtn" type="button">Créer la salle</button>
+            <button class="secondary-btn hidden" id="copyRoomLinkBtn" type="button">Copier le lien</button>
+          </div>
+
+          <div class="room-link-box" id="roomLinkBox"></div>
+
+          <div class="helper-note">
+            Seul le compte <strong>borisamoussou01@gmail.com</strong> peut créer, administrer et fermer une réunion.
+          </div>
         </div>
-      </div>
 
-      <div class="section-card" id="guestInfoPanel">
-        <h3>Accès invité</h3>
-        <div class="helper-note">
-          Les invités ne peuvent pas créer de salle. Ils peuvent rejoindre uniquement via un lien direct envoyé par le propriétaire.
+        <div id="guestInfoPanel" class="hidden">
+          <h3>Accès invité</h3>
+          <div class="helper-note">
+            Les invités ne peuvent pas créer de salle. Ils peuvent seulement rejoindre une salle avec un lien valide envoyé par l’administrateur.
+          </div>
+          <div class="join-note" id="guestJoinNote"></div>
         </div>
       </div>
 
       <div class="section-card">
-        <h3>Informations de la salle</h3>
-        <div class="room-meta" id="roomMeta">
-          <div class="meta-line">Aucune salle ouverte.</div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <h3>Participants</h3>
-        <div class="participants-list" id="participantsList">
-          <div style="opacity:.92;">Aucun participant pour le moment.</div>
+        <h3>Informations de salle</h3>
+        <div class="meta-box" id="roomMeta">
+          <div class="empty-note">Aucune salle ouverte.</div>
         </div>
       </div>
     </aside>
 
-    <main class="main">
-      <section class="hero">
-        <div>
-          <h3 id="meetingTitle">Salle de réunion professionnelle</h3>
+    <main class="center">
+      <div class="center-card">
+        <div class="meeting-head">
+          <h1 id="meetingTitle">Salle de réunion professionnelle</h1>
           <p id="meetingSubtitle">Le propriétaire crée le lien et l’envoie aux participants.</p>
         </div>
 
-        <div class="hero-actions">
-          <button class="secondary-btn" id="joinCurrentRoomBtn" type="button" style="display:none;">Entrer dans la salle</button>
-          <button class="secondary-btn" id="muteAllBtn" type="button" style="display:none;">Couper le micro de tous</button>
-          <button class="danger-btn" id="closeRoomBtn" type="button" style="display:none;">Fermer la salle</button>
-        </div>
-      </section>
-
-      <section class="status-bar" id="statusBar">
-        Prêt.
-      </section>
-
-      <section class="stage">
-        <div class="stage-controls">
-          <button class="control-btn" id="joinRoomBtn" type="button">Entrer dans la réunion</button>
-          <button class="control-btn" id="toggleMicBtn" type="button">Micro ON</button>
-          <button class="control-btn" id="toggleCamBtn" type="button">Caméra ON</button>
-          <button class="control-btn" id="shareScreenBtn" type="button">Partager l’écran</button>
-          <button class="control-btn danger" id="leaveRoomBtn" type="button">Quitter la réunion</button>
-        </div>
-
-        <div class="video-grid" id="videoGrid">
-          <div class="video-tile">
-            <div class="video-head">
-              <div class="video-name">Aperçu</div>
-              <div class="video-badges">
-                <span class="tiny-pill">En attente</span>
-              </div>
-            </div>
-            <div class="video-wrap">
-              <div class="video-empty">
-                Crée une salle ou ouvre un lien de réunion,<br>
-                puis clique sur « Entrer dans la réunion ».
-              </div>
-            </div>
+        <div class="video-stage">
+          <div class="video-placeholder">
+            <h3 id="stageTitle">Salle non rejointe</h3>
+            <p id="stageText">
+              Cette page gère l’accès, l’expiration, la salle d’attente et l’organisation de la réunion.
+              L’administrateur contrôle la salle. Les invités accèdent uniquement avec un lien valide.
+            </p>
           </div>
         </div>
-      </section>
-    </main>
 
-    <aside class="rightbar">
-      <div class="section-card" id="waitingRoomPanel">
-        <h3>Salle d’attente</h3>
-        <div class="requests-list" id="requestsList">
-          <div style="opacity:.92;">Aucune demande.</div>
+        <div class="control-bar">
+          <span class="status-pill"><span class="dot" id="roomDot"></span><span id="roomStatusText">Aucune salle</span></span>
+          <button class="main-btn" id="joinRoomBtn" type="button">Rejoindre</button>
+          <button class="secondary-btn hidden" id="joinCurrentRoomBtn" type="button">Rejoindre en tant que propriétaire</button>
+          <button class="secondary-btn hidden" id="approveAllBtn" type="button">Accepter tous les invités</button>
+          <button class="danger-btn hidden" id="closeRoomBtn" type="button">Fermer la salle</button>
         </div>
-      </div>
 
-      <div class="section-card">
-        <h3>Chat de réunion</h3>
         <div class="chat-box">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-msg">
@@ -753,15 +559,33 @@
                 <span>Système</span>
                 <span>—</span>
               </div>
-              <div class="chat-msg-body">Les messages de réunion apparaîtront ici.</div>
+              <div class="chat-msg-body">
+                Le salon de réunion est prêt. Les messages affichés ici sont liés à la salle en cours.
+              </div>
             </div>
           </div>
           <div class="chat-compose">
-            <textarea id="chatInput" placeholder="Écris un message à toute la salle..."></textarea>
-            <div class="btn-row">
+            <textarea id="chatInput" placeholder="Écrire un message à propos de la réunion..."></textarea>
+            <div class="action-row">
               <button class="main-btn" id="sendChatBtn" type="button">Envoyer</button>
             </div>
           </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="rightbar">
+      <div class="section-card">
+        <h3>Participants présents</h3>
+        <div class="mini-list" id="participantsList">
+          <div class="empty-note">Aucun participant pour le moment.</div>
+        </div>
+      </div>
+
+      <div class="section-card hidden" id="waitingRoomPanel">
+        <h3>Salle d’attente</h3>
+        <div class="mini-list" id="waitingList">
+          <div class="empty-note">Aucune personne en attente.</div>
         </div>
       </div>
     </aside>
@@ -769,120 +593,99 @@
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       ref,
+      get,
       set,
       update,
-      get,
-      push,
-      remove,
       onValue,
-      onChildAdded,
-      onDisconnect
+      push,
+      remove
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const OWNER_EMAIL = "borisamoussou01@gmail.com";
+    const LAST_ACTIVITY_KEY = "insights_last_activity";
+    const INACTIVITY_LIMIT = 15 * 60 * 1000;
 
     const myAvatar = document.getElementById("myAvatar");
     const myName = document.getElementById("myName");
+    const meetingNavLink = document.getElementById("meetingNavLink");
+
     const ownerPanel = document.getElementById("ownerPanel");
     const guestInfoPanel = document.getElementById("guestInfoPanel");
-    const waitingRoomPanel = document.getElementById("waitingRoomPanel");
-    const meetingNavLink = document.getElementById("meetingNavLink");
+    const guestJoinNote = document.getElementById("guestJoinNote");
 
     const roomTitleInput = document.getElementById("roomTitleInput");
     const roomExpiryInput = document.getElementById("roomExpiryInput");
     const roomPasswordInput = document.getElementById("roomPasswordInput");
     const waitingRoomInput = document.getElementById("waitingRoomInput");
+
     const createRoomBtn = document.getElementById("createRoomBtn");
     const copyRoomLinkBtn = document.getElementById("copyRoomLinkBtn");
     const roomLinkBox = document.getElementById("roomLinkBox");
-    const roomMeta = document.getElementById("roomMeta");
-    const participantsList = document.getElementById("participantsList");
-    const requestsList = document.getElementById("requestsList");
 
+    const roomMeta = document.getElementById("roomMeta");
     const meetingTitle = document.getElementById("meetingTitle");
     const meetingSubtitle = document.getElementById("meetingSubtitle");
-    const joinCurrentRoomBtn = document.getElementById("joinCurrentRoomBtn");
-    const muteAllBtn = document.getElementById("muteAllBtn");
-    const closeRoomBtn = document.getElementById("closeRoomBtn");
-    const statusBar = document.getElementById("statusBar");
+    const roomDot = document.getElementById("roomDot");
+    const roomStatusText = document.getElementById("roomStatusText");
+    const stageTitle = document.getElementById("stageTitle");
+    const stageText = document.getElementById("stageText");
+
     const joinRoomBtn = document.getElementById("joinRoomBtn");
-    const toggleMicBtn = document.getElementById("toggleMicBtn");
-    const toggleCamBtn = document.getElementById("toggleCamBtn");
-    const shareScreenBtn = document.getElementById("shareScreenBtn");
-    const leaveRoomBtn = document.getElementById("leaveRoomBtn");
-    const videoGrid = document.getElementById("videoGrid");
+    const joinCurrentRoomBtn = document.getElementById("joinCurrentRoomBtn");
+    const approveAllBtn = document.getElementById("approveAllBtn");
+    const closeRoomBtn = document.getElementById("closeRoomBtn");
+
+    const participantsList = document.getElementById("participantsList");
+    const waitingRoomPanel = document.getElementById("waitingRoomPanel");
+    const waitingList = document.getElementById("waitingList");
 
     const chatMessages = document.getElementById("chatMessages");
     const chatInput = document.getElementById("chatInput");
     const sendChatBtn = document.getElementById("sendChatBtn");
 
     let currentUser = null;
-    let currentUserProfile = null;
-    let usersCache = {};
-
-    let roomId = null;
-    let roomMetaCache = null;
-    let participantsCache = {};
-    let requestsCache = {};
+    let currentProfile = null;
+    let currentRoomId = "";
+    let currentRoomMeta = null;
     let joinedRoom = false;
-    let accessRequested = false;
+    let isInWaitingRoom = false;
+    let activityTimeout = null;
+    let lastGeneratedRoomLink = "";
 
-    let localStream = null;
-    let displayStream = null;
-    let isMicMuted = false;
-    let isCamOff = false;
-    let isScreenSharing = false;
+    function resetActivityTimer() {
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+      clearTimeout(activityTimeout);
+      activityTimeout = setTimeout(async () => {
+        try { await signOut(auth); } catch (e) {}
+        window.location.href = "insights.html";
+      }, INACTIVITY_LIMIT);
+    }
 
-    const peerConnections = new Map();
-    const remoteStreams = new Map();
-    const processedSignalIds = new Set();
+    function bindActivityEvents() {
+      ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
+        window.addEventListener(evt, () => {
+          if (auth.currentUser) resetActivityTimer();
+        }, { passive: true });
+      });
+    }
 
-    const rtcConfig = {
-      iceServers: [
-        { urls: "stun:stun.relay.metered.ca:80" },
-        {
-          urls: "turn:standard.relay.metered.ca:80",
-          username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e"
-        },
-        {
-          urls: "turn:standard.relay.metered.ca:80?transport=tcp",
-          username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e"
-        },
-        {
-          urls: "turn:standard.relay.metered.ca:443",
-          username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e"
-        },
-        {
-          urls: "turns:standard.relay.metered.ca:443?transport=tcp",
-          username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e"
-        }
-      ]
-    };
+    function initials(name = "", email = "") {
+      const s = (name || email || "U").trim();
+      const parts = s.split(" ").filter(Boolean);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return s.slice(0, 2).toUpperCase();
+    }
 
     function escapeHtml(text = "") {
       const div = document.createElement("div");
       div.textContent = text;
       return div.innerHTML;
-    }
-
-    function initials(name = "", email = "") {
-      const source = (name || email || "U").trim();
-      const parts = source.split(" ").filter(Boolean);
-      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-      return source.slice(0, 2).toUpperCase();
-    }
-
-    function avatarMarkup(profile) {
-      const photo = profile?.photoURL || "";
-      const label = initials(profile?.displayName || "", profile?.email || "");
-      return photo ? `<img src="${escapeHtml(photo)}" alt="avatar">` : escapeHtml(label);
     }
 
     function formatDate(ts) {
@@ -896,45 +699,29 @@
       });
     }
 
-    function formatRemaining(ms) {
-      if (ms <= 0) return "Expirée";
-      const totalMin = Math.floor(ms / 60000);
-      const h = Math.floor(totalMin / 60);
-      const m = totalMin % 60;
-      if (h > 0) return `${h}h ${m}min`;
-      return `${m} min`;
-    }
-
-    function setStatus(text, isError = false) {
-      statusBar.textContent = text;
-      statusBar.style.color = isError ? "#b00020" : "#14854b";
-    }
-
-    function isOwnerEmail() {
-      return (currentUser?.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase();
-    }
-
-    function isRoomOwner() {
-      return roomMetaCache?.ownerId === currentUser?.uid;
-    }
-
-    function getDisplayName(uid) {
-      if (uid === currentUser?.uid) return currentUserProfile?.displayName || "Moi";
-      return usersCache[uid]?.displayName || participantsCache?.[uid]?.displayName || requestsCache?.[uid]?.displayName || "Participant";
-    }
-
-    function makeRoomLink(id) {
-      return `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(id)}`;
+    function setAvatar(profile = {}, user = {}) {
+      if (profile.photoURL) {
+        myAvatar.innerHTML = `<img src="${profile.photoURL}" alt="avatar">`;
+      } else {
+        myAvatar.textContent = initials(profile.displayName || user.displayName || "", user.email || "");
+      }
     }
 
     function getRoomQueryParam() {
       const params = new URLSearchParams(window.location.search);
-      return params.get("room");
+      return params.get("room") || "";
+    }
+
+    function isOwnerEmail() {
+      return !!currentUser && (currentUser.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase();
+    }
+
+    function isRoomOwner() {
+      return isOwnerEmail() && currentRoomMeta && currentRoomMeta.ownerEmail && currentRoomMeta.ownerEmail.toLowerCase() === OWNER_EMAIL.toLowerCase();
     }
 
     function showExpiredPage(message = "Lien expiré") {
       document.title = "Lien expiré | Boris Research Hub";
-
       document.body.innerHTML = `
         <div style="
           min-height:100vh;
@@ -954,7 +741,6 @@
             padding:34px 28px;
             text-align:center;
           ">
-            <div style="font-size:54px;margin-bottom:14px;">⏳</div>
             <h1 style="margin:0 0 10px;color:#082e5b;font-size:30px;">Lien expiré</h1>
             <p style="margin:0 0 18px;color:#6b7d93;font-size:16px;line-height:1.6;">${escapeHtml(message)}</p>
             <p style="margin:0 0 24px;color:#6b7d93;font-size:14px;line-height:1.5;">
@@ -969,21 +755,35 @@
               font-weight:800;
               cursor:pointer;
               font-size:15px;
-            ">Aller vers une page neutre</button>
+            ">Retour à Home</button>
           </div>
         </div>
       `;
-
       try {
         history.replaceState({}, "", "meeting-room.html?expired=1");
       } catch (_) {}
-
       const btn = document.getElementById("goNeutralPageBtn");
       if (btn) {
         btn.addEventListener("click", () => {
-          window.location.replace("messages.html");
+          window.location.replace("home.html");
         });
       }
+    }
+
+    function roomPath(roomId) {
+      return `meetingRooms/${roomId}`;
+    }
+
+    function participantPath(roomId, uid) {
+      return `meetingRooms/${roomId}/participants/${uid}`;
+    }
+
+    function waitingPath(roomId, uid) {
+      return `meetingRooms/${roomId}/waiting/${uid}`;
+    }
+
+    function chatPath(roomId) {
+      return `meetingRooms/${roomId}/chat`;
     }
 
     function updateVisibilityByRole() {
@@ -1002,985 +802,504 @@
       }
 
       waitingRoomPanel.classList.toggle("hidden", !isRoomOwner());
-      muteAllBtn.style.display = isRoomOwner() ? "inline-flex" : "none";
-      closeRoomBtn.style.display = isRoomOwner() ? "inline-flex" : "none";
-      joinCurrentRoomBtn.style.display = isRoomOwner() ? "inline-flex" : "none";
+      closeRoomBtn.classList.toggle("hidden", !isRoomOwner());
+      approveAllBtn.classList.toggle("hidden", !isRoomOwner());
+      joinCurrentRoomBtn.classList.toggle("hidden", !isRoomOwner() || !currentRoomId);
     }
 
-    function updateButtons() {
-      toggleMicBtn.disabled = !joinedRoom || !localStream;
-      toggleCamBtn.disabled = !joinedRoom || !localStream;
-      shareScreenBtn.disabled = !joinedRoom || !localStream;
-      leaveRoomBtn.disabled = !joinedRoom;
-      joinRoomBtn.disabled = !roomId;
+    function randomRoomId(length = 14) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+      let out = "";
+      const arr = new Uint32Array(length);
+      window.crypto.getRandomValues(arr);
+      for (let i = 0; i < length; i++) {
+        out += chars[arr[i] % chars.length];
+      }
+      return out;
+    }
 
-      toggleMicBtn.textContent = isMicMuted ? "Micro OFF" : "Micro ON";
-      toggleCamBtn.textContent = isCamOff ? "Caméra OFF" : "Caméra ON";
-      shareScreenBtn.textContent = isScreenSharing ? "Arrêter le partage" : "Partager l’écran";
-
-      if (isScreenSharing) shareScreenBtn.classList.add("active");
-      else shareScreenBtn.classList.remove("active");
-
-      muteAllBtn.style.display = isRoomOwner() ? "inline-flex" : "none";
-      updateVisibilityByRole();
+    function getProfileName() {
+      return currentProfile?.displayName || currentUser?.displayName || "Utilisateur";
     }
 
     function renderRoomMeta() {
-      if (!roomMetaCache) {
-        roomMeta.innerHTML = `<div class="meta-line">Aucune salle ouverte.</div>`;
+      if (!currentRoomMeta) {
+        roomMeta.innerHTML = `<div class="empty-note">Aucune salle ouverte.</div>`;
         meetingTitle.textContent = "Salle de réunion professionnelle";
         meetingSubtitle.textContent = "Le propriétaire crée le lien et l’envoie aux participants.";
+        stageTitle.textContent = "Salle non rejointe";
+        stageText.textContent = "Cette page gère l’accès, l’expiration, la salle d’attente et l’organisation de la réunion. L’administrateur contrôle la salle. Les invités accèdent uniquement avec un lien valide.";
+        roomDot.className = "dot";
+        roomStatusText.textContent = "Aucune salle";
+        if (!isOwnerEmail()) {
+          guestJoinNote.style.display = "none";
+        }
         return;
       }
 
-      const expired = Date.now() > (roomMetaCache.expiresAt || 0);
-      const closed = roomMetaCache.status === "closed";
+      const expired = Date.now() > (currentRoomMeta.expiresAt || 0);
+      const closed = currentRoomMeta.status === "closed";
+      const waitingEnabled = !!currentRoomMeta.waitingRoomEnabled;
 
-      meetingTitle.textContent = roomMetaCache.title || "Salle de réunion";
+      meetingTitle.textContent = currentRoomMeta.title || "Salle de réunion";
       meetingSubtitle.textContent = isRoomOwner()
         ? "Tu es le propriétaire de cette salle."
-        : `Salle créée par ${getDisplayName(roomMetaCache.ownerId)}.`;
+        : `Salle créée par ${escapeHtml(currentRoomMeta.ownerDisplayName || "l’administrateur")}.`;
 
       roomMeta.innerHTML = `
-        <div class="meta-line"><strong>Titre :</strong> ${escapeHtml(roomMetaCache.title || "Salle de réunion")}</div>
-        <div class="meta-line"><strong>Créateur :</strong> ${escapeHtml(roomMetaCache.ownerName || getDisplayName(roomMetaCache.ownerId))}</div>
-        <div class="meta-line"><strong>Créée le :</strong> ${escapeHtml(formatDate(roomMetaCache.createdAt))}</div>
-        <div class="meta-line"><strong>Expire le :</strong> ${escapeHtml(formatDate(roomMetaCache.expiresAt))}</div>
-        <div class="meta-line"><strong>Temps restant :</strong> ${escapeHtml(formatRemaining((roomMetaCache.expiresAt || 0) - Date.now()))}</div>
-        <div class="meta-line"><strong>Mot de passe :</strong> ${roomMetaCache.hasPassword ? "Oui" : "Non"}</div>
-        <div class="meta-line"><strong>Salle d’attente :</strong> ${roomMetaCache.waitingRoom ? "Oui" : "Non"}</div>
-        <div class="meta-line"><strong>État :</strong>
-          <span class="${closed ? "status-bad" : expired ? "status-warn" : "status-ok"}">
-            ${closed ? "Salle fermée" : expired ? "Salle expirée" : "Salle active"}
-          </span>
+        <div style="line-height:1.7;">
+          <div><strong>Titre :</strong> ${escapeHtml(currentRoomMeta.title || "—")}</div>
+          <div><strong>Créée le :</strong> ${escapeHtml(formatDate(currentRoomMeta.createdAt) || "—")}</div>
+          <div><strong>Expire le :</strong> ${escapeHtml(formatDate(currentRoomMeta.expiresAt) || "—")}</div>
+          <div><strong>Salle d’attente :</strong> ${waitingEnabled ? "Oui" : "Non"}</div>
+          <div><strong>Mot de passe :</strong> ${currentRoomMeta.hasPassword ? "Oui" : "Non"}</div>
+          <div><strong>Statut :</strong> ${closed ? "Fermée" : expired ? "Expirée" : "Ouverte"}</div>
         </div>
       `;
 
-      updateButtons();
-    }
-
-    function renderParticipants() {
-      const entries = Object.entries(participantsCache || {});
-      if (!entries.length) {
-        participantsList.innerHTML = `<div style="opacity:.92;">Aucun participant pour le moment.</div>`;
+      if (closed) {
+        roomDot.className = "dot red";
+        roomStatusText.textContent = "Salle fermée";
+        stageTitle.textContent = "Salle fermée";
+        stageText.textContent = "Cette salle a été fermée par le propriétaire.";
         return;
       }
 
-      entries.sort((a, b) => (a[1]?.joinedAt || 0) - (b[1]?.joinedAt || 0));
-
-      participantsList.innerHTML = entries.map(([uid, p]) => {
-        const profile = usersCache[uid] || {};
-        const owner = roomMetaCache?.ownerId === uid;
-        const sharing = !!p.isScreenSharing;
-        return `
-          <div class="participant-card">
-            <div class="avatar small">${avatarMarkup(profile.uid ? profile : {displayName:p.displayName,email:p.email,photoURL:p.photoURL})}</div>
-            <div class="participant-main">
-              <div class="participant-name">${escapeHtml(profile.displayName || p.displayName || "Participant")}</div>
-              <div class="participant-sub">${escapeHtml(uid === currentUser?.uid ? "Toi" : (p.email || "Participant"))}</div>
-            </div>
-            ${sharing ? `<span class="share-pill">Écran</span>` : ``}
-            ${owner ? `<span class="owner-pill">Owner</span>` : ``}
-            ${isRoomOwner() && uid !== currentUser?.uid ? `<button class="mini-btn danger" type="button" data-remove-uid="${uid}">Retirer</button>` : ``}
-          </div>
-        `;
-      }).join("");
-
-      document.querySelectorAll("[data-remove-uid]").forEach(btn => {
-        btn.addEventListener("click", () => removeParticipant(btn.dataset.removeUid));
-      });
-    }
-
-    function renderRequests() {
-      if (!isRoomOwner()) {
-        requestsList.innerHTML = `<div style="opacity:.92;">Réservé au propriétaire.</div>`;
+      if (expired) {
+        roomDot.className = "dot red";
+        roomStatusText.textContent = "Lien expiré";
+        stageTitle.textContent = "Lien expiré";
+        stageText.textContent = "Le délai de validité de cette salle est dépassé.";
         return;
       }
 
-      const entries = Object.entries(requestsCache || {});
-      if (!entries.length) {
-        requestsList.innerHTML = `<div style="opacity:.92;">Aucune demande.</div>`;
-        return;
+      if (joinedRoom) {
+        roomDot.className = "dot online";
+        roomStatusText.textContent = "Salle rejointe";
+        stageTitle.textContent = "Réunion active";
+        stageText.textContent = isRoomOwner()
+          ? "Tu gères actuellement cette salle. Tu peux laisser entrer les invités, partager le lien et fermer la réunion."
+          : "Tu es dans la salle. Tu peux participer et suivre les informations partagées ici.";
+      } else if (isInWaitingRoom) {
+        roomDot.className = "dot warn";
+        roomStatusText.textContent = "En salle d’attente";
+        stageTitle.textContent = "En attente d’approbation";
+        stageText.textContent = "Le propriétaire doit encore t’autoriser à entrer dans la réunion.";
+      } else {
+        roomDot.className = "dot warn";
+        roomStatusText.textContent = "Salle ouverte";
+        stageTitle.textContent = "Salle prête à être rejointe";
+        stageText.textContent = "La salle est disponible. Utilise le bouton rejoindre pour entrer ou demander l’accès.";
       }
 
-      entries.sort((a, b) => (a[1]?.createdAt || 0) - (b[1]?.createdAt || 0));
-
-      requestsList.innerHTML = entries.map(([uid, r]) => `
-        <div class="request-card">
-          <div class="avatar small">${avatarMarkup({displayName:r.displayName,email:r.email,photoURL:r.photoURL})}</div>
-          <div class="request-main">
-            <div class="request-name">${escapeHtml(r.displayName || "Participant")}</div>
-            <div class="request-sub">${escapeHtml(r.email || "")}</div>
-          </div>
-          <button class="mini-btn" type="button" data-accept-uid="${uid}">Accepter</button>
-          <button class="mini-btn danger" type="button" data-reject-uid="${uid}">Refuser</button>
-        </div>
-      `).join("");
-
-      document.querySelectorAll("[data-accept-uid]").forEach(btn => {
-        btn.addEventListener("click", () => acceptRequest(btn.dataset.acceptUid));
-      });
-
-      document.querySelectorAll("[data-reject-uid]").forEach(btn => {
-        btn.addEventListener("click", () => rejectRequest(btn.dataset.rejectUid));
-      });
-    }
-
-    function renderChat(messagesObj = {}) {
-      const arr = Object.entries(messagesObj)
-        .map(([id, val]) => ({ id, ...val }))
-        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-
-      if (!arr.length) {
-        chatMessages.innerHTML = `
-          <div class="chat-msg">
-            <div class="chat-msg-head"><span>Système</span><span>—</span></div>
-            <div class="chat-msg-body">Les messages de réunion apparaîtront ici.</div>
-          </div>
-        `;
-        return;
+      if (!isOwnerEmail()) {
+        guestJoinNote.style.display = "block";
+        guestJoinNote.textContent = waitingEnabled
+          ? "Cette salle utilise une salle d’attente. Après ta demande, l’administrateur devra t’accepter."
+          : "Tu peux rejoindre directement cette salle tant que le lien est valide.";
       }
-
-      chatMessages.innerHTML = arr.map(msg => `
-        <div class="chat-msg">
-          <div class="chat-msg-head">
-            <span>${escapeHtml(msg.displayName || "Participant")}</span>
-            <span>${escapeHtml(formatDate(msg.createdAt))}</span>
-          </div>
-          <div class="chat-msg-body">${escapeHtml(msg.text || "")}</div>
-        </div>
-      `).join("");
-
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function renderVideoGrid() {
-      const tiles = [];
-
-      tiles.push(`
-        <div class="video-tile">
-          <div class="video-head">
-            <div class="video-name">Toi</div>
-            <div class="video-badges">
-              ${isRoomOwner() ? `<span class="tiny-pill owner">Owner</span>` : ``}
-              ${isScreenSharing ? `<span class="tiny-pill share">Écran</span>` : ``}
-              ${isMicMuted ? `<span class="tiny-pill">Micro OFF</span>` : ``}
-              ${isCamOff ? `<span class="tiny-pill">Caméra OFF</span>` : ``}
-            </div>
-          </div>
-          <div class="video-wrap">
-            ${localStream ? `<video id="localVideo" autoplay playsinline muted></video>` : `<div class="video-empty">Tu n'es pas encore dans la réunion.</div>`}
-          </div>
-        </div>
-      `);
-
-      const entries = Object.entries(participantsCache || {})
-        .filter(([uid]) => uid !== currentUser?.uid)
-        .sort((a, b) => (a[1]?.joinedAt || 0) - (b[1]?.joinedAt || 0));
-
-      entries.forEach(([uid, p]) => {
-        const stream = remoteStreams.get(uid);
-        const owner = roomMetaCache?.ownerId === uid;
-        tiles.push(`
-          <div class="video-tile">
-            <div class="video-head">
-              <div class="video-name">${escapeHtml(p.displayName || getDisplayName(uid))}</div>
-              <div class="video-badges">
-                ${p.isScreenSharing ? `<span class="tiny-pill share">Écran</span>` : ``}
-                ${owner ? `<span class="tiny-pill owner">Owner</span>` : ``}
-              </div>
-            </div>
-            <div class="video-wrap">
-              ${stream ? `<video id="video-${uid}" autoplay playsinline></video>` : `<div class="video-empty">${escapeHtml(p.displayName || "Participant")} est connecté, flux en attente...</div>`}
-            </div>
-          </div>
-        `);
-      });
-
-      videoGrid.innerHTML = tiles.join("");
-
-      const localVideo = document.getElementById("localVideo");
-      if (localVideo && localStream) localVideo.srcObject = displayStream || localStream;
-
-      entries.forEach(([uid]) => {
-        const v = document.getElementById(`video-${uid}`);
-        const s = remoteStreams.get(uid);
-        if (v && s) v.srcObject = s;
-      });
-    }
-
-    async function ensureMyProfile(user) {
-      const userRef = ref(db, "users/" + user.uid);
-      const snap = await get(userRef);
-
-      const payload = {
-        uid: user.uid,
-        email: user.email || "",
-        displayName: user.displayName || user.email?.split("@")[0] || "Utilisateur",
-        photoURL: snap.exists() ? (snap.val().photoURL || "") : "",
-        bio: snap.exists() ? (snap.val().bio || "") : "",
-        verifiedEmail: !!user.emailVerified,
-        updatedAt: Date.now()
-      };
-
-      if (!snap.exists()) payload.createdAt = Date.now();
-      await update(userRef, payload);
-      return payload;
-    }
-
-    async function setupPresence(user, displayName) {
-      const connectedRef = ref(db, ".info/connected");
-      const presenceRef = ref(db, "users/" + user.uid + "/presence");
-
-      onValue(connectedRef, async (snap) => {
-        if (snap.val() === true) {
-          await onDisconnect(presenceRef).set({
-            online: false,
-            lastSeen: Date.now(),
-            displayName: displayName || user.displayName || "Utilisateur"
-          });
-
-          await set(presenceRef, {
-            online: true,
-            lastSeen: Date.now(),
-            displayName: displayName || user.displayName || "Utilisateur"
-          });
-        }
-      });
-    }
-
-    function subscribeUsers() {
-      onValue(ref(db, "users"), snap => {
-        usersCache = snap.val() || {};
-        if (currentUser) {
-          currentUserProfile = usersCache[currentUser.uid] || currentUserProfile;
-          myAvatar.innerHTML = avatarMarkup(currentUserProfile);
-          myName.textContent = currentUserProfile?.displayName || "Utilisateur";
-        }
-        renderParticipants();
-        renderRequests();
-        renderRoomMeta();
-        renderVideoGrid();
-      });
-    }
-
-    function generateRoomId() {
-      return "room_" + Math.random().toString(36).slice(2, 10) + "_" + Date.now().toString(36);
     }
 
     async function createRoom() {
-      if (!currentUser || !isOwnerEmail()) {
-        setStatus("Seul le compte autorisé peut créer une salle.", true);
-        return;
-      }
+      if (!isOwnerEmail()) return;
 
-      const title = roomTitleInput.value.trim() || "Réunion professionnelle";
-      const durationMin = Number(roomExpiryInput.value || "60");
-      const password = roomPasswordInput.value.trim();
-      const waitingRoom = !!waitingRoomInput.checked;
-      const expiresAt = Date.now() + durationMin * 60 * 1000;
-      const newRoomId = generateRoomId();
+      const title = roomTitleInput.value.trim() || "Salle de réunion";
+      const expiresInMinutes = Number(roomExpiryInput.value || "60");
+      const roomPassword = roomPasswordInput.value;
+      const waitingEnabled = !!waitingRoomInput.checked;
 
-      const payload = {
-        id: newRoomId,
+      const roomId = randomRoomId();
+      const now = Date.now();
+      const expiresAt = now + expiresInMinutes * 60 * 1000;
+
+      const roomData = {
+        roomId,
         title,
         ownerId: currentUser.uid,
         ownerEmail: currentUser.email || "",
-        ownerName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
+        ownerDisplayName: getProfileName(),
+        createdAt: now,
+        updatedAt: now,
         expiresAt,
-        status: "active",
-        waitingRoom,
-        hasPassword: !!password,
-        password: password || ""
+        waitingRoomEnabled: waitingEnabled,
+        hasPassword: !!roomPassword,
+        password: roomPassword || "",
+        status: "open"
       };
 
+      createRoomBtn.disabled = true;
+
       try {
-        await set(ref(db, `meetingRooms/${newRoomId}/meta`), payload);
+        await set(ref(db, roomPath(roomId)), roomData);
 
-        roomId = newRoomId;
-        roomMetaCache = payload;
-        history.replaceState({}, "", `?room=${encodeURIComponent(newRoomId)}`);
+        currentRoomId = roomId;
+        currentRoomMeta = roomData;
 
-        const link = makeRoomLink(newRoomId);
+        const shareLink = `${window.location.origin}${window.location.pathname.replace(/[^/]+$/, "")}meeting-room.html?room=${encodeURIComponent(roomId)}`;
+        lastGeneratedRoomLink = shareLink;
         roomLinkBox.style.display = "block";
-        roomLinkBox.textContent = link;
-        copyRoomLinkBtn.style.display = "inline-flex";
-
-        subscribeRoom(newRoomId);
-        renderRoomMeta();
-        setStatus("Salle créée. Tu peux maintenant envoyer le lien.");
-      } catch (e) {
-        console.error(e);
-        setStatus("Impossible de créer la salle.", true);
-      }
-    }
-
-    async function copyRoomLink() {
-      if (!roomId) return;
-      const link = makeRoomLink(roomId);
-      try {
-        await navigator.clipboard.writeText(link);
-        setStatus("Lien copié.");
-      } catch (e) {
-        roomLinkBox.style.display = "block";
-        roomLinkBox.textContent = link;
-        setStatus("Copie automatique impossible. Copie le lien affiché.", true);
-      }
-    }
-
-    function subscribeRoom(id) {
-      onValue(ref(db, `meetingRooms/${id}/meta`), async snap => {
-        roomMetaCache = snap.val() || null;
-        renderRoomMeta();
-        updateVisibilityByRole();
-
-        if (!roomMetaCache) {
-          showExpiredPage("Cette salle n’existe plus ou a été supprimée.");
-          return;
-        }
-
-        const expired = Date.now() > (roomMetaCache.expiresAt || 0);
-
-        if (expired && roomMetaCache.status !== "closed" && isRoomOwner()) {
-          await update(ref(db, `meetingRooms/${id}/meta`), {
-            status: "closed",
-            updatedAt: Date.now(),
-            closedAt: Date.now()
-          }).catch(() => {});
-        }
-
-        if ((roomMetaCache.status === "closed" || expired) && joinedRoom) {
-          await leaveRoom(false);
-          showExpiredPage(
-            roomMetaCache.status === "closed"
-              ? "La salle a été fermée. Ce lien ne permet plus d’y revenir."
-              : "Le temps défini pour cette salle est écoulé. Ce lien n’est plus utilisable."
-          );
-          return;
-        }
-      });
-
-      onValue(ref(db, `meetingRooms/${id}/participants`), async snap => {
-        participantsCache = snap.val() || {};
-        renderParticipants();
-        renderVideoGrid();
-
-        if (!joinedRoom || !currentUser) return;
-
-        const others = Object.entries(participantsCache).filter(([uid]) => uid !== currentUser.uid);
-
-        for (const [remoteUid, p] of others) {
-          if (peerConnections.has(remoteUid)) continue;
-          const mine = participantsCache[currentUser.uid];
-          if (!mine || !p) continue;
-
-          const iStart =
-            (mine.joinedAt || 0) < (p.joinedAt || 0) ||
-            ((mine.joinedAt || 0) === (p.joinedAt || 0) && currentUser.uid < remoteUid);
-
-          if (iStart) {
-            await createPeerForUser(remoteUid, true);
-          }
-        }
-
-        const activeRemote = new Set(others.map(([uid]) => uid));
-        for (const remoteUid of [...peerConnections.keys()]) {
-          if (!activeRemote.has(remoteUid)) {
-            closePeer(remoteUid);
-          }
-        }
-      });
-
-      onValue(ref(db, `meetingRooms/${id}/joinRequests`), snap => {
-        requestsCache = snap.val() || {};
-        renderRequests();
-      });
-
-      onValue(ref(db, `meetingRooms/${id}/chat`), snap => {
-        renderChat(snap.val() || {});
-      });
-
-      onChildAdded(ref(db, `meetingRooms/${id}/signals/${currentUser.uid}`), async snap => {
-        const signalId = snap.key;
-        if (!signalId || processedSignalIds.has(signalId)) return;
-        processedSignalIds.add(signalId);
-
-        const signal = snap.val();
-        if (!signal) return;
+        roomLinkBox.textContent = shareLink;
+        copyRoomLinkBtn.classList.remove("hidden");
 
         try {
-          await handleSignal(signal);
-          await remove(ref(db, `meetingRooms/${id}/signals/${currentUser.uid}/${signalId}`)).catch(() => {});
-        } catch (e) {
-          console.error("handleSignal error:", e);
-        }
-      });
+          history.replaceState({}, "", `meeting-room.html?room=${encodeURIComponent(roomId)}`);
+        } catch (_) {}
+
+        await joinAsApprovedParticipant();
+
+        renderRoomMeta();
+        updateVisibilityByRole();
+      } catch (error) {
+        console.error(error);
+        alert("Impossible de créer la salle.");
+      } finally {
+        createRoomBtn.disabled = false;
+      }
     }
 
-    async function loadRoomFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const expiredFlag = params.get("expired");
-      const queryRoom = params.get("room");
-
-      if (expiredFlag === "1") {
-        showExpiredPage("Ce lien de réunion a déjà expiré ou a été neutralisé.");
-        return;
-      }
-
-      if (!queryRoom) {
-        if (!isOwnerEmail()) {
-          window.location.href = "messages.html";
-          return;
-        }
+    async function loadRoom(roomId) {
+      if (!roomId) {
+        currentRoomId = "";
+        currentRoomMeta = null;
+        renderRoomMeta();
         updateVisibilityByRole();
         return;
       }
 
-      roomId = queryRoom;
+      currentRoomId = roomId;
 
-      try {
-        const snap = await get(ref(db, `meetingRooms/${roomId}/meta`));
+      const snap = await get(ref(db, roomPath(roomId)));
+      if (!snap.exists()) {
+        showExpiredPage("Cette salle n’existe pas ou n’est plus disponible.");
+        return;
+      }
 
+      currentRoomMeta = snap.val() || {};
+      renderRoomMeta();
+      updateVisibilityByRole();
+
+      if (Date.now() > (currentRoomMeta.expiresAt || 0)) {
+        showExpiredPage("Le lien de réunion a expiré.");
+        return;
+      }
+
+      if (currentRoomMeta.status === "closed") {
+        showExpiredPage("Cette salle a été fermée par l’administrateur.");
+        return;
+      }
+
+      subscribeRoomRealtime(roomId);
+      subscribeParticipants(roomId);
+      subscribeWaiting(roomId);
+      subscribeChat(roomId);
+    }
+
+    function subscribeRoomRealtime(roomId) {
+      onValue(ref(db, roomPath(roomId)), (snap) => {
         if (!snap.exists()) {
-          showExpiredPage("Cette salle n’existe plus ou le lien n’est plus valide.");
+          showExpiredPage("Cette salle n’est plus disponible.");
           return;
         }
-
-        roomMetaCache = snap.val();
-
-        const isExpired = Date.now() > (roomMetaCache.expiresAt || 0);
-        const isClosed = roomMetaCache.status === "closed";
-
-        if (isExpired || isClosed) {
-          showExpiredPage(
-            isClosed
-              ? "Cette salle a été fermée par le propriétaire."
-              : "La durée de validité de cette salle est terminée."
-          );
-          return;
-        }
-
-        roomLinkBox.style.display = "block";
-        roomLinkBox.textContent = makeRoomLink(roomId);
-        copyRoomLinkBtn.style.display = isOwnerEmail() ? "inline-flex" : "none";
-
-        subscribeRoom(roomId);
+        currentRoomMeta = snap.val() || {};
         renderRoomMeta();
-        updateVisibilityByRole();
 
-        if (!isOwnerEmail()) {
-          meetingNavLink.classList.remove("hidden");
+        if (Date.now() > (currentRoomMeta.expiresAt || 0)) {
+          showExpiredPage("Le lien de réunion a expiré.");
+          return;
         }
-
-        setStatus("Salle chargée.");
-      } catch (e) {
-        console.error(e);
-        showExpiredPage("Impossible de charger cette salle. Le lien peut être devenu invalide.");
-      }
-    }
-
-    async function prepareLocalMedia() {
-      if (localStream) return;
-      localStream = await navigator.mediaDevices.getUserMedia({
-        audio:true,
-        video:true
-      });
-      isMicMuted = false;
-      isCamOff = false;
-      renderVideoGrid();
-      updateButtons();
-    }
-
-    function getCurrentVideoTrack() {
-      if (displayStream && displayStream.getVideoTracks().length) return displayStream.getVideoTracks()[0];
-      if (localStream && localStream.getVideoTracks().length) return localStream.getVideoTracks()[0];
-      return null;
-    }
-
-    async function sendSignal(toUid, data) {
-      if (!roomId || !currentUser || !toUid) return;
-      const signalRef = push(ref(db, `meetingRooms/${roomId}/signals/${toUid}`));
-      await set(signalRef, {
-        ...data,
-        from: currentUser.uid,
-        to: toUid,
-        createdAt: Date.now()
+        if (currentRoomMeta.status === "closed") {
+          showExpiredPage("Cette salle a été fermée par l’administrateur.");
+        }
       });
     }
 
-    async function createPeerForUser(remoteUid, initiator = false) {
-      if (!localStream || !roomId || !currentUser) return;
-      if (peerConnections.has(remoteUid)) return;
+    function subscribeParticipants(roomId) {
+      onValue(ref(db, `${roomPath(roomId)}/participants`), (snap) => {
+        const data = snap.val() || {};
+        const items = Object.values(data);
 
-      const pc = new RTCPeerConnection(rtcConfig);
-      peerConnections.set(remoteUid, pc);
-
-      const remoteStream = new MediaStream();
-      remoteStreams.set(remoteUid, remoteStream);
-
-      const audioTrack = localStream.getAudioTracks()[0];
-      const videoTrack = getCurrentVideoTrack();
-
-      if (audioTrack) pc.addTrack(audioTrack, localStream);
-      if (videoTrack) pc.addTrack(videoTrack, displayStream || localStream);
-
-      pc.ontrack = event => {
-        event.streams[0].getTracks().forEach(track => {
-          if (!remoteStream.getTracks().some(t => t.id === track.id)) {
-            remoteStream.addTrack(track);
-          }
-        });
-        renderVideoGrid();
-      };
-
-      pc.onicecandidate = async event => {
-        if (!event.candidate) return;
-        await sendSignal(remoteUid, {
-          type:"candidate",
-          candidate:event.candidate.candidate,
-          sdpMid:event.candidate.sdpMid,
-          sdpMLineIndex:event.candidate.sdpMLineIndex
-        });
-      };
-
-      renderVideoGrid();
-
-      if (initiator) {
-        const offer = await pc.createOffer({
-          offerToReceiveAudio:true,
-          offerToReceiveVideo:true
-        });
-        await pc.setLocalDescription(offer);
-
-        await sendSignal(remoteUid, {
-          type:"offer",
-          sdp:offer.sdp,
-          descriptionType:offer.type
-        });
-      }
-    }
-
-    async function handleSignal(signal) {
-      if (!signal || !signal.type) return;
-
-      if (signal.type === "mute_all") {
-        if (signal.to === currentUser.uid) {
-          const tracks = localStream?.getAudioTracks?.() || [];
-          tracks.forEach(t => t.enabled = false);
-          isMicMuted = true;
-          updateButtons();
-          renderVideoGrid();
-          setStatus("Le propriétaire a coupé ton micro.");
-        }
-        return;
-      }
-
-      if (signal.type === "remove_participant") {
-        if (signal.to === currentUser.uid) {
-          setStatus("Tu as été retiré de la salle.", true);
-          await leaveRoom(true);
-        }
-        return;
-      }
-
-      const remoteUid = signal.from;
-      if (!remoteUid || remoteUid === currentUser?.uid) return;
-
-      let pc = peerConnections.get(remoteUid);
-
-      if (!pc && signal.type === "offer") {
-        await createPeerForUser(remoteUid, false);
-        pc = peerConnections.get(remoteUid);
-      }
-
-      if (!pc) return;
-
-      if (signal.type === "offer") {
-        await pc.setRemoteDescription(new RTCSessionDescription({
-          type: signal.descriptionType || "offer",
-          sdp: signal.sdp
-        }));
-
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-
-        await sendSignal(remoteUid, {
-          type:"answer",
-          sdp:answer.sdp,
-          descriptionType:answer.type
-        });
-      }
-
-      if (signal.type === "answer") {
-        if (!pc.currentRemoteDescription) {
-          await pc.setRemoteDescription(new RTCSessionDescription({
-            type: signal.descriptionType || "answer",
-            sdp: signal.sdp
-          }));
-        }
-      }
-
-      if (signal.type === "candidate") {
-        try {
-          await pc.addIceCandidate(new RTCIceCandidate({
-            candidate: signal.candidate,
-            sdpMid: signal.sdpMid,
-            sdpMLineIndex: signal.sdpMLineIndex
-          }));
-        } catch (e) {
-          console.error("ICE error:", e);
-        }
-      }
-    }
-
-    function closePeer(remoteUid) {
-      const pc = peerConnections.get(remoteUid);
-      if (pc) {
-        try { pc.close(); } catch (_) {}
-      }
-      peerConnections.delete(remoteUid);
-      remoteStreams.delete(remoteUid);
-      renderVideoGrid();
-    }
-
-    async function joinRoom() {
-      if (!currentUser || !roomId || !roomMetaCache) {
-        setStatus("Aucune salle sélectionnée.", true);
-        return;
-      }
-
-      if (roomMetaCache.status === "closed") {
-        showExpiredPage("Cette salle est fermée.");
-        return;
-      }
-
-      if (Date.now() > (roomMetaCache.expiresAt || 0)) {
-        showExpiredPage("Cette salle a expiré.");
-        return;
-      }
-
-      if (!isRoomOwner()) {
-        if (roomMetaCache.hasPassword) {
-          const entered = prompt("Mot de passe de la réunion :");
-          if (entered === null) return;
-          if ((entered || "").trim() !== (roomMetaCache.password || "")) {
-            setStatus("Mot de passe incorrect.", true);
-            return;
-          }
-        }
-
-        if (roomMetaCache.waitingRoom) {
-          if (!accessRequested) {
-            await set(ref(db, `meetingRooms/${roomId}/joinRequests/${currentUser.uid}`), {
-              uid: currentUser.uid,
-              displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
-              email: currentUser.email || "",
-              photoURL: currentUserProfile?.photoURL || "",
-              createdAt: Date.now()
-            });
-            accessRequested = true;
-            setStatus("Demande envoyée. Attends l’acceptation du propriétaire.");
-          }
-
-          const allowedSnap = await get(ref(db, `meetingRooms/${roomId}/approved/${currentUser.uid}`));
-          if (!allowedSnap.exists()) {
-            setStatus("Tu es encore en salle d’attente.", true);
-            return;
-          }
-        }
-      }
-
-      try {
-        await prepareLocalMedia();
-
-        const participantRef = ref(db, `meetingRooms/${roomId}/participants/${currentUser.uid}`);
-        await set(participantRef, {
-          uid: currentUser.uid,
-          displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
-          email: currentUser.email || "",
-          photoURL: currentUserProfile?.photoURL || "",
-          joinedAt: Date.now(),
-          isScreenSharing: false
-        });
-
-        await onDisconnect(participantRef).remove();
-        await remove(ref(db, `meetingRooms/${roomId}/joinRequests/${currentUser.uid}`)).catch(() => {});
-        await set(ref(db, `meetingRooms/${roomId}/approved/${currentUser.uid}`), true).catch(() => {});
-
-        joinedRoom = true;
-        renderVideoGrid();
-        updateButtons();
-        setStatus("Tu as rejoint la réunion.");
-      } catch (e) {
-        console.error(e);
-        setStatus("Impossible de rejoindre la réunion. Vérifie micro et caméra.", true);
-      }
-    }
-
-    async function acceptRequest(uid) {
-      if (!isRoomOwner() || !roomId || !uid) return;
-      try {
-        await set(ref(db, `meetingRooms/${roomId}/approved/${uid}`), true);
-        await remove(ref(db, `meetingRooms/${roomId}/joinRequests/${uid}`));
-        setStatus("Participant accepté.");
-      } catch (e) {
-        console.error(e);
-        setStatus("Impossible d'accepter la demande.", true);
-      }
-    }
-
-    async function rejectRequest(uid) {
-      if (!isRoomOwner() || !roomId || !uid) return;
-      try {
-        await remove(ref(db, `meetingRooms/${roomId}/joinRequests/${uid}`));
-        await remove(ref(db, `meetingRooms/${roomId}/approved/${uid}`)).catch(() => {});
-        setStatus("Demande refusée.");
-      } catch (e) {
-        console.error(e);
-        setStatus("Impossible de refuser la demande.", true);
-      }
-    }
-
-    async function removeParticipant(uid) {
-      if (!isRoomOwner() || !roomId || !uid) return;
-      try {
-        await sendSignal(uid, { type:"remove_participant", to:uid });
-        await remove(ref(db, `meetingRooms/${roomId}/participants/${uid}`)).catch(() => {});
-        await remove(ref(db, `meetingRooms/${roomId}/approved/${uid}`)).catch(() => {});
-        closePeer(uid);
-        setStatus("Participant retiré.");
-      } catch (e) {
-        console.error(e);
-        setStatus("Impossible de retirer ce participant.", true);
-      }
-    }
-
-    async function muteAll() {
-      if (!isRoomOwner() || !roomId) return;
-      try {
-        const targets = Object.keys(participantsCache || {}).filter(uid => uid !== currentUser.uid);
-        for (const uid of targets) {
-          await sendSignal(uid, { type:"mute_all", to:uid });
-        }
-        setStatus("Demande de coupure micro envoyée à tous.");
-      } catch (e) {
-        console.error(e);
-        setStatus("Impossible de couper le micro de tous.", true);
-      }
-    }
-
-    async function replaceVideoTrackForAllPeers(newTrack, streamForSender) {
-      for (const pc of peerConnections.values()) {
-        const sender = pc.getSenders().find(s => s.track && s.track.kind === "video");
-        if (sender) {
-          await sender.replaceTrack(newTrack);
-        } else if (newTrack) {
-          pc.addTrack(newTrack, streamForSender);
-        }
-      }
-    }
-
-    async function startScreenShare() {
-      if (!joinedRoom || !localStream) return;
-
-      try {
-        displayStream = await navigator.mediaDevices.getDisplayMedia({
-          video:true,
-          audio:true
-        });
-
-        const screenTrack = displayStream.getVideoTracks()[0];
-        if (!screenTrack) {
-          setStatus("Aucun écran sélectionné.", true);
+        if (!items.length) {
+          participantsList.innerHTML = `<div class="empty-note">Aucun participant pour le moment.</div>`;
           return;
         }
 
-        await replaceVideoTrackForAllPeers(screenTrack, displayStream);
-        isScreenSharing = true;
+        participantsList.innerHTML = items.map(item => `
+          <div class="mini-item">
+            <div class="mini-item-head">
+              <div>
+                <div class="mini-name">${escapeHtml(item.displayName || "Utilisateur")}</div>
+                <div class="mini-sub">${escapeHtml(item.email || "")}</div>
+              </div>
+              <span class="status-pill" style="background:#ecfdf3;color:#166534;">
+                <span class="dot online"></span>présent
+              </span>
+            </div>
+            <div class="mini-sub">Entrée : ${escapeHtml(formatDate(item.joinedAt) || "—")}</div>
+          </div>
+        `).join("");
+      });
+    }
 
-        if (roomId && currentUser) {
-          await update(ref(db, `meetingRooms/${roomId}/participants/${currentUser.uid}`), {
-            isScreenSharing: true
-          }).catch(() => {});
+    function subscribeWaiting(roomId) {
+      onValue(ref(db, `${roomPath(roomId)}/waiting`), (snap) => {
+        const data = snap.val() || {};
+        const items = Object.entries(data).map(([uid, val]) => ({ uid, ...(val || {}) }));
+
+        if (!items.length) {
+          waitingList.innerHTML = `<div class="empty-note">Aucune personne en attente.</div>`;
+          return;
         }
 
-        renderVideoGrid();
-        renderParticipants();
-        updateButtons();
-        setStatus("Partage d’écran activé.");
+        waitingList.innerHTML = items.map(item => `
+          <div class="mini-item">
+            <div class="mini-item-head">
+              <div>
+                <div class="mini-name">${escapeHtml(item.displayName || "Utilisateur")}</div>
+                <div class="mini-sub">${escapeHtml(item.email || "")}</div>
+              </div>
+              <span class="status-pill" style="background:#fff3e8;color:#b45309;">
+                <span class="dot warn"></span>en attente
+              </span>
+            </div>
+            <div class="mini-sub">Demande : ${escapeHtml(formatDate(item.requestedAt) || "—")}</div>
+            ${isRoomOwner() ? `
+              <div class="action-row">
+                <button class="main-btn" type="button" data-accept="${item.uid}">Accepter</button>
+                <button class="danger-btn" type="button" data-refuse="${item.uid}">Refuser</button>
+              </div>
+            ` : ""}
+          </div>
+        `).join("");
 
-        screenTrack.onended = async () => {
-          await stopScreenShare();
-        };
-      } catch (e) {
-        console.error(e);
-        setStatus("Partage d’écran annulé ou refusé.", true);
+        if (isRoomOwner()) {
+          document.querySelectorAll("[data-accept]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              await acceptWaitingUser(btn.dataset.accept);
+            });
+          });
+          document.querySelectorAll("[data-refuse]").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              await refuseWaitingUser(btn.dataset.refuse);
+            });
+          });
+        }
+      });
+    }
+
+    async function acceptWaitingUser(uid) {
+      if (!isRoomOwner() || !currentRoomId || !uid) return;
+
+      const snap = await get(ref(db, waitingPath(currentRoomId, uid)));
+      if (!snap.exists()) return;
+      const data = snap.val() || {};
+
+      await set(ref(db, participantPath(currentRoomId, uid)), {
+        uid,
+        displayName: data.displayName || "Utilisateur",
+        email: data.email || "",
+        joinedAt: Date.now()
+      });
+
+      await remove(ref(db, waitingPath(currentRoomId, uid)));
+    }
+
+    async function refuseWaitingUser(uid) {
+      if (!isRoomOwner() || !currentRoomId || !uid) return;
+      await remove(ref(db, waitingPath(currentRoomId, uid)));
+    }
+
+    async function approveAllWaiting() {
+      if (!isRoomOwner() || !currentRoomId) return;
+
+      const snap = await get(ref(db, `${roomPath(currentRoomId)}/waiting`));
+      const data = snap.val() || {};
+      const entries = Object.entries(data);
+
+      for (const [uid, val] of entries) {
+        await set(ref(db, participantPath(currentRoomId, uid)), {
+          uid,
+          displayName: val.displayName || "Utilisateur",
+          email: val.email || "",
+          joinedAt: Date.now()
+        });
+        await remove(ref(db, waitingPath(currentRoomId, uid)));
       }
     }
 
-    async function stopScreenShare() {
-      if (!displayStream) return;
+    async function joinAsApprovedParticipant() {
+      if (!currentRoomId || !currentUser) return;
 
-      try {
-        displayStream.getTracks().forEach(t => t.stop());
-      } catch (_) {}
+      await set(ref(db, participantPath(currentRoomId, currentUser.uid)), {
+        uid: currentUser.uid,
+        displayName: getProfileName(),
+        email: currentUser.email || "",
+        joinedAt: Date.now()
+      });
 
-      displayStream = null;
-      isScreenSharing = false;
-
-      const camTrack = localStream?.getVideoTracks?.()[0] || null;
-      if (camTrack) {
-        await replaceVideoTrackForAllPeers(camTrack, localStream);
-      }
-
-      if (roomId && currentUser) {
-        await update(ref(db, `meetingRooms/${roomId}/participants/${currentUser.uid}`), {
-          isScreenSharing: false
-        }).catch(() => {});
-      }
-
-      renderVideoGrid();
-      renderParticipants();
-      updateButtons();
-      setStatus("Partage d’écran arrêté.");
+      joinedRoom = true;
+      isInWaitingRoom = false;
+      renderRoomMeta();
     }
 
-    async function toggleScreenShare() {
-      if (isScreenSharing) await stopScreenShare();
-      else await startScreenShare();
-    }
+    async function joinRoomFlow() {
+      if (!currentRoomMeta || !currentRoomId || !currentUser) return;
 
-    async function toggleMic() {
-      if (!localStream) return;
-      const tracks = localStream.getAudioTracks();
-      if (!tracks.length) return;
-      isMicMuted = !isMicMuted;
-      tracks.forEach(track => track.enabled = !isMicMuted);
-      updateButtons();
-      renderVideoGrid();
-    }
-
-    async function toggleCam() {
-      if (!localStream) return;
-      const tracks = localStream.getVideoTracks();
-      if (!tracks.length) return;
-      isCamOff = !isCamOff;
-      tracks.forEach(track => track.enabled = !isCamOff);
-      updateButtons();
-      renderVideoGrid();
-    }
-
-    async function leaveRoom(removeParticipant = true) {
-      try {
-        if (displayStream) displayStream.getTracks().forEach(t => t.stop());
-      } catch (_) {}
-
-      displayStream = null;
-      isScreenSharing = false;
-
-      for (const uid of [...peerConnections.keys()]) {
-        closePeer(uid);
+      if (Date.now() > (currentRoomMeta.expiresAt || 0)) {
+        showExpiredPage("Le lien de réunion a expiré.");
+        return;
       }
 
-      if (removeParticipant && roomId && currentUser) {
-        try { await remove(ref(db, `meetingRooms/${roomId}/participants/${currentUser.uid}`)); } catch (_) {}
+      if (currentRoomMeta.status === "closed") {
+        showExpiredPage("Cette salle a été fermée.");
+        return;
       }
 
-      if (localStream) {
-        try { localStream.getTracks().forEach(t => t.stop()); } catch (_) {}
+      if (currentRoomMeta.hasPassword) {
+        const pass = window.prompt("Cette réunion est protégée. Entre le mot de passe :");
+        if (pass === null) return;
+        if (pass !== String(currentRoomMeta.password || "")) {
+          alert("Mot de passe incorrect.");
+          return;
+        }
       }
 
-      localStream = null;
-      joinedRoom = false;
-      isMicMuted = false;
-      isCamOff = false;
-      renderVideoGrid();
-      updateButtons();
+      if (currentRoomMeta.waitingRoomEnabled && !isRoomOwner()) {
+        await set(ref(db, waitingPath(currentRoomId, currentUser.uid)), {
+          uid: currentUser.uid,
+          displayName: getProfileName(),
+          email: currentUser.email || "",
+          requestedAt: Date.now()
+        });
+        isInWaitingRoom = true;
+        joinedRoom = false;
+        renderRoomMeta();
+        return;
+      }
+
+      await joinAsApprovedParticipant();
     }
 
     async function closeRoom() {
-      if (!isRoomOwner() || !roomId) return;
-      try {
-        await update(ref(db, `meetingRooms/${roomId}/meta`), {
-          status:"closed",
-          updatedAt:Date.now(),
-          closedAt:Date.now()
-        });
-        await leaveRoom(false);
-        showExpiredPage("La salle a été fermée. Ce lien ne permet plus d’ouvrir la réunion.");
-      } catch (e) {
-        console.error(e);
-        setStatus("Impossible de fermer la salle.", true);
-      }
+      if (!isRoomOwner() || !currentRoomId) return;
+
+      const ok = confirm("Fermer cette salle maintenant ?");
+      if (!ok) return;
+
+      await update(ref(db, roomPath(currentRoomId)), {
+        status: "closed",
+        updatedAt: Date.now()
+      });
+
+      joinedRoom = false;
+      renderRoomMeta();
     }
 
     async function sendChatMessage() {
-      if (!roomId || !currentUser) return;
       const text = chatInput.value.trim();
-      if (!text) return;
+      if (!text || !currentRoomId || !currentUser) return;
 
-      try {
-        const msgRef = push(ref(db, `meetingRooms/${roomId}/chat`));
-        await set(msgRef, {
-          uid: currentUser.uid,
-          displayName: currentUserProfile?.displayName || currentUser.displayName || "Utilisateur",
-          text,
-          createdAt: Date.now()
-        });
-        chatInput.value = "";
-      } catch (e) {
-        console.error(e);
-        setStatus("Impossible d'envoyer le message.", true);
+      if (!joinedRoom && !isRoomOwner()) {
+        alert("Tu dois avoir accès à la salle avant d’envoyer un message.");
+        return;
       }
+
+      const newRef = push(ref(db, chatPath(currentRoomId)));
+      await set(newRef, {
+        uid: currentUser.uid,
+        displayName: getProfileName(),
+        text,
+        createdAt: Date.now()
+      });
+
+      chatInput.value = "";
     }
 
-    function attachEvents() {
-      createRoomBtn.addEventListener("click", createRoom);
-      copyRoomLinkBtn.addEventListener("click", copyRoomLink);
-      joinRoomBtn.addEventListener("click", joinRoom);
-      joinCurrentRoomBtn.addEventListener("click", joinRoom);
-      muteAllBtn.addEventListener("click", muteAll);
-      closeRoomBtn.addEventListener("click", closeRoom);
-      toggleMicBtn.addEventListener("click", toggleMic);
-      toggleCamBtn.addEventListener("click", toggleCam);
-      shareScreenBtn.addEventListener("click", toggleScreenShare);
-      leaveRoomBtn.addEventListener("click", () => leaveRoom(true));
-      sendChatBtn.addEventListener("click", sendChatMessage);
+    function subscribeChat(roomId) {
+      onValue(ref(db, chatPath(roomId)), (snap) => {
+        const data = snap.val() || {};
+        const items = Object.values(data).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
-      chatInput.addEventListener("keydown", e => {
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-          sendChatMessage();
+        if (!items.length) {
+          chatMessages.innerHTML = `
+            <div class="chat-msg">
+              <div class="chat-msg-head"><span>Système</span><span>—</span></div>
+              <div class="chat-msg-body">Aucun message pour le moment.</div>
+            </div>
+          `;
+          return;
         }
-      });
 
-      window.addEventListener("beforeunload", () => {
-        try { leaveRoom(false); } catch (_) {}
+        chatMessages.innerHTML = items.map(msg => `
+          <div class="chat-msg">
+            <div class="chat-msg-head">
+              <span>${escapeHtml(msg.displayName || "Utilisateur")}</span>
+              <span>${escapeHtml(formatDate(msg.createdAt) || "")}</span>
+            </div>
+            <div class="chat-msg-body">${escapeHtml(msg.text || "")}</div>
+          </div>
+        `).join("");
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
       });
     }
 
-    onAuthStateChanged(auth, async user => {
+    async function loadMyProfile(user) {
+      const snap = await get(ref(db, "users/" + user.uid));
+      currentProfile = snap.exists() ? (snap.val() || {}) : {};
+      setAvatar(currentProfile, user);
+      myName.textContent = currentProfile.displayName || user.displayName || "Utilisateur";
+    }
+
+    createRoomBtn.addEventListener("click", createRoom);
+
+    copyRoomLinkBtn.addEventListener("click", async () => {
+      if (!lastGeneratedRoomLink) return;
+      try {
+        await navigator.clipboard.writeText(lastGeneratedRoomLink);
+        alert("Lien copié.");
+      } catch (e) {
+        alert("Impossible de copier automatiquement. Copie le lien affiché.");
+      }
+    });
+
+    joinRoomBtn.addEventListener("click", joinRoomFlow);
+    joinCurrentRoomBtn.addEventListener("click", joinAsApprovedParticipant);
+    approveAllBtn.addEventListener("click", approveAllWaiting);
+    closeRoomBtn.addEventListener("click", closeRoom);
+    sendChatBtn.addEventListener("click", sendChatMessage);
+
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        sendChatMessage();
+      }
+    });
+
+    onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "insights.html";
         return;
       }
 
+      const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
+      if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
+        try { await signOut(auth); } catch (e) {}
+        window.location.href = "insights.html";
+        return;
+      }
+
       currentUser = user;
-      currentUserProfile = await ensureMyProfile(user);
+      bindActivityEvents();
+      resetActivityTimer();
 
-      myAvatar.innerHTML = avatarMarkup(currentUserProfile);
-      myName.textContent = currentUserProfile.displayName || "Utilisateur";
+      await loadMyProfile(user);
 
-      await setupPresence(user, currentUserProfile.displayName || user.displayName || "Utilisateur");
+      const roomId = getRoomQueryParam();
+      if (roomId) {
+        meetingNavLink.classList.remove("hidden");
+      }
 
-      subscribeUsers();
-      attachEvents();
-      updateButtons();
-      renderVideoGrid();
       updateVisibilityByRole();
-      await loadRoomFromUrl();
+      await loadRoom(roomId);
     });
   </script>
 </body>
