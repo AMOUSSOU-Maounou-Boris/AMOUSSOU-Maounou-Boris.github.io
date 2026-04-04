@@ -2,371 +2,315 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Créer un compte</title>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #07294d, #0b3f76);
-      padding: 20px;
+    * { box-sizing: border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#07294d,#0b3f76);
+      padding:20px;
     }
-    .card {
-      width: 100%;
-      max-width: 520px;
-      background: #fff;
-      border-radius: 22px;
-      padding: 28px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+
+    .card{
+      width:100%;
+      max-width:520px;
+      background:#fff;
+      border-radius:24px;
+      padding:28px;
+      box-shadow:0 20px 50px rgba(0,0,0,0.2);
     }
-    h1 {
-      font-size: 32px;
-      color: #082c53;
-      margin-bottom: 10px;
+
+    h1{
+      font-size:32px;
+      color:#082c53;
+      margin-bottom:10px;
     }
-    .sub {
-      color: #5e738b;
-      margin-bottom: 18px;
-      line-height: 1.6;
+
+    .sub{
+      color:#5e738b;
+      margin-bottom:18px;
+      line-height:1.5;
     }
-    .invite-box {
-      background: #f4f8fc;
-      border: 1px solid #d6e0ea;
-      border-radius: 14px;
-      padding: 12px 14px;
-      margin-bottom: 18px;
-      font-size: 14px;
-      line-height: 1.5;
-      color: #0b2f57;
+
+    .invite-box{
+      border:1px solid #dce7f3;
+      background:#f8fbff;
+      padding:12px;
+      border-radius:14px;
+      font-size:14px;
+      margin-bottom:14px;
     }
-    .invite-box.ok {
-      background: #ecfdf3;
-      border-color: #b7ebc9;
-      color: #166534;
+
+    .invite-box.ok{
+      background:#ecfdf3;
+      color:#166534;
     }
-    .invite-box.bad {
-      background: #fff4f4;
-      border-color: #f1c1c1;
-      color: #b42318;
+
+    .invite-box.bad{
+      background:#fff4f4;
+      color:#b42318;
     }
-    .field { margin-bottom: 14px; }
-    .field label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 700;
-      color: #0b2f57;
+
+    .field{ margin-bottom:14px; }
+
+    .field label{
+      display:block;
+      margin-bottom:6px;
+      font-weight:700;
+      color:#0b2f57;
     }
-    .field input {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1px solid #d6e0ea;
-      border-radius: 14px;
-      outline: none;
-      font-size: 15px;
+
+    .field input{
+      width:100%;
+      padding:13px;
+      border:1px solid #d6e0ea;
+      border-radius:14px;
+      outline:none;
+      font-size:15px;
     }
-    .field input:focus {
-      border-color: #7fb5ff;
-      box-shadow: 0 0 0 3px rgba(47,140,255,0.12);
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:14px;
+      padding:14px;
+      background:#0c3d73;
+      color:#fff;
+      font-weight:800;
+      cursor:pointer;
+      margin-top:8px;
     }
-    .btn {
-      width: 100%;
-      border: none;
-      border-radius: 14px;
-      padding: 14px;
-      background: #0c3d73;
-      color: #fff;
-      font-weight: 800;
-      font-size: 15px;
-      cursor: pointer;
-      margin-top: 8px;
+
+    .msg{
+      margin-top:14px;
+      text-align:center;
+      font-size:14px;
+      color:#b42318;
     }
-    .btn:disabled {
-      opacity: .65;
-      cursor: not-allowed;
+
+    .msg.success{ color:#15803d; }
+
+    .links{
+      text-align:center;
+      margin-top:16px;
+      font-size:14px;
     }
-    .msg {
-      margin-top: 14px;
-      min-height: 22px;
-      font-size: 14px;
-      text-align: center;
-      color: #b42318;
-      line-height: 1.5;
-    }
-    .msg.success { color: #15803d; }
-    .links {
-      text-align: center;
-      margin-top: 16px;
-      color: #4e6278;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    .links a {
-      color: #0c3d73;
-      text-decoration: none;
-      font-weight: 700;
-    }
-    .small-note {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #5e738b;
-      text-align: center;
-      line-height: 1.5;
+
+    .links a{
+      color:#0c3d73;
+      font-weight:700;
+      text-decoration:none;
     }
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <h1>Créer un compte</h1>
-    <p class="sub">Crée ton compte pour rejoindre l’espace privé famille / proches / étudiants.</p>
 
-    <div class="invite-box" id="inviteStatusBox">
-      Vérification du lien d’invitation...
-    </div>
+<div class="card">
+  <h1>Créer un compte</h1>
+  <p class="sub">Accès privé sécurisé par invitation.</p>
 
-    <div class="field">
-      <label for="displayName">Nom complet</label>
-      <input type="text" id="displayName" placeholder="Ex: Maounou Boris AMOUSSOU">
-    </div>
-
-    <div class="field">
-      <label for="email">Adresse e-mail</label>
-      <input type="email" id="email" placeholder="Ex: boris@gmail.com">
-    </div>
-
-    <div class="field">
-      <label for="password">Mot de passe</label>
-      <input type="password" id="password" placeholder="Au moins 6 caractères">
-    </div>
-
-    <div class="field">
-      <label for="confirmPassword">Confirmer le mot de passe</label>
-      <input type="password" id="confirmPassword" placeholder="Répète le mot de passe">
-    </div>
-
-    <button class="btn" id="signupBtn" disabled>Créer mon compte</button>
-
-    <div class="msg" id="messageBox"></div>
-
-    <div class="links">
-      Tu as déjà un compte ? <a href="login.html">Se connecter</a>
-    </div>
-
-    <div class="small-note">
-      La création de compte nécessite un lien d’invitation valide envoyé par l’administrateur.
-    </div>
+  <div id="inviteStatus" class="invite-box">
+    Vérification du lien...
   </div>
 
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import {
-      createUserWithEmailAndPassword,
-      updateProfile,
-      sendEmailVerification,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      ref,
-      get,
-      set,
-      update
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+  <div class="field">
+    <label>Nom complet</label>
+    <input type="text" id="displayName">
+  </div>
 
-    const displayName = document.getElementById("displayName");
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-    const confirmPassword = document.getElementById("confirmPassword");
-    const signupBtn = document.getElementById("signupBtn");
-    const messageBox = document.getElementById("messageBox");
-    const inviteStatusBox = document.getElementById("inviteStatusBox");
+  <div class="field">
+    <label>Email</label>
+    <input type="email" id="email">
+  </div>
 
-    const params = new URLSearchParams(window.location.search);
-    const inviteToken = params.get("invite") || "";
+  <div class="field">
+    <label>Mot de passe</label>
+    <input type="password" id="password">
+  </div>
 
-    let inviteOk = false;
-    let inviteData = null;
+  <div class="field">
+    <label>Confirmer</label>
+    <input type="password" id="confirmPassword">
+  </div>
 
-    function showMessage(text, ok = false) {
-      messageBox.textContent = text;
-      messageBox.className = ok ? "msg success" : "msg";
+  <button class="btn" id="signupBtn">Créer mon compte</button>
+
+  <div id="messageBox" class="msg"></div>
+
+  <div class="links">
+    <a href="login.html">Se connecter</a>
+  </div>
+</div>
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendEmailVerification,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  ref,
+  get,
+  set,
+  update
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+
+const displayName = document.getElementById("displayName");
+const email = document.getElementById("email");
+const password = document.getElementById("password");
+const confirmPassword = document.getElementById("confirmPassword");
+const signupBtn = document.getElementById("signupBtn");
+const messageBox = document.getElementById("messageBox");
+const inviteStatus = document.getElementById("inviteStatus");
+
+const params = new URLSearchParams(window.location.search);
+const inviteToken = params.get("invite") || "";
+
+let inviteOk = false;
+let inviteData = null;
+
+function showMsg(text, ok=false){
+  messageBox.textContent = text;
+  messageBox.className = ok ? "msg success" : "msg";
+}
+
+function showInvite(text, type=""){
+  inviteStatus.textContent = text;
+  inviteStatus.className = "invite-box " + type;
+}
+
+async function checkInvite(){
+  const mail = email.value.trim().toLowerCase();
+
+  if(mail === ADMIN_EMAIL){
+    inviteOk = true;
+    showInvite("Compte admin : accès libre", "ok");
+    signupBtn.disabled = false;
+    return;
+  }
+
+  if(!inviteToken){
+    inviteOk = false;
+    showInvite("Lien d’invitation requis", "bad");
+    signupBtn.disabled = true;
+    return;
+  }
+
+  const snap = await get(ref(db, "signupInvites/" + inviteToken));
+
+  if(!snap.exists()){
+    inviteOk = false;
+    showInvite("Invitation invalide", "bad");
+    signupBtn.disabled = true;
+    return;
+  }
+
+  inviteData = snap.val();
+
+  if(inviteData.used){
+    showInvite("Invitation déjà utilisée", "bad");
+    signupBtn.disabled = true;
+    return;
+  }
+
+  if(Date.now() > inviteData.expiresAt){
+    showInvite("Invitation expirée", "bad");
+    signupBtn.disabled = true;
+    return;
+  }
+
+  inviteOk = true;
+  signupBtn.disabled = false;
+  showInvite("Invitation valide", "ok");
+
+  if(inviteData.email){
+    email.value = inviteData.email;
+  }
+}
+
+email.addEventListener("input", checkInvite);
+
+signupBtn.addEventListener("click", async () => {
+
+  const name = displayName.value.trim();
+  const mail = email.value.trim().toLowerCase();
+  const pass = password.value;
+  const confirm = confirmPassword.value;
+
+  const isAdmin = mail === ADMIN_EMAIL;
+
+  if(!name || !mail || !pass || !confirm){
+    showMsg("Remplis tous les champs");
+    return;
+  }
+
+  if(pass !== confirm){
+    showMsg("Mot de passe incorrect");
+    return;
+  }
+
+  if(!isAdmin && !inviteOk){
+    showMsg("Invitation invalide");
+    return;
+  }
+
+  try{
+    const cred = await createUserWithEmailAndPassword(auth, mail, pass);
+    const user = cred.user;
+
+    await updateProfile(user, { displayName:name });
+
+    if(!isAdmin){
+      await sendEmailVerification(user);
     }
 
-    function showInviteStatus(text, type = "") {
-      inviteStatusBox.textContent = text;
-      inviteStatusBox.className = "invite-box" + (type ? " " + type : "");
-    }
-
-    function disableForm() {
-      signupBtn.disabled = true;
-      displayName.disabled = true;
-      email.disabled = true;
-      password.disabled = true;
-      confirmPassword.disabled = true;
-    }
-
-    function enableForm() {
-      signupBtn.disabled = false;
-      displayName.disabled = false;
-      email.disabled = false;
-      password.disabled = false;
-      confirmPassword.disabled = false;
-    }
-
-    async function verifyInvite() {
-      if (!inviteToken) {
-        inviteOk = false;
-        showInviteStatus("Lien d’invitation absent. Demande un lien valide à l’administrateur.", "bad");
-        disableForm();
-        return;
-      }
-
-      try {
-        const inviteSnap = await get(ref(db, "signupInvites/" + inviteToken));
-
-        if (!inviteSnap.exists()) {
-          inviteOk = false;
-          showInviteStatus("Ce lien d’invitation est introuvable ou invalide.", "bad");
-          disableForm();
-          return;
-        }
-
-        inviteData = inviteSnap.val() || {};
-        const now = Date.now();
-
-        if (inviteData.used === true) {
-          inviteOk = false;
-          showInviteStatus("Ce lien d’invitation a déjà été utilisé.", "bad");
-          disableForm();
-          return;
-        }
-
-        if (!inviteData.expiresAt || now > Number(inviteData.expiresAt)) {
-          inviteOk = false;
-          showInviteStatus("Ce lien d’invitation a expiré.", "bad");
-          disableForm();
-          return;
-        }
-
-        inviteOk = true;
-        showInviteStatus("Lien d’invitation valide. Tu peux créer ton compte.", "ok");
-        enableForm();
-
-        if (inviteData.email) {
-          email.value = inviteData.email;
-        }
-      } catch (error) {
-        console.error(error);
-        inviteOk = false;
-        showInviteStatus("Impossible de vérifier le lien d’invitation.", "bad");
-        disableForm();
-      }
-    }
-
-    signupBtn.addEventListener("click", async () => {
-      const name = displayName.value.trim();
-      const mail = email.value.trim().toLowerCase();
-      const pass = password.value;
-      const confirm = confirmPassword.value;
-
-      if (!inviteOk) {
-        showMessage("Lien d’invitation invalide ou expiré.");
-        return;
-      }
-
-      if (!name || !mail || !pass || !confirm) {
-        showMessage("Remplis tous les champs.");
-        return;
-      }
-
-      if (pass.length < 6) {
-        showMessage("Le mot de passe doit contenir au moins 6 caractères.");
-        return;
-      }
-
-      if (pass !== confirm) {
-        showMessage("Les mots de passe ne correspondent pas.");
-        return;
-      }
-
-      if (inviteData?.email && mail !== String(inviteData.email).toLowerCase()) {
-        showMessage("Tu dois utiliser l’adresse e-mail prévue dans l’invitation.");
-        return;
-      }
-
-      signupBtn.disabled = true;
-      showMessage("Création du compte en cours...", true);
-
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, mail, pass);
-        const user = cred.user;
-
-        await updateProfile(user, { displayName: name });
-
-        await sendEmailVerification(user);
-
-        await set(ref(db, "users/" + user.uid), {
-          uid: user.uid,
-          displayName: name,
-          email: mail,
-          photoURL: "",
-          bio: "",
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          signupInviteToken: inviteToken,
-          accountStatus: "pending_admin_approval",
-          emailVerifiedAtSignup: false,
-          approvedBy: "",
-          approvedAt: 0,
-          rejectedAt: 0,
-          role: "member"
-        });
-
-        await update(ref(db, "signupInvites/" + inviteToken), {
-          used: true,
-          usedByUid: user.uid,
-          usedByEmail: mail,
-          usedAt: Date.now()
-        });
-
-        await set(ref(db, "accountApprovals/" + user.uid), {
-          uid: user.uid,
-          displayName: name,
-          email: mail,
-          status: "pending_admin_approval",
-          createdAt: Date.now(),
-          inviteToken: inviteToken,
-          inviteCreatedBy: inviteData?.createdBy || "",
-          emailVerified: false
-        });
-
-        try { await signOut(auth); } catch (e) {}
-
-        showMessage("Compte créé. Vérifie ton e-mail. Après vérification, ton compte restera en attente de validation par l’administrateur.", true);
-
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 2600);
-
-      } catch (error) {
-        console.error(error);
-
-        if (error.code === "auth/email-already-in-use") {
-          showMessage("Cette adresse e-mail est déjà utilisée.");
-        } else if (error.code === "auth/invalid-email") {
-          showMessage("Adresse e-mail invalide.");
-        } else if (error.code === "auth/weak-password") {
-          showMessage("Mot de passe trop faible.");
-        } else {
-          showMessage("Impossible de créer le compte.");
-        }
-
-        signupBtn.disabled = false;
-      }
+    await set(ref(db, "users/" + user.uid), {
+      uid:user.uid,
+      displayName:name,
+      email:mail,
+      role:isAdmin ? "admin" : "member",
+      accountStatus:isAdmin ? "approved" : "pending_admin_approval",
+      approvedBy:isAdmin ? ADMIN_EMAIL : "",
+      approvedAt:isAdmin ? Date.now() : 0,
+      createdAt:Date.now()
     });
 
-    verifyInvite();
-  </script>
+    if(!isAdmin){
+      await update(ref(db, "signupInvites/" + inviteToken), {
+        used:true
+      });
+
+      try{ await signOut(auth); }catch(e){}
+      showMsg("Compte créé, vérifie ton email", true);
+    }else{
+      showMsg("Compte admin créé", true);
+    }
+
+    setTimeout(()=>{
+      window.location.href = "login.html";
+    },2000);
+
+  }catch(e){
+    console.error(e);
+    showMsg("Erreur création compte");
+  }
+
+});
+
+checkInvite();
+</script>
+
 </body>
 </html>
