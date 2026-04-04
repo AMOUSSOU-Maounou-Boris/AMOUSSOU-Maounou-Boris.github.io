@@ -6,7 +6,6 @@
   <title>Profil</title>
   <style>
     * { box-sizing: border-box; }
-
     :root{
       --bg:#eaf5ff;
       --card:#ffffff;
@@ -17,17 +16,16 @@
       --blue-dark:#0f4d92;
       --green:#18c34a;
       --red:#df4b4b;
+      --orange:#e67e22;
       --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
       --line:#d9e5f2;
     }
-
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
       background:var(--bg);
       color:var(--text);
     }
-
     .topbar{
       background:var(--nav);
       padding:18px 20px;
@@ -36,7 +34,6 @@
       z-index:20;
       box-shadow:0 4px 16px rgba(0,0,0,0.08);
     }
-
     .topbar nav{
       display:flex;
       gap:18px;
@@ -44,7 +41,6 @@
       align-items:center;
       flex-wrap:wrap;
     }
-
     .topbar a{
       color:#fff;
       text-decoration:none;
@@ -56,11 +52,9 @@
       align-items:center;
       gap:8px;
     }
-
     .topbar a.active{
       border-bottom-color:#fff;
     }
-
     .nav-online-dot{
       width:10px;
       height:10px;
@@ -100,7 +94,6 @@
       position:relative;
       overflow:hidden;
     }
-
     .profile-left::before{
       content:"";
       position:absolute;
@@ -111,7 +104,6 @@
       right:-60px;
       top:-60px;
     }
-
     .big-avatar{
       width:150px;
       height:150px;
@@ -127,8 +119,8 @@
       border:4px solid rgba(255,255,255,0.18);
       position:relative;
       margin-bottom:18px;
+      z-index:1;
     }
-
     .big-avatar img{
       width:100%;
       height:100%;
@@ -151,13 +143,11 @@
       flex-wrap:wrap;
       margin-bottom:20px;
     }
-
     .profile-top h1{
       margin:0 0 8px;
       font-size:38px;
       line-height:1.12;
     }
-
     .profile-top p{
       margin:0 0 8px;
       color:var(--muted);
@@ -174,7 +164,6 @@
       color:#14854b;
       margin-top:8px;
     }
-
     .status-dot{
       width:12px;
       height:12px;
@@ -183,7 +172,6 @@
       display:inline-block;
       flex:0 0 12px;
     }
-
     .status-dot.online{
       background:var(--green);
     }
@@ -196,7 +184,8 @@
 
     .primary-btn,
     .secondary-btn,
-    .danger-btn{
+    .danger-btn,
+    .warn-btn{
       border:none;
       border-radius:16px;
       padding:13px 18px;
@@ -207,51 +196,56 @@
       align-items:center;
       justify-content:center;
       gap:8px;
+      font-size:14px;
     }
-
     .primary-btn{
       background:var(--blue-dark);
       color:#fff;
     }
-
     .secondary-btn{
       background:#eef4fb;
       color:var(--text);
     }
-
     .danger-btn{
       background:var(--red);
+      color:#fff;
+    }
+    .warn-btn{
+      background:var(--orange);
       color:#fff;
     }
 
     .editor-block,
     .bio-block,
-    .posts-section{
+    .posts-section,
+    .admin-section,
+    .admin-subcard{
       background:#fff;
       border:1px solid #e4edf7;
       border-radius:24px;
       padding:20px;
       box-shadow:0 8px 18px rgba(8, 33, 64, 0.05);
     }
-
     .editor-block{
       margin-bottom:18px;
     }
-
-    .editor-block label{
+    .editor-block label,
+    .admin-subcard label{
       display:block;
       font-weight:800;
       margin-bottom:8px;
       margin-top:12px;
       font-size:14px;
     }
-
-    .editor-block label:first-child{
+    .editor-block label:first-child,
+    .admin-subcard label:first-child{
       margin-top:0;
     }
-
     .editor-block input,
-    .editor-block textarea{
+    .editor-block textarea,
+    .admin-subcard input,
+    .admin-subcard select,
+    .admin-subcard textarea{
       width:100%;
       border:1px solid #d3ddea;
       border-radius:16px;
@@ -261,9 +255,11 @@
       font-family:inherit;
       background:#fcfdff;
     }
-
     .editor-block input:focus,
-    .editor-block textarea:focus{
+    .editor-block textarea:focus,
+    .admin-subcard input:focus,
+    .admin-subcard select:focus,
+    .admin-subcard textarea:focus{
       border-color:#7fb5ff;
       box-shadow:0 0 0 3px rgba(47, 140, 255, 0.13);
     }
@@ -272,13 +268,13 @@
       margin-top:12px;
       font-weight:700;
       font-size:14px;
+      line-height:1.5;
     }
 
     .bio-block h3{
       margin:0 0 10px;
       font-size:22px;
     }
-
     .bio-block p{
       margin:0;
       color:var(--muted);
@@ -295,7 +291,6 @@
       margin-bottom:14px;
       flex-wrap:wrap;
     }
-
     .section-head h2{
       margin:0;
       font-size:28px;
@@ -315,11 +310,9 @@
       cursor:pointer;
       transition:.18s ease;
     }
-
     .post-preview:hover{
       transform:translateY(-2px);
     }
-
     .post-preview-img{
       width:100%;
       max-height:420px;
@@ -327,11 +320,9 @@
       display:block;
       border-bottom:1px solid #e6eef8;
     }
-
     .post-preview-body{
       padding:16px 18px 18px;
     }
-
     .post-preview-body p{
       margin:0 0 10px;
       line-height:1.6;
@@ -339,7 +330,6 @@
       word-break:break-word;
       font-size:16px;
     }
-
     .post-preview-body small{
       color:var(--muted);
       font-weight:700;
@@ -357,14 +347,12 @@
       gap:14px;
       flex-wrap:wrap;
     }
-
     .pdf-info{
       display:flex;
       align-items:center;
       gap:12px;
       min-width:0;
     }
-
     .pdf-icon{
       width:44px;
       height:44px;
@@ -377,18 +365,15 @@
       font-weight:800;
       flex:0 0 44px;
     }
-
     .pdf-title{
       font-weight:800;
       word-break:break-word;
     }
-
     .pdf-sub{
       color:var(--muted);
       font-size:13px;
       margin-top:3px;
     }
-
     .pdf-open{
       text-decoration:none;
       background:var(--blue-dark);
@@ -425,14 +410,12 @@
       position:relative;
       z-index:1;
     }
-
     .preview-image-box img{
       width:100%;
       border-radius:18px;
       border:1px solid rgba(255,255,255,0.14);
       display:block;
     }
-
     .preview-meta{
       margin-top:10px;
       font-size:12px;
@@ -448,11 +431,145 @@
       line-height:1.5;
     }
 
+    .admin-section{
+      display:grid;
+      gap:18px;
+    }
+    .admin-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .admin-head h2{
+      margin:0;
+      font-size:28px;
+    }
+    .admin-head p{
+      margin:8px 0 0;
+      color:var(--muted);
+      line-height:1.6;
+    }
+    .admin-grid{
+      display:grid;
+      grid-template-columns:1.1fr 1fr;
+      gap:18px;
+    }
+    .admin-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+    .admin-msg{
+      min-height:22px;
+      margin-top:12px;
+      font-size:14px;
+      font-weight:700;
+      line-height:1.5;
+    }
+    .admin-msg.ok{ color:#15803d; }
+    .admin-msg.err{ color:#b42318; }
+
+    .invite-result{
+      margin-top:14px;
+      border:1px dashed #cfe0f4;
+      background:#f8fbff;
+      border-radius:16px;
+      padding:14px;
+    }
+    .invite-result-title{
+      font-weight:800;
+      margin-bottom:8px;
+    }
+    .invite-link-box{
+      width:100%;
+      border:1px solid #d3ddea;
+      background:#fff;
+      padding:12px 14px;
+      border-radius:14px;
+      font-size:14px;
+      word-break:break-all;
+      color:#0b2340;
+    }
+
+    .admin-list{
+      display:grid;
+      gap:12px;
+      margin-top:8px;
+    }
+    .approval-card{
+      border:1px solid #e1ebf7;
+      border-radius:18px;
+      padding:16px;
+      background:#fbfdff;
+      display:grid;
+      gap:12px;
+    }
+    .approval-top{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .approval-name{
+      font-weight:800;
+      font-size:17px;
+      color:#082e5b;
+    }
+    .approval-email{
+      color:var(--muted);
+      margin-top:4px;
+      word-break:break-word;
+    }
+    .approval-meta{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.6;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .pill.pending{
+      background:#fff3e8;
+      color:#b45309;
+    }
+    .pill.approved{
+      background:#ecfdf3;
+      color:#166534;
+    }
+    .pill.rejected{
+      background:#fff1f2;
+      color:#b42318;
+    }
+    .approval-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .approval-empty{
+      color:var(--muted);
+      font-weight:700;
+      padding:12px 0 4px;
+    }
+
+    @media (max-width: 1100px){
+      .admin-grid{
+        grid-template-columns:1fr;
+      }
+    }
     @media (max-width: 980px){
       .profile-card{
         grid-template-columns:1fr;
       }
-
       .profile-top{
         flex-direction:column;
         align-items:flex-start;
@@ -497,7 +614,6 @@
             </div>
             <div class="session-note">Les publications de ce profil sont cliquables et ouvrent directement Insights.</div>
           </div>
-
           <div class="profile-actions">
             <a class="secondary-btn" id="messageBtn" href="messages.html">Message</a>
           </div>
@@ -521,6 +637,57 @@
       </div>
     </section>
 
+    <section class="admin-section hidden" id="adminSection">
+      <div class="admin-head">
+        <div>
+          <h2>Espace administrateur</h2>
+          <p>
+            Cette zone est visible uniquement pour <strong>borisamoussou01@gmail.com</strong>.
+            Tu peux créer des liens d’invitation, puis approuver ou refuser les demandes de compte.
+          </p>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-subcard">
+          <h3 style="margin:0 0 14px;">Créer un lien d’invitation</h3>
+
+          <label for="inviteEmailInput">Adresse e-mail invitée</label>
+          <input type="email" id="inviteEmailInput" placeholder="Ex : membre@gmail.com">
+
+          <label for="inviteHoursInput">Durée du lien</label>
+          <select id="inviteHoursInput">
+            <option value="6">6 heures</option>
+            <option value="12">12 heures</option>
+            <option value="24" selected>24 heures</option>
+            <option value="48">48 heures</option>
+            <option value="72">72 heures</option>
+            <option value="168">7 jours</option>
+          </select>
+
+          <div class="admin-row">
+            <button class="primary-btn" type="button" id="createInviteBtn">Créer le lien</button>
+            <button class="secondary-btn hidden" type="button" id="copyInviteBtn">Copier le lien</button>
+          </div>
+
+          <div class="invite-result hidden" id="inviteResultBox">
+            <div class="invite-result-title">Lien généré</div>
+            <div class="invite-link-box" id="inviteLinkText"></div>
+          </div>
+
+          <div class="admin-msg" id="inviteAdminMsg"></div>
+        </div>
+
+        <div class="admin-subcard">
+          <h3 style="margin:0 0 14px;">Demandes en attente</h3>
+          <div class="admin-list" id="approvalsList">
+            <div class="approval-empty">Chargement...</div>
+          </div>
+          <div class="admin-msg" id="approvalAdminMsg"></div>
+        </div>
+      </div>
+    </section>
+
     <section class="posts-section">
       <div class="section-head">
         <h2>Publications</h2>
@@ -531,13 +698,26 @@
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import {
+      onAuthStateChanged,
+      signOut,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      ref,
+      get,
+      update,
+      onValue,
+      set
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
 
     const bigAvatar = document.getElementById("bigAvatar");
     const changeAvatarBtn = document.getElementById("changeAvatarBtn");
     const avatarInput = document.getElementById("avatarInput");
     const avatarPreviewMount = document.getElementById("avatarPreviewMount");
+
     const profileName = document.getElementById("profileName");
     const profileEmail = document.getElementById("profileEmail");
     const statusDot = document.getElementById("statusDot");
@@ -551,6 +731,17 @@
     const userPosts = document.getElementById("userPosts");
     const messageBtn = document.getElementById("messageBtn");
 
+    const adminSection = document.getElementById("adminSection");
+    const inviteEmailInput = document.getElementById("inviteEmailInput");
+    const inviteHoursInput = document.getElementById("inviteHoursInput");
+    const createInviteBtn = document.getElementById("createInviteBtn");
+    const copyInviteBtn = document.getElementById("copyInviteBtn");
+    const inviteResultBox = document.getElementById("inviteResultBox");
+    const inviteLinkText = document.getElementById("inviteLinkText");
+    const inviteAdminMsg = document.getElementById("inviteAdminMsg");
+    const approvalsList = document.getElementById("approvalsList");
+    const approvalAdminMsg = document.getElementById("approvalAdminMsg");
+
     const params = new URLSearchParams(window.location.search);
     const requestedUid = params.get("uid");
 
@@ -558,6 +749,8 @@
     let viewedUid = null;
     let viewedUser = null;
     let activityTimeout = null;
+    let lastInviteLink = "";
+    let approvalsUnsubscribeBound = false;
 
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
     const LAST_ACTIVITY_KEY = "insights_last_activity";
@@ -630,6 +823,16 @@
       profileMsg.style.color = ok ? "#12824b" : "#c0392b";
     }
 
+    function showInviteMsg(text, ok = false) {
+      inviteAdminMsg.textContent = text;
+      inviteAdminMsg.className = ok ? "admin-msg ok" : "admin-msg err";
+    }
+
+    function showApprovalMsg(text, ok = false) {
+      approvalAdminMsg.textContent = text;
+      approvalAdminMsg.className = ok ? "admin-msg ok" : "admin-msg err";
+    }
+
     function userPrivacy(userData = {}) {
       return userData.privacy || {
         hidePresence: false,
@@ -698,13 +901,11 @@
       const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
       const newWidth = Math.round(width * ratio);
       const newHeight = Math.round(height * ratio);
-
       const canvas = document.createElement("canvas");
       canvas.width = newWidth;
       canvas.height = newHeight;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, newWidth, newHeight);
-
       return { canvas, width: newWidth, height: newHeight };
     }
 
@@ -715,7 +916,6 @@
     async function compressImageFile(file) {
       const img = await loadImageFromFile(file);
       const { canvas, width, height } = drawResizedToCanvas(img, MAX_WIDTH, MAX_HEIGHT);
-
       const originalType = file.type === "image/png" ? "image/png" : "image/jpeg";
       let bestDataUrl = canvasToDataURL(canvas, originalType, JPEG_QUALITY);
 
@@ -740,6 +940,214 @@
       };
     }
 
+    function isAdminUser(user) {
+      return !!user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    }
+
+    function isViewingOwnProfile() {
+      return !!currentUser && !!viewedUid && currentUser.uid === viewedUid;
+    }
+
+    function isRealAdminContext() {
+      return isAdminUser(currentUser) && isViewingOwnProfile();
+    }
+
+    function randomToken(length = 28) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+      let out = "";
+      const arr = new Uint32Array(length);
+      window.crypto.getRandomValues(arr);
+      for (let i = 0; i < length; i++) {
+        out += chars[arr[i] % chars.length];
+      }
+      return out;
+    }
+
+    function renderInviteResult(link) {
+      lastInviteLink = link || "";
+      if (!link) {
+        inviteResultBox.classList.add("hidden");
+        copyInviteBtn.classList.add("hidden");
+        inviteLinkText.textContent = "";
+        return;
+      }
+      inviteResultBox.classList.remove("hidden");
+      copyInviteBtn.classList.remove("hidden");
+      inviteLinkText.textContent = link;
+    }
+
+    async function createSignupInvite() {
+      if (!isRealAdminContext()) return;
+
+      const mail = inviteEmailInput.value.trim().toLowerCase();
+      const hours = Number(inviteHoursInput.value || "24");
+
+      if (!mail) {
+        showInviteMsg("Entre l’adresse e-mail de la personne à inviter.");
+        return;
+      }
+
+      const basicMailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!basicMailPattern.test(mail)) {
+        showInviteMsg("Adresse e-mail invalide.");
+        return;
+      }
+
+      createInviteBtn.disabled = true;
+      showInviteMsg("Création du lien en cours...", true);
+
+      try {
+        const token = randomToken(32);
+        const now = Date.now();
+        const expiresAt = now + (hours * 60 * 60 * 1000);
+        const signupUrl = `${window.location.origin}${window.location.pathname.replace(/[^/]+$/, "")}signup.html?invite=${encodeURIComponent(token)}`;
+
+        await set(ref(db, "signupInvites/" + token), {
+          token,
+          email: mail,
+          createdBy: ADMIN_EMAIL,
+          createdAt: now,
+          expiresAt,
+          used: false
+        });
+
+        renderInviteResult(signupUrl);
+        showInviteMsg(`Lien créé avec succès. Expiration : ${formatDate(expiresAt)}.`, true);
+      } catch (error) {
+        console.error(error);
+        showInviteMsg("Impossible de créer le lien d’invitation.");
+      } finally {
+        createInviteBtn.disabled = false;
+      }
+    }
+
+    async function approveAccount(uid) {
+      if (!isRealAdminContext() || !uid) return;
+      try {
+        await update(ref(db, "users/" + uid), {
+          accountStatus: "approved",
+          approvedBy: ADMIN_EMAIL,
+          approvedAt: Date.now(),
+          rejectedAt: 0,
+          updatedAt: Date.now(),
+          role: "member"
+        });
+
+        await update(ref(db, "accountApprovals/" + uid), {
+          status: "approved",
+          approvedBy: ADMIN_EMAIL,
+          approvedAt: Date.now()
+        });
+
+        showApprovalMsg("Compte approuvé avec succès.", true);
+      } catch (error) {
+        console.error(error);
+        showApprovalMsg("Impossible d’approuver ce compte.");
+      }
+    }
+
+    async function rejectAccount(uid) {
+      if (!isRealAdminContext() || !uid) return;
+      try {
+        await update(ref(db, "users/" + uid), {
+          accountStatus: "rejected",
+          approvedBy: "",
+          approvedAt: 0,
+          rejectedAt: Date.now(),
+          updatedAt: Date.now()
+        });
+
+        await update(ref(db, "accountApprovals/" + uid), {
+          status: "rejected",
+          rejectedAt: Date.now(),
+          rejectedBy: ADMIN_EMAIL
+        });
+
+        showApprovalMsg("Compte refusé.", true);
+      } catch (error) {
+        console.error(error);
+        showApprovalMsg("Impossible de refuser ce compte.");
+      }
+    }
+
+    function renderApprovals(data = {}) {
+      const entries = Object.entries(data || {})
+        .map(([uid, val]) => ({ uid, ...(val || {}) }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      const pendingFirst = entries.filter(item => (item.status || "pending_admin_approval") === "pending_admin_approval");
+      const approvedThenRejected = entries.filter(item => (item.status || "") !== "pending_admin_approval");
+      const all = [...pendingFirst, ...approvedThenRejected].slice(0, 40);
+
+      if (!all.length) {
+        approvalsList.innerHTML = `<div class="approval-empty">Aucune demande pour le moment.</div>`;
+        return;
+      }
+
+      approvalsList.innerHTML = all.map(item => {
+        const status = item.status || "pending_admin_approval";
+        const pillClass = status === "approved" ? "approved" : status === "rejected" ? "rejected" : "pending";
+        const pillText = status === "approved" ? "Approuvé" : status === "rejected" ? "Refusé" : "En attente";
+
+        return `
+          <div class="approval-card">
+            <div class="approval-top">
+              <div>
+                <div class="approval-name">${escapeHtml(item.displayName || "Sans nom")}</div>
+                <div class="approval-email">${escapeHtml(item.email || "")}</div>
+              </div>
+              <span class="pill ${pillClass}">${pillText}</span>
+            </div>
+
+            <div class="approval-meta">
+              Demande créée : ${escapeHtml(formatDate(item.createdAt) || "-")}<br>
+              Email vérifié : ${item.emailVerified ? "Oui" : "Non"}<br>
+              ${item.approvedAt ? `Approuvé le : ${escapeHtml(formatDate(item.approvedAt))}<br>` : ""}
+              ${item.rejectedAt ? `Refusé le : ${escapeHtml(formatDate(item.rejectedAt))}<br>` : ""}
+            </div>
+
+            ${status === "pending_admin_approval" ? `
+              <div class="approval-actions">
+                <button class="primary-btn" type="button" data-approve-uid="${item.uid}">Approuver</button>
+                <button class="danger-btn" type="button" data-reject-uid="${item.uid}">Refuser</button>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-approve-uid]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await approveAccount(btn.dataset.approveUid);
+        });
+      });
+
+      document.querySelectorAll("[data-reject-uid]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await rejectAccount(btn.dataset.rejectUid);
+        });
+      });
+    }
+
+    function bindAdminRealtime() {
+      if (!isRealAdminContext() || approvalsUnsubscribeBound) return;
+      approvalsUnsubscribeBound = true;
+
+      onValue(ref(db, "accountApprovals"), (snap) => {
+        const data = snap.val() || {};
+        renderApprovals(data);
+      });
+    }
+
+    function updateAdminVisibility() {
+      if (isRealAdminContext()) {
+        adminSection.classList.remove("hidden");
+        bindAdminRealtime();
+      } else {
+        adminSection.classList.add("hidden");
+      }
+    }
+
     async function loadUserProfile(uid) {
       const snap = await get(ref(db, "users/" + uid));
       if (!snap.exists()) {
@@ -748,6 +1156,7 @@
         bioText.textContent = "Ce profil n'existe pas.";
         editorBlock.style.display = "none";
         changeAvatarBtn.style.display = "none";
+        adminSection.classList.add("hidden");
         return;
       }
 
@@ -761,6 +1170,7 @@
 
       editorBlock.style.display = isMine ? "block" : "none";
       changeAvatarBtn.style.display = isMine ? "inline-flex" : "none";
+
       nameInput.value = viewedUser.displayName || "";
       bioInput.value = viewedUser.bio || "";
 
@@ -770,6 +1180,8 @@
         messageBtn.style.display = "inline-flex";
         messageBtn.href = `messages.html?user=${encodeURIComponent(uid)}`;
       }
+
+      updateAdminVisibility();
     }
 
     function listenPresence(uid) {
@@ -783,7 +1195,6 @@
         showAvatar(viewedUser.photoURL, viewedUser.displayName, viewedUser.email);
 
         const data = viewedUser.presence || {};
-
         if (!canSeePresence(viewedUser)) {
           statusDot.classList.remove("online");
           statusText.textContent = "Visibilité masquée";
@@ -862,6 +1273,7 @@
 
     saveProfileBtn.addEventListener("click", async () => {
       if (!currentUser || currentUser.uid !== viewedUid) return;
+
       const newName = nameInput.value.trim();
       const newBio = bioInput.value.trim();
 
@@ -872,7 +1284,6 @@
 
       try {
         await updateProfile(currentUser, { displayName: newName });
-
         await update(ref(db, "users/" + currentUser.uid), {
           displayName: newName,
           bio: newBio,
@@ -892,6 +1303,7 @@
 
     avatarInput.addEventListener("change", async () => {
       if (!currentUser || currentUser.uid !== viewedUid) return;
+
       const file = avatarInput.files[0];
       if (!file) return;
 
@@ -937,6 +1349,19 @@
       }
     });
 
+    createInviteBtn.addEventListener("click", createSignupInvite);
+
+    copyInviteBtn.addEventListener("click", async () => {
+      if (!lastInviteLink) return;
+      try {
+        await navigator.clipboard.writeText(lastInviteLink);
+        showInviteMsg("Lien copié dans le presse-papiers.", true);
+      } catch (error) {
+        console.error(error);
+        showInviteMsg("Impossible de copier automatiquement. Copie le lien manuellement.");
+      }
+    });
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "insights.html";
@@ -959,6 +1384,25 @@
       await loadUserProfile(viewedUid);
       listenPresence(viewedUid);
       loadUserPosts(viewedUid);
+
+      if (isAdminUser(currentUser)) {
+        try {
+          const meSnap = await get(ref(db, "users/" + currentUser.uid));
+          if (meSnap.exists()) {
+            const meData = meSnap.val() || {};
+            if ((meData.role || "") !== "admin") {
+              await update(ref(db, "users/" + currentUser.uid), {
+                role: "admin",
+                updatedAt: Date.now()
+              });
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      updateAdminVisibility();
     });
   </script>
 </body>
