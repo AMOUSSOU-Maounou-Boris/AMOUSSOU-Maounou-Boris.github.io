@@ -75,6 +75,11 @@
       font-size:15px;
     }
 
+    .field input:focus{
+      border-color:#7fb5ff;
+      box-shadow:0 0 0 3px rgba(47,140,255,0.12);
+    }
+
     .btn{
       width:100%;
       border:none;
@@ -87,11 +92,18 @@
       margin-top:8px;
     }
 
+    .btn:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+    }
+
     .msg{
       margin-top:14px;
       text-align:center;
       font-size:14px;
       color:#b42318;
+      line-height:1.5;
+      min-height:20px;
     }
 
     .msg.success{ color:#15803d; }
@@ -114,7 +126,7 @@
 
 <div class="card">
   <h1>Créer un compte</h1>
-  <p class="sub">Accès privé sécurisé par invitation.</p>
+  <p class="sub">Accès privé sécurisé par invitation, sauf pour l’administrateur.</p>
 
   <div id="inviteStatus" class="invite-box">
     Vérification du lien...
@@ -181,14 +193,14 @@ const inviteToken = params.get("invite") || "";
 let inviteOk = false;
 let inviteData = null;
 
-function showMsg(text, ok=false){
+function showMsg(text, ok = false){
   messageBox.textContent = text;
   messageBox.className = ok ? "msg success" : "msg";
 }
 
-function showInvite(text, type=""){
+function showInvite(text, type = ""){
   inviteStatus.textContent = text;
-  inviteStatus.className = "invite-box " + type;
+  inviteStatus.className = "invite-box" + (type ? " " + type : "");
 }
 
 async function checkInvite(){
@@ -196,59 +208,70 @@ async function checkInvite(){
 
   if(mail === ADMIN_EMAIL){
     inviteOk = true;
-    showInvite("Compte admin : accès libre", "ok");
+    inviteData = null;
+    showInvite("Compte administrateur : accès libre", "ok");
     signupBtn.disabled = false;
     return;
   }
 
   if(!inviteToken){
     inviteOk = false;
+    inviteData = null;
     showInvite("Lien d’invitation requis", "bad");
     signupBtn.disabled = true;
     return;
   }
 
-  const snap = await get(ref(db, "signupInvites/" + inviteToken));
+  try{
+    const snap = await get(ref(db, "signupInvites/" + inviteToken));
 
-  if(!snap.exists()){
+    if(!snap.exists()){
+      inviteOk = false;
+      inviteData = null;
+      showInvite("Invitation invalide", "bad");
+      signupBtn.disabled = true;
+      return;
+    }
+
+    inviteData = snap.val() || {};
+
+    if(inviteData.used){
+      inviteOk = false;
+      showInvite("Invitation déjà utilisée", "bad");
+      signupBtn.disabled = true;
+      return;
+    }
+
+    if(!inviteData.expiresAt || Date.now() > Number(inviteData.expiresAt)){
+      inviteOk = false;
+      showInvite("Invitation expirée", "bad");
+      signupBtn.disabled = true;
+      return;
+    }
+
+    inviteOk = true;
+    signupBtn.disabled = false;
+    showInvite("Invitation valide", "ok");
+
+    if(inviteData.email){
+      email.value = inviteData.email;
+    }
+  } catch(e){
+    console.error(e);
     inviteOk = false;
-    showInvite("Invitation invalide", "bad");
+    inviteData = null;
+    showInvite("Erreur lors de la vérification de l’invitation", "bad");
     signupBtn.disabled = true;
-    return;
-  }
-
-  inviteData = snap.val();
-
-  if(inviteData.used){
-    showInvite("Invitation déjà utilisée", "bad");
-    signupBtn.disabled = true;
-    return;
-  }
-
-  if(Date.now() > inviteData.expiresAt){
-    showInvite("Invitation expirée", "bad");
-    signupBtn.disabled = true;
-    return;
-  }
-
-  inviteOk = true;
-  signupBtn.disabled = false;
-  showInvite("Invitation valide", "ok");
-
-  if(inviteData.email){
-    email.value = inviteData.email;
   }
 }
 
 email.addEventListener("input", checkInvite);
 
 signupBtn.addEventListener("click", async () => {
-
   const name = displayName.value.trim();
   const mail = email.value.trim().toLowerCase();
   const pass = password.value;
   const confirm = confirmPassword.value;
-
   const isAdmin = mail === ADMIN_EMAIL;
 
   if(!name || !mail || !pass || !confirm){
@@ -256,8 +279,13 @@ signupBtn.addEventListener("click", async () => {
     return;
   }
 
+  if(pass.length < 6){
+    showMsg("Le mot de passe doit contenir au moins 6 caractères");
+    return;
+  }
+
   if(pass !== confirm){
-    showMsg("Mot de passe incorrect");
+    showMsg("Les mots de passe ne correspondent pas");
     return;
   }
 
@@ -266,47 +294,90 @@ signupBtn.addEventListener("click", async () => {
     return;
   }
 
+  if(!isAdmin && inviteData?.email && mail !== String(inviteData.email).toLowerCase()){
+    showMsg("Tu dois utiliser l’adresse email prévue dans l’invitation");
+    return;
+  }
+
+  signupBtn.disabled = true;
+  showMsg("Création du compte en cours...", true);
+
   try{
     const cred = await createUserWithEmailAndPassword(auth, mail, pass);
     const user = cred.user;
 
-    await updateProfile(user, { displayName:name });
+    await updateProfile(user, { displayName: name });
 
     if(!isAdmin){
       await sendEmailVerification(user);
     }
 
     await set(ref(db, "users/" + user.uid), {
-      uid:user.uid,
-      displayName:name,
-      email:mail,
-      role:isAdmin ? "admin" : "member",
-      accountStatus:isAdmin ? "approved" : "pending_admin_approval",
-      approvedBy:isAdmin ? ADMIN_EMAIL : "",
-      approvedAt:isAdmin ? Date.now() : 0,
-      createdAt:Date.now()
+      uid: user.uid,
+      displayName: name,
+      email: mail,
+      photoURL: "",
+      bio: "",
+      role: isAdmin ? "admin" : "member",
+      accountStatus: isAdmin ? "approved" : "pending_admin_approval",
+      approvedBy: isAdmin ? ADMIN_EMAIL : "",
+      approvedAt: isAdmin ? Date.now() : 0,
+      rejectedAt: 0,
+      emailVerifiedAtSignup: isAdmin,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      signupInviteToken: isAdmin ? "" : inviteToken,
+      privacy: {
+        hideEmail: true,
+        hideBio: false,
+        hidePresence: false
+      }
     });
 
     if(!isAdmin){
       await update(ref(db, "signupInvites/" + inviteToken), {
-        used:true
+        used: true,
+        usedByUid: user.uid,
+        usedByEmail: mail,
+        usedAt: Date.now()
       });
 
-      try{ await signOut(auth); }catch(e){}
-      showMsg("Compte créé, vérifie ton email", true);
-    }else{
-      showMsg("Compte admin créé", true);
+      await set(ref(db, "accountApprovals/" + user.uid), {
+        uid: user.uid,
+        displayName: name,
+        email: mail,
+        status: "pending_admin_approval",
+        createdAt: Date.now(),
+        inviteToken: inviteToken,
+        inviteCreatedBy: inviteData?.createdBy || "",
+        emailVerified: false
+      });
+
+      try { await signOut(auth); } catch(e) {}
+      showMsg("Compte créé. Vérifie ton email puis attends la validation admin.", true);
+    } else {
+      showMsg("Compte admin créé avec succès", true);
     }
 
-    setTimeout(()=>{
+    setTimeout(() => {
       window.location.href = "login.html";
-    },2000);
+    }, 2200);
 
-  }catch(e){
+  } catch(e){
     console.error(e);
-    showMsg("Erreur création compte");
-  }
 
+    if(e.code === "auth/email-already-in-use"){
+      showMsg("Cette adresse email est déjà utilisée");
+    } else if(e.code === "auth/invalid-email"){
+      showMsg("Adresse email invalide");
+    } else if(e.code === "auth/weak-password"){
+      showMsg("Mot de passe trop faible");
+    } else {
+      showMsg("Erreur lors de la création du compte");
+    }
+  } finally {
+    signupBtn.disabled = false;
+  }
 });
 
 checkInvite();
