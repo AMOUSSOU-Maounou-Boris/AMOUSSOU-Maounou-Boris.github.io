@@ -6,6 +6,7 @@
   <title>Connexion</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+
     body {
       min-height: 100vh;
       display: flex;
@@ -14,6 +15,7 @@
       background: linear-gradient(135deg, #07294d, #0b3f76);
       padding: 20px;
     }
+
     .card {
       width: 100%;
       max-width: 500px;
@@ -22,23 +24,28 @@
       padding: 28px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     }
+
     h1 {
       font-size: 32px;
       color: #082c53;
       margin-bottom: 10px;
     }
+
     .sub {
       color: #5e738b;
       margin-bottom: 22px;
       line-height: 1.5;
     }
+
     .field { margin-bottom: 14px; }
+
     .field label {
       display: block;
       margin-bottom: 6px;
       font-weight: 700;
       color: #0b2f57;
     }
+
     .field input {
       width: 100%;
       padding: 13px 14px;
@@ -47,10 +54,12 @@
       outline: none;
       font-size: 15px;
     }
+
     .field input:focus {
       border-color: #7fb5ff;
       box-shadow: 0 0 0 3px rgba(47,140,255,0.12);
     }
+
     .btn {
       width: 100%;
       border: none;
@@ -61,14 +70,17 @@
       cursor: pointer;
       margin-top: 8px;
     }
+
     .btn-primary {
       background: #0c3d73;
       color: #fff;
     }
+
     .btn-secondary {
       background: #eef4fb;
       color: #0b2f57;
     }
+
     .msg {
       margin-top: 14px;
       min-height: 22px;
@@ -77,7 +89,9 @@
       color: #b42318;
       line-height: 1.5;
     }
+
     .msg.success { color: #15803d; }
+
     .links {
       text-align: center;
       margin-top: 16px;
@@ -85,11 +99,13 @@
       font-size: 14px;
       line-height: 1.6;
     }
+
     .links a {
       color: #0c3d73;
       text-decoration: none;
       font-weight: 700;
     }
+
     .small-note {
       margin-top: 12px;
       font-size: 13px;
@@ -124,7 +140,7 @@
     </div>
 
     <div class="small-note">
-      L’accès aux espaces privés est réservé aux comptes vérifiés et approuvés.
+      L’accès aux espaces privés est réservé aux comptes vérifiés et approuvés, sauf le compte administrateur.
     </div>
   </div>
 
@@ -137,6 +153,7 @@
       signOut,
       reload
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
     import {
       ref,
       get,
@@ -158,10 +175,14 @@
       messageBox.className = ok ? "msg success" : "msg";
     }
 
-    async function handleApprovedUserRedirect(user, userData) {
+    function isAdminEmail(mail = "") {
+      return String(mail).trim().toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    }
+
+    async function redirectApprovedUser(userData = {}) {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
 
-      if ((userData?.role || "") === "admin" || user.email === ADMIN_EMAIL) {
+      if ((userData.role || "") === "admin" || isAdminEmail(userData.email || auth.currentUser?.email || "")) {
         window.location.href = "insights.html";
         return;
       }
@@ -169,7 +190,7 @@
       window.location.href = "insights.html";
     }
 
-    async function handleLogin() {
+    async function loginUser() {
       const mail = email.value.trim().toLowerCase();
       const pass = password.value;
 
@@ -188,7 +209,9 @@
 
         await reload(user);
 
-        if (!user.emailVerified) {
+        const adminLogin = isAdminEmail(user.email || mail);
+
+        if (!adminLogin && !user.emailVerified) {
           try { await signOut(auth); } catch (e) {}
           showMessage("Vérifie d’abord ton adresse e-mail avant de te connecter.");
           loginBtn.disabled = false;
@@ -196,9 +219,40 @@
           return;
         }
 
-        const userSnap = await get(ref(db, "users/" + user.uid));
+        const userRef = ref(db, "users/" + user.uid);
+        const userSnap = await get(userRef);
 
         if (!userSnap.exists()) {
+          if (adminLogin) {
+            await update(userRef, {
+              uid: user.uid,
+              displayName: user.displayName || "Administrateur",
+              email: user.email || ADMIN_EMAIL,
+              photoURL: user.photoURL || "",
+              bio: "",
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+              accountStatus: "approved",
+              emailVerifiedAtSignup: true,
+              approvedBy: ADMIN_EMAIL,
+              approvedAt: Date.now(),
+              rejectedAt: 0,
+              role: "admin",
+              privacy: {
+                hideEmail: true,
+                hideBio: false,
+                hidePresence: false
+              }
+            });
+
+            showMessage("Connexion administrateur réussie.", true);
+            await redirectApprovedUser({
+              role: "admin",
+              email: user.email || ADMIN_EMAIL
+            });
+            return;
+          }
+
           try { await signOut(auth); } catch (e) {}
           showMessage("Compte introuvable dans la base de données.");
           loginBtn.disabled = false;
@@ -207,18 +261,42 @@
         }
 
         const userData = userSnap.val() || {};
-        const status = userData.accountStatus || "pending_admin_approval";
+        const accountStatus = userData.accountStatus || "pending_admin_approval";
 
-        if (status === "approved") {
-          await update(ref(db, "users/" + user.uid), {
+        if (adminLogin) {
+          await update(userRef, {
+            email: user.email || ADMIN_EMAIL,
+            displayName: userData.displayName || user.displayName || "Administrateur",
+            updatedAt: Date.now(),
+            accountStatus: "approved",
             emailVerifiedAtSignup: true,
-            updatedAt: Date.now()
+            approvedBy: ADMIN_EMAIL,
+            approvedAt: userData.approvedAt || Date.now(),
+            rejectedAt: 0,
+            role: "admin"
           });
-          await handleApprovedUserRedirect(user, userData);
+
+          showMessage("Connexion administrateur réussie.", true);
+          await redirectApprovedUser({
+            ...userData,
+            role: "admin",
+            email: user.email || ADMIN_EMAIL
+          });
           return;
         }
 
-        if (status === "rejected") {
+        if (accountStatus === "approved") {
+          await update(userRef, {
+            emailVerifiedAtSignup: true,
+            updatedAt: Date.now()
+          });
+
+          showMessage("Connexion réussie.", true);
+          await redirectApprovedUser(userData);
+          return;
+        }
+
+        if (accountStatus === "rejected") {
           try { await signOut(auth); } catch (e) {}
           showMessage("Ton compte a été refusé par l’administrateur.");
           loginBtn.disabled = false;
@@ -226,12 +304,12 @@
           return;
         }
 
-        try {
-          await update(ref(db, "users/" + user.uid), {
-            emailVerifiedAtSignup: true,
-            updatedAt: Date.now()
-          });
+        await update(userRef, {
+          emailVerifiedAtSignup: true,
+          updatedAt: Date.now()
+        });
 
+        try {
           await update(ref(db, "accountApprovals/" + user.uid), {
             emailVerified: true,
             verifiedAt: Date.now(),
@@ -242,7 +320,6 @@
         }
 
         try { await signOut(auth); } catch (e) {}
-
         showMessage("Ton e-mail est vérifié, mais ton compte est encore en attente d’approbation par l’administrateur.");
         loginBtn.disabled = false;
         forgotBtn.disabled = false;
@@ -269,7 +346,7 @@
       }
     }
 
-    async function handleForgotPassword() {
+    async function forgotPassword() {
       const mail = email.value.trim().toLowerCase();
 
       if (!mail) {
@@ -279,6 +356,7 @@
 
       forgotBtn.disabled = true;
       loginBtn.disabled = true;
+      showMessage("");
 
       try {
         await sendPasswordResetEmail(auth, mail);
@@ -297,12 +375,12 @@
       loginBtn.disabled = false;
     }
 
-    loginBtn.addEventListener("click", handleLogin);
-    forgotBtn.addEventListener("click", handleForgotPassword);
+    loginBtn.addEventListener("click", loginUser);
+    forgotBtn.addEventListener("click", forgotPassword);
 
     [email, password].forEach(input => {
       input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") handleLogin();
+        if (e.key === "Enter") loginUser();
       });
     });
 
@@ -312,7 +390,8 @@
       try {
         await reload(user);
 
-        if (!user.emailVerified) {
+        const adminLogin = isAdminEmail(user.email || "");
+        if (!adminLogin && !user.emailVerified) {
           try { await signOut(auth); } catch (e) {}
           return;
         }
@@ -324,14 +403,64 @@
         }
 
         const userSnap = await get(ref(db, "users/" + user.uid));
+
         if (!userSnap.exists()) {
+          if (adminLogin) {
+            await update(ref(db, "users/" + user.uid), {
+              uid: user.uid,
+              displayName: user.displayName || "Administrateur",
+              email: user.email || ADMIN_EMAIL,
+              photoURL: user.photoURL || "",
+              bio: "",
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+              accountStatus: "approved",
+              emailVerifiedAtSignup: true,
+              approvedBy: ADMIN_EMAIL,
+              approvedAt: Date.now(),
+              rejectedAt: 0,
+              role: "admin",
+              privacy: {
+                hideEmail: true,
+                hideBio: false,
+                hidePresence: false
+              }
+            });
+
+            await redirectApprovedUser({
+              role: "admin",
+              email: user.email || ADMIN_EMAIL
+            });
+            return;
+          }
+
           try { await signOut(auth); } catch (e) {}
           return;
         }
 
         const userData = userSnap.val() || {};
+
+        if (adminLogin) {
+          await update(ref(db, "users/" + user.uid), {
+            updatedAt: Date.now(),
+            accountStatus: "approved",
+            emailVerifiedAtSignup: true,
+            approvedBy: ADMIN_EMAIL,
+            approvedAt: userData.approvedAt || Date.now(),
+            rejectedAt: 0,
+            role: "admin"
+          });
+
+          await redirectApprovedUser({
+            ...userData,
+            role: "admin",
+            email: user.email || ADMIN_EMAIL
+          });
+          return;
+        }
+
         if ((userData.accountStatus || "") === "approved") {
-          await handleApprovedUserRedirect(user, userData);
+          await redirectApprovedUser(userData);
           return;
         }
 
