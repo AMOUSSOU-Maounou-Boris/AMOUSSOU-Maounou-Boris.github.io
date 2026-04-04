@@ -18,7 +18,6 @@
       --red:#df4b4b;
       --orange:#f7a600;
       --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
-      --highlight:#fff8cc;
       --line:#d9e5f2;
       --soft:#f4f8fc;
     }
@@ -28,11 +27,6 @@
       font-family:Arial, Helvetica, sans-serif;
       background:var(--bg);
       color:var(--text);
-    }
-
-    body.secure-page *:not(input):not(textarea){
-      -webkit-user-drag:none;
-      user-select:none;
     }
 
     .topbar{
@@ -70,7 +64,6 @@
       border-radius:50%;
       background:var(--green);
       display:inline-block;
-      box-shadow:0 0 0 2px rgba(255,255,255,0.18);
     }
 
     .hidden{ display:none !important; }
@@ -95,6 +88,7 @@
       box-shadow:0 24px 60px rgba(0,0,0,0.25);
       padding:28px 22px 22px;
     }
+
     .auth-logo{
       width:62px;
       height:62px;
@@ -108,12 +102,14 @@
       font-size:28px;
       font-weight:900;
     }
+
     .auth-title{
       text-align:center;
       margin:0 0 8px;
       color:#082e5b;
       font-size:30px;
     }
+
     .auth-subtitle{
       text-align:center;
       color:#5e738b;
@@ -121,6 +117,7 @@
       margin:0 0 18px;
       font-size:14px;
     }
+
     .auth-row{
       display:flex;
       align-items:center;
@@ -131,6 +128,7 @@
       margin-bottom:12px;
       background:#fff;
     }
+
     .auth-icon{
       width:18px;
       height:18px;
@@ -138,6 +136,7 @@
       border-radius:50%;
       background:#dce8f6;
     }
+
     .auth-row input{
       width:100%;
       border:none;
@@ -147,8 +146,8 @@
       background:transparent;
       font-family:inherit;
     }
+
     .auth-submit,
-    .auth-switch-btn,
     .auth-link-btn{
       width:100%;
       border:none;
@@ -158,22 +157,24 @@
       font-weight:800;
       cursor:pointer;
     }
+
     .auth-submit{
       background:var(--blue-dark);
       color:#fff;
       margin-top:4px;
     }
+
     .auth-links{
       margin-top:12px;
       display:grid;
       gap:10px;
     }
-    .auth-links button,
-    .auth-switch-btn,
-    .auth-link-btn{
+
+    .auth-links button{
       background:#eef4fb;
       color:var(--text);
     }
+
     .auth-message{
       margin-top:14px;
       min-height:22px;
@@ -182,10 +183,14 @@
       font-weight:700;
       line-height:1.5;
       color:#b42318;
+      white-space:pre-wrap;
+      word-break:break-word;
     }
+
     .auth-message.ok{
       color:#15803d;
     }
+
     .invite-status-box{
       border:1px solid #d7e3f0;
       border-radius:16px;
@@ -196,11 +201,13 @@
       padding:12px 14px;
       margin-bottom:14px;
     }
+
     .invite-status-box.ok{
       background:#ecfdf3;
       border-color:#b7ebc9;
       color:#166534;
     }
+
     .invite-status-box.bad{
       background:#fff4f4;
       border-color:#f1c1c1;
@@ -222,6 +229,7 @@
       top:96px;
       min-width:0;
     }
+
     .center-panel,
     .right-panel{
       min-width:0;
@@ -261,11 +269,13 @@
       overflow:hidden;
       flex:0 0 auto;
     }
+
     .avatar.large{
       width:74px;
       height:74px;
       font-size:28px;
     }
+
     .avatar img{
       width:100%;
       height:100%;
@@ -282,17 +292,15 @@
       font-weight:800;
       white-space:nowrap;
     }
+
     .pill.online{
       background:#ecfdf3;
       color:#166534;
     }
+
     .pill.offline{
       background:#eef4fb;
       color:#63778f;
-    }
-    .pill.warn{
-      background:#fff8e8;
-      color:#9a6700;
     }
 
     .dot{
@@ -303,6 +311,7 @@
       background:#a6b7c9;
       flex:0 0 10px;
     }
+
     .dot.online{
       background:var(--green);
     }
@@ -343,17 +352,20 @@
       gap:8px;
       text-decoration:none;
     }
+
     .primary-btn,
     .submit-post-btn{
       background:var(--blue-dark);
       color:#fff;
     }
+
     .secondary-btn,
     .ghost-btn,
     .mini-btn{
       background:#eef4fb;
       color:var(--text);
     }
+
     .danger-btn{
       background:var(--red);
       color:#fff;
@@ -372,11 +384,13 @@
       flex-wrap:wrap;
       margin-bottom:14px;
     }
+
     .composer-head h2{
       margin:0 0 6px;
       font-size:28px;
       color:#082e5b;
     }
+
     .composer-head p{
       margin:0;
       color:var(--muted);
@@ -395,12 +409,6 @@
       font-size:15px;
       font-family:inherit;
       background:#fcfdff;
-    }
-    .post-textarea:focus,
-    .report-textarea:focus,
-    .text-input:focus{
-      border-color:#7fb5ff;
-      box-shadow:0 0 0 3px rgba(47,140,255,0.13);
     }
 
     .composer-tools{
@@ -433,6 +441,7 @@
       overflow:hidden;
       padding:10px;
     }
+
     .image-preview-card img{
       width:100%;
       height:180px;
@@ -441,6 +450,7 @@
       background:#fff;
       border-radius:12px;
     }
+
     .image-preview-meta{
       margin-top:8px;
       font-size:12px;
@@ -461,12 +471,14 @@
       justify-content:space-between;
       flex-wrap:wrap;
     }
+
     .pdf-left{
       display:flex;
       align-items:center;
       gap:12px;
       min-width:0;
     }
+
     .pdf-icon{
       width:46px;
       height:46px;
@@ -479,10 +491,12 @@
       font-weight:900;
       flex:0 0 46px;
     }
+
     .pdf-name{
       font-weight:800;
       word-break:break-word;
     }
+
     .pdf-sub{
       margin-top:4px;
       font-size:12px;
@@ -529,6 +543,7 @@
       color:#082e5b;
       font-size:16px;
     }
+
     .post-author-meta{
       color:var(--muted);
       font-size:13px;
@@ -539,6 +554,7 @@
     .post-menu-wrap{
       position:relative;
     }
+
     .post-menu-btn{
       border:none;
       background:#eef4fb;
@@ -550,6 +566,7 @@
       font-size:18px;
       line-height:1;
     }
+
     .post-menu{
       position:absolute;
       right:0;
@@ -563,9 +580,11 @@
       display:none;
       z-index:25;
     }
+
     .post-menu.open{
       display:block;
     }
+
     .post-menu button{
       width:100%;
       border:none;
@@ -577,9 +596,11 @@
       cursor:pointer;
       color:var(--text);
     }
+
     .post-menu button:hover{
       background:#f4f8fc;
     }
+
     .post-menu button.danger{
       color:#b42318;
     }
@@ -598,6 +619,7 @@
       gap:12px;
       margin-bottom:14px;
     }
+
     .post-image{
       width:100%;
       height:240px;
@@ -651,6 +673,7 @@
       font-weight:800;
       font-size:13px;
     }
+
     .action-chip.active{
       background:#dfeeff;
       color:#0f4d92;
@@ -709,29 +732,25 @@
       color:#082e5b;
       font-size:14px;
     }
+
     .comment-meta{
       font-size:12px;
       color:var(--muted);
       line-height:1.5;
       margin-top:4px;
     }
+
     .comment-text{
       line-height:1.7;
       white-space:pre-wrap;
       word-break:break-word;
       font-size:14px;
     }
+
     .comment-sticker{
       margin-top:6px;
       font-size:28px;
       line-height:1.2;
-    }
-
-    .comment-actions{
-      margin-top:10px;
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
     }
 
     .side-list{
@@ -759,6 +778,7 @@
       color:#082e5b;
       line-height:1.4;
     }
+
     .side-item-sub{
       color:var(--muted);
       font-size:13px;
@@ -787,9 +807,11 @@
       padding:18px;
       z-index:90;
     }
+
     .modal.show{
       display:flex;
     }
+
     .modal-content{
       width:100%;
       max-width:520px;
@@ -799,6 +821,7 @@
       padding:22px;
       position:relative;
     }
+
     .modal-close{
       position:absolute;
       top:12px;
@@ -810,11 +833,13 @@
       color:#0b2340;
       line-height:1;
     }
+
     .modal h3{
       margin:0 0 10px;
       font-size:24px;
       color:#082e5b;
     }
+
     .modal-note{
       color:var(--muted);
       line-height:1.6;
@@ -837,12 +862,12 @@
       border-radius:14px;
       background:#f9fbfe;
     }
+
     .reason-item input{
       margin-top:3px;
     }
 
-    .report-textarea,
-    .text-input{
+    .report-textarea{
       width:100%;
       min-height:110px;
       resize:vertical;
@@ -854,32 +879,15 @@
       margin-bottom:14px;
       font-family:inherit;
     }
-    .text-input{
-      min-height:auto;
-      resize:none;
-    }
-
-    .modal-actions{
-      display:flex;
-      justify-content:flex-end;
-      gap:10px;
-      flex-wrap:wrap;
-    }
 
     @media (max-width: 1200px){
       .page{ grid-template-columns:1fr; }
       .left-panel{ position:static; }
       .right-panel{ order:3; }
     }
-
-    @media (max-width: 1000px){
-      .page{ grid-template-columns:1fr; }
-      .left-panel{ position:static; }
-      .post-head{ align-items:flex-start; }
-    }
   </style>
 </head>
-<body class="secure-page">
+<body>
   <header class="topbar" id="publicTopbar">
     <nav>
       <a href="index.html">Home</a>
@@ -1708,7 +1716,64 @@
         signupBtn.disabled = false;
       }
     }
-        async function loginToInsights() {
+        async function ensureAdminProfile(user) {
+      const userRef = ref(db, "users/" + user.uid);
+      const snap = await get(userRef);
+
+      const baseData = {
+        uid: user.uid,
+        displayName: user.displayName || "Maounou Boris AMOUSSOU",
+        email: user.email || OWNER_EMAIL,
+        photoURL: "",
+        bio: "",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        role: "admin",
+        accountStatus: "approved",
+        approvedBy: OWNER_EMAIL,
+        approvedAt: Date.now(),
+        rejectedAt: 0,
+        emailVerifiedAtSignup: true,
+        privacy: {
+          hideEmail: true,
+          hideBio: false,
+          hidePresence: false
+        },
+        presence: {
+          online: false,
+          lastSeen: Date.now()
+        }
+      };
+
+      if (!snap.exists()) {
+        await set(userRef, baseData);
+        return baseData;
+      }
+
+      const existing = snap.val() || {};
+      const merged = {
+        ...existing,
+        uid: user.uid,
+        displayName: existing.displayName || baseData.displayName,
+        email: user.email || OWNER_EMAIL,
+        photoURL: existing.photoURL || "",
+        bio: existing.bio || "",
+        updatedAt: Date.now(),
+        role: "admin",
+        accountStatus: "approved",
+        approvedBy: OWNER_EMAIL,
+        approvedAt: existing.approvedAt || Date.now(),
+        rejectedAt: 0,
+        emailVerifiedAtSignup: true,
+        privacy: existing.privacy || baseData.privacy,
+        presence: existing.presence || baseData.presence
+      };
+
+      await set(userRef, merged);
+      return merged;
+    }
+
+    async function loginToInsights() {
       const email = loginEmail.value.trim().toLowerCase();
       const password = loginPassword.value;
 
@@ -1726,9 +1791,16 @@
 
         await reload(user);
 
-        const isAdmin = (user.email || email).toLowerCase() === OWNER_EMAIL.toLowerCase();
+        if (isAdminEmail(user.email || email)) {
+          await ensureAdminProfile(user);
+          showAuthMessage("Connexion administrateur réussie.", true);
+          setTimeout(() => {
+            window.location.href = "insights.html";
+          }, 500);
+          return;
+        }
 
-        if (!isAdmin && !user.emailVerified) {
+        if (!user.emailVerified) {
           try { await signOut(auth); } catch (e) {}
           showAuthMessage("Vérifie d’abord ton adresse email avant de te connecter.");
           return;
@@ -1744,17 +1816,16 @@
         const userData = snap.val() || {};
         const status = userData.accountStatus || "pending_admin_approval";
 
-        if (isAdmin || status === "approved") {
+        if (status === "approved") {
           await update(ref(db, "users/" + user.uid), {
             emailVerifiedAtSignup: true,
-            updatedAt: Date.now(),
-            accountStatus: isAdmin ? "approved" : status,
-            role: isAdmin ? "admin" : (userData.role || "member"),
-            approvedBy: isAdmin ? OWNER_EMAIL : (userData.approvedBy || ""),
-            approvedAt: isAdmin ? (userData.approvedAt || Date.now()) : (userData.approvedAt || 0),
-            rejectedAt: 0
+            updatedAt: Date.now()
           });
+
           showAuthMessage("Connexion réussie.", true);
+          setTimeout(() => {
+            window.location.href = "insights.html";
+          }, 500);
           return;
         }
 
@@ -1769,619 +1840,28 @@
           updatedAt: Date.now()
         });
 
-        await update(ref(db, "accountApprovals/" + user.uid), {
-          emailVerified: true,
-          verifiedAt: Date.now(),
-          status: "pending_admin_approval"
-        });
+        try {
+          await update(ref(db, "accountApprovals/" + user.uid), {
+            emailVerified: true,
+            verifiedAt: Date.now(),
+            status: "pending_admin_approval"
+          });
+        } catch (e) {
+          console.error(e);
+        }
 
         try { await signOut(auth); } catch (e) {}
-        showAuthMessage("Ton email est vérifié, mais ton compte attend encore l’approbation de l’administrateur.");
+        showAuthMessage("Ton compte est encore en attente d’approbation.");
       } catch (error) {
-        console.error(error);
-        if (
-          error.code === "auth/invalid-credential" ||
-          error.code === "auth/wrong-password" ||
-          error.code === "auth/user-not-found"
-        ) {
-          showAuthMessage("Adresse email ou mot de passe incorrect.");
-        } else if (error.code === "auth/too-many-requests") {
-          showAuthMessage("Trop de tentatives. Réessaie plus tard.");
-        } else {
-          showAuthMessage("Connexion impossible pour le moment.");
-        }
+        console.error("INSIGHTS LOGIN ERROR:", error);
+        showAuthMessage(`Erreur réelle : ${error.code || "inconnue"} ${error.message || ""}`);
       } finally {
         loginBtn.disabled = false;
       }
     }
 
-    async function sendResetLink() {
-      const email = resetEmail.value.trim().toLowerCase();
-      if (!email) {
-        showAuthMessage("Entre d’abord ton adresse email.");
-        return;
-      }
-
-      resetBtn.disabled = true;
-      showAuthMessage("Envoi du lien...", true);
-
-      try {
-        await sendPasswordResetEmail(auth, email);
-        showAuthMessage("Lien de réinitialisation envoyé par email.", true);
-      } catch (error) {
-        console.error(error);
-        showAuthMessage("Impossible d’envoyer le lien de réinitialisation.");
-      } finally {
-        resetBtn.disabled = false;
-      }
-    }
-
-    async function updatePresenceOnline() {
-      if (!currentUser) return;
-      try {
-        await update(ref(db, "users/" + currentUser.uid), {
-          presence: {
-            online: true,
-            lastSeen: Date.now()
-          },
-          updatedAt: Date.now()
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    async function updatePresenceOffline() {
-      if (!currentUser) return;
-      try {
-        await update(ref(db, "users/" + currentUser.uid), {
-          presence: {
-            online: false,
-            lastSeen: Date.now()
-          },
-          updatedAt: Date.now()
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    async function loadCurrentUserData() {
-      if (!currentUser) return;
-      const snap = await get(ref(db, "users/" + currentUser.uid));
-      if (!snap.exists()) return;
-      currentUserData = { uid: currentUser.uid, ...snap.val() };
-      updateMyHeader();
-    }
-
-    function listenUsers() {
-      onValue(ref(db, "users"), (snap) => {
-        usersMap = snap.val() || {};
-        if (currentUser && usersMap[currentUser.uid]) {
-          currentUserData = { uid: currentUser.uid, ...usersMap[currentUser.uid] };
-          updateMyHeader();
-        }
-        renderOnlineMembers();
-        renderPosts();
-        renderRecentActivities();
-      });
-    }
-
-    function listenPosts() {
-      onValue(ref(db, "posts"), (snap) => {
-        postsMap = snap.val() || {};
-        renderPosts();
-        renderRecentActivities();
-        focusPostFromUrl();
-      });
-    }
-
-    function listenLikes() {
-      onValue(ref(db, "likes"), (snap) => {
-        likesMap = snap.val() || {};
-        renderPosts();
-      });
-    }
-
-    function listenComments() {
-      onValue(ref(db, "comments"), (snap) => {
-        commentsMap = snap.val() || {};
-        renderPosts();
-      });
-    }
-
-    function renderOnlineMembers() {
-      const items = Object.entries(usersMap || {})
-        .map(([uid, val]) => ({ uid, ...(val || {}) }))
-        .filter(user => user.uid !== currentUser?.uid)
-        .filter(user => canSeePresence(currentUser?.uid, user))
-        .sort((a, b) => {
-          const onlineA = a.presence?.online ? 1 : 0;
-          const onlineB = b.presence?.online ? 1 : 0;
-          if (onlineA !== onlineB) return onlineB - onlineA;
-          return (a.displayName || "").localeCompare(b.displayName || "");
-        })
-        .slice(0, 12);
-
-      if (!items.length) {
-        onlineMembersList.innerHTML = `<div class="empty-card">Aucun membre visible pour le moment.</div>`;
-        return;
-      }
-
-      onlineMembersList.innerHTML = items.map(user => {
-        const presence = user.presence || {};
-        const online = !!presence.online;
-        return `
-          <div class="side-item">
-            <div class="side-item-head">
-              <div class="side-item-title">${escapeHtml(user.displayName || "Sans nom")}</div>
-              <span class="pill ${online ? "online" : "offline"}">
-                <span class="dot ${online ? "online" : ""}"></span>
-                ${online ? "En ligne" : "Hors ligne"}
-              </span>
-            </div>
-            <div class="side-item-sub">
-              ${online ? "Disponible maintenant" : (presence.lastSeen ? `Dernière activité : ${escapeHtml(formatDate(presence.lastSeen))}` : "Pas d’activité récente")}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function getPostLikes(postId) {
-      return likesMap?.[postId] || {};
-    }
-
-    function getPostComments(postId) {
-      return commentsMap?.[postId] || {};
-    }
-
-    function normalizePostImages(post = {}) {
-      if (Array.isArray(post.imageUrls) && post.imageUrls.length) return post.imageUrls;
-      if (post.imageUrl) return [post.imageUrl];
-      if (post.attachmentType === "image" && post.attachmentUrl) return [post.attachmentUrl];
-      return [];
-    }
-
-    function normalizePostPdf(post = {}) {
-      if (post.pdfUrl) {
-        return { url: post.pdfUrl, name: post.pdfName || "Document PDF" };
-      }
-      if (post.attachmentType === "pdf" && post.attachmentUrl) {
-        return { url: post.attachmentUrl, name: post.attachmentName || "Document PDF" };
-      }
-      return null;
-    }
-
-    function renderPostAttachment(post = {}) {
-      const images = normalizePostImages(post);
-      const pdf = normalizePostPdf(post);
-
-      let html = "";
-
-      if (images.length) {
-        html += `<div class="post-images">`;
-        html += images.map(url => `<img class="post-image" src="${url}" alt="publication image">`).join("");
-        html += `</div>`;
-      }
-
-      if (pdf) {
-        html += `
-          <div class="post-pdf">
-            <div class="pdf-left">
-              <div class="pdf-icon">PDF</div>
-              <div>
-                <div class="pdf-name">${escapeHtml(pdf.name)}</div>
-                <div class="pdf-sub">Document joint à la publication</div>
-              </div>
-            </div>
-            <a class="pdf-open" href="${pdf.url}" target="_blank" rel="noopener">Ouvrir</a>
-          </div>
-        `;
-      }
-
-      return html;
-    }
-
-    function renderCommentAttachment(comment = {}) {
-      if (comment.sticker) {
-        return `<div class="comment-sticker">${escapeHtml(comment.sticker)}</div>`;
-      }
-      return "";
-    }
-
-    function closeAllPostMenus() {
-      document.querySelectorAll(".post-menu.open").forEach(menu => menu.classList.remove("open"));
-    }
-
-    function postCanBeEdited(post = {}) {
-      return currentUser && post.authorId === currentUser.uid;
-    }
-
-    function renderPosts() {
-      const posts = Object.entries(postsMap || {})
-        .map(([id, val]) => ({ id, ...(val || {}) }))
-        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-      if (!posts.length) {
-        postGrid.innerHTML = `<div class="empty-card">Aucune publication pour le moment.</div>`;
-        return;
-      }
-
-      postGrid.innerHTML = posts.map(post => {
-        const author = usersMap?.[post.authorId] ? { uid:post.authorId, ...usersMap[post.authorId] } : {};
-        const likes = getPostLikes(post.id);
-        const comments = getPostComments(post.id);
-        const likeCount = Object.keys(likes || {}).length;
-        const commentCount = Object.keys(comments || {}).length;
-        const likedByMe = !!(currentUser && likes && likes[currentUser.uid]);
-
-        const commentsHtml = Object.entries(comments || {})
-          .map(([cid, val]) => ({ id:cid, ...(val || {}) }))
-          .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
-          .map(comment => {
-            const cAuthor = usersMap?.[comment.authorId] ? { uid:comment.authorId, ...usersMap[comment.authorId] } : {};
-            return `
-              <div class="comment-card">
-                <div class="comment-head">
-                  <div>
-                    <div class="comment-author">${escapeHtml(cAuthor.displayName || "Utilisateur")}</div>
-                    <div class="comment-meta">${escapeHtml(formatDate(comment.createdAt))}</div>
-                  </div>
-                  ${currentUser && comment.authorId === currentUser.uid ? `<button class="mini-btn" type="button" data-delete-comment="${post.id}|${comment.id}">Supprimer</button>` : ""}
-                </div>
-                <div class="comment-text">${escapeHtml(comment.text || "")}</div>
-                ${renderCommentAttachment(comment)}
-              </div>
-            `;
-          }).join("");
-
-        return `
-          <article class="post-card" id="post-${post.id}" data-post-id="${post.id}">
-            <div class="post-head">
-              <div class="post-author">
-                <div class="avatar">${avatarMarkup(author, author.email || "")}</div>
-                <div>
-                  <div class="post-author-name">${escapeHtml(author.displayName || "Sans nom")}</div>
-                  <div class="post-author-meta">
-                    ${escapeHtml(visibleEmail(currentUser?.uid, author))}<br>
-                    ${escapeHtml(formatDate(post.createdAt))}
-                  </div>
-                </div>
-              </div>
-
-              <div class="post-menu-wrap">
-                <button class="post-menu-btn" type="button" data-post-menu-btn="${post.id}">⋯</button>
-                <div class="post-menu" data-post-menu="${post.id}">
-                  ${postCanBeEdited(post) ? `<button type="button" data-delete-post="${post.id}" class="danger">Supprimer</button>` : ""}
-                  <button type="button" data-report-post="${post.id}">Signaler</button>
-                  <button type="button" data-open-profile="${post.authorId}">Voir le profil</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="post-text">${escapeHtml(post.text || "")}</div>
-
-            ${renderPostAttachment(post)}
-
-            <div class="post-actions">
-              <button class="action-chip ${likedByMe ? "active" : ""}" type="button" data-like-post="${post.id}">
-                👍 Like (${likeCount})
-              </button>
-              <button class="action-chip" type="button" data-focus-comment="${post.id}">
-                💬 Comment (${commentCount})
-              </button>
-            </div>
-
-            <div class="comment-form">
-              <textarea class="comment-textarea" id="comment-input-${post.id}" placeholder="Écris un commentaire..."></textarea>
-              <div class="comment-tools">
-                <button class="secondary-btn" type="button" data-comment-sticker="${post.id}">Emoji / Sticker</button>
-                <button class="primary-btn" type="button" data-send-comment="${post.id}">Commenter</button>
-              </div>
-            </div>
-
-            <div class="comment-list">
-              ${commentsHtml || `<div class="empty-card">Aucun commentaire pour le moment.</div>`}
-            </div>
-          </article>
-        `;
-      }).join("");
-
-      bindPostActions();
-    }
-
-    function bindPostActions() {
-      closeAllPostMenus();
-
-      document.querySelectorAll("[data-post-menu-btn]").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          const id = btn.dataset.postMenuBtn;
-          const menu = document.querySelector(`[data-post-menu="${id}"]`);
-          if (!menu) return;
-          const open = menu.classList.contains("open");
-          closeAllPostMenus();
-          if (!open) menu.classList.add("open");
-        });
-      });
-
-      document.querySelectorAll("[data-like-post]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const postId = btn.dataset.likePost;
-          await toggleLike(postId);
-        });
-      });
-
-      document.querySelectorAll("[data-send-comment]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const postId = btn.dataset.sendComment;
-          await sendComment(postId);
-        });
-      });
-
-      document.querySelectorAll("[data-comment-sticker]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const postId = btn.dataset.commentSticker;
-          const sticker = prompt("Entre un emoji ou un sticker texte :");
-          if (!sticker) return;
-          await sendComment(postId, sticker);
-        });
-      });
-
-      document.querySelectorAll("[data-delete-comment]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const [postId, commentId] = btn.dataset.deleteComment.split("|");
-          await deleteComment(postId, commentId);
-        });
-      });
-
-      document.querySelectorAll("[data-delete-post]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const postId = btn.dataset.deletePost;
-          await deletePost(postId);
-        });
-      });
-
-      document.querySelectorAll("[data-report-post]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          currentReportPostId = btn.dataset.reportPost;
-          reportText.value = "";
-          openModal(reportModal);
-        });
-      });
-
-      document.querySelectorAll("[data-open-profile]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const uid = btn.dataset.openProfile;
-          window.location.href = `profile.html?uid=${encodeURIComponent(uid)}`;
-        });
-      });
-
-      document.querySelectorAll("[data-focus-comment]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const postId = btn.dataset.focusComment;
-          const input = document.getElementById(`comment-input-${postId}`);
-          if (input) input.focus();
-        });
-      });
-
-      document.addEventListener("click", closeAllPostMenus, { once:true });
-    }
-
-    async function toggleLike(postId) {
-      if (!currentUser || !postId) return;
-      const likeRef = ref(db, `likes/${postId}/${currentUser.uid}`);
-      const snap = await get(likeRef);
-      if (snap.exists()) {
-        await remove(likeRef);
-      } else {
-        await set(likeRef, {
-          uid: currentUser.uid,
-          createdAt: Date.now()
-        });
-      }
-    }
-
-    async function sendComment(postId, sticker = "") {
-      if (!currentUser || !postId) return;
-
-      const input = document.getElementById(`comment-input-${postId}`);
-      const text = input ? input.value.trim() : "";
-
-      if (!text && !sticker) return;
-
-      const newRef = push(ref(db, `comments/${postId}`));
-      await set(newRef, {
-        authorId: currentUser.uid,
-        text,
-        sticker: sticker || "",
-        createdAt: Date.now()
-      });
-
-      if (input) input.value = "";
-    }
-
-    async function deleteComment(postId, commentId) {
-      if (!currentUser || !postId || !commentId) return;
-      const commentRef = ref(db, `comments/${postId}/${commentId}`);
-      const snap = await get(commentRef);
-      if (!snap.exists()) return;
-      const val = snap.val() || {};
-      if (val.authorId !== currentUser.uid) return;
-      await remove(commentRef);
-    }
-
-    async function deletePost(postId) {
-      if (!currentUser || !postId) return;
-      const postRef = ref(db, `posts/${postId}`);
-      const snap = await get(postRef);
-      if (!snap.exists()) return;
-      const val = snap.val() || {};
-      if (val.authorId !== currentUser.uid) return;
-
-      await remove(postRef);
-      await remove(ref(db, `likes/${postId}`));
-      await remove(ref(db, `comments/${postId}`));
-    }
-
-    async function publishPost() {
-      if (!currentUser || !currentUserData) return;
-
-      const text = postText.value.trim();
-      if (!text && !pendingImages.length && !pendingPdf) {
-        alert("Écris un texte ou ajoute une pièce jointe avant de publier.");
-        return;
-      }
-
-      publishBtn.disabled = true;
-
-      try {
-        const newRef = push(ref(db, "posts"));
-        const payload = {
-          authorId: currentUser.uid,
-          text,
-          createdAt: Date.now(),
-          updatedAt: Date.now()
-        };
-
-        if (pendingImages.length) {
-          payload.imageUrls = pendingImages.map(img => img.url);
-        }
-
-        if (pendingPdf) {
-          payload.pdfUrl = pendingPdf.url;
-          payload.pdfName = pendingPdf.name;
-        }
-
-        await set(newRef, payload);
-        resetComposer();
-      } catch (e) {
-        console.error(e);
-        alert("Impossible de publier pour le moment.");
-      } finally {
-        publishBtn.disabled = false;
-      }
-    }
-
-    async function setPrivacyField(field) {
-      if (!currentUser || !currentUserData) return;
-      const current = ensurePrivacy(currentUserData);
-      const newVal = !current[field];
-      await update(ref(db, `users/${currentUser.uid}/privacy`), {
-        ...current,
-        [field]: newVal
-      });
-    }
-
-    function renderRecentActivities() {
-      const posts = Object.entries(postsMap || {})
-        .map(([id, val]) => ({ id, ...(val || {}) }))
-        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-        .slice(0, 8);
-
-      if (!posts.length) {
-        recentActivityList.innerHTML = `<div class="empty-card">Aucune activité pour le moment.</div>`;
-        return;
-      }
-
-      recentActivityList.innerHTML = posts.map(post => {
-        const author = usersMap?.[post.authorId] ? { uid:post.authorId, ...usersMap[post.authorId] } : {};
-        return `
-          <div class="side-item">
-            <div class="side-item-head">
-              <div class="side-item-title">${escapeHtml(author.displayName || "Utilisateur")}</div>
-            </div>
-            <div class="side-item-sub">
-              ${escapeHtml((post.text || "Publication").slice(0, 90))}${(post.text || "").length > 90 ? "..." : ""}<br>
-              ${escapeHtml(formatDate(post.createdAt))}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    async function submitReport() {
-      if (!currentReportPostId || !currentUser) return;
-
-      const reasonNode = document.querySelector('input[name="reportReason"]:checked');
-      const reason = reasonNode ? reasonNode.value : "Autre";
-
-      const post = postsMap?.[currentReportPostId] || {};
-
-      const reportRef = push(ref(db, "reports"));
-      await set(reportRef, {
-        postId: currentReportPostId,
-        postAuthorId: post.authorId || "",
-        reportedByUid: currentUser.uid,
-        reportedByName: currentUserData?.displayName || currentUser.displayName || "",
-        destinationEmail: "maounou-boris.amoussou@cnrs.fr",
-        reason,
-        comment: reportText.value.trim(),
-        createdAt: Date.now()
-      });
-
-      closeModal(reportModal);
-      currentReportPostId = null;
-      reportText.value = "";
-      alert("Signalement envoyé.");
-    }
-
-    function focusPostFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const postId = params.get("postId");
-      if (!postId) return;
-
-      const postEl = document.getElementById(`post-${postId}`);
-      if (postEl) {
-        postEl.scrollIntoView({ behavior:"smooth", block:"center" });
-        postEl.style.boxShadow = "0 0 0 4px rgba(47,140,255,0.18), var(--shadow)";
-        setTimeout(() => {
-          postEl.style.boxShadow = "";
-        }, 2600);
-      }
-    }
-
-    async function handleImagesSelected(files) {
-      const arr = Array.from(files || []);
-      if (!arr.length) return;
-
-      const results = [];
-      for (const file of arr) {
-        if (!file.type.startsWith("image/")) continue;
-        if (file.size > MAX_IMAGE_SIZE) {
-          alert(`Image trop lourde : ${file.name}`);
-          continue;
-        }
-        try {
-          const compressed = await compressImage(file);
-          results.push(compressed);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
-      pendingImages = results;
-      renderAttachmentPreview();
-    }
-
-    async function handlePdfSelected(file) {
-      if (!file) return;
-      if (file.size > MAX_PDF_SIZE) {
-        alert("PDF trop lourd.");
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        pendingPdf = {
-          type: "pdf",
-          name: file.name || "document.pdf",
-          url: reader.result
-        };
-        renderAttachmentPreview();
-      };
-      reader.readAsDataURL(file);
+    function isAdminEmail(mail = "") {
+      return String(mail).trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
     }
 
     logoutBtn.addEventListener("click", async () => {
@@ -2461,18 +1941,6 @@
       if (e.target === reportModal) closeModal(reportModal);
     });
 
-    document.addEventListener("contextmenu", (e) => {
-      if (!privatePage.classList.contains("hidden")) {
-        e.preventDefault();
-      }
-    });
-
-    window.addEventListener("beforeunload", () => {
-      if (currentUser) {
-        navigator.sendBeacon?.("");
-      }
-    });
-
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         currentUser = null;
@@ -2483,23 +1951,29 @@
         return;
       }
 
-      const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
-      if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
-        try { await signOut(auth); } catch (e) {}
-        setUIConnected(false);
-        showView("login");
-        return;
-      }
-
       try {
         await reload(user);
       } catch (e) {
         console.error(e);
       }
 
-      const isAdmin = (user.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase();
+      if (isAdminEmail(user.email || "")) {
+        await ensureAdminProfile(user);
+        currentUser = user;
+        await loadCurrentUserData();
+        setUIConnected(true);
+        bindActivityEvents();
+        resetInactivityTimer();
+        await updatePresenceOnline();
+        listenUsers();
+        listenPosts();
+        listenLikes();
+        listenComments();
+        parseInviteToken();
+        return;
+      }
 
-      if (!isAdmin && !user.emailVerified) {
+      if (!user.emailVerified) {
         try { await signOut(auth); } catch (e) {}
         setUIConnected(false);
         showView("login");
@@ -2519,7 +1993,7 @@
       const userData = snap.val() || {};
       const status = userData.accountStatus || "pending_admin_approval";
 
-      if (!isAdmin && status !== "approved") {
+      if (status !== "approved") {
         try { await signOut(auth); } catch (e) {}
         setUIConnected(false);
         showView("login");
@@ -2530,18 +2004,6 @@
           showAuthMessage("Ton compte est encore en attente d’approbation.");
         }
         return;
-      }
-
-      if (isAdmin) {
-        await update(ref(db, "users/" + user.uid), {
-          accountStatus: "approved",
-          role: "admin",
-          approvedBy: OWNER_EMAIL,
-          approvedAt: userData.approvedAt || Date.now(),
-          rejectedAt: 0,
-          emailVerifiedAtSignup: true,
-          updatedAt: Date.now()
-        });
       }
 
       currentUser = user;
