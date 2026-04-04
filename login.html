@@ -258,9 +258,12 @@
           await ensureAdminProfile(user);
           localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
           showMessage("Connexion administrateur réussie.", true);
-          window.location.href = "insights.html";
+
+          setTimeout(() => {
+          window.location.replace("./insights.html");
+          }, 600);
+
           return;
-        }
 
         if (!user.emailVerified) {
           showMessage("Vérifie d’abord ton adresse e-mail avant de te connecter.");
@@ -285,8 +288,12 @@
           });
           localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
           showMessage("Connexion réussie.", true);
-          window.location.href = "insights.html";
-          return;
+
+          setTimeout(() => {
+          window.location.replace("./insights.html");
+          }, 600);
+
+          return;;
         }
 
         if (status === "rejected") {
