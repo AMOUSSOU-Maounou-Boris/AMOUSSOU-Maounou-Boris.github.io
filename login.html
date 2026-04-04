@@ -83,7 +83,7 @@
 
     .msg {
       margin-top: 14px;
-      min-height: 22px;
+      min-height: 24px;
       font-size: 14px;
       text-align: center;
       color: #b42318;
@@ -142,7 +142,7 @@
     </div>
 
     <div class="small-note">
-      L’accès aux espaces privés est réservé aux comptes vérifiés et approuvés, sauf le compte administrateur.
+      Le compte <strong>borisamoussou01@gmail.com</strong> est administrateur et peut entrer librement.
     </div>
   </div>
 
@@ -151,10 +151,8 @@
     import {
       signInWithEmailAndPassword,
       sendPasswordResetEmail,
-      signOut,
       reload
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
     import {
       ref,
       get,
@@ -188,7 +186,7 @@
         uid: user.uid,
         displayName: user.displayName || "Maounou Boris AMOUSSOU",
         email: user.email || ADMIN_EMAIL,
-        photoURL: user.photoURL || "",
+        photoURL: "",
         bio: "",
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -220,7 +218,7 @@
         uid: user.uid,
         displayName: existing.displayName || baseData.displayName,
         email: user.email || ADMIN_EMAIL,
-        photoURL: existing.photoURL || baseData.photoURL,
+        photoURL: existing.photoURL || "",
         bio: existing.bio || "",
         updatedAt: Date.now(),
         role: "admin",
@@ -253,11 +251,10 @@
       try {
         const cred = await signInWithEmailAndPassword(auth, mail, pass);
         const user = cred.user;
+
         await reload(user);
 
-        const adminLogin = isAdminEmail(user.email || mail);
-
-        if (adminLogin) {
+        if (isAdminEmail(user.email || mail)) {
           await ensureAdminProfile(user);
           localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
           showMessage("Connexion administrateur réussie.", true);
@@ -266,45 +263,36 @@
         }
 
         if (!user.emailVerified) {
-          await signOut(auth);
           showMessage("Vérifie d’abord ton adresse e-mail avant de te connecter.");
           return;
         }
 
         const userRef = ref(db, "users/" + user.uid);
-        const userSnap = await get(userRef);
+        const snap = await get(userRef);
 
-        if (!userSnap.exists()) {
-          await signOut(auth);
+        if (!snap.exists()) {
           showMessage("Compte introuvable dans la base de données.");
           return;
         }
 
-        const userData = userSnap.val() || {};
-        const accountStatus = userData.accountStatus || "pending_admin_approval";
+        const userData = snap.val() || {};
+        const status = userData.accountStatus || "pending_admin_approval";
 
-        if (accountStatus === "approved") {
+        if (status === "approved") {
           await update(userRef, {
-            emailVerifiedAtSignup: true,
-            updatedAt: Date.now()
+            updatedAt: Date.now(),
+            emailVerifiedAtSignup: true
           });
-
           localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
           showMessage("Connexion réussie.", true);
           window.location.href = "insights.html";
           return;
         }
 
-        if (accountStatus === "rejected") {
-          await signOut(auth);
+        if (status === "rejected") {
           showMessage("Ton compte a été refusé par l’administrateur.");
           return;
         }
-
-        await update(userRef, {
-          emailVerifiedAtSignup: true,
-          updatedAt: Date.now()
-        });
 
         try {
           await update(ref(db, "accountApprovals/" + user.uid), {
@@ -316,11 +304,9 @@
           console.error("accountApprovals update error:", e);
         }
 
-        await signOut(auth);
-        showMessage("Ton e-mail est vérifié, mais ton compte est encore en attente d’approbation.");
+        showMessage("Ton compte est encore en attente d’approbation.");
       } catch (error) {
         console.error("LOGIN ERROR:", error);
-
         if (
           error.code === "auth/invalid-credential" ||
           error.code === "auth/wrong-password" ||
@@ -332,7 +318,7 @@
         } else if (error.code === "auth/too-many-requests") {
           showMessage("Trop de tentatives. Réessaie plus tard.");
         } else {
-          showMessage(`Erreur réelle : ${error.code || "inconnue"}\n${error.message || ""}`);
+          showMessage(`Erreur réelle : ${error.code || "inconnue"} ${error.message || ""}`);
         }
       } finally {
         loginBtn.disabled = false;
@@ -357,11 +343,10 @@
         showMessage("Lien de réinitialisation envoyé par e-mail.", true);
       } catch (error) {
         console.error("RESET ERROR:", error);
-
         if (error.code === "auth/invalid-email") {
           showMessage("Adresse e-mail invalide.");
         } else {
-          showMessage(`Erreur réelle : ${error.code || "inconnue"}\n${error.message || ""}`);
+          showMessage(`Erreur réelle : ${error.code || "inconnue"} ${error.message || ""}`);
         }
       } finally {
         forgotBtn.disabled = false;
