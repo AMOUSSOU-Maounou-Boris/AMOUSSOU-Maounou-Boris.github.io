@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Créer un compte</title>
-
   <style>
     * { box-sizing: border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
 
@@ -30,12 +29,14 @@
       font-size:32px;
       color:#082c53;
       margin-bottom:10px;
+      text-align:center;
     }
 
     .sub{
       color:#5e738b;
       margin-bottom:18px;
       line-height:1.5;
+      text-align:center;
     }
 
     .invite-box{
@@ -169,7 +170,6 @@
       updateProfile,
       sendEmailVerification
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
     import {
       ref,
       get,
@@ -363,7 +363,7 @@
         }
 
         setTimeout(() => {
-          window.location.href = "login.html";
+          window.location.replace("./login.html");
         }, 2200);
 
       } catch(e){
