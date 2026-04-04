@@ -1,13 +1,11 @@
-<!-- insights.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Insights - Réseau social</title>
+  <title>Insights | Boris Research Hub</title>
   <style>
     * { box-sizing: border-box; }
-
     :root{
       --bg:#eaf5ff;
       --card:#ffffff;
@@ -18,8 +16,11 @@
       --blue-dark:#0f4d92;
       --green:#18c34a;
       --red:#df4b4b;
+      --orange:#f7a600;
       --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
       --highlight:#fff8cc;
+      --line:#d9e5f2;
+      --soft:#f4f8fc;
     }
 
     body{
@@ -42,7 +43,6 @@
       z-index:20;
       box-shadow:0 4px 16px rgba(0,0,0,0.08);
     }
-
     .topbar nav{
       display:flex;
       gap:18px;
@@ -50,7 +50,6 @@
       align-items:center;
       flex-wrap:wrap;
     }
-
     .topbar a{
       color:#fff;
       text-decoration:none;
@@ -62,16 +61,9 @@
       align-items:center;
       gap:8px;
     }
-
-    .topbar a.active{ border-bottom-color:#fff; }
-
-    .login-link{
-      background:#1678e5;
-      padding:10px 14px !important;
-      border-radius:12px;
-      border-bottom:none !important;
+    .topbar a.active{
+      border-bottom-color:#fff;
     }
-
     .nav-online-dot{
       width:10px;
       height:10px;
@@ -81,787 +73,753 @@
       box-shadow:0 0 0 2px rgba(255,255,255,0.18);
     }
 
-    .page{
-      max-width:1450px;
-      margin:26px auto;
-      padding:0 18px 40px;
+    .hidden{ display:none !important; }
+
+    .auth-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(8,35,64,0.50);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      z-index:60;
+      backdrop-filter:blur(5px);
+    }
+
+    .auth-card{
+      width:100%;
+      max-width:470px;
+      background:#fff;
+      border-radius:28px;
+      box-shadow:0 24px 60px rgba(0,0,0,0.25);
+      padding:28px 22px 22px;
+    }
+    .auth-logo{
+      width:62px;
+      height:62px;
+      margin:0 auto 14px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg, #0c3d73, #2f8cff);
+      color:#fff;
+      font-size:28px;
+      font-weight:900;
+    }
+    .auth-title{
+      text-align:center;
+      margin:0 0 8px;
+      color:#082e5b;
+      font-size:30px;
+    }
+    .auth-subtitle{
+      text-align:center;
+      color:#5e738b;
+      line-height:1.6;
+      margin:0 0 18px;
+      font-size:14px;
+    }
+    .auth-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid #d6e0ea;
+      border-radius:16px;
+      padding:0 12px;
+      margin-bottom:12px;
+      background:#fff;
+    }
+    .auth-icon{
+      width:18px;
+      height:18px;
+      flex:0 0 18px;
+      border-radius:50%;
+      background:#dce8f6;
+    }
+    .auth-row input{
+      width:100%;
+      border:none;
+      outline:none;
+      padding:14px 0;
+      font-size:15px;
+      background:transparent;
+      font-family:inherit;
+    }
+    .auth-submit,
+    .auth-switch-btn,
+    .auth-link-btn{
+      width:100%;
+      border:none;
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .auth-submit{
+      background:var(--blue-dark);
+      color:#fff;
+      margin-top:4px;
+    }
+    .auth-links{
+      margin-top:12px;
       display:grid;
-      grid-template-columns:370px 1fr;
-      gap:24px;
+      gap:10px;
+    }
+    .auth-links button,
+    .auth-switch-btn,
+    .auth-link-btn{
+      background:#eef4fb;
+      color:var(--text);
+    }
+    .auth-message{
+      margin-top:14px;
+      min-height:22px;
+      text-align:center;
+      font-size:14px;
+      font-weight:700;
+      line-height:1.5;
+      color:#b42318;
+    }
+    .auth-message.ok{
+      color:#15803d;
+    }
+    .invite-status-box{
+      border:1px solid #d7e3f0;
+      border-radius:16px;
+      background:#f8fbff;
+      color:#0b2f57;
+      line-height:1.6;
+      font-size:14px;
+      padding:12px 14px;
+      margin-bottom:14px;
+    }
+    .invite-status-box.ok{
+      background:#ecfdf3;
+      border-color:#b7ebc9;
+      color:#166534;
+    }
+    .invite-status-box.bad{
+      background:#fff4f4;
+      border-color:#f1c1c1;
+      color:#b42318;
+    }
+
+    .page{
+      max-width:1500px;
+      margin:24px auto;
+      padding:0 18px 30px;
+      display:grid;
+      grid-template-columns:300px 1fr 300px;
+      gap:20px;
+      align-items:start;
     }
 
     .left-panel{
-      align-self:start;
       position:sticky;
-      top:95px;
+      top:96px;
+      min-width:0;
+    }
+    .center-panel,
+    .right-panel{
+      min-width:0;
     }
 
-    .profile-box{
-      background:linear-gradient(180deg, #0d376d 0%, #032750 100%);
-      color:#fff;
-      border-radius:28px;
-      padding:24px;
+    .panel-card,
+    .post-card,
+    .composer-card{
+      background:var(--card);
+      border:1px solid #e4edf7;
+      border-radius:26px;
       box-shadow:var(--shadow);
-      overflow:hidden;
-      position:relative;
     }
 
-    .profile-box::before{
-      content:"";
-      position:absolute;
-      width:180px;
-      height:180px;
-      right:-60px;
-      top:-60px;
-      border-radius:50%;
-      background:rgba(255,255,255,0.06);
+    .panel-card{
+      padding:18px;
+      margin-bottom:18px;
+    }
+
+    .me-box{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      margin-bottom:14px;
     }
 
     .avatar{
-      width:102px;
-      height:102px;
+      width:56px;
+      height:56px;
       border-radius:50%;
       background:#184684;
+      color:#fff;
       display:flex;
       align-items:center;
       justify-content:center;
       font-weight:800;
-      font-size:42px;
       overflow:hidden;
-      margin-bottom:18px;
-      position:relative;
-      border:3px solid rgba(255,255,255,0.12);
+      flex:0 0 auto;
     }
-
+    .avatar.large{
+      width:74px;
+      height:74px;
+      font-size:28px;
+    }
     .avatar img{
       width:100%;
       height:100%;
       object-fit:cover;
     }
 
-    .small-avatar{
-      width:52px;
-      height:52px;
-      font-size:18px;
-      margin-bottom:0;
-      flex:0 0 52px;
-    }
-
-    .status-dot{
-      width:14px;
-      height:14px;
-      border-radius:50%;
-      background:var(--green);
-      border:2px solid #fff;
-      position:absolute;
-      bottom:6px;
-      right:6px;
-      box-shadow:0 0 0 2px rgba(0,0,0,0.05);
-    }
-
-    .small-avatar .status-dot{
-      width:11px;
-      height:11px;
-      bottom:2px;
-      right:2px;
-      border-width:1.5px;
-    }
-
-    .profile-box h2{
-      margin:0 0 10px;
-      font-size:30px;
-      line-height:1.15;
-      position:relative;
-      z-index:1;
-    }
-
-    .profile-box p{
-      margin:0 0 18px;
-      font-size:16px;
-      line-height:1.5;
-      color:rgba(255,255,255,0.95);
-      position:relative;
-      z-index:1;
-      white-space:pre-wrap;
-      word-break:break-word;
-    }
-
-    .panel-btn{
-      display:block;
-      width:100%;
-      border:none;
-      text-decoration:none;
-      text-align:center;
-      background:#fff;
-      color:var(--nav);
-      padding:16px;
-      border-radius:16px;
-      font-size:18px;
-      font-weight:800;
-      margin-bottom:14px;
-      cursor:pointer;
-      position:relative;
-      z-index:1;
-    }
-
-    .panel-btn.alt{
-      background:rgba(255,255,255,0.14);
-      color:#fff;
-      border:1px solid rgba(255,255,255,0.08);
-    }
-
-    .panel-btn.logout-btn{
-      background:var(--red);
-      color:#fff;
-      margin-bottom:0;
-    }
-
-    .privacy-shell{
-      margin-top:16px;
-      position:relative;
-      z-index:1;
-    }
-
-    .privacy-toggle-btn{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      border:none;
-      cursor:pointer;
-      border-radius:18px;
-      padding:14px 16px;
-      background:rgba(255,255,255,0.10);
-      color:#fff;
-      font-size:17px;
-      font-weight:800;
-      border:1px solid rgba(255,255,255,0.08);
-    }
-
-    .privacy-toggle-btn span:last-child{
-      font-size:18px;
-      transition:.18s ease;
-    }
-
-    .privacy-toggle-btn.open span:last-child{
-      transform:rotate(180deg);
-    }
-
-    .privacy-card{
-      margin-top:10px;
-      background:rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:18px;
-      padding:14px;
-    }
-
-    .privacy-card.hidden-panel{
-      display:none;
-    }
-
-    .privacy-item{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:9px 0;
-      border-bottom:1px solid rgba(255,255,255,0.08);
-      font-size:14px;
-      color:#fff;
-    }
-
-    .privacy-item:last-child{ border-bottom:none; }
-
-    .switch{
-      position:relative;
-      width:48px;
-      height:28px;
-      flex:0 0 48px;
-    }
-
-    .switch input{
-      opacity:0;
-      width:0;
-      height:0;
-    }
-
-    .slider{
-      position:absolute;
-      inset:0;
-      background:rgba(255,255,255,0.25);
-      border-radius:999px;
-      cursor:pointer;
-      transition:.18s ease;
-    }
-
-    .slider::before{
-      content:"";
-      position:absolute;
-      width:22px;
-      height:22px;
-      left:3px;
-      top:3px;
-      background:#fff;
-      border-radius:50%;
-      transition:.18s ease;
-    }
-
-    .switch input:checked + .slider{
-      background:#2f8cff;
-    }
-
-    .switch input:checked + .slider::before{
-      transform:translateX(20px);
-    }
-
-    .privacy-msg{
-      margin-top:8px;
-      font-size:12px;
-      font-weight:700;
-      color:#d9f6e5;
-      min-height:16px;
-    }
-
-    .feed-section{ min-width:0; }
-
-    .composer-card{
-      background:var(--card);
-      border-radius:28px;
-      padding:24px;
-      box-shadow:var(--shadow);
-      margin-bottom:20px;
-    }
-
-    .composer-card h2{
-      margin:0 0 18px;
-      font-size:28px;
-    }
-
-    #postText{
-      width:100%;
-      min-height:155px;
-      border-radius:22px;
-      border:1px solid #cfd9e6;
-      padding:16px;
-      font-size:18px;
-      resize:vertical;
-      outline:none;
-      background:#fcfdff;
-      font-family:inherit;
-    }
-
-    #postText:focus,
-    .comment-form input:focus,
-    .auth-row input:focus,
-    .report-textarea:focus{
-      border-color:#7fb5ff;
-      box-shadow:0 0 0 3px rgba(47, 140, 255, 0.13);
-    }
-
-    .composer-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:14px;
-      align-items:center;
-      margin-top:18px;
-    }
-
-    .file-label{
+    .pill{
       display:inline-flex;
       align-items:center;
-      gap:10px;
-      padding:12px 16px;
-      border-radius:14px;
-      background:#eef4fb;
-      color:#0b2340;
-      font-weight:700;
-      cursor:pointer;
-      border:1px solid #d9e6f5;
-    }
-
-    .file-label input{ display:none; }
-
-    .primary-btn, .danger-btn, .small-btn, .report-btn{
-      border:none;
-      cursor:pointer;
-      border-radius:16px;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
       font-weight:800;
-      transition:.18s ease;
+      white-space:nowrap;
+    }
+    .pill.online{
+      background:#ecfdf3;
+      color:#166534;
+    }
+    .pill.offline{
+      background:#eef4fb;
+      color:#63778f;
+    }
+    .pill.warn{
+      background:#fff8e8;
+      color:#9a6700;
     }
 
-    .primary-btn:hover,
-    .danger-btn:hover,
-    .small-btn:hover,
-    .report-btn:hover,
-    .panel-btn:hover,
-    .auth-submit:hover{
-      transform:translateY(-1px);
-      filter:brightness(1.02);
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      display:inline-block;
+      background:#a6b7c9;
+      flex:0 0 10px;
+    }
+    .dot.online{
+      background:var(--green);
     }
 
-    .primary-btn{
-      background:var(--blue-dark);
-      color:#fff;
-      padding:13px 22px;
+    .mini-title{
+      margin:0 0 10px;
+      color:#082e5b;
       font-size:20px;
     }
 
+    .side-note{
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .quick-actions{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .secondary-btn,
+    .primary-btn,
+    .danger-btn,
+    .ghost-btn,
+    .submit-post-btn,
+    .mini-btn{
+      border:none;
+      border-radius:16px;
+      padding:13px 16px;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-decoration:none;
+    }
+    .primary-btn,
+    .submit-post-btn{
+      background:var(--blue-dark);
+      color:#fff;
+    }
+    .secondary-btn,
+    .ghost-btn,
+    .mini-btn{
+      background:#eef4fb;
+      color:var(--text);
+    }
     .danger-btn{
       background:var(--red);
       color:#fff;
-      padding:10px 16px;
+    }
+
+    .composer-card{
+      padding:20px;
+      margin-bottom:18px;
+    }
+
+    .composer-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .composer-head h2{
+      margin:0 0 6px;
+      font-size:28px;
+      color:#082e5b;
+    }
+    .composer-head p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
       font-size:14px;
     }
 
-    .small-btn{
-      background:var(--blue-dark);
-      color:#fff;
-      padding:10px 16px;
-      font-size:14px;
+    .post-textarea{
+      width:100%;
+      min-height:140px;
+      resize:vertical;
+      border:1px solid #d4dfed;
+      border-radius:18px;
+      padding:14px 15px;
+      outline:none;
+      font-size:15px;
+      font-family:inherit;
+      background:#fcfdff;
+    }
+    .post-textarea:focus,
+    .report-textarea:focus,
+    .text-input:focus{
+      border-color:#7fb5ff;
+      box-shadow:0 0 0 3px rgba(47,140,255,0.13);
     }
 
-    .report-btn{
-      background:#fff4f4;
-      color:#b82d2d;
-      padding:10px 16px;
-      font-size:14px;
-      border:1px solid #ffd6d6;
+    .composer-tools{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
     }
 
-    #composerPreview{ margin-top:14px; }
+    .hidden-file{
+      display:none;
+    }
 
-    .preview-grid{
+    .attachment-preview{
+      margin-top:14px;
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
       gap:12px;
     }
 
-    .preview-grid .img-frame,
-    .post-gallery .img-frame{
-      width:100%;
-      border-radius:16px;
-      border:1px solid #dde5ef;
-      background:#f7fbff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    .image-preview-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:12px;
+    }
+
+    .image-preview-card{
+      border:1px solid #dce7f3;
+      background:#fff;
+      border-radius:18px;
       overflow:hidden;
+      padding:10px;
     }
-
-    .preview-grid .img-frame{
-      height:160px;
-    }
-
-    .post-gallery .img-frame{
-      height:220px;
-      border:1px solid #e1e9f4;
-      background:#fbfdff;
-    }
-
-    .preview-grid img,
-    .post-gallery img{
+    .image-preview-card img{
       width:100%;
-      height:100%;
+      height:180px;
       object-fit:contain;
       display:block;
       background:#fff;
+      border-radius:12px;
+    }
+    .image-preview-meta{
+      margin-top:8px;
+      font-size:12px;
+      color:#5d7188;
+      line-height:1.5;
+      word-break:break-word;
+      font-weight:700;
     }
 
-    .pdf-card{
-      margin-top:12px;
-      padding:16px;
-      border:1px solid #dce6f3;
-      border-radius:18px;
+    .pdf-preview-card{
+      border:1px solid #dce7f3;
       background:#f8fbff;
+      border-radius:18px;
+      padding:14px;
       display:flex;
+      gap:12px;
       align-items:center;
       justify-content:space-between;
-      gap:14px;
       flex-wrap:wrap;
     }
-
-    .pdf-info{
+    .pdf-left{
       display:flex;
       align-items:center;
       gap:12px;
       min-width:0;
     }
-
     .pdf-icon{
-      width:44px;
-      height:44px;
-      border-radius:12px;
+      width:46px;
+      height:46px;
+      border-radius:14px;
       background:#e53e3e;
       color:#fff;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-weight:800;
-      flex:0 0 44px;
+      font-weight:900;
+      flex:0 0 46px;
     }
-
-    .pdf-title{
+    .pdf-name{
       font-weight:800;
-      color:var(--text);
       word-break:break-word;
     }
-
     .pdf-sub{
-      font-size:13px;
+      margin-top:4px;
+      font-size:12px;
       color:var(--muted);
-      margin-top:3px;
+      line-height:1.4;
     }
 
-    .pdf-open{
-      background:var(--blue-dark);
-      color:#fff;
-      padding:10px 16px;
-      border-radius:12px;
-      text-decoration:none;
-      font-weight:700;
-      white-space:nowrap;
+    .composer-footer{
+      margin-top:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
     }
 
-    .small-msg{
-      margin-top:12px;
-      font-size:14px;
-      font-weight:700;
-      min-height:18px;
+    .post-grid{
+      display:grid;
+      gap:18px;
     }
 
     .post-card{
-      background:var(--card);
-      border-radius:24px;
-      padding:20px;
-      box-shadow:var(--shadow);
-      margin-bottom:18px;
-      scroll-margin-top:110px;
-    }
-
-    .post-card.highlight-post{
-      background:var(--highlight);
-      border:1px solid #f2d763;
+      padding:18px;
     }
 
     .post-head{
       display:flex;
       justify-content:space-between;
-      gap:16px;
+      gap:14px;
       align-items:center;
+      flex-wrap:wrap;
       margin-bottom:14px;
     }
 
-    .author-block{
+    .post-author{
       display:flex;
-      align-items:center;
       gap:12px;
-      text-decoration:none;
-      color:inherit;
+      align-items:center;
       min-width:0;
     }
 
-    .author-meta{ min-width:0; }
-
-    .author-name-row{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      flex-wrap:wrap;
+    .post-author-name{
+      font-weight:800;
+      color:#082e5b;
+      font-size:16px;
     }
-
-    .online-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      font-size:12px;
-      color:#14854b;
-      font-weight:700;
-      background:#ebfff2;
-      padding:4px 8px;
-      border-radius:999px;
-    }
-
-    .online-badge::before{
-      content:"";
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:var(--green);
-      display:inline-block;
-    }
-
-    .date-line{
+    .post-author-meta{
       color:var(--muted);
       font-size:13px;
-      margin-top:3px;
+      line-height:1.5;
+      margin-top:4px;
     }
 
-    .delete-note{
-      margin-top:6px;
-      font-size:12px;
-      color:var(--muted);
+    .post-menu-wrap{
+      position:relative;
+    }
+    .post-menu-btn{
+      border:none;
+      background:#eef4fb;
+      color:#0b2340;
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:18px;
+      line-height:1;
+    }
+    .post-menu{
+      position:absolute;
+      right:0;
+      top:44px;
+      min-width:170px;
+      background:#fff;
+      border:1px solid #dce8f3;
+      border-radius:14px;
+      box-shadow:0 16px 34px rgba(7,31,66,0.12);
+      padding:8px;
+      display:none;
+      z-index:25;
+    }
+    .post-menu.open{
+      display:block;
+    }
+    .post-menu button{
+      width:100%;
+      border:none;
+      background:#fff;
+      text-align:left;
+      border-radius:10px;
+      padding:10px 12px;
       font-weight:700;
+      cursor:pointer;
+      color:var(--text);
+    }
+    .post-menu button:hover{
+      background:#f4f8fc;
+    }
+    .post-menu button.danger{
+      color:#b42318;
     }
 
     .post-text{
-      margin:10px 0 14px;
+      line-height:1.8;
       white-space:pre-wrap;
-      font-size:17px;
-      line-height:1.55;
       word-break:break-word;
+      font-size:15px;
+      margin-bottom:14px;
     }
 
-    .post-gallery{
+    .post-images{
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
       gap:12px;
-      margin-top:8px;
+      margin-bottom:14px;
+    }
+    .post-image{
+      width:100%;
+      height:240px;
+      object-fit:contain;
+      background:#fff;
+      border:1px solid #dce7f3;
+      border-radius:18px;
+      display:block;
+      padding:8px;
+    }
+
+    .post-pdf{
+      margin-bottom:14px;
+      border:1px solid #dce7f3;
+      border-radius:18px;
+      background:#f8fbff;
+      padding:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .pdf-open{
+      text-decoration:none;
+      background:var(--blue-dark);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:800;
+      white-space:nowrap;
     }
 
     .post-actions{
       display:flex;
-      gap:12px;
-      margin-top:14px;
-      margin-bottom:14px;
+      gap:10px;
       flex-wrap:wrap;
+      margin-top:10px;
+      margin-bottom:14px;
     }
 
-    .react-btn{
+    .action-chip{
       border:none;
-      background:#edf3fb;
+      background:#eef4fb;
       color:var(--text);
       border-radius:999px;
-      padding:10px 16px;
-      font-weight:800;
+      padding:10px 14px;
       cursor:pointer;
-      transition:.18s ease;
+      font-weight:800;
+      font-size:13px;
     }
-
-    .react-btn:hover{ transform:translateY(-1px); }
-    .react-btn.liked{ background:#ffdfe8; }
-
-    .comments-box{
-      margin-top:8px;
-      border-top:1px solid #edf1f7;
-      padding-top:14px;
-    }
-
-    .comment-list{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-bottom:12px;
-    }
-
-    .comment-item{
-      background:#f6f8fb;
-      border-radius:16px;
-      padding:12px 14px;
-      font-size:15px;
-      line-height:1.4;
-    }
-
-    .comment-item strong{
-      display:block;
-      margin-bottom:4px;
-    }
-
-    .comment-item small{
-      display:block;
-      margin-top:6px;
-      color:var(--muted);
+    .action-chip.active{
+      background:#dfeeff;
+      color:#0f4d92;
     }
 
     .comment-form{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .comment-textarea{
+      width:100%;
+      min-height:92px;
+      resize:vertical;
+      border:1px solid #d4dfed;
+      border-radius:16px;
+      padding:12px 14px;
+      outline:none;
+      font-size:14px;
+      background:#fcfdff;
+      font-family:inherit;
+    }
+
+    .comment-tools{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+      align-items:center;
     }
 
-    .comment-form input{
-      flex:1 1 260px;
-      min-width:0;
-      border:1px solid #d3dbe7;
-      border-radius:14px;
-      padding:12px 14px;
-      font-size:15px;
-      outline:none;
+    .comment-list{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .comment-card{
+      background:#f8fbff;
+      border:1px solid #dce8f3;
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .comment-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+      align-items:flex-start;
+    }
+
+    .comment-author{
+      font-weight:800;
+      color:#082e5b;
+      font-size:14px;
+    }
+    .comment-meta{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+      margin-top:4px;
+    }
+    .comment-text{
+      line-height:1.7;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-size:14px;
+    }
+    .comment-sticker{
+      margin-top:6px;
+      font-size:28px;
+      line-height:1.2;
+    }
+
+    .comment-actions{
+      margin-top:10px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .side-list{
+      display:grid;
+      gap:12px;
+    }
+
+    .side-item{
+      border:1px solid #e0eaf6;
+      border-radius:18px;
+      background:#fbfdff;
+      padding:14px;
+    }
+
+    .side-item-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+      margin-bottom:8px;
+    }
+
+    .side-item-title{
+      font-weight:800;
+      color:#082e5b;
+      line-height:1.4;
+    }
+    .side-item-sub{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      margin-top:4px;
+    }
+
+    .empty-card{
       background:#fff;
-    }
-
-    .no-comment, .empty-feed{
+      border:1px dashed #dce8f3;
+      border-radius:18px;
+      padding:16px;
       color:var(--muted);
       font-weight:700;
-      background:#fff;
-      border-radius:20px;
-      padding:18px;
-      box-shadow:var(--shadow);
-    }
-
-    .auth-overlay{
-      position:fixed;
-      inset:0;
-      background:linear-gradient(135deg, #dff2ff 0%, #c6e8ff 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:1000;
-      padding:20px;
-    }
-
-    .auth-card{
-      width:100%;
-      max-width:420px;
-      background:rgba(255,255,255,0.22);
-      backdrop-filter:blur(8px);
-      border:1px solid rgba(255,255,255,0.45);
-      border-radius:28px;
-      box-shadow:0 24px 60px rgba(8, 33, 64, 0.14);
-      padding:30px 24px;
-    }
-
-    .auth-logo{
-      width:74px;
-      height:74px;
-      border-radius:22px;
-      margin:0 auto 18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:linear-gradient(135deg, #2f8cff 0%, #0f4d92 100%);
-      color:#fff;
-      font-size:30px;
-      font-weight:800;
-      box-shadow:0 14px 28px rgba(15,77,146,0.18);
-    }
-
-    .auth-title{
-      font-size:28px;
-      margin:0 0 8px;
-      color:#193656;
-      font-weight:800;
-      text-align:center;
-    }
-
-    .auth-subtitle{
-      margin:0 0 20px;
-      color:var(--muted);
-      font-size:14px;
       line-height:1.6;
       text-align:center;
     }
 
-    .auth-row{
-      display:flex;
-      margin-bottom:12px;
-      border:1px solid #cfe0f1;
-      background:#ffffff;
-      border-radius:16px;
-      overflow:hidden;
-      transition:.15s ease;
-    }
-
-    .auth-row:focus-within{
-      border-color:#86b7ff;
-      box-shadow:0 0 0 3px rgba(47,140,255,0.14);
-    }
-
-    .auth-icon{
-      width:54px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#f7fbff;
-      color:#2d3c49;
-      font-size:18px;
-      border-right:1px solid #e5edf7;
-      flex:0 0 54px;
-    }
-
-    .auth-row input{
-      flex:1;
-      border:none;
-      outline:none;
-      padding:15px 15px;
-      font-size:15px;
-      background:#fff;
-    }
-
-    .auth-submit{
-      width:100%;
-      border:none;
-      background:linear-gradient(135deg, #2f8cff 0%, #0f4d92 100%);
-      color:#fff;
-      font-size:17px;
-      font-weight:800;
-      padding:14px;
-      border-radius:16px;
-      cursor:pointer;
-      margin-top:6px;
-      box-shadow:0 10px 22px rgba(15, 77, 146, 0.18);
-      transition:.18s ease;
-    }
-
-    .auth-links{
-      margin-top:16px;
-      font-size:14px;
-      display:flex;
-      justify-content:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .auth-links button{
-      background:none;
-      border:none;
-      color:#0a84d8;
-      cursor:pointer;
-      font-size:14px;
-      padding:0;
-      font-weight:700;
-    }
-
-    .auth-msg{
-      min-height:22px;
-      margin-top:14px;
-      font-size:14px;
-      font-weight:700;
-      text-align:center;
-    }
-
-    .modal-overlay{
+    .modal{
       position:fixed;
       inset:0;
-      background:rgba(0,0,0,0.45);
-      display:flex;
+      background:rgba(8,35,64,0.45);
+      display:none;
       align-items:center;
       justify-content:center;
-      z-index:2000;
-      padding:20px;
+      padding:18px;
+      z-index:90;
     }
-
-    .modal-card{
+    .modal.show{
+      display:flex;
+    }
+    .modal-content{
       width:100%;
       max-width:520px;
       background:#fff;
       border-radius:24px;
+      box-shadow:0 20px 50px rgba(0,0,0,0.22);
       padding:22px;
-      box-shadow:0 20px 50px rgba(0,0,0,0.2);
+      position:relative;
     }
-
-    .modal-title{
+    .modal-close{
+      position:absolute;
+      top:12px;
+      right:14px;
+      border:none;
+      background:transparent;
+      font-size:28px;
+      cursor:pointer;
+      color:#0b2340;
+      line-height:1;
+    }
+    .modal h3{
+      margin:0 0 10px;
       font-size:24px;
-      font-weight:800;
-      margin:0 0 8px;
-      color:var(--text);
+      color:#082e5b;
     }
-
-    .modal-sub{
+    .modal-note{
       color:var(--muted);
+      line-height:1.6;
+      margin:0 0 16px;
       font-size:14px;
-      line-height:1.5;
-      margin-bottom:16px;
     }
 
     .report-reasons{
@@ -879,10 +837,12 @@
       border-radius:14px;
       background:#f9fbfe;
     }
+    .reason-item input{
+      margin-top:3px;
+    }
 
-    .reason-item input{ margin-top:3px; }
-
-    .report-textarea{
+    .report-textarea,
+    .text-input{
       width:100%;
       min-height:110px;
       resize:vertical;
@@ -894,6 +854,10 @@
       margin-bottom:14px;
       font-family:inherit;
     }
+    .text-input{
+      min-height:auto;
+      resize:none;
+    }
 
     .modal-actions{
       display:flex;
@@ -902,17 +866,11 @@
       flex-wrap:wrap;
     }
 
-    .ghost-btn{
-      border:none;
-      background:#eef4fb;
-      color:var(--text);
-      padding:11px 16px;
-      border-radius:14px;
-      font-weight:800;
-      cursor:pointer;
+    @media (max-width: 1200px){
+      .page{ grid-template-columns:1fr; }
+      .left-panel{ position:static; }
+      .right-panel{ order:3; }
     }
-
-    .hidden{ display:none !important; }
 
     @media (max-width: 1000px){
       .page{ grid-template-columns:1fr; }
@@ -922,7 +880,6 @@
   </style>
 </head>
 <body class="secure-page">
-
   <header class="topbar" id="publicTopbar">
     <nav>
       <a href="index.html">Home</a>
@@ -944,6 +901,8 @@
       <a href="contact.html">Contact</a>
       <a href="insights.html" class="active">Insights</a>
       <a href="messages.html">Messages</a>
+      <a href="calls.html">Appels</a>
+      <a href="meeting-room.html" id="meetingNavLink" class="hidden">Salle de réunion</a>
       <a href="profile.html"><span class="nav-online-dot" id="navOnlineDot"></span> Mon compte</a>
     </nav>
   </header>
@@ -957,188 +916,248 @@
         <p class="auth-subtitle">Connecte-toi pour accéder à Insights.</p>
 
         <div class="auth-row">
-          <div class="auth-icon">✉️</div>
+          <div class="auth-icon"></div>
           <input type="email" id="loginEmail" placeholder="Adresse email" />
         </div>
 
         <div class="auth-row">
-          <div class="auth-icon">🔒</div>
+          <div class="auth-icon"></div>
           <input type="password" id="loginPassword" placeholder="Mot de passe" />
         </div>
 
         <button class="auth-submit" id="loginBtn" type="button">Se connecter</button>
 
         <div class="auth-links">
-          <button id="showResetBtn" type="button">Mot de passe oublié ?</button>
-          <button id="showSignupBtn" type="button">Créer un compte</button>
+          <button id="showResetBtn" class="auth-link-btn" type="button">Mot de passe oublié ?</button>
+          <button id="showSignupBtn" class="auth-link-btn" type="button">Créer un compte</button>
         </div>
       </div>
 
       <div id="signupView" class="hidden">
         <h2 class="auth-title">Créer un compte</h2>
-        <p class="auth-subtitle">Remplis les champs puis confirme ton email.</p>
+        <p class="auth-subtitle">Création réservée aux personnes disposant d’un lien d’invitation valide.</p>
+
+        <div class="invite-status-box" id="inviteStatusBox">
+          Vérification du lien d’invitation...
+        </div>
 
         <div class="auth-row">
-          <div class="auth-icon">👤</div>
+          <div class="auth-icon"></div>
           <input type="text" id="signupFirstName" placeholder="Prénom" />
         </div>
 
         <div class="auth-row">
-          <div class="auth-icon">👤</div>
+          <div class="auth-icon"></div>
           <input type="text" id="signupLastName" placeholder="Nom" />
         </div>
 
         <div class="auth-row">
-          <div class="auth-icon">🌍</div>
+          <div class="auth-icon"></div>
           <input type="text" id="signupCountry" placeholder="Pays" />
         </div>
 
         <div class="auth-row">
-          <div class="auth-icon">✉️</div>
+          <div class="auth-icon"></div>
           <input type="email" id="signupEmail" placeholder="Email Gmail ou institutionnel" />
         </div>
 
         <div class="auth-row">
-          <div class="auth-icon">🔒</div>
+          <div class="auth-icon"></div>
           <input type="password" id="signupPassword" placeholder="Mot de passe" />
         </div>
 
         <div class="auth-row">
-          <div class="auth-icon">🔒</div>
-          <input type="password" id="signupPassword2" placeholder="Confirmer le mot de passe" />
+          <div class="auth-icon"></div>
+          <input type="password" id="signupConfirmPassword" placeholder="Confirmer le mot de passe" />
         </div>
 
-        <button class="auth-submit" id="signupBtn" type="button">Créer le compte</button>
+        <button class="auth-submit" id="signupBtn" type="button" disabled>Créer mon compte</button>
 
         <div class="auth-links">
-          <button id="backToLogin1" type="button">Retour connexion</button>
+          <button id="showLoginBtn" class="auth-link-btn" type="button">Déjà un compte ? Se connecter</button>
         </div>
       </div>
 
       <div id="resetView" class="hidden">
-        <h2 class="auth-title">Mot de passe oublié</h2>
-        <p class="auth-subtitle">Reçois un lien de réinitialisation par email.</p>
+        <h2 class="auth-title">Réinitialiser</h2>
+        <p class="auth-subtitle">Entre ton adresse email pour recevoir un lien de réinitialisation.</p>
 
         <div class="auth-row">
-          <div class="auth-icon">✉️</div>
+          <div class="auth-icon"></div>
           <input type="email" id="resetEmail" placeholder="Adresse email" />
         </div>
 
         <button class="auth-submit" id="resetBtn" type="button">Envoyer le lien</button>
 
         <div class="auth-links">
-          <button id="backToLogin2" type="button">Retour connexion</button>
+          <button id="backToLoginBtn" class="auth-link-btn" type="button">Retour à la connexion</button>
         </div>
       </div>
 
-      <div class="auth-msg" id="authMsg"></div>
+      <div class="auth-message" id="authMessage"></div>
     </div>
   </div>
 
-  <main class="page hidden" id="appContent">
+  <main class="page hidden" id="privatePage">
     <aside class="left-panel">
-      <div class="profile-box">
-        <div class="avatar" id="meAvatar">MB</div>
-        <h2 id="meName">Chargement...</h2>
-        <p id="meBio">Bienvenue sur ton espace social privé.</p>
-
-        <a class="panel-btn" href="profile.html">Voir mon profil</a>
-        <a class="panel-btn alt" href="messages.html">Messagerie</a>
-
-        <div class="privacy-shell">
-          <button class="privacy-toggle-btn" id="privacyToggleBtn" type="button">
-            <span>Confidentialité</span>
-            <span>⌄</span>
-          </button>
-
-          <div class="privacy-card hidden-panel" id="privacyPanel">
-            <div class="privacy-item">
-              <span>Masquer la présence en ligne</span>
-              <label class="switch">
-                <input type="checkbox" id="hidePresenceToggle">
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="privacy-item">
-              <span>Masquer l'email</span>
-              <label class="switch">
-                <input type="checkbox" id="hideEmailToggle">
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="privacy-item">
-              <span>Masquer la bio</span>
-              <label class="switch">
-                <input type="checkbox" id="hideBioToggle">
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="privacy-msg" id="privacyMsg"></div>
+      <div class="panel-card">
+        <div class="me-box" id="myBox">
+          <div class="avatar large" id="myAvatar">MB</div>
+          <div>
+            <h3 class="mini-title" style="margin:0 0 6px;font-size:24px;">Insights</h3>
+            <p class="side-note" id="myName">Chargement...</p>
           </div>
         </div>
 
-        <button class="panel-btn logout-btn" id="logoutBtn" type="button">Déconnexion</button>
+        <div id="myPresenceBox" class="pill offline">
+          <span class="dot" id="myPresenceDot"></span>
+          <span id="myPresenceText">Connexion...</span>
+        </div>
+
+        <div class="quick-actions">
+          <a class="secondary-btn" href="profile.html">Mon compte</a>
+          <a class="secondary-btn" href="messages.html">Messages</a>
+          <a class="secondary-btn" href="calls.html">Appels</a>
+          <button class="danger-btn" id="logoutBtn" type="button">Déconnexion</button>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <h3 class="mini-title">Academic Hub</h3>
+        <div class="side-list">
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">Collaboration</div>
+            </div>
+            <div class="side-item-sub">Échanges scientifiques, co-idées, soutien académique et entraide.</div>
+          </div>
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">Communications</div>
+            </div>
+            <div class="side-item-sub">Partage de nouvelles, publications, conférences, appels et discussions.</div>
+          </div>
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">Lab Activity</div>
+            </div>
+            <div class="side-item-sub">Résultats, essais, supports PDF, photos et notes de travail.</div>
+          </div>
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">Scientific Interests</div>
+            </div>
+            <div class="side-item-sub">Catalyse, environnement, matériaux, énergie, chimie verte et plus.</div>
+          </div>
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">Opportunities</div>
+            </div>
+            <div class="side-item-sub">Stages, offres, collaborations, événements et opportunités de la communauté.</div>
+          </div>
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">Community Spirit</div>
+            </div>
+            <div class="side-item-sub">Un espace privé, humain, professionnel et respectueux.</div>
+          </div>
+        </div>
       </div>
     </aside>
 
-    <section class="feed-section">
+    <section class="center-panel">
       <div class="composer-card">
-        <h2>Créer une publication</h2>
-        <textarea id="postText" placeholder="Écris quelque chose à partager..."></textarea>
-
-        <div class="composer-actions">
-          <label class="file-label">
-            <span>📎 Photos ou PDF</span>
-            <input type="file" id="postFileInput" accept="image/*,application/pdf" multiple />
-          </label>
-          <button class="primary-btn" id="publishBtn" type="button">Publier</button>
+        <div class="composer-head">
+          <div>
+            <h2>Partager une publication</h2>
+            <p>Écris un message, ajoute des images ou un PDF, puis publie dans l’espace privé.</p>
+          </div>
         </div>
 
-        <div id="composerPreview"></div>
-        <div class="small-msg" id="publishMsg"></div>
+        <textarea class="post-textarea" id="postText" placeholder="Écris ici ton insight scientifique, ta mise à jour, ton annonce ou ton message..."></textarea>
+
+        <div class="composer-tools">
+          <button class="secondary-btn" id="addImagesBtn" type="button">Ajouter image(s)</button>
+          <button class="secondary-btn" id="addPdfBtn" type="button">Ajouter PDF</button>
+          <button class="secondary-btn" id="togglePrivacyBtn" type="button">Paramètres de confidentialité</button>
+
+          <input type="file" id="imagesInput" class="hidden-file" accept="image/*" multiple />
+          <input type="file" id="pdfInput" class="hidden-file" accept=".pdf,application/pdf" />
+        </div>
+
+        <div class="panel-card hidden" id="privacyPanel" style="margin-top:14px;margin-bottom:0;">
+          <h3 class="mini-title" style="font-size:18px;">Paramètres de confidentialité</h3>
+          <p class="side-note" style="margin-bottom:14px;">Choisis quelles informations de ton profil restent visibles pour les autres membres.</p>
+
+          <div class="quick-actions">
+            <button class="secondary-btn" id="toggleHideEmailBtn" type="button">Masquer / afficher l’email</button>
+            <button class="secondary-btn" id="toggleHideBioBtn" type="button">Masquer / afficher la bio</button>
+            <button class="secondary-btn" id="toggleHidePresenceBtn" type="button">Masquer / afficher la présence</button>
+          </div>
+
+          <div class="side-note" id="privacyStatusText" style="margin-top:14px;"></div>
+        </div>
+
+        <div class="attachment-preview" id="attachmentPreview"></div>
+
+        <div class="composer-footer">
+          <div class="side-note" id="postInfoText">Images et PDF seront affichés proprement sans déformation.</div>
+          <button class="submit-post-btn" id="publishBtn" type="button">Publier</button>
+        </div>
       </div>
 
-      <div id="feed"></div>
+      <div class="post-grid" id="postGrid">
+        <div class="empty-card">Chargement des publications...</div>
+      </div>
     </section>
+
+    <aside class="right-panel">
+      <div class="panel-card">
+        <h3 class="mini-title">En ligne</h3>
+        <div class="side-list" id="onlineMembersList">
+          <div class="empty-card">Chargement...</div>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <h3 class="mini-title">Dernières activités</h3>
+        <div class="side-list" id="recentActivityList">
+          <div class="empty-card">Aucune activité pour le moment.</div>
+        </div>
+      </div>
+    </aside>
   </main>
 
-  <div class="modal-overlay hidden" id="reportModal">
-    <div class="modal-card">
-      <h3 class="modal-title">Signaler cette publication</h3>
-      <div class="modal-sub">Choisis un motif rapide ou écris ton explication.</div>
+  <div class="modal" id="reportModal">
+    <div class="modal-content">
+      <button class="modal-close" type="button" id="closeReportModal">×</button>
+      <h3>Signaler une publication</h3>
+      <p class="modal-note">Choisis une raison puis ajoute un commentaire si nécessaire.</p>
 
       <div class="report-reasons">
         <label class="reason-item">
-          <input type="radio" name="reportReason" value="Spam ou publicité" />
-          <span>Spam ou publicité</span>
+          <input type="radio" name="reportReason" value="Contenu inapproprié" checked />
+          <span>Contenu inapproprié</span>
         </label>
-
         <label class="reason-item">
-          <input type="radio" name="reportReason" value="Harcèlement ou insultes" />
-          <span>Harcèlement ou insultes</span>
+          <input type="radio" name="reportReason" value="Spam" />
+          <span>Spam</span>
         </label>
-
         <label class="reason-item">
-          <input type="radio" name="reportReason" value="Contenu inapproprié ou choquant" />
-          <span>Contenu inapproprié ou choquant</span>
+          <input type="radio" name="reportReason" value="Harcèlement" />
+          <span>Harcèlement</span>
         </label>
-
         <label class="reason-item">
-          <input type="radio" name="reportReason" value="Usurpation d'identité ou faux compte" />
-          <span>Usurpation d'identité ou faux compte</span>
+          <input type="radio" name="reportReason" value="Autre" />
+          <span>Autre</span>
         </label>
       </div>
 
-      <textarea class="report-textarea" id="reportCustomText" placeholder="Autre motif ou précision..."></textarea>
-
-      <div class="small-msg" id="reportMsg"></div>
+      <textarea class="report-textarea" id="reportText" placeholder="Ajoute un détail complémentaire..."></textarea>
 
       <div class="modal-actions">
-        <button class="ghost-btn" id="closeReportBtn" type="button">Annuler</button>
-        <button class="primary-btn" id="sendReportBtn" type="button">Envoyer</button>
+        <button class="ghost-btn" id="cancelReportBtn" type="button">Annuler</button>
+        <button class="primary-btn" id="submitReportBtn" type="button">Envoyer</button>
       </div>
     </div>
   </div>
@@ -1147,12 +1166,12 @@
     import { auth, db } from "./firebase-config.js";
     import {
       onAuthStateChanged,
-      createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
-      sendPasswordResetEmail,
+      createUserWithEmailAndPassword,
       sendEmailVerification,
-      updateProfile,
+      sendPasswordResetEmail,
       signOut,
+      updateProfile,
       reload
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -1163,139 +1182,158 @@
       update,
       push,
       remove,
-      onValue,
-      onDisconnect
+      onValue
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const CONTACT_EMAIL = "contact@tonsite.fr";
+    const OWNER_EMAIL = "borisamoussou01@gmail.com";
+    const LAST_ACTIVITY_KEY = "insights_last_activity";
+    const INACTIVITY_LIMIT = 15 * 60 * 1000;
+    const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+    const MAX_PDF_SIZE = 12 * 1024 * 1024;
+    const MAX_IMAGE_WIDTH = 1400;
+    const MAX_IMAGE_HEIGHT = 1400;
+    const JPEG_QUALITY = 0.78;
 
     const publicTopbar = document.getElementById("publicTopbar");
     const privateTopbar = document.getElementById("privateTopbar");
-    const navOnlineDot = document.getElementById("navOnlineDot");
+    const meetingNavLink = document.getElementById("meetingNavLink");
+
     const authOverlay = document.getElementById("authOverlay");
-    const appContent = document.getElementById("appContent");
-    const authMsg = document.getElementById("authMsg");
+    const privatePage = document.getElementById("privatePage");
 
     const loginView = document.getElementById("loginView");
     const signupView = document.getElementById("signupView");
     const resetView = document.getElementById("resetView");
+    const authMessage = document.getElementById("authMessage");
+    const inviteStatusBox = document.getElementById("inviteStatusBox");
 
     const loginEmail = document.getElementById("loginEmail");
     const loginPassword = document.getElementById("loginPassword");
     const loginBtn = document.getElementById("loginBtn");
+    const showResetBtn = document.getElementById("showResetBtn");
+    const showSignupBtn = document.getElementById("showSignupBtn");
+    const showLoginBtn = document.getElementById("showLoginBtn");
+    const backToLoginBtn = document.getElementById("backToLoginBtn");
 
     const signupFirstName = document.getElementById("signupFirstName");
     const signupLastName = document.getElementById("signupLastName");
     const signupCountry = document.getElementById("signupCountry");
     const signupEmail = document.getElementById("signupEmail");
     const signupPassword = document.getElementById("signupPassword");
-    const signupPassword2 = document.getElementById("signupPassword2");
+    const signupConfirmPassword = document.getElementById("signupConfirmPassword");
     const signupBtn = document.getElementById("signupBtn");
 
     const resetEmail = document.getElementById("resetEmail");
     const resetBtn = document.getElementById("resetBtn");
 
-    const showSignupBtn = document.getElementById("showSignupBtn");
-    const showResetBtn = document.getElementById("showResetBtn");
-    const backToLogin1 = document.getElementById("backToLogin1");
-    const backToLogin2 = document.getElementById("backToLogin2");
-
-    const meAvatar = document.getElementById("meAvatar");
-    const meName = document.getElementById("meName");
-    const meBio = document.getElementById("meBio");
+    const myAvatar = document.getElementById("myAvatar");
+    const myName = document.getElementById("myName");
+    const myPresenceDot = document.getElementById("myPresenceDot");
+    const myPresenceText = document.getElementById("myPresenceText");
+    const navOnlineDot = document.getElementById("navOnlineDot");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    const privacyToggleBtn = document.getElementById("privacyToggleBtn");
-    const privacyPanel = document.getElementById("privacyPanel");
-    const hidePresenceToggle = document.getElementById("hidePresenceToggle");
-    const hideEmailToggle = document.getElementById("hideEmailToggle");
-    const hideBioToggle = document.getElementById("hideBioToggle");
-    const privacyMsg = document.getElementById("privacyMsg");
-
     const postText = document.getElementById("postText");
-    const postFileInput = document.getElementById("postFileInput");
+    const addImagesBtn = document.getElementById("addImagesBtn");
+    const addPdfBtn = document.getElementById("addPdfBtn");
+    const togglePrivacyBtn = document.getElementById("togglePrivacyBtn");
+    const privacyPanel = document.getElementById("privacyPanel");
+    const toggleHideEmailBtn = document.getElementById("toggleHideEmailBtn");
+    const toggleHideBioBtn = document.getElementById("toggleHideBioBtn");
+    const toggleHidePresenceBtn = document.getElementById("toggleHidePresenceBtn");
+    const privacyStatusText = document.getElementById("privacyStatusText");
+
+    const imagesInput = document.getElementById("imagesInput");
+    const pdfInput = document.getElementById("pdfInput");
+    const attachmentPreview = document.getElementById("attachmentPreview");
+    const postInfoText = document.getElementById("postInfoText");
     const publishBtn = document.getElementById("publishBtn");
-    const composerPreview = document.getElementById("composerPreview");
-    const publishMsg = document.getElementById("publishMsg");
-    const feed = document.getElementById("feed");
+
+    const postGrid = document.getElementById("postGrid");
+    const onlineMembersList = document.getElementById("onlineMembersList");
+    const recentActivityList = document.getElementById("recentActivityList");
 
     const reportModal = document.getElementById("reportModal");
-    const reportCustomText = document.getElementById("reportCustomText");
-    const reportMsg = document.getElementById("reportMsg");
-    const closeReportBtn = document.getElementById("closeReportBtn");
-    const sendReportBtn = document.getElementById("sendReportBtn");
+    const closeReportModal = document.getElementById("closeReportModal");
+    const cancelReportBtn = document.getElementById("cancelReportBtn");
+    const submitReportBtn = document.getElementById("submitReportBtn");
+    const reportText = document.getElementById("reportText");
 
     let currentUser = null;
+    let currentUserData = null;
+    let activityTimeout = null;
+
     let usersMap = {};
     let postsMap = {};
     let likesMap = {};
     let commentsMap = {};
-    let selectedAttachment = { images: [], pdf: null };
-    let inactivityTimeout = null;
-    let currentReportTarget = null;
 
-    const INACTIVITY_LIMIT = 15 * 60 * 1000;
-    const LAST_ACTIVITY_KEY = "insights_last_activity";
-    const MAX_INPUT_FILE_SIZE = 10 * 1024 * 1024;
-    const MAX_PDF_SIZE = 2 * 1024 * 1024;
-    const MAX_IMAGE_COUNT = 6;
-    const MAX_WIDTH = 640;
-    const MAX_HEIGHT = 640;
-    const JPEG_QUALITY = 0.48;
-    const DELETE_WINDOW_MS = 30 * 60 * 1000;
-    const urlParams = new URLSearchParams(window.location.search);
-    const focusPostId = urlParams.get("postId");
+    let inviteToken = "";
+    let inviteOk = false;
+    let inviteData = null;
 
-    function activatePageProtection() {
-      document.addEventListener("contextmenu", e => e.preventDefault());
-      document.addEventListener("dragstart", e => e.preventDefault());
-      document.addEventListener("copy", e => {
-        const tag = (document.activeElement?.tagName || "").toLowerCase();
-        if (tag !== "input" && tag !== "textarea") e.preventDefault();
+    let pendingImages = [];
+    let pendingPdf = null;
+    let currentReportPostId = null;
+
+    function showAuthMessage(text, ok = false) {
+      authMessage.textContent = text;
+      authMessage.className = ok ? "auth-message ok" : "auth-message";
+    }
+
+    function showInviteStatus(text, type = "") {
+      inviteStatusBox.textContent = text;
+      inviteStatusBox.className = "invite-status-box" + (type ? " " + type : "");
+    }
+
+    function showView(name) {
+      loginView.classList.toggle("hidden", name !== "login");
+      signupView.classList.toggle("hidden", name !== "signup");
+      resetView.classList.toggle("hidden", name !== "reset");
+      showAuthMessage("");
+    }
+
+    function setUIConnected(isConnected) {
+      publicTopbar.classList.toggle("hidden", isConnected);
+      privateTopbar.classList.toggle("hidden", !isConnected);
+      authOverlay.classList.toggle("hidden", isConnected);
+      privatePage.classList.toggle("hidden", !isConnected);
+
+      if (currentUser && (currentUser.email || "").toLowerCase() === OWNER_EMAIL.toLowerCase()) {
+        meetingNavLink.classList.remove("hidden");
+      } else {
+        meetingNavLink.classList.add("hidden");
+      }
+    }
+
+    function resetInactivityTimer() {
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+      clearTimeout(activityTimeout);
+      activityTimeout = setTimeout(async () => {
+        try { await signOut(auth); } catch (e) {}
+        window.location.href = "insights.html";
+      }, INACTIVITY_LIMIT);
+    }
+
+    function bindActivityEvents() {
+      ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
+        window.addEventListener(evt, () => {
+          if (auth.currentUser) resetInactivityTimer();
+        }, { passive: true });
       });
-      document.addEventListener("keydown", async (e) => {
-        const key = (e.key || "").toLowerCase();
-        const isPrint = e.key === "PrintScreen";
-        const isSaveShot = (e.ctrlKey && e.shiftKey && key === "s") || (e.metaKey && e.shiftKey && (key === "3" || key === "4" || key === "5"));
-        const isPrintPage = (e.ctrlKey || e.metaKey) && key === "p";
-        if (isPrint || isSaveShot || isPrintPage) {
-          e.preventDefault();
-          try { await navigator.clipboard.writeText(""); } catch (_) {}
-        }
-      });
     }
 
-    function showAuthMsg(text, ok = false) {
-      authMsg.textContent = text;
-      authMsg.style.color = ok ? "#14854b" : "#c0392b";
-    }
-
-    function showPublishMsg(text, ok = false) {
-      publishMsg.textContent = text;
-      publishMsg.style.color = ok ? "#14854b" : "#c0392b";
-    }
-
-    function showPrivacyMsg(text, ok = false) {
-      privacyMsg.textContent = text;
-      privacyMsg.style.color = ok ? "#d9f6e5" : "#ffd0d0";
-    }
-
-    function showReportMsg(text, ok = false) {
-      reportMsg.textContent = text;
-      reportMsg.style.color = ok ? "#14854b" : "#c0392b";
+    function initials(name = "", email = "") {
+      const s = (name || email || "U").trim();
+      const parts = s.split(" ").filter(Boolean);
+      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+      return s.slice(0, 2).toUpperCase();
     }
 
     function escapeHtml(text = "") {
       const div = document.createElement("div");
       div.textContent = text;
       return div.innerHTML;
-    }
-
-    function initials(name = "", email = "") {
-      const source = (name || email || "U").trim();
-      const parts = source.split(" ").filter(Boolean);
-      if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-      return source.slice(0, 2).toUpperCase();
     }
 
     function formatDate(ts) {
@@ -1309,183 +1347,136 @@
       });
     }
 
-    function isAcceptedEmail(email) {
-      const value = (email || "").trim().toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return false;
-      const domain = value.split("@")[1];
-      const blocked = ["yahoo.com", "hotmail.com", "outlook.com", "live.com", "icloud.com", "aol.com", "mail.com", "gmx.com"];
-      if (domain === "gmail.com") return true;
-      if (blocked.includes(domain)) return false;
-      return true;
+    function formatBytes(bytes) {
+      if (!bytes || bytes < 1024) return `${bytes || 0} o`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
+      return `${(bytes / (1024 * 1024)).toFixed(2)} Mo`;
     }
 
-    function showView(view) {
-      loginView.classList.add("hidden");
-      signupView.classList.add("hidden");
-      resetView.classList.add("hidden");
-      if (view === "login") loginView.classList.remove("hidden");
-      if (view === "signup") signupView.classList.remove("hidden");
-      if (view === "reset") resetView.classList.remove("hidden");
+    function avatarMarkup(userData = {}, fallbackEmail = "") {
+      if (userData.photoURL) return `<img src="${userData.photoURL}" alt="avatar">`;
+      return escapeHtml(initials(userData.displayName || "", userData.email || fallbackEmail));
     }
 
-    function setUIConnected(connected) {
-      if (connected) {
-        publicTopbar.classList.add("hidden");
-        privateTopbar.classList.remove("hidden");
-        authOverlay.classList.add("hidden");
-        appContent.classList.remove("hidden");
-      } else {
-        publicTopbar.classList.remove("hidden");
-        privateTopbar.classList.add("hidden");
-        authOverlay.classList.remove("hidden");
-        appContent.classList.add("hidden");
+    function openModal(modal) {
+      modal.classList.add("show");
+    }
+
+    function closeModal(modal) {
+      modal.classList.remove("show");
+    }
+
+    function parseInviteToken() {
+      const params = new URLSearchParams(window.location.search);
+      inviteToken = params.get("invite") || "";
+    }
+
+    async function verifyInviteToken() {
+      parseInviteToken();
+
+      if (!inviteToken) {
+        inviteOk = false;
+        showInviteStatus("Lien d’invitation absent. Demande un lien valide à l’administrateur.", "bad");
+        signupBtn.disabled = true;
+        return;
+      }
+
+      try {
+        const snap = await get(ref(db, "signupInvites/" + inviteToken));
+        if (!snap.exists()) {
+          inviteOk = false;
+          showInviteStatus("Ce lien d’invitation est introuvable ou invalide.", "bad");
+          signupBtn.disabled = true;
+          return;
+        }
+
+        inviteData = snap.val() || {};
+        if (inviteData.used === true) {
+          inviteOk = false;
+          showInviteStatus("Ce lien d’invitation a déjà été utilisé.", "bad");
+          signupBtn.disabled = true;
+          return;
+        }
+
+        if (!inviteData.expiresAt || Date.now() > Number(inviteData.expiresAt)) {
+          inviteOk = false;
+          showInviteStatus("Ce lien d’invitation a expiré.", "bad");
+          signupBtn.disabled = true;
+          return;
+        }
+
+        inviteOk = true;
+        signupBtn.disabled = false;
+        showInviteStatus("Lien d’invitation valide. Tu peux créer ton compte.", "ok");
+
+        if (inviteData.email) {
+          signupEmail.value = inviteData.email;
+        }
+      } catch (e) {
+        console.error(e);
+        inviteOk = false;
+        signupBtn.disabled = true;
+        showInviteStatus("Impossible de vérifier ce lien d’invitation.", "bad");
       }
     }
 
-    async function forceSessionCloseWithMessage(message) {
-      try { await signOut(auth); } catch (e) { console.error(e); }
-      currentUser = null;
-      setUIConnected(false);
-      showView("login");
-      showAuthMsg(message || "Reconnecte-toi.");
-      loginPassword.value = "";
-    }
-
-    function resetInactivityTimer() {
-      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
-      clearTimeout(inactivityTimeout);
-      inactivityTimeout = setTimeout(async () => {
-        await forceSessionCloseWithMessage("Session expirée, veuillez vous reconnecter.");
-      }, INACTIVITY_LIMIT);
-    }
-
-    function bindActivityEvents() {
-      ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
-        window.addEventListener(evt, () => {
-          if (auth.currentUser) resetInactivityTimer();
-        }, { passive: true });
-      });
-    }
-
-    function userPrivacy(userData = {}) {
-      return userData.privacy || { hidePresence: false, hideEmail: true, hideBio: false };
-    }
-
-    function isPresenceVisible(userData = {}, viewerUid = null) {
-      if (viewerUid && userData.uid === viewerUid) return true;
-      return !userPrivacy(userData).hidePresence;
-    }
-
-    function isUserOnline(userData = {}, viewerUid = null) {
-      return !!(userData.presence && userData.presence.online && isPresenceVisible(userData, viewerUid));
-    }
-
-    async function ensureUserRecord(user, extra = {}) {
-      const userRef = ref(db, "users/" + user.uid);
-      const snap = await get(userRef);
-      const oldData = snap.exists() ? snap.val() : {};
-      const displayName =
-        extra.displayName ||
-        oldData.displayName ||
-        user.displayName ||
-        user.email?.split("@")[0] ||
-        "Utilisateur";
-
-      const data = {
-        uid: user.uid,
-        email: user.email || "",
-        firstName: extra.firstName || oldData.firstName || "",
-        lastName: extra.lastName || oldData.lastName || "",
-        country: extra.country || oldData.country || "",
-        displayName,
-        photoURL: oldData.photoURL || "",
-        bio: oldData.bio || "",
-        verifiedEmail: !!user.emailVerified,
-        updatedAt: Date.now(),
-        presence: oldData.presence || {
-          online: false,
-          lastSeen: Date.now(),
-          displayName
-        },
-        privacy: oldData.privacy || {
-          hidePresence: false,
-          hideEmail: true,
-          hideBio: false
-        }
+    function ensurePrivacy(userData = {}) {
+      return userData.privacy || {
+        hideEmail: true,
+        hideBio: false,
+        hidePresence: false
       };
-
-      if (!snap.exists()) data.createdAt = Date.now();
-      await update(userRef, data);
-      return data;
     }
 
-    async function setupPresence(user, displayName) {
-      const connectedRef = ref(db, ".info/connected");
-      const presenceRef = ref(db, "users/" + user.uid + "/presence");
-
-      onValue(connectedRef, async (snap) => {
-        if (snap.val() === true) {
-          await onDisconnect(presenceRef).set({
-            online: false,
-            lastSeen: Date.now(),
-            displayName: displayName || user.displayName || "Utilisateur"
-          });
-
-          await set(presenceRef, {
-            online: true,
-            lastSeen: Date.now(),
-            displayName: displayName || user.displayName || "Utilisateur"
-          });
-        }
-      });
+    function visibleEmail(viewerUid, userData = {}) {
+      const privacy = ensurePrivacy(userData);
+      if (viewerUid && viewerUid === userData.uid) return userData.email || "";
+      return privacy.hideEmail ? "Email masqué" : (userData.email || "");
     }
 
-    function avatarHtml(userData = {}, sizeClass = "") {
-      const online = isUserOnline(userData, currentUser?.uid || null);
-      const photo = userData.photoURL || "";
-      const name = userData.displayName || "Utilisateur";
-      const email = userData.email || "";
-      return `
-        <div class="avatar ${sizeClass}">
-          ${photo ? `<img src="${photo}" alt="avatar">` : escapeHtml(initials(name, email))}
-          ${online ? `<span class="status-dot"></span>` : ""}
-        </div>
-      `;
+    function visibleBio(viewerUid, userData = {}) {
+      const privacy = ensurePrivacy(userData);
+      if (viewerUid && viewerUid === userData.uid) return userData.bio || "Aucune bio.";
+      return privacy.hideBio ? "Bio masquée" : (userData.bio || "Aucune bio.");
     }
 
-    function renderMyBox(userData) {
-      const privacy = userPrivacy(userData);
-      meName.textContent = userData.displayName || "Utilisateur";
-
-      let bioDisplay = userData.bio || "Bienvenue sur ton espace social privé.";
-      if (!bioDisplay) bioDisplay = privacy.hidePresence ? "Présence masquée" : "🟢 Connecté";
-      meBio.textContent = bioDisplay;
-
-      if (userData.photoURL) {
-        meAvatar.innerHTML = `<img src="${userData.photoURL}" alt="avatar">${isUserOnline(userData, currentUser?.uid || null) ? `<span class="status-dot"></span>` : ""}`;
-      } else {
-        meAvatar.innerHTML = `${escapeHtml(initials(userData.displayName, userData.email))}${isUserOnline(userData, currentUser?.uid || null) ? `<span class="status-dot"></span>` : ""}`;
-      }
-
-      hidePresenceToggle.checked = !!privacy.hidePresence;
-      hideEmailToggle.checked = !!privacy.hideEmail;
-      hideBioToggle.checked = !!privacy.hideBio;
-      navOnlineDot.style.visibility = privacy.hidePresence ? "hidden" : "visible";
+    function canSeePresence(viewerUid, userData = {}) {
+      const privacy = ensurePrivacy(userData);
+      if (viewerUid && viewerUid === userData.uid) return true;
+      return !privacy.hidePresence;
     }
 
-    function bytesFromDataURL(dataURL) {
-      if (!dataURL || !dataURL.includes(",")) return 0;
-      const base64 = dataURL.split(",")[1] || "";
-      const padding = (base64.match(/=*$/) || [""])[0].length;
-      return Math.floor((base64.length * 3) / 4) - padding;
+    function drawResizedCanvas(img, maxWidth, maxHeight) {
+      let { width, height } = img;
+      const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+      const newWidth = Math.round(width * ratio);
+      const newHeight = Math.round(height * ratio);
+      const canvas = document.createElement("canvas");
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, newWidth, newHeight);
+      return { canvas, width:newWidth, height:newHeight };
     }
 
-    function loadImageFromFile(file) {
+    async function compressImage(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
           const img = new Image();
-          img.onload = () => resolve(img);
+          img.onload = () => {
+            const { canvas, width, height } = drawResizedCanvas(img, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
+            let dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+            resolve({
+              type: "image",
+              name: file.name || "image.jpg",
+              url: dataUrl,
+              width,
+              height,
+              originalSize: file.size,
+              finalSize: Math.round((dataUrl.length * 3) / 4)
+            });
+          };
           img.onerror = reject;
           img.src = reader.result;
         };
@@ -1494,648 +1485,1032 @@
       });
     }
 
-    function drawResizedToCanvas(img, maxWidth, maxHeight) {
-      let { width, height } = img;
-      const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
-      const newWidth = Math.max(1, Math.round(width * ratio));
-      const newHeight = Math.max(1, Math.round(height * ratio));
-
-      const canvas = document.createElement("canvas");
-      canvas.width = newWidth;
-      canvas.height = newHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, newWidth, newHeight);
-      return { canvas };
-    }
-
-    async function compressImageFile(file) {
-      const img = await loadImageFromFile(file);
-      const { canvas } = drawResizedToCanvas(img, MAX_WIDTH, MAX_HEIGHT);
-      let bestDataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
-      const lighter = canvas.toDataURL("image/jpeg", 0.38);
-      if (bytesFromDataURL(lighter) < bytesFromDataURL(bestDataUrl)) bestDataUrl = lighter;
-      return { dataUrl: bestDataUrl, size: bytesFromDataURL(bestDataUrl) };
-    }
-
-    function readFileAsDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function clearComposerAttachment() {
-      selectedAttachment = { images: [], pdf: null };
-      postFileInput.value = "";
-      composerPreview.innerHTML = "";
+    function resetComposer() {
+      postText.value = "";
+      pendingImages = [];
+      pendingPdf = null;
+      renderAttachmentPreview();
     }
 
     function renderAttachmentPreview() {
-      const parts = [];
-      if (selectedAttachment.images.length) {
-        parts.push(`
-          <div class="preview-grid">
-            ${selectedAttachment.images.map(img => `<div class="img-frame"><img src="${img.dataUrl}" alt="preview image"></div>`).join("")}
-          </div>
-        `);
+      if (!pendingImages.length && !pendingPdf) {
+        attachmentPreview.innerHTML = "";
+        postInfoText.textContent = "Images et PDF seront affichés proprement sans déformation.";
+        return;
       }
 
-      if (selectedAttachment.pdf) {
-        parts.push(`
-          <div class="pdf-card">
-            <div class="pdf-info">
+      let html = "";
+
+      if (pendingImages.length) {
+        html += `<div class="image-preview-grid">`;
+        html += pendingImages.map((img, index) => `
+          <div class="image-preview-card">
+            <img src="${img.url}" alt="preview image ${index + 1}">
+            <div class="image-preview-meta">
+              ${escapeHtml(img.name)}<br>
+              ${img.width} × ${img.height}<br>
+              avant ${formatBytes(img.originalSize)} — après ${formatBytes(img.finalSize)}
+            </div>
+          </div>
+        `).join("");
+        html += `</div>`;
+      }
+
+      if (pendingPdf) {
+        html += `
+          <div class="pdf-preview-card">
+            <div class="pdf-left">
               <div class="pdf-icon">PDF</div>
               <div>
-                <div class="pdf-title">${escapeHtml(selectedAttachment.pdf.name)}</div>
+                <div class="pdf-name">${escapeHtml(pendingPdf.name)}</div>
                 <div class="pdf-sub">Document prêt à être publié</div>
               </div>
             </div>
-            <a class="pdf-open" href="${selectedAttachment.pdf.dataUrl}" target="_blank" rel="noopener">Ouvrir</a>
           </div>
-        `);
+        `;
       }
 
-      composerPreview.innerHTML = parts.join("");
+      attachmentPreview.innerHTML = html;
+      postInfoText.textContent = "Pièces jointes prêtes. Tu peux publier maintenant.";
+    }
+        function renderPrivacyStatus() {
+      if (!currentUserData) {
+        privacyStatusText.textContent = "";
+        return;
+      }
+      const privacy = ensurePrivacy(currentUserData);
+      privacyStatusText.textContent =
+        `Email : ${privacy.hideEmail ? "masqué" : "visible"} — ` +
+        `Bio : ${privacy.hideBio ? "masquée" : "visible"} — ` +
+        `Présence : ${privacy.hidePresence ? "masquée" : "visible"}`;
     }
 
-    function normalizePostImages(post) {
+    function updateMyHeader() {
+      if (!currentUserData) return;
+
+      myAvatar.innerHTML = avatarMarkup(currentUserData, currentUser?.email || "");
+      myName.textContent = currentUserData.displayName || "Utilisateur";
+
+      const presence = currentUserData.presence || {};
+      if (presence.online) {
+        myPresenceBox.className = "pill online";
+        myPresenceDot.className = "dot online";
+        myPresenceText.textContent = "En ligne";
+        navOnlineDot.style.background = "var(--green)";
+      } else {
+        myPresenceBox.className = "pill offline";
+        myPresenceDot.className = "dot";
+        myPresenceText.textContent = presence.lastSeen
+          ? `Dernière activité : ${formatDate(presence.lastSeen)}`
+          : "Hors ligne";
+        navOnlineDot.style.background = "#a6b7c9";
+      }
+
+      renderPrivacyStatus();
+    }
+
+    async function createAccountFromInvite() {
+      const firstName = signupFirstName.value.trim();
+      const lastName = signupLastName.value.trim();
+      const country = signupCountry.value.trim();
+      const email = signupEmail.value.trim().toLowerCase();
+      const password = signupPassword.value;
+      const confirmPassword = signupConfirmPassword.value;
+
+      if (!inviteOk) {
+        showAuthMessage("Lien d’invitation invalide ou expiré.");
+        return;
+      }
+
+      if (!firstName || !lastName || !country || !email || !password || !confirmPassword) {
+        showAuthMessage("Remplis tous les champs.");
+        return;
+      }
+
+      if (password.length < 6) {
+        showAuthMessage("Le mot de passe doit contenir au moins 6 caractères.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showAuthMessage("Les mots de passe ne correspondent pas.");
+        return;
+      }
+
+      if (inviteData?.email && email !== String(inviteData.email).toLowerCase()) {
+        showAuthMessage("Tu dois utiliser l’adresse email prévue dans l’invitation.");
+        return;
+      }
+
+      signupBtn.disabled = true;
+      showAuthMessage("Création du compte en cours...", true);
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const user = cred.user;
+        const fullName = `${firstName} ${lastName}`.trim();
+
+        await updateProfile(user, { displayName: fullName });
+        await sendEmailVerification(user);
+
+        await set(ref(db, "users/" + user.uid), {
+          uid: user.uid,
+          firstName,
+          lastName,
+          country,
+          displayName: fullName,
+          email,
+          photoURL: "",
+          bio: "",
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          signupInviteToken: inviteToken,
+          accountStatus: "pending_admin_approval",
+          emailVerifiedAtSignup: false,
+          approvedBy: "",
+          approvedAt: 0,
+          rejectedAt: 0,
+          role: "member",
+          privacy: {
+            hideEmail: true,
+            hideBio: false,
+            hidePresence: false
+          }
+        });
+
+        await update(ref(db, "signupInvites/" + inviteToken), {
+          used: true,
+          usedByUid: user.uid,
+          usedByEmail: email,
+          usedAt: Date.now()
+        });
+
+        await set(ref(db, "accountApprovals/" + user.uid), {
+          uid: user.uid,
+          firstName,
+          lastName,
+          displayName: fullName,
+          email,
+          country,
+          status: "pending_admin_approval",
+          createdAt: Date.now(),
+          inviteToken,
+          inviteCreatedBy: inviteData?.createdBy || "",
+          emailVerified: false
+        });
+
+        try { await signOut(auth); } catch (e) {}
+
+        showAuthMessage("Compte créé. Vérifie ton email, puis attends l’approbation de l’administrateur.", true);
+        setTimeout(() => {
+          showView("login");
+        }, 2200);
+      } catch (error) {
+        console.error(error);
+        if (error.code === "auth/email-already-in-use") {
+          showAuthMessage("Cette adresse email est déjà utilisée.");
+        } else if (error.code === "auth/invalid-email") {
+          showAuthMessage("Adresse email invalide.");
+        } else if (error.code === "auth/weak-password") {
+          showAuthMessage("Mot de passe trop faible.");
+        } else {
+          showAuthMessage("Impossible de créer le compte.");
+        }
+      } finally {
+        signupBtn.disabled = false;
+      }
+    }
+
+    async function loginToInsights() {
+      const email = loginEmail.value.trim().toLowerCase();
+      const password = loginPassword.value;
+
+      if (!email || !password) {
+        showAuthMessage("Entre ton email et ton mot de passe.");
+        return;
+      }
+
+      loginBtn.disabled = true;
+      showAuthMessage("Connexion en cours...", true);
+
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const user = cred.user;
+
+        await reload(user);
+
+        if (!user.emailVerified) {
+          try { await signOut(auth); } catch (e) {}
+          showAuthMessage("Vérifie d’abord ton adresse email avant de te connecter.");
+          return;
+        }
+
+        const snap = await get(ref(db, "users/" + user.uid));
+        if (!snap.exists()) {
+          try { await signOut(auth); } catch (e) {}
+          showAuthMessage("Compte introuvable dans la base de données.");
+          return;
+        }
+
+        const userData = snap.val() || {};
+        const status = userData.accountStatus || "pending_admin_approval";
+
+        if (status === "approved") {
+          await update(ref(db, "users/" + user.uid), {
+            emailVerifiedAtSignup: true,
+            updatedAt: Date.now()
+          });
+          showAuthMessage("Connexion réussie.", true);
+          return;
+        }
+
+        if (status === "rejected") {
+          try { await signOut(auth); } catch (e) {}
+          showAuthMessage("Ton compte a été refusé par l’administrateur.");
+          return;
+        }
+
+        await update(ref(db, "users/" + user.uid), {
+          emailVerifiedAtSignup: true,
+          updatedAt: Date.now()
+        });
+
+        await update(ref(db, "accountApprovals/" + user.uid), {
+          emailVerified: true,
+          verifiedAt: Date.now(),
+          status: "pending_admin_approval"
+        });
+
+        try { await signOut(auth); } catch (e) {}
+        showAuthMessage("Ton email est vérifié, mais ton compte attend encore l’approbation de l’administrateur.");
+      } catch (error) {
+        console.error(error);
+        if (
+          error.code === "auth/invalid-credential" ||
+          error.code === "auth/wrong-password" ||
+          error.code === "auth/user-not-found"
+        ) {
+          showAuthMessage("Adresse email ou mot de passe incorrect.");
+        } else if (error.code === "auth/too-many-requests") {
+          showAuthMessage("Trop de tentatives. Réessaie plus tard.");
+        } else {
+          showAuthMessage("Connexion impossible pour le moment.");
+        }
+      } finally {
+        loginBtn.disabled = false;
+      }
+    }
+
+    async function sendResetLink() {
+      const email = resetEmail.value.trim().toLowerCase();
+      if (!email) {
+        showAuthMessage("Entre d’abord ton adresse email.");
+        return;
+      }
+
+      resetBtn.disabled = true;
+      showAuthMessage("Envoi du lien...", true);
+
+      try {
+        await sendPasswordResetEmail(auth, email);
+        showAuthMessage("Lien de réinitialisation envoyé par email.", true);
+      } catch (error) {
+        console.error(error);
+        showAuthMessage("Impossible d’envoyer le lien de réinitialisation.");
+      } finally {
+        resetBtn.disabled = false;
+      }
+    }
+
+    async function updatePresenceOnline() {
+      if (!currentUser) return;
+      try {
+        await update(ref(db, "users/" + currentUser.uid), {
+          presence: {
+            online: true,
+            lastSeen: Date.now()
+          },
+          updatedAt: Date.now()
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function updatePresenceOffline() {
+      if (!currentUser) return;
+      try {
+        await update(ref(db, "users/" + currentUser.uid), {
+          presence: {
+            online: false,
+            lastSeen: Date.now()
+          },
+          updatedAt: Date.now()
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function loadCurrentUserData() {
+      if (!currentUser) return;
+      const snap = await get(ref(db, "users/" + currentUser.uid));
+      if (!snap.exists()) return;
+      currentUserData = { uid: currentUser.uid, ...snap.val() };
+      updateMyHeader();
+    }
+
+    function listenUsers() {
+      onValue(ref(db, "users"), (snap) => {
+        usersMap = snap.val() || {};
+        if (currentUser && usersMap[currentUser.uid]) {
+          currentUserData = { uid: currentUser.uid, ...usersMap[currentUser.uid] };
+          updateMyHeader();
+        }
+        renderOnlineMembers();
+        renderPosts();
+        renderRecentActivities();
+      });
+    }
+
+    function listenPosts() {
+      onValue(ref(db, "posts"), (snap) => {
+        postsMap = snap.val() || {};
+        renderPosts();
+        renderRecentActivities();
+        focusPostFromUrl();
+      });
+    }
+
+    function listenLikes() {
+      onValue(ref(db, "likes"), (snap) => {
+        likesMap = snap.val() || {};
+        renderPosts();
+      });
+    }
+
+    function listenComments() {
+      onValue(ref(db, "comments"), (snap) => {
+        commentsMap = snap.val() || {};
+        renderPosts();
+      });
+    }
+
+    function renderOnlineMembers() {
+      const items = Object.entries(usersMap || {})
+        .map(([uid, val]) => ({ uid, ...(val || {}) }))
+        .filter(user => user.uid !== currentUser?.uid)
+        .filter(user => canSeePresence(currentUser?.uid, user))
+        .sort((a, b) => {
+          const onlineA = a.presence?.online ? 1 : 0;
+          const onlineB = b.presence?.online ? 1 : 0;
+          if (onlineA !== onlineB) return onlineB - onlineA;
+          return (a.displayName || "").localeCompare(b.displayName || "");
+        })
+        .slice(0, 12);
+
+      if (!items.length) {
+        onlineMembersList.innerHTML = `<div class="empty-card">Aucun membre visible pour le moment.</div>`;
+        return;
+      }
+
+      onlineMembersList.innerHTML = items.map(user => {
+        const presence = user.presence || {};
+        const online = !!presence.online;
+        return `
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">${escapeHtml(user.displayName || "Sans nom")}</div>
+              <span class="pill ${online ? "online" : "offline"}">
+                <span class="dot ${online ? "online" : ""}"></span>
+                ${online ? "En ligne" : "Hors ligne"}
+              </span>
+            </div>
+            <div class="side-item-sub">
+              ${online ? "Disponible maintenant" : (presence.lastSeen ? `Dernière activité : ${escapeHtml(formatDate(presence.lastSeen))}` : "Pas d’activité récente")}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function getPostLikes(postId) {
+      return likesMap?.[postId] || {};
+    }
+
+    function getPostComments(postId) {
+      return commentsMap?.[postId] || {};
+    }
+
+    function normalizePostImages(post = {}) {
       if (Array.isArray(post.imageUrls) && post.imageUrls.length) return post.imageUrls;
       if (post.imageUrl) return [post.imageUrl];
       if (post.attachmentType === "image" && post.attachmentUrl) return [post.attachmentUrl];
       return [];
     }
 
-    function normalizePostPdf(post) {
-      if (post.pdfUrl) return { url: post.pdfUrl, name: post.pdfName || "Document PDF" };
-      if (post.attachmentType === "pdf" && post.attachmentUrl) return { url: post.attachmentUrl, name: post.attachmentName || "Document PDF" };
+    function normalizePostPdf(post = {}) {
+      if (post.pdfUrl) {
+        return { url: post.pdfUrl, name: post.pdfName || "Document PDF" };
+      }
+      if (post.attachmentType === "pdf" && post.attachmentUrl) {
+        return { url: post.attachmentUrl, name: post.attachmentName || "Document PDF" };
+      }
       return null;
     }
 
-    function canDeletePost(post) {
-      if (!currentUser) return false;
-      if (currentUser.uid !== post.authorId) return false;
-      if (!post.createdAt) return false;
-      return (Date.now() - post.createdAt) <= DELETE_WINDOW_MS;
-    }
+    function renderPostAttachment(post = {}) {
+      const images = normalizePostImages(post);
+      const pdf = normalizePostPdf(post);
 
-    function deleteRemainingText(post) {
-      if (!post.createdAt) return "";
-      const remaining = DELETE_WINDOW_MS - (Date.now() - post.createdAt);
-      if (remaining <= 0) return "Suppression impossible après 30 min";
-      const mins = Math.max(1, Math.ceil(remaining / 60000));
-      return `Suppression possible encore ${mins} min`;
-    }
+      let html = "";
 
-    async function updatePrivacySettings() {
-      if (!currentUser) return;
-      try {
-        await update(ref(db, "users/" + currentUser.uid + "/privacy"), {
-          hidePresence: !!hidePresenceToggle.checked,
-          hideEmail: !!hideEmailToggle.checked,
-          hideBio: !!hideBioToggle.checked
-        });
-        showPrivacyMsg("Confidentialité mise à jour.", true);
-      } catch (e) {
-        console.error(e);
-        showPrivacyMsg("Impossible d'enregistrer.");
+      if (images.length) {
+        html += `<div class="post-images">`;
+        html += images.map(url => `<img class="post-image" src="${url}" alt="publication image">`).join("");
+        html += `</div>`;
       }
-    }
 
-    function renderImagesGrid(images) {
-      if (!images.length) return "";
-      return `<div class="post-gallery">${images.map(url => `<div class="img-frame"><img src="${url}" alt="image publication"></div>`).join("")}</div>`;
-    }
-
-    function renderPdfCard(pdf) {
-      if (!pdf) return "";
-      return `
-        <div class="pdf-card">
-          <div class="pdf-info">
-            <div class="pdf-icon">PDF</div>
-            <div>
-              <div class="pdf-title">${escapeHtml(pdf.name || "Document PDF")}</div>
-              <div class="pdf-sub">Document joint</div>
+      if (pdf) {
+        html += `
+          <div class="post-pdf">
+            <div class="pdf-left">
+              <div class="pdf-icon">PDF</div>
+              <div>
+                <div class="pdf-name">${escapeHtml(pdf.name)}</div>
+                <div class="pdf-sub">Document joint à la publication</div>
+              </div>
             </div>
+            <a class="pdf-open" href="${pdf.url}" target="_blank" rel="noopener">Ouvrir</a>
           </div>
-          <a class="pdf-open" href="${pdf.url}" target="_blank" rel="noopener">Ouvrir</a>
-        </div>
-      `;
-    }
-
-    function openReportModal(postId, authorId) {
-      currentReportTarget = { postId, authorId };
-      reportCustomText.value = "";
-      showReportMsg("");
-      document.querySelectorAll('input[name="reportReason"]').forEach(el => { el.checked = false; });
-      reportModal.classList.remove("hidden");
-    }
-
-    function closeReportModal() {
-      currentReportTarget = null;
-      reportModal.classList.add("hidden");
-    }
-
-    async function sendReport() {
-      if (!currentUser || !currentReportTarget) return;
-      const checked = document.querySelector('input[name="reportReason"]:checked');
-      const quickReason = checked ? checked.value : "";
-      const customReason = reportCustomText.value.trim();
-
-      if (!quickReason && !customReason) {
-        showReportMsg("Choisis un motif ou écris une explication.");
-        return;
+        `;
       }
 
-      const post = postsMap[currentReportTarget.postId] || {};
-      const reportedUser = usersMap[currentReportTarget.authorId] || {};
-      const reporterUser = usersMap[currentUser.uid] || {};
-      const finalReason = customReason ? (quickReason ? `${quickReason} | ${customReason}` : customReason) : quickReason;
+      return html;
+    }
 
-      try {
-        sendReportBtn.disabled = true;
-
-        const reportRef = push(ref(db, "reports"));
-        await set(reportRef, {
-          postId: currentReportTarget.postId,
-          reportedUserId: currentReportTarget.authorId,
-          reportedUserName: reportedUser.displayName || "",
-          reportedUserEmail: reportedUser.email || "",
-          reporterUserId: currentUser.uid,
-          reporterUserName: reporterUser.displayName || currentUser.displayName || "",
-          reporterUserEmail: currentUser.email || "",
-          reason: finalReason,
-          postText: post.text || "",
-          createdAt: Date.now(),
-          status: "new"
-        });
-
-        const subject = encodeURIComponent("Signalement Insights");
-        const body = encodeURIComponent(
-`Un nouveau signalement a été envoyé depuis Insights.
-
-Publication ID : ${currentReportTarget.postId}
-Utilisateur signalé : ${reportedUser.displayName || "Utilisateur"} (${reportedUser.email || ""})
-Signalé par : ${reporterUser.displayName || currentUser.displayName || "Utilisateur"} (${currentUser.email || ""})
-Motif : ${finalReason}
-Date : ${new Date().toLocaleString("fr-FR")}
-
-Texte de la publication :
-${post.text || "[aucun texte]"}
-`
-        );
-
-        window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-        showReportMsg("Signalement envoyé.", true);
-        setTimeout(() => closeReportModal(), 800);
-      } catch (e) {
-        console.error(e);
-        showReportMsg("Impossible d'envoyer le signalement.");
-      } finally {
-        sendReportBtn.disabled = false;
+    function renderCommentAttachment(comment = {}) {
+      if (comment.sticker) {
+        return `<div class="comment-sticker">${escapeHtml(comment.sticker)}</div>`;
       }
+      return "";
     }
 
-    function scrollToFocusedPostIfNeeded() {
-      if (!focusPostId) return;
-      const target = document.getElementById(`post-${focusPostId}`);
-      if (!target) return;
-      target.classList.add("highlight-post");
-      target.scrollIntoView({ behavior: "smooth", block: "center" });
-      setTimeout(() => target.classList.remove("highlight-post"), 4000);
+    function closeAllPostMenus() {
+      document.querySelectorAll(".post-menu.open").forEach(menu => menu.classList.remove("open"));
     }
 
-    async function toggleLike(postId) {
-      if (!currentUser) return;
-      const likeRef = ref(db, `likes/${postId}/${currentUser.uid}`);
-      const snap = await get(likeRef);
-      if (snap.exists()) await remove(likeRef);
-      else await set(likeRef, true);
+    function postCanBeEdited(post = {}) {
+      return currentUser && post.authorId === currentUser.uid;
     }
 
-    async function addComment(postId) {
-      if (!currentUser) return;
-      const input = document.getElementById(`comment-input-${postId}`);
-      if (!input) return;
-      const text = input.value.trim();
-      if (!text) return;
-
-      const commentRef = push(ref(db, `comments/${postId}`));
-      await set(commentRef, {
-        authorId: currentUser.uid,
-        text,
-        createdAt: Date.now()
-      });
-
-      input.value = "";
-    }
-
-    async function deletePost(postId, authorId) {
-      if (!currentUser || currentUser.uid !== authorId) return;
-      const post = postsMap[postId];
-      if (!post || !canDeletePost(post)) return;
-      const ok = confirm("Supprimer cette publication ?");
-      if (!ok) return;
-
-      await remove(ref(db, "posts/" + postId));
-      await remove(ref(db, "comments/" + postId));
-      await remove(ref(db, "likes/" + postId));
-    }
-
-    function rerenderFeed() {
+    function renderPosts() {
       const posts = Object.entries(postsMap || {})
-        .map(([id, value]) => ({ id, ...value }))
+        .map(([id, val]) => ({ id, ...(val || {}) }))
         .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
       if (!posts.length) {
-        feed.innerHTML = `<div class="empty-feed">Aucune publication pour le moment.</div>`;
+        postGrid.innerHTML = `<div class="empty-card">Aucune publication pour le moment.</div>`;
         return;
       }
 
-      feed.innerHTML = posts.map(post => {
-        const author = usersMap[post.authorId] || {};
-        const authorName = author.displayName || "Utilisateur";
-        const privacy = userPrivacy(author);
-        const images = normalizePostImages(post);
-        const pdf = normalizePostPdf(post);
-        const likeCount = likesMap[post.id] ? Object.keys(likesMap[post.id]).length : 0;
-        const likedByMe = !!(currentUser && likesMap[post.id] && likesMap[post.id][currentUser.uid]);
-        const comments = commentsMap[post.id]
-          ? Object.entries(commentsMap[post.id]).map(([id, val]) => ({ id, ...val })).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
-          : [];
-        const bioLine = privacy.hideBio ? "" : (author.bio || "");
+      postGrid.innerHTML = posts.map(post => {
+        const author = usersMap?.[post.authorId] ? { uid:post.authorId, ...usersMap[post.authorId] } : {};
+        const likes = getPostLikes(post.id);
+        const comments = getPostComments(post.id);
+        const likeCount = Object.keys(likes || {}).length;
+        const commentCount = Object.keys(comments || {}).length;
+        const likedByMe = !!(currentUser && likes && likes[currentUser.uid]);
+
+        const commentsHtml = Object.entries(comments || {})
+          .map(([cid, val]) => ({ id:cid, ...(val || {}) }))
+          .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+          .map(comment => {
+            const cAuthor = usersMap?.[comment.authorId] ? { uid:comment.authorId, ...usersMap[comment.authorId] } : {};
+            return `
+              <div class="comment-card">
+                <div class="comment-head">
+                  <div>
+                    <div class="comment-author">${escapeHtml(cAuthor.displayName || "Utilisateur")}</div>
+                    <div class="comment-meta">${escapeHtml(formatDate(comment.createdAt))}</div>
+                  </div>
+                  ${currentUser && comment.authorId === currentUser.uid ? `<button class="mini-btn" type="button" data-delete-comment="${post.id}|${comment.id}">Supprimer</button>` : ""}
+                </div>
+                <div class="comment-text">${escapeHtml(comment.text || "")}</div>
+                ${renderCommentAttachment(comment)}
+              </div>
+            `;
+          }).join("");
 
         return `
-          <article class="post-card ${focusPostId === post.id ? "highlight-post" : ""}" id="post-${post.id}">
+          <article class="post-card" id="post-${post.id}" data-post-id="${post.id}">
             <div class="post-head">
-              <a href="profile.html?uid=${encodeURIComponent(post.authorId)}" class="author-block">
-                ${avatarHtml(author, "small-avatar")}
-                <div class="author-meta">
-                  <div class="author-name-row">
-                    <strong>${escapeHtml(authorName)}</strong>
-                    ${isUserOnline(author, currentUser?.uid || null) ? `<span class="online-badge">Connecté</span>` : ``}
+              <div class="post-author">
+                <div class="avatar">${avatarMarkup(author, author.email || "")}</div>
+                <div>
+                  <div class="post-author-name">${escapeHtml(author.displayName || "Sans nom")}</div>
+                  <div class="post-author-meta">
+                    ${escapeHtml(visibleEmail(currentUser?.uid, author))}<br>
+                    ${escapeHtml(formatDate(post.createdAt))}
                   </div>
-                  <div class="date-line">${escapeHtml(formatDate(post.createdAt))}</div>
-                  ${bioLine ? `<div class="date-line">${escapeHtml(bioLine)}</div>` : ``}
                 </div>
-              </a>
+              </div>
 
-              <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-                ${currentUser && currentUser.uid !== post.authorId ? `<button class="report-btn" data-report-post="${post.id}" data-report-author="${post.authorId}">Signaler</button>` : ""}
-                ${canDeletePost(post) ? `<button class="danger-btn" data-delete-post="${post.id}" data-author-id="${post.authorId}">Supprimer</button>` : ""}
+              <div class="post-menu-wrap">
+                <button class="post-menu-btn" type="button" data-post-menu-btn="${post.id}">⋯</button>
+                <div class="post-menu" data-post-menu="${post.id}">
+                  ${postCanBeEdited(post) ? `<button type="button" data-delete-post="${post.id}" class="danger">Supprimer</button>` : ""}
+                  <button type="button" data-report-post="${post.id}">Signaler</button>
+                  <button type="button" data-open-profile="${post.authorId}">Voir le profil</button>
+                </div>
               </div>
             </div>
 
-            ${post.text ? `<p class="post-text">${escapeHtml(post.text)}</p>` : ""}
-            ${renderImagesGrid(images)}
-            ${renderPdfCard(pdf)}
+            <div class="post-text">${escapeHtml(post.text || "")}</div>
 
-            ${currentUser && currentUser.uid === post.authorId ? `<div class="delete-note">${escapeHtml(deleteRemainingText(post))}</div>` : ""}
+            ${renderPostAttachment(post)}
 
             <div class="post-actions">
-              <button class="react-btn ${likedByMe ? "liked" : ""}" data-like-post="${post.id}">❤️ J'aime (${likeCount})</button>
+              <button class="action-chip ${likedByMe ? "active" : ""}" type="button" data-like-post="${post.id}">
+                👍 Like (${likeCount})
+              </button>
+              <button class="action-chip" type="button" data-focus-comment="${post.id}">
+                💬 Comment (${commentCount})
+              </button>
             </div>
 
-            <div class="comments-box">
-              <div class="comment-list">
-                ${
-                  comments.length
-                    ? comments.map(comment => {
-                        const cu = usersMap[comment.authorId] || {};
-                        return `
-                          <div class="comment-item">
-                            <strong>${escapeHtml(cu.displayName || "Utilisateur")}</strong>
-                            <span>${escapeHtml(comment.text || "")}</span>
-                            <small>${escapeHtml(formatDate(comment.createdAt))}</small>
-                          </div>
-                        `;
-                      }).join("")
-                    : `<div class="no-comment">Aucun commentaire.</div>`
-                }
+            <div class="comment-form">
+              <textarea class="comment-textarea" id="comment-input-${post.id}" placeholder="Écris un commentaire..."></textarea>
+              <div class="comment-tools">
+                <button class="secondary-btn" type="button" data-comment-sticker="${post.id}">Emoji / Sticker</button>
+                <button class="primary-btn" type="button" data-send-comment="${post.id}">Commenter</button>
               </div>
+            </div>
 
-              <div class="comment-form">
-                <input id="comment-input-${post.id}" type="text" placeholder="Écrire un commentaire...">
-                <button class="small-btn" data-comment-post="${post.id}" type="button">Publier</button>
-              </div>
+            <div class="comment-list">
+              ${commentsHtml || `<div class="empty-card">Aucun commentaire pour le moment.</div>`}
             </div>
           </article>
         `;
       }).join("");
 
-      document.querySelectorAll("[data-like-post]").forEach(btn => {
-        btn.addEventListener("click", () => toggleLike(btn.dataset.likePost));
+      bindPostActions();
+    }
+
+    function bindPostActions() {
+      closeAllPostMenus();
+
+      document.querySelectorAll("[data-post-menu-btn]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.postMenuBtn;
+          const menu = document.querySelector(`[data-post-menu="${id}"]`);
+          if (!menu) return;
+          const open = menu.classList.contains("open");
+          closeAllPostMenus();
+          if (!open) menu.classList.add("open");
+        });
       });
 
-      document.querySelectorAll("[data-comment-post]").forEach(btn => {
-        btn.addEventListener("click", () => addComment(btn.dataset.commentPost));
+      document.querySelectorAll("[data-like-post]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const postId = btn.dataset.likePost;
+          await toggleLike(postId);
+        });
+      });
+
+      document.querySelectorAll("[data-send-comment]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const postId = btn.dataset.sendComment;
+          await sendComment(postId);
+        });
+      });
+
+      document.querySelectorAll("[data-comment-sticker]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const postId = btn.dataset.commentSticker;
+          const sticker = prompt("Entre un emoji ou un sticker texte :");
+          if (!sticker) return;
+          await sendComment(postId, sticker);
+        });
+      });
+
+      document.querySelectorAll("[data-delete-comment]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const [postId, commentId] = btn.dataset.deleteComment.split("|");
+          await deleteComment(postId, commentId);
+        });
       });
 
       document.querySelectorAll("[data-delete-post]").forEach(btn => {
-        btn.addEventListener("click", () => deletePost(btn.dataset.deletePost, btn.dataset.authorId));
+        btn.addEventListener("click", async () => {
+          const postId = btn.dataset.deletePost;
+          await deletePost(postId);
+        });
       });
 
       document.querySelectorAll("[data-report-post]").forEach(btn => {
-        btn.addEventListener("click", () => openReportModal(btn.dataset.reportPost, btn.dataset.reportAuthor));
+        btn.addEventListener("click", () => {
+          currentReportPostId = btn.dataset.reportPost;
+          reportText.value = "";
+          openModal(reportModal);
+        });
       });
 
-      scrollToFocusedPostIfNeeded();
+      document.querySelectorAll("[data-open-profile]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const uid = btn.dataset.openProfile;
+          window.location.href = `profile.html?uid=${encodeURIComponent(uid)}`;
+        });
+      });
+
+      document.querySelectorAll("[data-focus-comment]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const postId = btn.dataset.focusComment;
+          const input = document.getElementById(`comment-input-${postId}`);
+          if (input) input.focus();
+        });
+      });
+
+      document.addEventListener("click", closeAllPostMenus, { once:true });
     }
 
-    postFileInput.addEventListener("change", async () => {
-      const files = Array.from(postFileInput.files || []);
-      clearComposerAttachment();
-      if (!files.length) return;
-
-      const pdfs = files.filter(f => f.type === "application/pdf");
-      const images = files.filter(f => f.type.startsWith("image/"));
-      const others = files.filter(f => !f.type.startsWith("image/") && f.type !== "application/pdf");
-
-      if (others.length) {
-        showPublishMsg("Choisis uniquement des photos ou un PDF.");
-        return;
-      }
-
-      if (pdfs.length > 1) {
-        showPublishMsg("Un seul PDF est autorisé.");
-        return;
-      }
-
-      if (pdfs.length && images.length) {
-        showPublishMsg("Choisis soit des photos, soit un PDF, pas les deux en même temps.");
-        return;
-      }
-
-      try {
-        if (pdfs.length) {
-          const file = pdfs[0];
-          if (file.size > MAX_PDF_SIZE) {
-            showPublishMsg("PDF trop lourd. Garde un PDF de 2 Mo maximum.");
-            return;
-          }
-
-          const dataUrl = await readFileAsDataURL(file);
-          selectedAttachment.pdf = { dataUrl, name: file.name, size: file.size };
-          renderAttachmentPreview();
-          showPublishMsg("Fichier prêt.", true);
-          return;
-        }
-
-        if (images.length > MAX_IMAGE_COUNT) {
-          showPublishMsg(`Maximum ${MAX_IMAGE_COUNT} photos à la fois.`);
-          return;
-        }
-
-        for (const file of images) {
-          if (file.size > MAX_INPUT_FILE_SIZE) continue;
-          const result = await compressImageFile(file);
-          selectedAttachment.images.push(result);
-        }
-
-        if (!selectedAttachment.images.length) {
-          showPublishMsg("Aucune image valide.");
-          return;
-        }
-
-        renderAttachmentPreview();
-        showPublishMsg("Fichiers prêts.", true);
-      } catch (e) {
-        console.error(e);
-        clearComposerAttachment();
-        showPublishMsg("Impossible de traiter ce fichier.");
-      }
-    });
-
-    publishBtn.addEventListener("click", async () => {
-      if (!currentUser) return;
-      const text = postText.value.trim();
-      const imageUrls = selectedAttachment.images.map(img => img.dataUrl);
-      const pdf = selectedAttachment.pdf;
-
-      if (!text && !imageUrls.length && !pdf) {
-        showPublishMsg("Écris quelque chose ou ajoute un fichier.");
-        return;
-      }
-
-      try {
-        publishBtn.disabled = true;
-        showPublishMsg("Publication en cours...", true);
-
-        const postRef = push(ref(db, "posts"));
-        await set(postRef, {
-          authorId: currentUser.uid,
-          text,
-          imageUrls,
-          pdfUrl: pdf ? pdf.dataUrl : "",
-          pdfName: pdf ? pdf.name : "",
+    async function toggleLike(postId) {
+      if (!currentUser || !postId) return;
+      const likeRef = ref(db, `likes/${postId}/${currentUser.uid}`);
+      const snap = await get(likeRef);
+      if (snap.exists()) {
+        await remove(likeRef);
+      } else {
+        await set(likeRef, {
+          uid: currentUser.uid,
           createdAt: Date.now()
         });
+      }
+    }
 
-        postText.value = "";
-        clearComposerAttachment();
-        showPublishMsg("Publication ajoutée avec succès.", true);
+    async function sendComment(postId, sticker = "") {
+      if (!currentUser || !postId) return;
+
+      const input = document.getElementById(`comment-input-${postId}`);
+      const text = input ? input.value.trim() : "";
+
+      if (!text && !sticker) return;
+
+      const newRef = push(ref(db, `comments/${postId}`));
+      await set(newRef, {
+        authorId: currentUser.uid,
+        text,
+        sticker: sticker || "",
+        createdAt: Date.now()
+      });
+
+      if (input) input.value = "";
+    }
+
+    async function deleteComment(postId, commentId) {
+      if (!currentUser || !postId || !commentId) return;
+      const commentRef = ref(db, `comments/${postId}/${commentId}`);
+      const snap = await get(commentRef);
+      if (!snap.exists()) return;
+      const val = snap.val() || {};
+      if (val.authorId !== currentUser.uid) return;
+      await remove(commentRef);
+    }
+
+    async function deletePost(postId) {
+      if (!currentUser || !postId) return;
+      const postRef = ref(db, `posts/${postId}`);
+      const snap = await get(postRef);
+      if (!snap.exists()) return;
+      const val = snap.val() || {};
+      if (val.authorId !== currentUser.uid) return;
+
+      await remove(postRef);
+      await remove(ref(db, `likes/${postId}`));
+      await remove(ref(db, `comments/${postId}`));
+    }
+
+    async function publishPost() {
+      if (!currentUser || !currentUserData) return;
+
+      const text = postText.value.trim();
+      if (!text && !pendingImages.length && !pendingPdf) {
+        alert("Écris un texte ou ajoute une pièce jointe avant de publier.");
+        return;
+      }
+
+      publishBtn.disabled = true;
+
+      try {
+        const newRef = push(ref(db, "posts"));
+        const payload = {
+          authorId: currentUser.uid,
+          text,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        };
+
+        if (pendingImages.length) {
+          payload.imageUrls = pendingImages.map(img => img.url);
+        }
+
+        if (pendingPdf) {
+          payload.pdfUrl = pendingPdf.url;
+          payload.pdfName = pendingPdf.name;
+        }
+
+        await set(newRef, payload);
+        resetComposer();
       } catch (e) {
         console.error(e);
-        showPublishMsg("Erreur lors de la publication.");
+        alert("Impossible de publier pour le moment.");
       } finally {
         publishBtn.disabled = false;
       }
-    });
+    }
 
-    showSignupBtn.addEventListener("click", () => {
-      showView("signup");
-      showAuthMsg("");
-    });
+    async function setPrivacyField(field) {
+      if (!currentUser || !currentUserData) return;
+      const current = ensurePrivacy(currentUserData);
+      const newVal = !current[field];
+      await update(ref(db, `users/${currentUser.uid}/privacy`), {
+        ...current,
+        [field]: newVal
+      });
+    }
 
-    showResetBtn.addEventListener("click", () => {
-      showView("reset");
-      showAuthMsg("");
-    });
+    function renderRecentActivities() {
+      const posts = Object.entries(postsMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}) }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+        .slice(0, 8);
 
-    backToLogin1.addEventListener("click", () => {
-      showView("login");
-      showAuthMsg("");
-    });
-
-    backToLogin2.addEventListener("click", () => {
-      showView("login");
-      showAuthMsg("");
-    });
-
-    closeReportBtn.addEventListener("click", closeReportModal);
-    sendReportBtn.addEventListener("click", sendReport);
-
-    reportModal.addEventListener("click", (e) => {
-      if (e.target === reportModal) closeReportModal();
-    });
-
-    hidePresenceToggle.addEventListener("change", updatePrivacySettings);
-    hideEmailToggle.addEventListener("change", updatePrivacySettings);
-    hideBioToggle.addEventListener("change", updatePrivacySettings);
-
-    privacyToggleBtn.addEventListener("click", () => {
-      const opened = !privacyPanel.classList.contains("hidden-panel");
-      privacyPanel.classList.toggle("hidden-panel", opened);
-      privacyToggleBtn.classList.toggle("open", !opened);
-    });
-
-    signupBtn.addEventListener("click", async () => {
-      const firstName = signupFirstName.value.trim();
-      const lastName = signupLastName.value.trim();
-      const country = signupCountry.value.trim();
-      const email = signupEmail.value.trim().toLowerCase();
-      const password = signupPassword.value;
-      const password2 = signupPassword2.value;
-
-      if (!firstName || !lastName || !country || !email || !password || !password2) {
-        showAuthMsg("Remplis tous les champs.");
+      if (!posts.length) {
+        recentActivityList.innerHTML = `<div class="empty-card">Aucune activité pour le moment.</div>`;
         return;
       }
 
-      if (!isAcceptedEmail(email)) {
-        showAuthMsg("Utilise Gmail ou une adresse institutionnelle.");
-        return;
+      recentActivityList.innerHTML = posts.map(post => {
+        const author = usersMap?.[post.authorId] ? { uid:post.authorId, ...usersMap[post.authorId] } : {};
+        return `
+          <div class="side-item">
+            <div class="side-item-head">
+              <div class="side-item-title">${escapeHtml(author.displayName || "Utilisateur")}</div>
+            </div>
+            <div class="side-item-sub">
+              ${escapeHtml((post.text || "Publication").slice(0, 90))}${(post.text || "").length > 90 ? "..." : ""}<br>
+              ${escapeHtml(formatDate(post.createdAt))}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function submitReport() {
+      if (!currentReportPostId || !currentUser) return;
+
+      const reasonNode = document.querySelector('input[name="reportReason"]:checked');
+      const reason = reasonNode ? reasonNode.value : "Autre";
+
+      const post = postsMap?.[currentReportPostId] || {};
+
+      const reportRef = push(ref(db, "reports"));
+      await set(reportRef, {
+        postId: currentReportPostId,
+        postAuthorId: post.authorId || "",
+        reportedByUid: currentUser.uid,
+        reportedByName: currentUserData?.displayName || currentUser.displayName || "",
+        destinationEmail: "maounou-boris.amoussou@cnrs.fr",
+        reason,
+        comment: reportText.value.trim(),
+        createdAt: Date.now()
+      });
+
+      closeModal(reportModal);
+      currentReportPostId = null;
+      reportText.value = "";
+      alert("Signalement envoyé.");
+    }
+
+    function focusPostFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const postId = params.get("postId");
+      if (!postId) return;
+
+      const postEl = document.getElementById(`post-${postId}`);
+      if (postEl) {
+        postEl.scrollIntoView({ behavior:"smooth", block:"center" });
+        postEl.style.boxShadow = "0 0 0 4px rgba(47,140,255,0.18), var(--shadow)";
+        setTimeout(() => {
+          postEl.style.boxShadow = "";
+        }, 2600);
       }
+    }
 
-      if (password.length < 6) {
-        showAuthMsg("Mot de passe trop court.");
-        return;
-      }
+    async function handleImagesSelected(files) {
+      const arr = Array.from(files || []);
+      if (!arr.length) return;
 
-      if (password !== password2) {
-        showAuthMsg("Les mots de passe ne correspondent pas.");
-        return;
-      }
-
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
-        const fullName = `${firstName} ${lastName}`.trim();
-
-        await updateProfile(cred.user, { displayName: fullName });
-        await ensureUserRecord(cred.user, {
-          firstName,
-          lastName,
-          country,
-          displayName: fullName
-        });
-
-        await sendEmailVerification(cred.user);
-        await signOut(auth);
-
-        showView("login");
-        showAuthMsg("Compte créé. Vérifie ton email avant de te connecter.", true);
-
-        signupFirstName.value = "";
-        signupLastName.value = "";
-        signupCountry.value = "";
-        signupEmail.value = "";
-        signupPassword.value = "";
-        signupPassword2.value = "";
-      } catch (e) {
-        console.error(e);
-        showAuthMsg("Impossible de créer le compte.");
-      }
-    });
-
-    loginBtn.addEventListener("click", async () => {
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value;
-
-      if (!email || !password) {
-        showAuthMsg("Entre l'email et le mot de passe.");
-        return;
-      }
-
-      try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        await reload(cred.user);
-
-        if (!cred.user.emailVerified) {
-          await signOut(auth);
-          showAuthMsg("Email non confirmé. Vérifie ta boite mail.");
-          loginPassword.value = "";
-          return;
+      const results = [];
+      for (const file of arr) {
+        if (!file.type.startsWith("image/")) continue;
+        if (file.size > MAX_IMAGE_SIZE) {
+          alert(`Image trop lourde : ${file.name}`);
+          continue;
         }
-
-        localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
-        showAuthMsg("", true);
-      } catch (e) {
-        console.error(e);
-        showAuthMsg("Connexion impossible. Vérifie ton email et ton mot de passe.");
-        loginPassword.value = "";
+        try {
+          const compressed = await compressImage(file);
+          results.push(compressed);
+        } catch (e) {
+          console.error(e);
+        }
       }
-    });
 
-    resetBtn.addEventListener("click", async () => {
-      const email = resetEmail.value.trim();
-      if (!email) {
-        showAuthMsg("Entre ton email.");
+      pendingImages = results;
+      renderAttachmentPreview();
+    }
+
+    async function handlePdfSelected(file) {
+      if (!file) return;
+      if (file.size > MAX_PDF_SIZE) {
+        alert("PDF trop lourd.");
         return;
       }
 
-      try {
-        await sendPasswordResetEmail(auth, email);
-        showAuthMsg("Mail de réinitialisation envoyé.", true);
-      } catch (e) {
-        console.error(e);
-        showAuthMsg("Impossible d'envoyer le mail.");
-      }
-    });
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingPdf = {
+          type: "pdf",
+          name: file.name || "document.pdf",
+          url: reader.result
+        };
+        renderAttachmentPreview();
+      };
+      reader.readAsDataURL(file);
+    }
 
     logoutBtn.addEventListener("click", async () => {
-      await forceSessionCloseWithMessage("Déconnecté. Veuillez vous reconnecter.");
-      loginEmail.value = "";
+      try {
+        await updatePresenceOffline();
+      } catch (e) {}
+      try { await signOut(auth); } catch (e) {}
+      window.location.href = "insights.html";
+    });
+
+    showResetBtn.addEventListener("click", () => showView("reset"));
+    showSignupBtn.addEventListener("click", async () => {
+      showView("signup");
+      await verifyInviteToken();
+    });
+    showLoginBtn.addEventListener("click", () => showView("login"));
+    backToLoginBtn.addEventListener("click", () => showView("login"));
+
+    loginBtn.addEventListener("click", loginToInsights);
+    signupBtn.addEventListener("click", createAccountFromInvite);
+    resetBtn.addEventListener("click", sendResetLink);
+
+    [loginEmail, loginPassword].forEach(el => {
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") loginToInsights();
+      });
+    });
+
+    [
+      signupFirstName,
+      signupLastName,
+      signupCountry,
+      signupEmail,
+      signupPassword,
+      signupConfirmPassword
+    ].forEach(el => {
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") createAccountFromInvite();
+      });
+    });
+
+    resetEmail.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendResetLink();
+    });
+
+    togglePrivacyBtn.addEventListener("click", () => {
+      privacyPanel.classList.toggle("hidden");
+    });
+
+    toggleHideEmailBtn.addEventListener("click", () => setPrivacyField("hideEmail"));
+    toggleHideBioBtn.addEventListener("click", () => setPrivacyField("hideBio"));
+    toggleHidePresenceBtn.addEventListener("click", () => setPrivacyField("hidePresence"));
+
+    addImagesBtn.addEventListener("click", () => imagesInput.click());
+    addPdfBtn.addEventListener("click", () => pdfInput.click());
+
+    imagesInput.addEventListener("change", async () => {
+      await handleImagesSelected(imagesInput.files);
+      imagesInput.value = "";
+    });
+
+    pdfInput.addEventListener("change", async () => {
+      const file = pdfInput.files[0];
+      await handlePdfSelected(file);
+      pdfInput.value = "";
+    });
+
+    publishBtn.addEventListener("click", publishPost);
+
+    closeReportModal.addEventListener("click", () => closeModal(reportModal));
+    cancelReportBtn.addEventListener("click", () => closeModal(reportModal));
+    submitReportBtn.addEventListener("click", submitReport);
+
+    reportModal.addEventListener("click", (e) => {
+      if (e.target === reportModal) closeModal(reportModal);
+    });
+
+    document.addEventListener("contextmenu", (e) => {
+      if (!privatePage.classList.contains("hidden")) {
+        e.preventDefault();
+      }
+    });
+
+    window.addEventListener("beforeunload", () => {
+      if (currentUser) {
+        navigator.sendBeacon?.("");
+      }
     });
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         currentUser = null;
+        currentUserData = null;
         setUIConnected(false);
-        clearTimeout(inactivityTimeout);
+        showView("login");
+        parseInviteToken();
         return;
       }
 
       const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
       if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
-        await forceSessionCloseWithMessage("Session expirée, veuillez vous reconnecter.");
+        try { await signOut(auth); } catch (e) {}
+        setUIConnected(false);
+        showView("login");
+        return;
+      }
+
+      try {
+        await reload(user);
+      } catch (e) {
+        console.error(e);
+      }
+
+      if (!user.emailVerified) {
+        try { await signOut(auth); } catch (e) {}
+        setUIConnected(false);
+        showView("login");
+        showAuthMessage("Vérifie d’abord ton adresse email avant de te connecter.");
+        return;
+      }
+
+      const snap = await get(ref(db, "users/" + user.uid));
+      if (!snap.exists()) {
+        try { await signOut(auth); } catch (e) {}
+        setUIConnected(false);
+        showView("login");
+        showAuthMessage("Compte introuvable dans la base de données.");
+        return;
+      }
+
+      const userData = snap.val() || {};
+      const status = userData.accountStatus || "pending_admin_approval";
+
+      if (status !== "approved") {
+        try { await signOut(auth); } catch (e) {}
+        setUIConnected(false);
+        showView("login");
+
+        if (status === "rejected") {
+          showAuthMessage("Ton compte a été refusé par l’administrateur.");
+        } else {
+          showAuthMessage("Ton compte est encore en attente d’approbation.");
+        }
         return;
       }
 
       currentUser = user;
+      currentUserData = { uid:user.uid, ...userData };
+
       setUIConnected(true);
+      bindActivityEvents();
       resetInactivityTimer();
 
-      const myData = await ensureUserRecord(user);
-      renderMyBox(myData);
-      await setupPresence(user, myData.displayName || user.displayName || "Utilisateur");
+      await updatePresenceOnline();
+      await loadCurrentUserData();
 
-      onValue(ref(db, "users"), snap => {
-        usersMap = snap.val() || {};
-        if (currentUser && usersMap[currentUser.uid]) renderMyBox(usersMap[currentUser.uid]);
-        rerenderFeed();
-      });
+      listenUsers();
+      listenPosts();
+      listenLikes();
+      listenComments();
 
-      onValue(ref(db, "posts"), snap => {
-        postsMap = snap.val() || {};
-        rerenderFeed();
-      });
-
-      onValue(ref(db, "likes"), snap => {
-        likesMap = snap.val() || {};
-        rerenderFeed();
-      });
-
-      onValue(ref(db, "comments"), snap => {
-        commentsMap = snap.val() || {};
-        rerenderFeed();
-      });
+      parseInviteToken();
     });
-
-    activatePageProtection();
-    bindActivityEvents();
-    showView("login");
-    setUIConnected(false);
   </script>
 </body>
 </html>
