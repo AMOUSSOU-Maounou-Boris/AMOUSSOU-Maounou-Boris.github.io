@@ -736,9 +736,13 @@
     let myProfile = null;
     let selectedContact = null;
     let allContacts = [];
+    let contactsMap = {};
+    let usersCache = {};
+    let allBlocks = {};
     let currentTab = "all";
     let searchText = "";
     let activityTimeout = null;
+    const preselectedCallUid = new URLSearchParams(window.location.search).get("user") || "";
 
     let currentLocalStream = null;
     let currentCallMode = "";
@@ -904,27 +908,49 @@
       myName.textContent = myProfile.displayName || "Utilisateur";
     }
 
-    async function loadContacts() {
-      onValue(ref(db, "users"), async (snap) => {
-        const usersData = snap.val() || {};
-        const blockSnap = await get(ref(db, "blocks"));
-        const blocks = blockSnap.exists() ? blockSnap.val() || {} : {};
+    function rebuildContacts() {
+      const acceptedIds = Object.entries(contactsMap || {})
+        .filter(([_, val]) => val && val.status === "accepted")
+        .map(([uid]) => uid);
 
-        allContacts = Object.entries(usersData)
-          .map(([uid, val]) => ({ uid, ...(val || {}) }))
-          .filter(user => user.uid !== currentUser.uid)
-          .filter(user => {
-            const isBlockedByMe = !!(blocks[currentUser.uid] && blocks[currentUser.uid][user.uid]);
-            const blockedMe = !!(blocks[user.uid] && blocks[user.uid][currentUser.uid]);
-            return !isBlockedByMe && !blockedMe;
-          })
-          .sort((a, b) => {
-            const nameA = (a.displayName || a.email || "").toLowerCase();
-            const nameB = (b.displayName || b.email || "").toLowerCase();
-            return nameA.localeCompare(nameB);
-          });
+      allContacts = acceptedIds
+        .map(uid => usersCache[uid] ? { uid, ...(usersCache[uid] || {}) } : null)
+        .filter(Boolean)
+        .filter(user => {
+          const isBlockedByMe = !!(allBlocks[currentUser.uid] && allBlocks[currentUser.uid][user.uid]);
+          const blockedMe = !!(allBlocks[user.uid] && allBlocks[user.uid][currentUser.uid]);
+          return !isBlockedByMe && !blockedMe;
+        })
+        .sort((a, b) => {
+          const nameA = (a.displayName || a.email || "").toLowerCase();
+          const nameB = (b.displayName || b.email || "").toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
 
-        renderContacts();
+      if (selectedContact) {
+        selectedContact = allContacts.find(x => x.uid === selectedContact.uid) || null;
+      } else if (preselectedCallUid) {
+        selectedContact = allContacts.find(x => x.uid === preselectedCallUid) || null;
+      }
+
+      renderContacts();
+      setupSelectedContactUI();
+    }
+
+    function loadContacts() {
+      onValue(ref(db, `contacts/${currentUser.uid}`), (snap) => {
+        contactsMap = snap.val() || {};
+        rebuildContacts();
+      });
+
+      onValue(ref(db, "users"), (snap) => {
+        usersCache = snap.val() || {};
+        rebuildContacts();
+      });
+
+      onValue(ref(db, "blocks"), (snap) => {
+        allBlocks = snap.val() || {};
+        rebuildContacts();
       });
     }
 
@@ -943,7 +969,7 @@
       }
 
       if (!items.length) {
-        contactsList.innerHTML = `<div class="empty-sidebar">Aucun contact trouvé.</div>`;
+        contactsList.innerHTML = `<div class="empty-sidebar">Aucun contact accepté pour le moment.</div>`;
         return;
       }
 
@@ -1100,7 +1126,7 @@
       }
     }
 
-    async function listenForCalls() {
+    function listenForCalls() {
       onValue(ref(db, "calls"), (snap) => {
         const data = snap.val() || {};
         const values = Object.values(data);
@@ -1239,7 +1265,6 @@
       }
 
       closeModal(optionsModal);
-      await loadContacts();
       selectedContact = null;
       setupSelectedContactUI();
     }
@@ -1332,8 +1357,8 @@
       resetActivityTimer();
 
       await loadMyProfile();
-      await loadContacts();
-      await listenForCalls();
+      loadContacts();
+      listenForCalls();
       setupSelectedContactUI();
     });
   </script>
