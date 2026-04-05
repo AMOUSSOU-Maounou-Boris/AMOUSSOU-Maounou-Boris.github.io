@@ -16,6 +16,7 @@
       --green:#18c34a;
       --red:#df4b4b;
       --shadow:0 14px 34px rgba(7,31,66,0.10);
+      --orange:#f7a600;
     }
 
     body{
@@ -683,6 +684,7 @@
 
     const LAST_ACTIVITY_KEY = "insights_last_activity";
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
+    const CALL_CLEANUP_DELAY = 3500;
 
     const myAvatar = document.getElementById("myAvatar");
     const myName = document.getElementById("myName");
@@ -721,11 +723,6 @@
     const callModalTitle = document.getElementById("callModalTitle");
     const callModalStatus = document.getElementById("callModalStatus");
     const callVideosMount = document.getElementById("callVideosMount");
-    const localVideo = document.getElementById("localVideo");
-    const remoteVideo = document.getElementById("remoteVideo");
-    const remoteVideoLabel = document.getElementById("remoteVideoLabel");
-    const localAudioBox = document.getElementById("localAudioBox");
-    const remoteAudioBox = document.getElementById("remoteAudioBox");
     const muteBtn = document.getElementById("muteBtn");
     const cameraBtn = document.getElementById("cameraBtn");
     const hangupBtn = document.getElementById("hangupBtn");
@@ -753,10 +750,17 @@
     let unsubscribeCandidates = null;
     let unsubscribeAnswer = null;
     let unsubscribeSession = null;
+    let incomingCallsListenerStarted = false;
+    let contactsListenerStarted = false;
     let muted = false;
     let cameraEnabled = true;
-    let contactsListenerStarted = false;
-    let incomingCallsListenerStarted = false;
+    let callEnding = false;
+
+    let localVideoEl = null;
+    let remoteVideoEl = null;
+    let localAudioBoxEl = null;
+    let remoteAudioBoxEl = null;
+    let remoteVideoLabelEl = null;
 
     const rtcConfig = {
       iceServers: [
@@ -784,13 +788,14 @@
           credential: "xzI7qJDBCvqPJt7e",
         },
       ],
+      iceCandidatePoolSize: 10
     };
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
       clearTimeout(activityTimeout);
       activityTimeout = setTimeout(async () => {
-        try { await signOut(auth); } catch (e) {}
+        try { await signOut(auth); } catch (_) {}
         window.location.href = "insights.html";
       }, INACTIVITY_LIMIT);
     }
@@ -827,25 +832,14 @@
       });
     }
 
-    function formatPresence(userData = {}) {
-      const presence = userData.presence || {};
-      const privacy = userData.privacy || {};
-      if (privacy.hidePresence && currentUser && userData.uid !== currentUser.uid) {
-        return {
-          online: false,
-          text: "Visibilité masquée"
-        };
-      }
-      if (presence.online) {
-        return {
-          online: true,
-          text: "En ligne"
-        };
-      }
-      return {
-        online: false,
-        text: presence.lastSeen ? `Dernière activité : ${formatDate(presence.lastSeen)}` : "Hors ligne"
-      };
+    function setStatus(message = "", isError = false) {
+      stageStatus.textContent = message;
+      stageStatus.style.color = isError ? "#b42318" : "#15803d";
+    }
+
+    function appendCallLog(message = "") {
+      const prefix = `[${formatDate(Date.now())}] `;
+      callLogBox.textContent = `${prefix}${message}\n\n${callLogBox.textContent}`.trim();
     }
 
     function setAvatar(el, photoURL, name, email) {
@@ -886,11 +880,26 @@
     }
 
     function attachModalMediaRefs() {
-      window.localVideoRef = document.getElementById("localVideo");
-      window.remoteVideoRef = document.getElementById("remoteVideo");
-      window.localAudioBoxRef = document.getElementById("localAudioBox");
-      window.remoteAudioBoxRef = document.getElementById("remoteAudioBox");
-      window.remoteVideoLabelRef = document.getElementById("remoteVideoLabel");
+      localVideoEl = document.getElementById("localVideo");
+      remoteVideoEl = document.getElementById("remoteVideo");
+      localAudioBoxEl = document.getElementById("localAudioBox");
+      remoteAudioBoxEl = document.getElementById("remoteAudioBox");
+      remoteVideoLabelEl = document.getElementById("remoteVideoLabel");
+    }
+
+    function formatPresence(userData = {}) {
+      const presence = userData.presence || {};
+      const privacy = userData.privacy || {};
+      if (privacy.hidePresence && currentUser && userData.uid !== currentUser.uid) {
+        return { online: false, text: "Visibilité masquée" };
+      }
+      if (presence.online) {
+        return { online: true, text: "En ligne" };
+      }
+      return {
+        online: false,
+        text: presence.lastSeen ? `Dernière activité : ${formatDate(presence.lastSeen)}` : "Hors ligne"
+      };
     }
 
     function setupSelectedContactUI() {
@@ -902,7 +911,7 @@
         audioCallBtn.style.display = "none";
         videoCallBtn.style.display = "none";
         optionsBtn.style.display = "none";
-        stageStatus.textContent = "";
+        setStatus("", false);
         stageBody.innerHTML = `
           <div class="empty-state">
             Choisis un contact accepté pour lancer un appel audio ou vidéo.
@@ -915,11 +924,9 @@
       selectedTitle.textContent = selectedContact.displayName || "Sans nom";
       selectedSubtitle.textContent = "Tu peux appeler ce contact en audio ou en vidéo.";
       selectedPresence.textContent = formatPresence(selectedContact).text;
-
       audioCallBtn.style.display = "inline-flex";
       videoCallBtn.style.display = "inline-flex";
       optionsBtn.style.display = "inline-flex";
-
       renderContactStage();
     }
 
@@ -947,7 +954,6 @@
         email: currentUser.email || "",
         photoURL: ""
       };
-
       setAvatar(myAvatar, myProfile.photoURL, myProfile.displayName, myProfile.email);
       myName.textContent = myProfile.displayName || "Utilisateur";
     }
@@ -958,14 +964,18 @@
 
       onValue(connectedRef, async (snap) => {
         if (snap.val() === true) {
-          await onDisconnect(presenceRef).set({
-            online: false,
-            lastSeen: Date.now()
-          });
-          await set(presenceRef, {
-            online: true,
-            lastSeen: Date.now()
-          });
+          try {
+            await onDisconnect(presenceRef).set({
+              online: false,
+              lastSeen: Date.now()
+            });
+            await set(presenceRef, {
+              online: true,
+              lastSeen: Date.now()
+            });
+          } catch (e) {
+            console.error(e);
+          }
         }
       });
     }
@@ -1077,10 +1087,22 @@
     }
 
     async function prepareLocalMedia(mode) {
+      cleanupStreams();
+
       try {
         currentLocalStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          },
           video: mode === "video"
+            ? {
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                frameRate: { ideal: 24, max: 30 }
+              }
+            : false
         });
         return true;
       } catch (error) {
@@ -1092,24 +1114,28 @@
 
     function cleanupPeerConnection() {
       if (peerConnection) {
-        try { peerConnection.ontrack = null; } catch(e) {}
-        try { peerConnection.onicecandidate = null; } catch(e) {}
-        try { peerConnection.onconnectionstatechange = null; } catch(e) {}
-        try { peerConnection.close(); } catch(e) {}
+        try { peerConnection.ontrack = null; } catch (_) {}
+        try { peerConnection.onicecandidate = null; } catch (_) {}
+        try { peerConnection.onconnectionstatechange = null; } catch (_) {}
+        try { peerConnection.oniceconnectionstatechange = null; } catch (_) {}
+        try { peerConnection.close(); } catch (_) {}
       }
       peerConnection = null;
     }
 
     function cleanupStreams() {
       if (currentLocalStream) {
-        currentLocalStream.getTracks().forEach(track => track.stop());
+        try { currentLocalStream.getTracks().forEach(track => track.stop()); } catch (_) {}
       }
       currentLocalStream = null;
 
       if (currentRemoteStream) {
-        currentRemoteStream.getTracks().forEach(track => track.stop());
+        try { currentRemoteStream.getTracks().forEach(track => track.stop()); } catch (_) {}
       }
       currentRemoteStream = null;
+
+      if (localVideoEl) localVideoEl.srcObject = null;
+      if (remoteVideoEl) remoteVideoEl.srcObject = null;
     }
 
     function cleanupRealtimeListeners() {
@@ -1128,23 +1154,40 @@
       processedRemoteCandidateIds = new Set();
     }
 
-    async function destroyCallArtifacts() {
-      if (!currentCallId) return;
-      try { await remove(ref(db, `callCandidates/${currentCallId}`)); } catch(e) {}
-      try { await remove(ref(db, `callOffers/${currentCallId}`)); } catch(e) {}
-      try { await remove(ref(db, `callAnswers/${currentCallId}`)); } catch(e) {}
-      try { await remove(ref(db, `calls/${currentCallId}`)); } catch(e) {}
+    async function destroyCallArtifacts(callId) {
+      if (!callId) return;
+      try { await remove(ref(db, `callCandidates/${callId}`)); } catch (_) {}
+      try { await remove(ref(db, `callOffers/${callId}`)); } catch (_) {}
+      try { await remove(ref(db, `callAnswers/${callId}`)); } catch (_) {}
+      try { await remove(ref(db, `calls/${callId}`)); } catch (_) {}
     }
 
-    async function endCurrentCall(silent = false) {
-      if (currentCallId) {
-        try {
-          await update(ref(db, `calls/${currentCallId}`), {
-            status: "ended",
-            updatedAt: Date.now(),
-            endedBy: currentUser?.uid || ""
-          });
-        } catch(e) {}
+    async function safeSetCallStatus(callId, payload = {}) {
+      if (!callId) return;
+      try {
+        const snap = await get(ref(db, `calls/${callId}`));
+        if (!snap.exists()) return;
+        await update(ref(db, `calls/${callId}`), {
+          ...payload,
+          updatedAt: Date.now()
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function endCurrentCall(silent = false, reason = "ended") {
+      if (callEnding) return;
+      callEnding = true;
+
+      const closingCallId = currentCallId;
+
+      if (closingCallId) {
+        await safeSetCallStatus(closingCallId, {
+          status: reason === "rejected" ? "rejected" : "ended",
+          endedBy: currentUser?.uid || "",
+          endedAt: Date.now()
+        });
       }
 
       cleanupRealtimeListeners();
@@ -1157,61 +1200,101 @@
       muted = false;
       cameraEnabled = true;
 
-      closeModal(callModal);
-
       if (!silent) {
-        setStatus("Appel terminé.");
+        setStatus(reason === "rejected" ? "Appel refusé." : "Appel terminé.");
       }
+
+      closeModal(callModal);
 
       if (selectedContact) {
         renderContactStage();
       } else {
         setupSelectedContactUI();
       }
+
+      if (closingCallId) {
+        setTimeout(async () => {
+          await destroyCallArtifacts(closingCallId);
+        }, CALL_CLEANUP_DELAY);
+      }
+
+      setTimeout(() => {
+        callEnding = false;
+      }, 400);
     }
 
     async function createPeerConnection(remoteUid) {
       peerConnection = new RTCPeerConnection(rtcConfig);
       currentRemoteStream = new MediaStream();
 
-      window.remoteVideoRef.srcObject = currentRemoteStream;
-      window.remoteVideoLabelRef.textContent = selectedContact?.displayName || "Participant";
+      if (remoteVideoEl) {
+        remoteVideoEl.srcObject = currentRemoteStream;
+      }
+      if (remoteVideoLabelEl) {
+        remoteVideoLabelEl.textContent = selectedContact?.displayName || currentIncomingCall?.fromName || "Participant";
+      }
 
       peerConnection.ontrack = (event) => {
-        if (!window.remoteVideoRef.srcObject) {
-          window.remoteVideoRef.srcObject = event.streams[0];
+        const incomingStream = event.streams && event.streams[0] ? event.streams[0] : null;
+        if (incomingStream) {
+          if (remoteVideoEl && remoteVideoEl.srcObject !== incomingStream) {
+            remoteVideoEl.srcObject = incomingStream;
+          }
+          currentRemoteStream = incomingStream;
         } else {
-          event.streams[0].getTracks().forEach(track => {
-            const already = currentRemoteStream.getTracks().find(t => t.id === track.id);
-            if (!already) currentRemoteStream.addTrack(track);
-          });
+          event.track && currentRemoteStream.addTrack(event.track);
+          if (remoteVideoEl) remoteVideoEl.srcObject = currentRemoteStream;
         }
+
+        callModalStatus.textContent = "Flux distant reçu.";
+        appendCallLog("Flux audio/vidéo distant reçu.");
       };
 
       peerConnection.onicecandidate = async (event) => {
         if (!event.candidate || !currentCallId || !currentUser) return;
-
-        const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
-        await set(candidateRef, {
-          candidate: event.candidate.candidate,
-          sdpMid: event.candidate.sdpMid,
-          sdpMLineIndex: event.candidate.sdpMLineIndex,
-          createdAt: Date.now()
-        });
+        try {
+          const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
+          await set(candidateRef, {
+            candidate: event.candidate.candidate,
+            sdpMid: event.candidate.sdpMid,
+            sdpMLineIndex: event.candidate.sdpMLineIndex,
+            createdAt: Date.now()
+          });
+        } catch (e) {
+          console.error(e);
+        }
       };
 
       peerConnection.onconnectionstatechange = () => {
-        console.log("STATE:", peerConnection.connectionState);
-        if (peerConnection.connectionState === "connected") {
+        const state = peerConnection?.connectionState || "";
+        console.log("connectionState:", state);
+
+        if (state === "connecting") {
+          callModalStatus.textContent = "Connexion en cours...";
+        }
+        if (state === "connected") {
           callModalStatus.textContent = "Connexion établie ✅";
+          setStatus("Appel en cours.");
+          appendCallLog("Connexion WebRTC établie.");
         }
-        if (peerConnection.connectionState === "failed") {
+        if (state === "failed") {
           callModalStatus.textContent = "Connexion échouée";
-          setStatus("Erreur d’appel", true);
+          setStatus("Connexion échouée.", true);
+          appendCallLog("La connexion WebRTC a échoué.");
         }
-        if (peerConnection.connectionState === "disconnected") {
+        if (state === "disconnected") {
           callModalStatus.textContent = "Connexion interrompue";
+          appendCallLog("Connexion interrompue.");
         }
+        if (state === "closed") {
+          callModalStatus.textContent = "Connexion fermée";
+        }
+      };
+
+      peerConnection.oniceconnectionstatechange = () => {
+        const iceState = peerConnection?.iceConnectionState || "";
+        console.log("iceConnectionState:", iceState);
+        appendCallLog(`État ICE : ${iceState}`);
       };
 
       currentLocalStream.getTracks().forEach(track => {
@@ -1223,6 +1306,7 @@
         for (const [id, cand] of Object.entries(candidates)) {
           if (processedRemoteCandidateIds.has(id)) continue;
           processedRemoteCandidateIds.add(id);
+
           try {
             await peerConnection.addIceCandidate(new RTCIceCandidate({
               candidate: cand.candidate,
@@ -1242,13 +1326,13 @@
       attachModalMediaRefs();
 
       if (mode === "audio") {
-        window.localAudioBoxRef.style.display = "flex";
-        window.remoteAudioBoxRef.style.display = "flex";
+        if (localAudioBoxEl) localAudioBoxEl.style.display = "flex";
+        if (remoteAudioBoxEl) remoteAudioBoxEl.style.display = "flex";
       }
 
       if (currentLocalStream) {
-        if (mode === "video") {
-          window.localVideoRef.srcObject = currentLocalStream;
+        if (mode === "video" && localVideoEl) {
+          localVideoEl.srcObject = currentLocalStream;
         }
       }
 
@@ -1260,26 +1344,31 @@
 
     async function startCall(mode) {
       if (!selectedContact || !currentUser) return;
-
-      currentCallMode = mode;
-      const mediaOk = await prepareLocalMedia(mode);
-      if (!mediaOk) {
-        setStatus("Erreur d’appel", true);
+      if (currentCallId) {
+        alert("Un appel est déjà en cours.");
         return;
       }
 
+      callEnding = false;
+      currentCallMode = mode;
       currentCallId = getConversationKey(currentUser.uid, selectedContact.uid);
 
-      try {
-        await destroyCallArtifacts().catch(() => {});
-      } catch(e) {}
+      const mediaOk = await prepareLocalMedia(mode);
+      if (!mediaOk) {
+        setStatus("Impossible d’accéder au micro ou à la caméra.", true);
+        currentCallId = "";
+        return;
+      }
+
+      await destroyCallArtifacts(currentCallId).catch(() => {});
 
       renderCallUI(mode, selectedContact.displayName || "Participant");
       openModal(callModal);
 
       callModalStatus.textContent = `Tentative d’appel avec ${selectedContact.displayName || "le contact"}...`;
-      callLogBox.textContent = `Type d’appel : ${mode === "video" ? "Vidéo" : "Audio"}
-Contact ciblé : ${selectedContact.displayName || ""}
+      callLogBox.textContent = `Préparation de l’appel...
+Type : ${mode === "video" ? "Vidéo" : "Audio"}
+Contact : ${selectedContact.displayName || ""}
 Heure : ${formatDate(Date.now())}`;
 
       try {
@@ -1299,7 +1388,10 @@ Heure : ${formatDate(Date.now())}`;
 
         await createPeerConnection(selectedContact.uid);
 
-        const offer = await peerConnection.createOffer();
+        const offer = await peerConnection.createOffer({
+          offerToReceiveAudio: true,
+          offerToReceiveVideo: mode === "video"
+        });
         await peerConnection.setLocalDescription(offer);
 
         await set(ref(db, `callOffers/${currentCallId}`), {
@@ -1307,6 +1399,7 @@ Heure : ${formatDate(Date.now())}`;
           sdp: offer.sdp,
           fromUid: currentUser.uid,
           toUid: selectedContact.uid,
+          mode,
           createdAt: Date.now()
         });
 
@@ -1314,9 +1407,14 @@ Heure : ${formatDate(Date.now())}`;
           const ans = snap.val();
           if (!ans || !peerConnection) return;
           if (peerConnection.currentRemoteDescription) return;
+
           try {
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
+            await peerConnection.setRemoteDescription(new RTCSessionDescription({
+              type: ans.type,
+              sdp: ans.sdp
+            }));
             callModalStatus.textContent = "Connexion à l’appel...";
+            appendCallLog("Réponse distante reçue.");
           } catch (e) {
             console.error(e);
           }
@@ -1325,24 +1423,33 @@ Heure : ${formatDate(Date.now())}`;
         unsubscribeSession = onValue(ref(db, `calls/${currentCallId}`), (snap) => {
           const callData = snap.val();
           if (!callData) return;
+
           if (callData.status === "ended") {
-            endCurrentCall(true);
+            callModalStatus.textContent = "Appel terminé";
+            appendCallLog("L’appel a été terminé.");
+            setTimeout(() => endCurrentCall(true, "ended"), 500);
           }
+
           if (callData.status === "rejected") {
             callModalStatus.textContent = "Appel refusé";
-            setTimeout(() => endCurrentCall(true), 700);
+            appendCallLog("Le destinataire a refusé l’appel.");
+            setStatus("Appel refusé.", true);
+            setTimeout(() => endCurrentCall(true, "rejected"), 700);
           }
+
           if (callData.status === "accepted") {
             callModalStatus.textContent = "Connexion en cours...";
+            appendCallLog("Le destinataire a accepté l’appel.");
           }
         });
 
         setStatus(`Appel ${mode === "video" ? "vidéo" : "audio"} lancé vers ${selectedContact.displayName || "le contact"}.`);
       } catch (error) {
         console.error(error);
-        alert("Erreur d’appel");
-        await endCurrentCall(true);
-        setStatus("Erreur d’appel", true);
+        callModalStatus.textContent = "Erreur d’appel";
+        appendCallLog(`Erreur : ${error?.message || error}`);
+        await endCurrentCall(true, "ended");
+        setStatus("Erreur d’appel.", true);
       }
     }
 
@@ -1359,7 +1466,7 @@ Heure : ${formatDate(Date.now())}`;
           call.status === "ringing"
         );
 
-        if (incoming && (!currentIncomingCall || currentIncomingCall.callId !== incoming.callId)) {
+        if (incoming && (!currentIncomingCall || currentIncomingCall.callId !== incoming.callId) && !currentCallId) {
           currentIncomingCall = incoming;
           incomingCallText.textContent = `${incoming.fromName || "Quelqu’un"} essaie de te joindre en ${incoming.mode === "video" ? "vidéo" : "audio"}.`;
           openModal(incomingCallModal);
@@ -1373,12 +1480,15 @@ Heure : ${formatDate(Date.now())}`;
     async function acceptIncomingCall() {
       if (!currentIncomingCall) return;
 
-      currentCallId = currentIncomingCall.callId;
-      currentCallMode = currentIncomingCall.mode;
+      const incoming = currentIncomingCall;
+      currentCallId = incoming.callId;
+      currentCallMode = incoming.mode;
+      callEnding = false;
 
-      const mediaOk = await prepareLocalMedia(currentIncomingCall.mode);
+      const mediaOk = await prepareLocalMedia(incoming.mode);
       if (!mediaOk) {
-        setStatus("Erreur d’appel", true);
+        setStatus("Impossible d’accéder au micro ou à la caméra.", true);
+        currentCallId = "";
         return;
       }
 
@@ -1386,14 +1496,15 @@ Heure : ${formatDate(Date.now())}`;
         const offerSnap = await get(ref(db, `callOffers/${currentCallId}`));
         if (!offerSnap.exists()) {
           alert("Offre introuvable.");
+          await endCurrentCall(true, "ended");
           return;
         }
 
-        renderCallUI(currentIncomingCall.mode, currentIncomingCall.fromName || "Participant");
+        renderCallUI(incoming.mode, incoming.fromName || "Participant");
         openModal(callModal);
         closeModal(incomingCallModal);
 
-        await createPeerConnection(currentIncomingCall.fromUid);
+        await createPeerConnection(incoming.fromUid);
 
         const offer = offerSnap.val();
         await peerConnection.setRemoteDescription(new RTCSessionDescription({
@@ -1408,35 +1519,42 @@ Heure : ${formatDate(Date.now())}`;
           type: answer.type,
           sdp: answer.sdp,
           fromUid: currentUser.uid,
-          toUid: currentIncomingCall.fromUid,
+          toUid: incoming.fromUid,
           createdAt: Date.now()
         });
 
-        await update(ref(db, `calls/${currentCallId}`), {
+        await safeSetCallStatus(currentCallId, {
           status: "accepted",
-          acceptedAt: Date.now(),
-          updatedAt: Date.now()
+          acceptedAt: Date.now()
         });
 
         unsubscribeSession = onValue(ref(db, `calls/${currentCallId}`), (snap) => {
           const callData = snap.val();
           if (!callData) return;
           if (callData.status === "ended") {
-            endCurrentCall(true);
+            callModalStatus.textContent = "Appel terminé";
+            appendCallLog("L’appel a été terminé.");
+            setTimeout(() => endCurrentCall(true, "ended"), 500);
+          }
+          if (callData.status === "rejected") {
+            callModalStatus.textContent = "Appel refusé";
+            setTimeout(() => endCurrentCall(true, "rejected"), 500);
           }
         });
 
-        callModalStatus.textContent = `Tu es en communication avec ${currentIncomingCall.fromName || "l’appelant"}.`;
+        callModalStatus.textContent = `Tu es en communication avec ${incoming.fromName || "l’appelant"}.`;
         callLogBox.textContent = `Appel entrant accepté.
-Expéditeur : ${currentIncomingCall.fromName || ""}
+Expéditeur : ${incoming.fromName || ""}
 Heure : ${formatDate(Date.now())}`;
 
+        setStatus("Appel accepté.");
         currentIncomingCall = null;
       } catch (error) {
         console.error(error);
-        alert("Erreur d’appel");
-        setStatus("Erreur d’appel", true);
-        await endCurrentCall(true);
+        callModalStatus.textContent = "Erreur d’appel";
+        appendCallLog(`Erreur : ${error?.message || error}`);
+        await endCurrentCall(true, "ended");
+        setStatus("Erreur d’appel.", true);
       }
     }
 
@@ -1445,17 +1563,19 @@ Heure : ${formatDate(Date.now())}`;
         closeModal(incomingCallModal);
         return;
       }
+
       try {
-        await update(ref(db, `calls/${currentIncomingCall.callId}`), {
+        await safeSetCallStatus(currentIncomingCall.callId, {
           status: "rejected",
-          rejectedAt: Date.now(),
-          updatedAt: Date.now()
+          rejectedAt: Date.now()
         });
       } catch (e) {
         console.error(e);
       }
+
       currentIncomingCall = null;
       closeModal(incomingCallModal);
+      setStatus("Appel refusé.");
     }
 
     async function updateBlockButton() {
@@ -1477,7 +1597,7 @@ Heure : ${formatDate(Date.now())}`;
           blockedAt: Date.now()
         });
         if (currentCallId) {
-          await endCurrentCall(true);
+          await endCurrentCall(true, "ended");
         }
       }
 
@@ -1487,7 +1607,7 @@ Heure : ${formatDate(Date.now())}`;
     }
 
     logoutBtn.addEventListener("click", async () => {
-      try { await signOut(auth); } catch (e) {}
+      try { await signOut(auth); } catch (_) {}
       window.location.href = "insights.html";
     });
 
@@ -1529,8 +1649,8 @@ Heure : ${formatDate(Date.now())}`;
     acceptIncomingCallBtn.addEventListener("click", acceptIncomingCall);
     rejectIncomingCallBtn.addEventListener("click", rejectIncomingCall);
 
-    closeCallModal.addEventListener("click", () => endCurrentCall(true));
-    hangupBtn.addEventListener("click", () => endCurrentCall(true));
+    closeCallModal.addEventListener("click", () => endCurrentCall(false, "ended"));
+    hangupBtn.addEventListener("click", () => endCurrentCall(false, "ended"));
 
     muteBtn.addEventListener("click", () => {
       if (!currentLocalStream) return;
@@ -1539,6 +1659,7 @@ Heure : ${formatDate(Date.now())}`;
         track.enabled = !muted;
       });
       muteBtn.textContent = muted ? "Rétablir micro" : "Couper micro";
+      appendCallLog(muted ? "Micro coupé." : "Micro réactivé.");
     });
 
     cameraBtn.addEventListener("click", () => {
@@ -1548,6 +1669,7 @@ Heure : ${formatDate(Date.now())}`;
         track.enabled = cameraEnabled;
       });
       cameraBtn.textContent = cameraEnabled ? "Couper caméra" : "Rétablir caméra";
+      appendCallLog(cameraEnabled ? "Caméra réactivée." : "Caméra coupée.");
     });
 
     [optionsModal, incomingCallModal, callModal].forEach(modal => {
@@ -1564,7 +1686,7 @@ Heure : ${formatDate(Date.now())}`;
 
       const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
       if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
-        try { await signOut(auth); } catch (e) {}
+        try { await signOut(auth); } catch (_) {}
         window.location.href = "insights.html";
         return;
       }
@@ -1583,7 +1705,7 @@ Heure : ${formatDate(Date.now())}`;
     window.addEventListener("beforeunload", () => {
       try {
         if (currentLocalStream) currentLocalStream.getTracks().forEach(track => track.stop());
-      } catch(e) {}
+      } catch (_) {}
     });
   </script>
 </body>
