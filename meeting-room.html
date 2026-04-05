@@ -534,8 +534,9 @@
           <p id="meetingSubtitle">Le propriétaire crée le lien et l’envoie aux participants.</p>
         </div>
 
-        <div class="video-stage">
-          <div class="video-placeholder">
+        <div class="video-stage" id="videoStage">
+          <video id="meetingLocalVideo" class="hidden" autoplay muted playsinline style="width:100%;max-height:440px;border-radius:22px;background:#000;object-fit:cover;"></video>
+          <div class="video-placeholder" id="videoPlaceholder">
             <h3 id="stageTitle">Salle non rejointe</h3>
             <p id="stageText">
               Cette page gère l’accès, l’expiration, la salle d’attente et l’organisation de la réunion.
@@ -635,6 +636,9 @@
     const roomStatusText = document.getElementById("roomStatusText");
     const stageTitle = document.getElementById("stageTitle");
     const stageText = document.getElementById("stageText");
+    const videoStage = document.getElementById("videoStage");
+    const meetingLocalVideo = document.getElementById("meetingLocalVideo");
+    const videoPlaceholder = document.getElementById("videoPlaceholder");
 
     const joinRoomBtn = document.getElementById("joinRoomBtn");
     const joinCurrentRoomBtn = document.getElementById("joinCurrentRoomBtn");
@@ -657,6 +661,7 @@
     let isInWaitingRoom = false;
     let activityTimeout = null;
     let lastGeneratedRoomLink = "";
+    let meetingLocalStream = null;
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
@@ -822,8 +827,43 @@
       return currentProfile?.displayName || currentUser?.displayName || "Utilisateur";
     }
 
+    async function startMeetingCamera() {
+      if (meetingLocalStream) return true;
+
+      try {
+        meetingLocalStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true
+        });
+
+        meetingLocalVideo.srcObject = meetingLocalStream;
+        meetingLocalVideo.classList.remove("hidden");
+        videoPlaceholder.classList.add("hidden");
+        return true;
+      } catch (error) {
+        console.error(error);
+        alert("Impossible d’accéder à la caméra ou au micro pour la salle.");
+        return false;
+      }
+    }
+
+    function stopMeetingCamera() {
+      if (meetingLocalStream) {
+        meetingLocalStream.getTracks().forEach(track => track.stop());
+      }
+      meetingLocalStream = null;
+      if (meetingLocalVideo) {
+        meetingLocalVideo.srcObject = null;
+        meetingLocalVideo.classList.add("hidden");
+      }
+      if (videoPlaceholder) {
+        videoPlaceholder.classList.remove("hidden");
+      }
+    }
+
     function renderRoomMeta() {
       if (!currentRoomMeta) {
+        stopMeetingCamera();
         roomMeta.innerHTML = `<div class="empty-note">Aucune salle ouverte.</div>`;
         meetingTitle.textContent = "Salle de réunion professionnelle";
         meetingSubtitle.textContent = "Le propriétaire crée le lien et l’envoie aux participants.";
@@ -862,6 +902,7 @@
         roomStatusText.textContent = "Salle fermée";
         stageTitle.textContent = "Salle fermée";
         stageText.textContent = "Cette salle a été fermée par le propriétaire.";
+        stopMeetingCamera();
         return;
       }
 
@@ -870,6 +911,7 @@
         roomStatusText.textContent = "Lien expiré";
         stageTitle.textContent = "Lien expiré";
         stageText.textContent = "Le délai de validité de cette salle est dépassé.";
+        stopMeetingCamera();
         return;
       }
 
@@ -1129,6 +1171,9 @@
     async function joinAsApprovedParticipant() {
       if (!currentRoomId || !currentUser) return;
 
+      const mediaOk = await startMeetingCamera();
+      if (!mediaOk) return;
+
       await set(ref(db, participantPath(currentRoomId, currentUser.uid)), {
         uid: currentUser.uid,
         displayName: getProfileName(),
@@ -1300,6 +1345,10 @@
 
       updateVisibilityByRole();
       await loadRoom(roomId);
+    });
+
+    window.addEventListener("beforeunload", () => {
+      stopMeetingCamera();
     });
   </script>
 </body>
