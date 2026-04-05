@@ -475,32 +475,6 @@
       background:#ff6b6b;
     }
 
-    .room-menu-wrap{
-      position:relative;
-      display:inline-flex;
-    }
-
-    .room-menu{
-      position:absolute;
-      right:0;
-      top:56px;
-      min-width:240px;
-      background:#ffffff;
-      border:1px solid #d9e5f2;
-      border-radius:18px;
-      box-shadow:0 18px 40px rgba(0,0,0,0.18);
-      padding:10px;
-      z-index:100;
-      display:grid;
-      gap:8px;
-    }
-
-    .room-menu .secondary-btn,
-    .room-menu .danger-btn{
-      width:100%;
-      justify-content:flex-start;
-    }
-
     .mini-list{
       display:grid;
       gap:12px;
@@ -641,23 +615,6 @@
         grid-template-columns:1fr;
       }
     }
-
-    @media (max-width: 760px){
-      .control-bar{
-        flex-direction:column;
-        align-items:stretch;
-      }
-
-      .room-menu-wrap{
-        width:100%;
-      }
-
-      .room-menu{
-        left:0;
-        right:auto;
-        width:100%;
-      }
-    }
   </style>
 </head>
 <body>
@@ -783,23 +740,16 @@
 
         <div class="control-bar">
           <span class="status-pill"><span class="dot" id="roomDot"></span><span id="roomStatusText">Aucune salle</span></span>
-
           <button class="main-btn" id="joinRoomBtn" type="button">Rejoindre</button>
           <button class="secondary-btn hidden" id="joinCurrentRoomBtn" type="button">Rejoindre en tant que propriétaire</button>
           <button class="secondary-btn hidden" id="toggleMicBtn" type="button">Micro ON</button>
           <button class="secondary-btn hidden" id="toggleCamBtn" type="button">Caméra ON</button>
+          <button class="secondary-btn hidden" id="shareScreenBtn" type="button">Partager écran</button>
+          <button class="secondary-btn hidden" id="stopShareScreenBtn" type="button">Arrêter partage</button>
+          <button class="secondary-btn hidden" id="toggleMiniModeBtn" type="button">Mode mini</button>
+          <button class="secondary-btn hidden" id="approveAllBtn" type="button">Accepter tous les invités</button>
           <button class="danger-btn hidden" id="leaveRoomBtn" type="button">Quitter</button>
-
-          <div class="room-menu-wrap">
-            <button class="secondary-btn hidden" id="roomMoreBtn" type="button">⋯</button>
-            <div class="room-menu hidden" id="roomMoreMenu">
-              <button class="secondary-btn hidden" id="shareScreenBtn" type="button">Partager écran</button>
-              <button class="secondary-btn hidden" id="stopShareScreenBtn" type="button">Arrêter partage</button>
-              <button class="secondary-btn hidden" id="toggleMiniModeBtn" type="button">Mode mini</button>
-              <button class="secondary-btn hidden" id="approveAllBtn" type="button">Accepter tous les invités</button>
-              <button class="danger-btn hidden" id="closeRoomBtn" type="button">Fermer la salle</button>
-            </div>
-          </div>
+          <button class="danger-btn hidden" id="closeRoomBtn" type="button">Fermer la salle</button>
         </div>
 
         <div class="chat-box">
@@ -943,8 +893,6 @@
     const toggleCamBtn = document.getElementById("toggleCamBtn");
     const shareScreenBtn = document.getElementById("shareScreenBtn");
     const stopShareScreenBtn = document.getElementById("stopShareScreenBtn");
-    const roomMoreBtn = document.getElementById("roomMoreBtn");
-    const roomMoreMenu = document.getElementById("roomMoreMenu");
     const toggleMiniModeBtn = document.getElementById("toggleMiniModeBtn");
     const approveAllBtn = document.getElementById("approveAllBtn");
     const leaveRoomBtn = document.getElementById("leaveRoomBtn");
@@ -1097,6 +1045,7 @@
 
     function toggleMiniMode(forceState = null) {
       const nextState = forceState === null ? !isMiniMode : !!forceState;
+
       isMiniMode = nextState;
 
       if (isMiniMode) {
@@ -1108,23 +1057,6 @@
         miniBadge.classList.remove("show");
         toggleMiniModeBtn.textContent = "Mode mini";
       }
-    }
-
-    function toggleRoomMenu(force = null) {
-      const openNow = !roomMoreMenu.classList.contains("hidden");
-      const next = force === null ? !openNow : !!force;
-      roomMoreMenu.classList.toggle("hidden", !next);
-    }
-
-    function refreshRoomMenuVisibility() {
-      const hasExtra =
-        !shareScreenBtn.classList.contains("hidden") ||
-        !stopShareScreenBtn.classList.contains("hidden") ||
-        !toggleMiniModeBtn.classList.contains("hidden") ||
-        !approveAllBtn.classList.contains("hidden") ||
-        !closeRoomBtn.classList.contains("hidden");
-
-      roomMoreBtn.classList.toggle("hidden", !hasExtra);
     }
 
     function renderRecentRooms(items = []) {
@@ -1448,19 +1380,15 @@
       }
 
       waitingRoomPanel.classList.toggle("hidden", !isRoomOwner());
-
       joinCurrentRoomBtn.classList.toggle("hidden", !isRoomOwner() || !currentRoomId);
       toggleMicBtn.classList.toggle("hidden", !localStream);
       toggleCamBtn.classList.toggle("hidden", !localStream);
       leaveRoomBtn.classList.toggle("hidden", !joinedRoom && !isInWaitingRoom);
-
       shareScreenBtn.classList.toggle("hidden", !joinedRoom || !localStream || !!screenStream);
       stopShareScreenBtn.classList.toggle("hidden", !screenStream);
       toggleMiniModeBtn.classList.toggle("hidden", !localStream);
       approveAllBtn.classList.toggle("hidden", !isRoomOwner());
       closeRoomBtn.classList.toggle("hidden", !isRoomOwner());
-
-      refreshRoomMenuVisibility();
     }
 
     function renderRoomMeta() {
@@ -2329,20 +2257,8 @@
     shareScreenBtn.addEventListener("click", startScreenShare);
     stopShareScreenBtn.addEventListener("click", stopScreenShare);
 
-    roomMoreBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      toggleRoomMenu();
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!roomMoreMenu.contains(e.target) && e.target !== roomMoreBtn) {
-        toggleRoomMenu(false);
-      }
-    });
-
     toggleMiniModeBtn.addEventListener("click", () => {
       toggleMiniMode();
-      toggleRoomMenu(false);
     });
 
     restoreMiniBtn.addEventListener("click", () => {
