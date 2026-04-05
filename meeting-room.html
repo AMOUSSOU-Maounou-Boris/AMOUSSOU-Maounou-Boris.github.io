@@ -436,6 +436,51 @@
       line-height:1.6;
     }
 
+    .test-box{
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.10);
+      border-radius:18px;
+      padding:14px;
+      position:relative;
+      z-index:1;
+    }
+    .test-box h3{
+      margin:0 0 10px;
+      font-size:18px;
+      color:#fff;
+    }
+    .test-box p{
+      margin:0;
+      color:#d7e4ff;
+      line-height:1.6;
+    }
+    .test-meter-wrap{
+      margin-top:12px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .test-meter{
+      width:180px;
+      height:12px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.16);
+      overflow:hidden;
+    }
+    .test-meter-fill{
+      height:100%;
+      width:0%;
+      background:#2fd46b;
+      border-radius:999px;
+      transition:width .12s linear;
+    }
+    .test-status{
+      color:#fff;
+      font-size:13px;
+      font-weight:800;
+    }
+
     @media (max-width: 1280px){
       .page{
         grid-template-columns:1fr;
@@ -549,6 +594,23 @@
           </div>
         </div>
 
+        <div class="test-box">
+          <h3>Test caméra / micro</h3>
+          <p>Tu peux activer ta caméra et ton micro pour tester ton matériel avant d’entrer, pendant l’attente, ou une fois dans la salle.</p>
+
+          <div class="test-meter-wrap">
+            <div class="test-meter">
+              <div class="test-meter-fill" id="micMeterFill"></div>
+            </div>
+            <span class="test-status" id="mediaTestStatus">Test non démarré.</span>
+          </div>
+
+          <div class="action-row">
+            <button class="secondary-btn" id="previewMediaBtn" type="button">Tester caméra / micro</button>
+            <button class="secondary-btn" id="stopPreviewBtn" type="button">Arrêter le test</button>
+          </div>
+        </div>
+
         <div class="control-bar">
           <span class="status-pill"><span class="dot" id="roomDot"></span><span id="roomStatusText">Aucune salle</span></span>
           <button class="main-btn" id="joinRoomBtn" type="button">Rejoindre</button>
@@ -649,6 +711,11 @@
     const videoGrid = document.getElementById("videoGrid");
     const meetingLocalVideo = document.getElementById("meetingLocalVideo");
 
+    const previewMediaBtn = document.getElementById("previewMediaBtn");
+    const stopPreviewBtn = document.getElementById("stopPreviewBtn");
+    const micMeterFill = document.getElementById("micMeterFill");
+    const mediaTestStatus = document.getElementById("mediaTestStatus");
+
     const joinRoomBtn = document.getElementById("joinRoomBtn");
     const joinCurrentRoomBtn = document.getElementById("joinCurrentRoomBtn");
     const toggleMicBtn = document.getElementById("toggleMicBtn");
@@ -678,11 +745,16 @@
     let camEnabled = true;
     let presenceStarted = false;
 
+    let audioContext = null;
+    let analyser = null;
+    let mediaSourceNode = null;
+    let meterAnimationFrame = null;
+
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
       clearTimeout(activityTimeout);
       activityTimeout = setTimeout(async () => {
-        try { await signOut(auth); } catch (e) {}
+        try { await signOut(auth); } catch (_) {}
         window.location.href = "insights.html";
       }, INACTIVITY_LIMIT);
     }
@@ -780,28 +852,93 @@
 
       onValue(connectedRef, async (snap) => {
         if (snap.val() === true) {
-          await onDisconnect(presenceRef).set({
-            online: false,
-            lastSeen: Date.now(),
-            roomId: ""
-          });
+          try {
+            await onDisconnect(presenceRef).set({
+              online: false,
+              lastSeen: Date.now(),
+              roomId: ""
+            });
 
-          await set(presenceRef, {
-            online: true,
-            lastSeen: Date.now(),
-            roomId: currentRoomId || ""
-          });
+            await set(presenceRef, {
+              online: true,
+              lastSeen: Date.now(),
+              roomId: currentRoomId || ""
+            });
+          } catch (e) {
+            console.error(e);
+          }
         }
       });
     }
 
+    function stopMeter() {
+      if (meterAnimationFrame) {
+        cancelAnimationFrame(meterAnimationFrame);
+        meterAnimationFrame = null;
+      }
+      if (mediaSourceNode) {
+        try { mediaSourceNode.disconnect(); } catch (_) {}
+        mediaSourceNode = null;
+      }
+      analyser = null;
+      if (audioContext) {
+        try { audioContext.close(); } catch (_) {}
+        audioContext = null;
+      }
+      micMeterFill.style.width = "0%";
+    }
+
+    function startMeter(stream) {
+      stopMeter();
+
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        mediaSourceNode = audioContext.createMediaStreamSource(stream);
+        mediaSourceNode.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        const tick = () => {
+          if (!analyser) return;
+          analyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+          const avg = sum / dataArray.length;
+          const pct = Math.max(2, Math.min(100, Math.round((avg / 255) * 100)));
+          micMeterFill.style.width = `${pct}%`;
+          meterAnimationFrame = requestAnimationFrame(tick);
+        };
+
+        tick();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     async function startLocalMedia() {
-      if (localStream) return true;
+      if (localStream) {
+        meetingLocalVideo.srcObject = localStream;
+        videoPlaceholder.classList.add("hidden");
+        videoGrid.classList.remove("hidden");
+        startMeter(localStream);
+        mediaTestStatus.textContent = "Caméra et micro actifs.";
+        return true;
+      }
 
       try {
         localStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          },
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 24, max: 30 }
+          }
         });
 
         meetingLocalVideo.srcObject = localStream;
@@ -810,9 +947,12 @@
         micEnabled = true;
         camEnabled = true;
         updateMediaButtons();
+        startMeter(localStream);
+        mediaTestStatus.textContent = "Caméra et micro actifs.";
         return true;
       } catch (error) {
         console.error(error);
+        mediaTestStatus.textContent = "Impossible d’accéder à la caméra ou au micro.";
         alert("Impossible d’accéder à la caméra ou au micro.");
         return false;
       }
@@ -820,7 +960,7 @@
 
     function stopLocalMedia() {
       if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
+        try { localStream.getTracks().forEach(track => track.stop()); } catch (_) {}
       }
       localStream = null;
       meetingLocalVideo.srcObject = null;
@@ -829,6 +969,8 @@
       micEnabled = true;
       camEnabled = true;
       updateMediaButtons();
+      stopMeter();
+      mediaTestStatus.textContent = "Test arrêté.";
     }
 
     function updateMediaButtons() {
@@ -855,9 +997,9 @@
       closeRoomBtn.classList.toggle("hidden", !isRoomOwner());
       approveAllBtn.classList.toggle("hidden", !isRoomOwner());
       joinCurrentRoomBtn.classList.toggle("hidden", !isRoomOwner() || !currentRoomId);
-      leaveRoomBtn.classList.toggle("hidden", !joinedRoom);
-      toggleMicBtn.classList.toggle("hidden", !joinedRoom);
-      toggleCamBtn.classList.toggle("hidden", !joinedRoom);
+      leaveRoomBtn.classList.toggle("hidden", !joinedRoom && !isInWaitingRoom);
+      toggleMicBtn.classList.toggle("hidden", !localStream);
+      toggleCamBtn.classList.toggle("hidden", !localStream);
     }
 
     function renderRoomMeta() {
@@ -869,9 +1011,7 @@
         stageText.textContent = "Cette page gère l’accès, l’expiration, la salle d’attente et l’organisation de la réunion. L’administrateur contrôle la salle. Les invités accèdent uniquement avec un lien valide.";
         roomDot.className = "dot";
         roomStatusText.textContent = "Aucune salle";
-        if (!isOwnerEmail()) {
-          guestJoinNote.style.display = "none";
-        }
+        if (!isOwnerEmail()) guestJoinNote.style.display = "none";
         updateVisibilityByRole();
         return;
       }
@@ -883,7 +1023,7 @@
       meetingTitle.textContent = currentRoomMeta.title || "Salle de réunion";
       meetingSubtitle.textContent = isRoomOwner()
         ? "Tu es le propriétaire de cette salle."
-        : `Salle créée par ${escapeHtml(currentRoomMeta.ownerDisplayName || "l’administrateur")}.`;
+        : `Salle créée par ${currentRoomMeta.ownerDisplayName || "l’administrateur"}.`;
 
       roomMeta.innerHTML = `
         <div style="line-height:1.7;">
@@ -901,8 +1041,8 @@
         roomStatusText.textContent = "Salle fermée";
         stageTitle.textContent = "Salle fermée";
         stageText.textContent = "Cette salle a été fermée par le propriétaire.";
-        stopLocalMedia();
         joinedRoom = false;
+        isInWaitingRoom = false;
         updateVisibilityByRole();
         return;
       }
@@ -912,8 +1052,8 @@
         roomStatusText.textContent = "Lien expiré";
         stageTitle.textContent = "Lien expiré";
         stageText.textContent = "Le délai de validité de cette salle est dépassé.";
-        stopLocalMedia();
         joinedRoom = false;
+        isInWaitingRoom = false;
         updateVisibilityByRole();
         return;
       }
@@ -924,24 +1064,24 @@
         stageTitle.textContent = "Réunion active";
         stageText.textContent = isRoomOwner()
           ? "Tu gères actuellement cette salle. Tu peux laisser entrer les invités, partager le lien et fermer la réunion."
-          : "Tu es dans la salle. Tu peux participer et suivre les informations partagées ici.";
+          : "Tu es dans la salle. Ton micro et ta caméra peuvent déjà être testés localement.";
       } else if (isInWaitingRoom) {
         roomDot.className = "dot warn";
         roomStatusText.textContent = "En salle d’attente";
         stageTitle.textContent = "En attente d’approbation";
-        stageText.textContent = "Le propriétaire doit encore t’autoriser à entrer dans la réunion.";
+        stageText.textContent = "Le propriétaire doit encore t’autoriser à entrer dans la réunion. En attendant, tu peux tester ta caméra et ton micro ici.";
       } else {
         roomDot.className = "dot warn";
         roomStatusText.textContent = "Salle ouverte";
         stageTitle.textContent = "Salle prête à être rejointe";
-        stageText.textContent = "La salle est disponible. Utilise le bouton rejoindre pour entrer ou demander l’accès.";
+        stageText.textContent = "La salle est disponible. Tu peux préparer et tester ton matériel avant d’entrer.";
       }
 
       if (!isOwnerEmail()) {
         guestJoinNote.style.display = "block";
         guestJoinNote.textContent = waitingEnabled
-          ? "Cette salle utilise une salle d’attente. Après ta demande, l’administrateur devra t’accepter."
-          : "Tu peux rejoindre directement cette salle tant que le lien est valide.";
+          ? "Cette salle utilise une salle d’attente. Après ta demande, l’administrateur devra t’accepter. Tu peux déjà tester ton matériel."
+          : "Tu peux rejoindre directement cette salle tant que le lien est valide. Tu peux aussi tester ton matériel avant l’entrée.";
       }
 
       updateVisibilityByRole();
@@ -992,6 +1132,7 @@
           history.replaceState({}, "", `meeting-room.html?room=${encodeURIComponent(roomId)}`);
         } catch (_) {}
 
+        await startLocalMedia();
         await joinAsApprovedParticipant();
 
         renderRoomMeta();
@@ -1195,7 +1336,6 @@
       await remove(ref(db, participantPath(currentRoomId, currentUser.uid))).catch(() => {});
       await remove(ref(db, waitingPath(currentRoomId, currentUser.uid))).catch(() => {});
 
-      stopLocalMedia();
       joinedRoom = false;
       isInWaitingRoom = false;
 
@@ -1222,6 +1362,9 @@
         alert("Cette salle a été fermée.");
         return;
       }
+
+      const mediaOk = await startLocalMedia();
+      if (!mediaOk) return;
 
       if (currentRoomMeta.hasPassword) {
         const pass = window.prompt("Cette réunion est protégée. Entre le mot de passe :");
@@ -1260,7 +1403,7 @@
       });
 
       joinedRoom = false;
-      stopLocalMedia();
+      isInWaitingRoom = false;
       renderRoomMeta();
     }
 
@@ -1268,8 +1411,8 @@
       const text = chatInput.value.trim();
       if (!text || !currentRoomId || !currentUser) return;
 
-      if (!joinedRoom && !isRoomOwner()) {
-        alert("Tu dois avoir accès à la salle avant d’envoyer un message.");
+      if (!joinedRoom && !isRoomOwner() && !isInWaitingRoom) {
+        alert("Tu dois avoir accès à la salle ou être en attente pour écrire ici.");
         return;
       }
 
@@ -1327,6 +1470,7 @@
         track.enabled = micEnabled;
       });
       updateMediaButtons();
+      mediaTestStatus.textContent = micEnabled ? "Micro actif." : "Micro coupé.";
     }
 
     function toggleCam() {
@@ -1336,6 +1480,7 @@
         track.enabled = camEnabled;
       });
       updateMediaButtons();
+      mediaTestStatus.textContent = camEnabled ? "Caméra active." : "Caméra coupée.";
     }
 
     createRoomBtn.addEventListener("click", createRoom);
@@ -1348,6 +1493,20 @@
       } catch (e) {
         alert("Impossible de copier automatiquement. Copie le lien affiché.");
       }
+    });
+
+    previewMediaBtn.addEventListener("click", async () => {
+      await startLocalMedia();
+      updateVisibilityByRole();
+    });
+
+    stopPreviewBtn.addEventListener("click", () => {
+      if (!joinedRoom && !isInWaitingRoom) {
+        stopLocalMedia();
+        updateVisibilityByRole();
+        return;
+      }
+      mediaTestStatus.textContent = "Le flux reste disponible car tu es déjà engagé dans la salle ou l’attente.";
     });
 
     joinRoomBtn.addEventListener("click", joinRoomFlow);
@@ -1373,7 +1532,7 @@
 
       const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
       if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
-        try { await signOut(auth); } catch (e) {}
+        try { await signOut(auth); } catch (_) {}
         window.location.href = "insights.html";
         return;
       }
