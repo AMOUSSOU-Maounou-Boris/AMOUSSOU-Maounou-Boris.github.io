@@ -295,6 +295,7 @@
       place-items:center;
       padding:20px;
       text-align:center;
+      overflow:hidden;
     }
     .video-placeholder{
       max-width:680px;
@@ -306,6 +307,29 @@
     .video-placeholder p{
       color:rgba(255,255,255,0.9);
       line-height:1.7;
+    }
+
+    .local-video-wrap{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      align-items:center;
+      justify-content:center;
+    }
+    .local-video-wrap video{
+      width:100%;
+      max-height:430px;
+      border-radius:22px;
+      background:#000;
+      object-fit:cover;
+    }
+    .local-video-note{
+      color:#d7e4ff;
+      line-height:1.6;
+      font-size:14px;
+      font-weight:700;
+      text-align:center;
     }
 
     .control-bar{
@@ -535,7 +559,6 @@
         </div>
 
         <div class="video-stage" id="videoStage">
-          <video id="meetingLocalVideo" class="hidden" autoplay muted playsinline style="width:100%;max-height:440px;border-radius:22px;background:#000;object-fit:cover;"></video>
           <div class="video-placeholder" id="videoPlaceholder">
             <h3 id="stageTitle">Salle non rejointe</h3>
             <p id="stageText">
@@ -543,13 +566,23 @@
               L’administrateur contrôle la salle. Les invités accèdent uniquement avec un lien valide.
             </p>
           </div>
+
+          <div class="local-video-wrap hidden" id="localVideoWrap">
+            <video id="meetingLocalVideo" autoplay muted playsinline></video>
+            <div class="local-video-note" id="localVideoNote">
+              Caméra locale active. Les fonctions de salle, attente et participants restent conservées.
+            </div>
+          </div>
         </div>
 
         <div class="control-bar">
           <span class="status-pill"><span class="dot" id="roomDot"></span><span id="roomStatusText">Aucune salle</span></span>
           <button class="main-btn" id="joinRoomBtn" type="button">Rejoindre</button>
           <button class="secondary-btn hidden" id="joinCurrentRoomBtn" type="button">Rejoindre en tant que propriétaire</button>
+          <button class="secondary-btn hidden" id="toggleMicBtn" type="button">Micro ON</button>
+          <button class="secondary-btn hidden" id="toggleCamBtn" type="button">Caméra ON</button>
           <button class="secondary-btn hidden" id="approveAllBtn" type="button">Accepter tous les invités</button>
+          <button class="danger-btn hidden" id="leaveRoomBtn" type="button">Quitter</button>
           <button class="danger-btn hidden" id="closeRoomBtn" type="button">Fermer la salle</button>
         </div>
 
@@ -605,7 +638,8 @@
       update,
       onValue,
       push,
-      remove
+      remove,
+      onDisconnect
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const OWNER_EMAIL = "borisamoussou01@gmail.com";
@@ -636,13 +670,18 @@
     const roomStatusText = document.getElementById("roomStatusText");
     const stageTitle = document.getElementById("stageTitle");
     const stageText = document.getElementById("stageText");
-    const videoStage = document.getElementById("videoStage");
-    const meetingLocalVideo = document.getElementById("meetingLocalVideo");
+
     const videoPlaceholder = document.getElementById("videoPlaceholder");
+    const localVideoWrap = document.getElementById("localVideoWrap");
+    const meetingLocalVideo = document.getElementById("meetingLocalVideo");
+    const localVideoNote = document.getElementById("localVideoNote");
 
     const joinRoomBtn = document.getElementById("joinRoomBtn");
     const joinCurrentRoomBtn = document.getElementById("joinCurrentRoomBtn");
+    const toggleMicBtn = document.getElementById("toggleMicBtn");
+    const toggleCamBtn = document.getElementById("toggleCamBtn");
     const approveAllBtn = document.getElementById("approveAllBtn");
+    const leaveRoomBtn = document.getElementById("leaveRoomBtn");
     const closeRoomBtn = document.getElementById("closeRoomBtn");
 
     const participantsList = document.getElementById("participantsList");
@@ -661,7 +700,10 @@
     let isInWaitingRoom = false;
     let activityTimeout = null;
     let lastGeneratedRoomLink = "";
-    let meetingLocalStream = null;
+    let localStream = null;
+    let micEnabled = true;
+    let camEnabled = true;
+    let presenceBound = false;
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
@@ -722,7 +764,7 @@
     }
 
     function isRoomOwner() {
-      return isOwnerEmail() && currentRoomMeta && currentRoomMeta.ownerEmail && currentRoomMeta.ownerEmail.toLowerCase() === OWNER_EMAIL.toLowerCase();
+      return !!currentRoomMeta && !!currentUser && currentRoomMeta.ownerId === currentUser.uid;
     }
 
     function showExpiredPage(message = "Lien expiré") {
@@ -770,7 +812,7 @@
       const btn = document.getElementById("goNeutralPageBtn");
       if (btn) {
         btn.addEventListener("click", () => {
-          window.location.replace("home.html");
+          window.location.replace("index.html");
         });
       }
     }
@@ -810,6 +852,9 @@
       closeRoomBtn.classList.toggle("hidden", !isRoomOwner());
       approveAllBtn.classList.toggle("hidden", !isRoomOwner());
       joinCurrentRoomBtn.classList.toggle("hidden", !isRoomOwner() || !currentRoomId);
+      leaveRoomBtn.classList.toggle("hidden", !joinedRoom);
+      toggleMicBtn.classList.toggle("hidden", !joinedRoom);
+      toggleCamBtn.classList.toggle("hidden", !joinedRoom);
     }
 
     function randomRoomId(length = 14) {
@@ -827,43 +872,76 @@
       return currentProfile?.displayName || currentUser?.displayName || "Utilisateur";
     }
 
-    async function startMeetingCamera() {
-      if (meetingLocalStream) return true;
+    async function bindPresence() {
+      if (!currentUser || presenceBound) return;
+      presenceBound = true;
+
+      const connectedRef = ref(db, ".info/connected");
+      const presenceRef = ref(db, `users/${currentUser.uid}/presence`);
+
+      onValue(connectedRef, async (snap) => {
+        if (snap.val() === true) {
+          await onDisconnect(presenceRef).set({
+            online: false,
+            lastSeen: Date.now(),
+            roomId: ""
+          });
+
+          await update(ref(db, `users/${currentUser.uid}`), {
+            presence: {
+              online: true,
+              lastSeen: Date.now(),
+              roomId: currentRoomId || ""
+            }
+          });
+        }
+      });
+    }
+
+    function updateMediaButtons() {
+      toggleMicBtn.textContent = micEnabled ? "Micro ON" : "Micro OFF";
+      toggleCamBtn.textContent = camEnabled ? "Caméra ON" : "Caméra OFF";
+    }
+
+    async function startLocalMedia() {
+      if (localStream) return true;
 
       try {
-        meetingLocalStream = await navigator.mediaDevices.getUserMedia({
+        localStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
           video: true
         });
 
-        meetingLocalVideo.srcObject = meetingLocalStream;
-        meetingLocalVideo.classList.remove("hidden");
+        meetingLocalVideo.srcObject = localStream;
         videoPlaceholder.classList.add("hidden");
+        localVideoWrap.classList.remove("hidden");
+        localVideoNote.textContent = "Caméra locale active. Tu es bien dans la salle.";
+        micEnabled = true;
+        camEnabled = true;
+        updateMediaButtons();
         return true;
       } catch (error) {
         console.error(error);
-        alert("Impossible d’accéder à la caméra ou au micro pour la salle.");
+        alert("Impossible d’accéder à la caméra ou au micro.");
         return false;
       }
     }
 
-    function stopMeetingCamera() {
-      if (meetingLocalStream) {
-        meetingLocalStream.getTracks().forEach(track => track.stop());
+    function stopLocalMedia() {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
       }
-      meetingLocalStream = null;
-      if (meetingLocalVideo) {
-        meetingLocalVideo.srcObject = null;
-        meetingLocalVideo.classList.add("hidden");
-      }
-      if (videoPlaceholder) {
-        videoPlaceholder.classList.remove("hidden");
-      }
+      localStream = null;
+      meetingLocalVideo.srcObject = null;
+      localVideoWrap.classList.add("hidden");
+      videoPlaceholder.classList.remove("hidden");
+      micEnabled = true;
+      camEnabled = true;
+      updateMediaButtons();
     }
 
     function renderRoomMeta() {
       if (!currentRoomMeta) {
-        stopMeetingCamera();
         roomMeta.innerHTML = `<div class="empty-note">Aucune salle ouverte.</div>`;
         meetingTitle.textContent = "Salle de réunion professionnelle";
         meetingSubtitle.textContent = "Le propriétaire crée le lien et l’envoie aux participants.";
@@ -874,6 +952,7 @@
         if (!isOwnerEmail()) {
           guestJoinNote.style.display = "none";
         }
+        updateVisibilityByRole();
         return;
       }
 
@@ -902,7 +981,9 @@
         roomStatusText.textContent = "Salle fermée";
         stageTitle.textContent = "Salle fermée";
         stageText.textContent = "Cette salle a été fermée par le propriétaire.";
-        stopMeetingCamera();
+        stopLocalMedia();
+        joinedRoom = false;
+        updateVisibilityByRole();
         return;
       }
 
@@ -911,7 +992,9 @@
         roomStatusText.textContent = "Lien expiré";
         stageTitle.textContent = "Lien expiré";
         stageText.textContent = "Le délai de validité de cette salle est dépassé.";
-        stopMeetingCamera();
+        stopLocalMedia();
+        joinedRoom = false;
+        updateVisibilityByRole();
         return;
       }
 
@@ -940,6 +1023,8 @@
           ? "Cette salle utilise une salle d’attente. Après ta demande, l’administrateur devra t’accepter."
           : "Tu peux rejoindre directement cette salle tant que le lien est valide.";
       }
+
+      updateVisibilityByRole();
     }
 
     async function createRoom() {
@@ -1171,7 +1256,7 @@
     async function joinAsApprovedParticipant() {
       if (!currentRoomId || !currentUser) return;
 
-      const mediaOk = await startMeetingCamera();
+      const mediaOk = await startLocalMedia();
       if (!mediaOk) return;
 
       await set(ref(db, participantPath(currentRoomId, currentUser.uid)), {
@@ -1183,6 +1268,36 @@
 
       joinedRoom = true;
       isInWaitingRoom = false;
+
+      await update(ref(db, `users/${currentUser.uid}`), {
+        presence: {
+          online: true,
+          lastSeen: Date.now(),
+          roomId: currentRoomId
+        }
+      });
+
+      renderRoomMeta();
+    }
+
+    async function leaveCurrentRoom() {
+      if (!currentRoomId || !currentUser) return;
+
+      await remove(ref(db, participantPath(currentRoomId, currentUser.uid))).catch(() => {});
+      await remove(ref(db, waitingPath(currentRoomId, currentUser.uid))).catch(() => {});
+
+      stopLocalMedia();
+      joinedRoom = false;
+      isInWaitingRoom = false;
+
+      await update(ref(db, `users/${currentUser.uid}`), {
+        presence: {
+          online: true,
+          lastSeen: Date.now(),
+          roomId: ""
+        }
+      }).catch(() => {});
+
       renderRoomMeta();
     }
 
@@ -1236,6 +1351,7 @@
       });
 
       joinedRoom = false;
+      stopLocalMedia();
       renderRoomMeta();
     }
 
@@ -1295,6 +1411,24 @@
       myName.textContent = currentProfile.displayName || user.displayName || "Utilisateur";
     }
 
+    async function toggleMic() {
+      if (!localStream) return;
+      micEnabled = !micEnabled;
+      localStream.getAudioTracks().forEach(track => {
+        track.enabled = micEnabled;
+      });
+      updateMediaButtons();
+    }
+
+    async function toggleCam() {
+      if (!localStream) return;
+      camEnabled = !camEnabled;
+      localStream.getVideoTracks().forEach(track => {
+        track.enabled = camEnabled;
+      });
+      updateMediaButtons();
+    }
+
     createRoomBtn.addEventListener("click", createRoom);
 
     copyRoomLinkBtn.addEventListener("click", async () => {
@@ -1310,8 +1444,11 @@
     joinRoomBtn.addEventListener("click", joinRoomFlow);
     joinCurrentRoomBtn.addEventListener("click", joinAsApprovedParticipant);
     approveAllBtn.addEventListener("click", approveAllWaiting);
+    leaveRoomBtn.addEventListener("click", leaveCurrentRoom);
     closeRoomBtn.addEventListener("click", closeRoom);
     sendChatBtn.addEventListener("click", sendChatMessage);
+    toggleMicBtn.addEventListener("click", toggleMic);
+    toggleCamBtn.addEventListener("click", toggleCam);
 
     chatInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -1337,6 +1474,7 @@
       resetActivityTimer();
 
       await loadMyProfile(user);
+      await bindPresence();
 
       const roomId = getRoomQueryParam();
       if (roomId) {
@@ -1347,8 +1485,14 @@
       await loadRoom(roomId);
     });
 
-    window.addEventListener("beforeunload", () => {
-      stopMeetingCamera();
+    window.addEventListener("beforeunload", async () => {
+      try {
+        if (currentRoomId && currentUser && joinedRoom) {
+          await remove(ref(db, participantPath(currentRoomId, currentUser.uid)));
+        }
+      } catch (_) {}
+
+      stopLocalMedia();
     });
   </script>
 </body>
