@@ -345,7 +345,7 @@
     .chat-shell{
       overflow:hidden;
       display:grid;
-      grid-template-rows:auto 1fr auto;
+      grid-template-rows:auto auto 1fr auto auto;
       min-height:760px;
       background:linear-gradient(180deg,#f9fcff 0%, #f3f8fd 100%);
     }
@@ -788,6 +788,52 @@
       display:flex;
     }
 
+    .sticker-panel{
+      margin-bottom:12px;
+      padding:12px;
+      border:1px solid #dce8f5;
+      border-radius:16px;
+      background:#f7fbff;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(44px,1fr));
+      gap:8px;
+    }
+    .sticker-choice-btn{
+      border:none;
+      background:#fff;
+      border-radius:12px;
+      padding:10px;
+      font-size:24px;
+      cursor:pointer;
+    }
+
+    .voice-record-bar{
+      margin-bottom:12px;
+      padding:12px 14px;
+      border:1px solid #dce8f5;
+      border-radius:16px;
+      background:#f3f8fe;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .voice-record-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#0b2340;
+      font-weight:800;
+    }
+    .voice-record-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#df4b4b;
+      display:inline-block;
+    }
+
     .modal{
       position:fixed;
       inset:0;
@@ -973,9 +1019,20 @@
 
           <div class="composer-top">
             <button class="attach-btn" id="attachBtn" type="button">Image / PDF</button>
-            <button class="sticker-btn" id="stickerBtn" type="button">Emoji / Sticker</button>
+            <button class="sticker-btn" id="stickerBtn" type="button" title="Stickers / emojis">😊</button>
             <button class="attach-btn" id="voiceNoteBtn" type="button">Vocal</button>
             <input type="file" id="attachmentInput" class="hidden-file" accept="image/*,.pdf,application/pdf">
+          </div>
+
+          <div id="stickerPanel" class="sticker-panel hidden"></div>
+
+          <div id="voiceRecordBar" class="voice-record-bar hidden">
+            <div class="voice-record-left">
+              <span class="voice-record-dot"></span>
+              <strong>Enregistrement en cours</strong>
+              <span id="voiceTimerText">00:00</span>
+            </div>
+            <button class="danger-btn" id="cancelVoiceBtn" type="button">Annuler vocal</button>
           </div>
 
           <div class="composer-bottom">
@@ -1051,7 +1108,8 @@
       </div>
     </div>
   </div>
-    <script type="module">
+
+  <script type="module">
     import { auth, db } from "./firebase-config.js";
     import {
       onAuthStateChanged,
@@ -1064,14 +1122,28 @@
       update,
       remove,
       push,
-      onValue
+      onValue,
+      query,
+      orderByChild,
+      limitToLast
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const OWNER_EMAIL = "borisamoussou01@gmail.com";
     const LAST_ACTIVITY_KEY = "insights_last_activity";
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
     const DELETE_WINDOW_MS = 30 * 60 * 1000;
+
     const MAX_VOICE_SIZE = 1024 * 1024;
+    const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
+    const MAX_PDF_SIZE = 450 * 1024;
+    const LAST_MESSAGES_LIMIT = 30;
+
+    const STICKERS = [
+      "😀","😁","😂","🤣","😊","😍","🥰","😘",
+      "😎","🤩","🙂","😉","🤗","🤔","😴","😭",
+      "😡","👍","👏","🙌","🙏","💖","🔥","🎉",
+      "🌹","💯","🥳","😺","🐶","🦁","🐼","🧪"
+    ];
 
     const myAvatar = document.getElementById("myAvatar");
     const myName = document.getElementById("myName");
@@ -1101,6 +1173,10 @@
     const attachBtn = document.getElementById("attachBtn");
     const stickerBtn = document.getElementById("stickerBtn");
     const voiceNoteBtn = document.getElementById("voiceNoteBtn");
+    const cancelVoiceBtn = document.getElementById("cancelVoiceBtn");
+    const stickerPanel = document.getElementById("stickerPanel");
+    const voiceRecordBar = document.getElementById("voiceRecordBar");
+    const voiceTimerText = document.getElementById("voiceTimerText");
     const attachmentInput = document.getElementById("attachmentInput");
     const messageInput = document.getElementById("messageInput");
     const sendBtn = document.getElementById("sendBtn");
@@ -1166,6 +1242,8 @@
     let voiceChunks = [];
     let voiceStream = null;
     let isRecordingVoice = false;
+    let voiceStartTime = 0;
+    let voiceTimerInterval = null;
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
@@ -1321,6 +1399,53 @@
       };
     }
 
+    function formatVoiceTimer(seconds) {
+      const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
+      const ss = String(seconds % 60).padStart(2, "0");
+      return `${mm}:${ss}`;
+    }
+
+    function startVoiceTimer() {
+      voiceStartTime = Date.now();
+      voiceTimerText.textContent = "00:00";
+      voiceRecordBar.classList.remove("hidden");
+
+      clearInterval(voiceTimerInterval);
+      voiceTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - voiceStartTime) / 1000);
+        voiceTimerText.textContent = formatVoiceTimer(elapsed);
+      }, 1000);
+    }
+
+    function stopVoiceTimer() {
+      clearInterval(voiceTimerInterval);
+      voiceTimerInterval = null;
+      voiceTimerText.textContent = "00:00";
+      voiceRecordBar.classList.add("hidden");
+    }
+
+    function renderStickerPicker() {
+      stickerPanel.innerHTML = STICKERS.map(item => `
+        <button type="button" class="sticker-choice-btn" data-sticker-choice="${item}">${item}</button>
+      `).join("");
+
+      document.querySelectorAll("[data-sticker-choice]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const value = btn.dataset.stickerChoice;
+          stickerPanel.classList.add("hidden");
+          if (!value) return;
+          await sendMessage({ sticker: value });
+        });
+      });
+    }
+
+    function toggleStickerPanel() {
+      if (!stickerPanel.innerHTML.trim()) {
+        renderStickerPicker();
+      }
+      stickerPanel.classList.toggle("hidden");
+    }
+
     function renderAttachment(msg) {
       if (!msg.attachmentType || !msg.attachmentUrl) return "";
 
@@ -1402,8 +1527,8 @@
       if (!messagesCache.length) {
         chatMessages.innerHTML = `
           <div class="empty-state">
-            Aucun message pour le moment.<br>
-            Tu peux commencer la discussion maintenant.
+            Aucun message récent pour le moment.<br>
+            Seuls les ${LAST_MESSAGES_LIMIT} derniers messages sont chargés pour réduire le coût.
           </div>
         `;
         return;
@@ -1748,11 +1873,16 @@
       selectedUserProfile = usersCache[uid] ? { uid, ...usersCache[uid] } : null;
       selectedUserInviteState = getInviteState(uid);
       currentChatId = getChatId(currentUser.uid, uid);
+
       replyTarget = null;
+      stickerPanel.classList.add("hidden");
       renderReplyPreview();
       clearSelection();
+
       updateSelectedHeader();
       updateComposerState();
+      renderMessages();
+
       listenChatMessages();
       listenTypingState();
       await markChatAsRead();
@@ -1898,7 +2028,12 @@
         return;
       }
 
-      const chatRef = ref(db, `privateMessages/${currentChatId}`);
+      const chatRef = query(
+        ref(db, `privateMessages/${currentChatId}`),
+        orderByChild("createdAt"),
+        limitToLast(LAST_MESSAGES_LIMIT)
+      );
+
       detachChatListener = onValue(chatRef, async (snap) => {
         const data = snap.val() || {};
         messagesCache = Object.entries(data)
@@ -2090,7 +2225,8 @@
 
         await set(msgRef, payload);
 
-        const currentUnread = Number((await get(ref(db, `unreadCountsByUser/${selectedUserId}/${currentUser.uid}`))).val() || 0);
+        const unreadSnap = await get(ref(db, `unreadCountsByUser/${selectedUserId}/${currentUser.uid}`));
+        const currentUnread = Number(unreadSnap.val() || 0);
 
         await update(ref(db), {
           [`privateThreads/${currentUser.uid}/${selectedUserId}`]: {
@@ -2183,8 +2319,7 @@
       closeModal(forwardModal);
       forwardMessageTarget = null;
     }
-
-    async function sendReport() {
+        async function sendReport() {
       if (!reportMessageTarget || !selectedUserProfile || !currentUser) return;
 
       const reportRef = push(ref(db, "reports"));
@@ -2209,6 +2344,17 @@
       return new Promise((resolve, reject) => {
         if (!file) {
           reject(new Error("Aucun fichier"));
+          return;
+        }
+
+        if (file.type.startsWith("image/") && file.size > MAX_IMAGE_SIZE) {
+          reject(new Error("Image trop lourde"));
+          return;
+        }
+
+        const isPdf = file.type === "application/pdf" || (file.name || "").toLowerCase().endsWith(".pdf");
+        if (isPdf && file.size > MAX_PDF_SIZE) {
+          reject(new Error("PDF trop lourd"));
           return;
         }
 
@@ -2243,10 +2389,11 @@
       });
     }
 
-    async function cleanupVoiceRecorderState() {
+    async function cleanupVoiceRecorderState(stopRecorder = false) {
       try {
-        if (voiceMediaRecorder && voiceMediaRecorder.state !== "inactive") {
+        if (stopRecorder && voiceMediaRecorder && voiceMediaRecorder.state !== "inactive") {
           voiceMediaRecorder.stop();
+          return;
         }
       } catch (e) {}
 
@@ -2261,6 +2408,7 @@
       voiceStream = null;
       isRecordingVoice = false;
       if (voiceNoteBtn) voiceNoteBtn.textContent = "Vocal";
+      stopVoiceTimer();
     }
 
     async function handleVoiceNoteRecording() {
@@ -2273,6 +2421,8 @@
 
       if (!isRecordingVoice) {
         try {
+          stickerPanel.classList.add("hidden");
+
           voiceStream = await navigator.mediaDevices.getUserMedia({
             audio: {
               echoCancellation: true,
@@ -2280,6 +2430,7 @@
               autoGainControl: true
             }
           });
+
           voiceChunks = [];
 
           let mimeType = "";
@@ -2325,24 +2476,25 @@
               console.error(e);
               alert("Impossible d’envoyer le vocal.");
             } finally {
-              await cleanupVoiceRecorderState();
+              await cleanupVoiceRecorderState(false);
             }
           };
 
           voiceMediaRecorder.start(250);
           isRecordingVoice = true;
           voiceNoteBtn.textContent = "Arrêter vocal";
+          startVoiceTimer();
         } catch (e) {
           console.error(e);
           alert("Impossible d’accéder au micro.");
-          await cleanupVoiceRecorderState();
+          await cleanupVoiceRecorderState(false);
         }
 
         return;
       }
 
       if (voiceMediaRecorder && voiceMediaRecorder.state !== "inactive") {
-        voiceMediaRecorder.stop();
+        await cleanupVoiceRecorderState(true);
       }
     }
 
@@ -2439,13 +2591,20 @@
 
     stickerBtn.addEventListener("click", async () => {
       if (!canChatWith(selectedUserId)) return;
-      const sticker = prompt("Entre un emoji ou un sticker texte :");
-      if (!sticker) return;
-      await sendMessage({ sticker });
+      toggleStickerPanel();
     });
 
     voiceNoteBtn.addEventListener("click", async () => {
       await handleVoiceNoteRecording();
+    });
+
+    cancelVoiceBtn.addEventListener("click", async () => {
+      try {
+        if (voiceMediaRecorder && voiceMediaRecorder.state !== "inactive") {
+          voiceMediaRecorder.onstop = null;
+        }
+      } catch (e) {}
+      await cleanupVoiceRecorderState(false);
     });
 
     attachBtn.addEventListener("click", () => {
@@ -2456,12 +2615,34 @@
     attachmentInput.addEventListener("change", async () => {
       const file = attachmentInput.files[0];
       if (!file) return;
+
       try {
+        const isImage = file.type.startsWith("image/");
+        const isPdf = file.type === "application/pdf" || (file.name || "").toLowerCase().endsWith(".pdf");
+
+        if (isImage && file.size > MAX_IMAGE_SIZE) {
+          alert("La photo dépasse 2 Mo maximum.");
+          attachmentInput.value = "";
+          return;
+        }
+
+        if (isPdf && file.size > MAX_PDF_SIZE) {
+          alert("Le PDF dépasse 450 Ko maximum.");
+          attachmentInput.value = "";
+          return;
+        }
+
         const uploaded = await fakeUploadAttachment(file);
         await sendMessage({ attachment: uploaded });
       } catch (e) {
         console.error(e);
-        alert("Impossible de joindre ce fichier.");
+        if ((e.message || "").includes("Image trop lourde")) {
+          alert("La photo dépasse 2 Mo maximum.");
+        } else if ((e.message || "").includes("PDF trop lourd")) {
+          alert("Le PDF dépasse 450 Ko maximum.");
+        } else {
+          alert("Impossible de joindre ce fichier.");
+        }
       } finally {
         attachmentInput.value = "";
       }
@@ -2499,7 +2680,7 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        await cleanupVoiceRecorderState();
+        await cleanupVoiceRecorderState(false);
         window.location.href = "insights.html";
         return;
       }
@@ -2507,7 +2688,7 @@
       const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
       if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
         try { await signOut(auth); } catch (e) {}
-        await cleanupVoiceRecorderState();
+        await cleanupVoiceRecorderState(false);
         window.location.href = "insights.html";
         return;
       }
@@ -2539,7 +2720,7 @@
 
     window.addEventListener("beforeunload", async () => {
       try {
-        await cleanupVoiceRecorderState();
+        await cleanupVoiceRecorderState(false);
       } catch (e) {}
     });
   </script>
