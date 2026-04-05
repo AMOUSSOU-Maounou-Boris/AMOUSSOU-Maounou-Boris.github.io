@@ -395,7 +395,9 @@
     }
 
     .modal-content.call-large{
-      max-width:980px;
+      max-width:1100px;
+      max-height:92vh;
+      overflow:auto;
       background:linear-gradient(180deg, #0d376d 0%, #032750 100%);
       color:#fff;
     }
@@ -462,9 +464,10 @@
 
     .call-videos{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
       gap:14px;
       margin-top:12px;
+      align-items:start;
     }
     .video-card{
       background:#0f2d58;
@@ -472,6 +475,7 @@
       border-radius:20px;
       padding:10px;
       min-height:250px;
+      min-width:0;
     }
     .video-card h4{
       margin:0 0 8px;
@@ -480,9 +484,10 @@
     }
     .video-card video{
       width:100%;
+      display:block;
       border-radius:16px;
       background:#000;
-      min-height:210px;
+      height:min(48vh, 360px);
       object-fit:cover;
     }
 
@@ -517,6 +522,8 @@
       font-size:14px;
       white-space:pre-wrap;
       word-break:break-word;
+      max-height:180px;
+      overflow:auto;
     }
 
     @media (max-width: 980px){
@@ -529,9 +536,6 @@
       .hero-main{
         flex-direction:column;
         align-items:flex-start;
-      }
-      .call-videos{
-        grid-template-columns:1fr;
       }
     }
   </style>
@@ -764,9 +768,7 @@
 
     const rtcConfig = {
       iceServers: [
-        {
-          urls: "stun:stun.relay.metered.ca:80",
-        },
+        { urls: "stun:stun.relay.metered.ca:80" },
         {
           urls: "turn:standard.relay.metered.ca:80",
           username: "5ff54ce1d293fa306e56fe05",
@@ -786,7 +788,7 @@
           urls: "turns:standard.relay.metered.ca:443?transport=tcp",
           username: "5ff54ce1d293fa306e56fe05",
           credential: "xzI7qJDBCvqPJt7e",
-        },
+        }
       ],
       iceCandidatePoolSize: 10
     };
@@ -1241,8 +1243,8 @@
             remoteVideoEl.srcObject = incomingStream;
           }
           currentRemoteStream = incomingStream;
-        } else {
-          event.track && currentRemoteStream.addTrack(event.track);
+        } else if (event.track) {
+          currentRemoteStream.addTrack(event.track);
           if (remoteVideoEl) remoteVideoEl.srcObject = currentRemoteStream;
         }
 
@@ -1267,7 +1269,6 @@
 
       peerConnection.onconnectionstatechange = () => {
         const state = peerConnection?.connectionState || "";
-        console.log("connectionState:", state);
 
         if (state === "connecting") {
           callModalStatus.textContent = "Connexion en cours...";
@@ -1293,7 +1294,6 @@
 
       peerConnection.oniceconnectionstatechange = () => {
         const iceState = peerConnection?.iceConnectionState || "";
-        console.log("iceConnectionState:", iceState);
         appendCallLog(`État ICE : ${iceState}`);
       };
 
@@ -1330,10 +1330,8 @@
         if (remoteAudioBoxEl) remoteAudioBoxEl.style.display = "flex";
       }
 
-      if (currentLocalStream) {
-        if (mode === "video" && localVideoEl) {
-          localVideoEl.srcObject = currentLocalStream;
-        }
+      if (currentLocalStream && mode === "video" && localVideoEl) {
+        localVideoEl.srcObject = currentLocalStream;
       }
 
       muteBtn.textContent = "Couper micro";
