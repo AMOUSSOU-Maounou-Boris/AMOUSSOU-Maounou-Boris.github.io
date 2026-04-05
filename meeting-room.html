@@ -12,14 +12,10 @@
       --nav:#082e5b;
       --text:#0b2340;
       --muted:#6b7d93;
-      --line:#d9e5f2;
-      --blue:#2f8cff;
       --blue-dark:#0f4d92;
       --green:#18c34a;
       --red:#df4b4b;
-      --soft:#f4f8fc;
       --shadow:0 14px 34px rgba(7,31,66,0.10);
-      --gold:#fff8cc;
       --orange:#f7a600;
     }
 
@@ -78,12 +74,6 @@
       align-items:start;
     }
 
-    .sidebar,
-    .center,
-    .rightbar{
-      min-width:0;
-    }
-
     .section-card{
       background:var(--card);
       border:1px solid #e3ebf5;
@@ -124,10 +114,6 @@
       object-fit:cover;
     }
 
-    h1,h2,h3,p{
-      margin:0;
-    }
-
     .label{
       display:block;
       font-weight:800;
@@ -148,17 +134,6 @@
       background:#fcfdff;
       font-family:inherit;
     }
-    .textarea{
-      min-height:100px;
-      resize:vertical;
-    }
-    .text-input:focus,
-    .password-input:focus,
-    .select-input:focus,
-    .textarea:focus{
-      border-color:#7fb5ff;
-      box-shadow:0 0 0 3px rgba(47,140,255,0.13);
-    }
 
     .check-row{
       display:flex;
@@ -166,7 +141,6 @@
       gap:10px;
       margin-top:14px;
       font-weight:700;
-      color:var(--text);
       flex-wrap:wrap;
     }
 
@@ -180,8 +154,7 @@
 
     .main-btn,
     .secondary-btn,
-    .danger-btn,
-    .warn-btn{
+    .danger-btn{
       border:none;
       border-radius:16px;
       padding:13px 16px;
@@ -204,10 +177,6 @@
     }
     .danger-btn{
       background:var(--red);
-      color:#fff;
-    }
-    .warn-btn{
-      background:var(--orange);
       color:#fff;
     }
 
@@ -309,27 +278,32 @@
       line-height:1.7;
     }
 
-    .local-video-wrap{
+    .video-grid{
       width:100%;
-      display:flex;
-      flex-direction:column;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
       gap:14px;
-      align-items:center;
-      justify-content:center;
+      align-items:stretch;
     }
-    .local-video-wrap video{
+
+    .video-tile{
+      background:#0f2d58;
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:20px;
+      padding:10px;
+      min-height:220px;
+    }
+    .video-tile h4{
+      margin:0 0 8px;
+      font-size:14px;
+      color:#d7e4ff;
+    }
+    .video-tile video{
       width:100%;
-      max-height:430px;
-      border-radius:22px;
+      min-height:180px;
+      border-radius:16px;
       background:#000;
       object-fit:cover;
-    }
-    .local-video-note{
-      color:#d7e4ff;
-      line-height:1.6;
-      font-size:14px;
-      font-weight:700;
-      text-align:center;
     }
 
     .control-bar{
@@ -558,7 +532,7 @@
           <p id="meetingSubtitle">Le propriétaire crée le lien et l’envoie aux participants.</p>
         </div>
 
-        <div class="video-stage" id="videoStage">
+        <div class="video-stage">
           <div class="video-placeholder" id="videoPlaceholder">
             <h3 id="stageTitle">Salle non rejointe</h3>
             <p id="stageText">
@@ -567,10 +541,10 @@
             </p>
           </div>
 
-          <div class="local-video-wrap hidden" id="localVideoWrap">
-            <video id="meetingLocalVideo" autoplay muted playsinline></video>
-            <div class="local-video-note" id="localVideoNote">
-              Caméra locale active. Les fonctions de salle, attente et participants restent conservées.
+          <div class="video-grid hidden" id="videoGrid">
+            <div class="video-tile">
+              <h4>Toi</h4>
+              <video id="meetingLocalVideo" autoplay muted playsinline></video>
             </div>
           </div>
         </div>
@@ -672,9 +646,8 @@
     const stageText = document.getElementById("stageText");
 
     const videoPlaceholder = document.getElementById("videoPlaceholder");
-    const localVideoWrap = document.getElementById("localVideoWrap");
+    const videoGrid = document.getElementById("videoGrid");
     const meetingLocalVideo = document.getElementById("meetingLocalVideo");
-    const localVideoNote = document.getElementById("localVideoNote");
 
     const joinRoomBtn = document.getElementById("joinRoomBtn");
     const joinCurrentRoomBtn = document.getElementById("joinCurrentRoomBtn");
@@ -703,7 +676,7 @@
     let localStream = null;
     let micEnabled = true;
     let camEnabled = true;
-    let presenceBound = false;
+    let presenceStarted = false;
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
@@ -764,57 +737,7 @@
     }
 
     function isRoomOwner() {
-      return !!currentRoomMeta && !!currentUser && currentRoomMeta.ownerId === currentUser.uid;
-    }
-
-    function showExpiredPage(message = "Lien expiré") {
-      document.title = "Lien expiré | Boris Research Hub";
-      document.body.innerHTML = `
-        <div style="
-          min-height:100vh;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          background:#eaf5ff;
-          font-family:Arial, Helvetica, sans-serif;
-          padding:24px;
-        ">
-          <div style="
-            max-width:620px;
-            width:100%;
-            background:#ffffff;
-            border-radius:24px;
-            box-shadow:0 14px 34px rgba(7,31,66,0.10);
-            padding:34px 28px;
-            text-align:center;
-          ">
-            <h1 style="margin:0 0 10px;color:#082e5b;font-size:30px;">Lien expiré</h1>
-            <p style="margin:0 0 18px;color:#6b7d93;font-size:16px;line-height:1.6;">${escapeHtml(message)}</p>
-            <p style="margin:0 0 24px;color:#6b7d93;font-size:14px;line-height:1.5;">
-              Ce lien de réunion n’est plus valide. Même en rechargeant, cette salle ne sera plus ouverte avec ce lien.
-            </p>
-            <button id="goNeutralPageBtn" style="
-              border:none;
-              background:#0f4d92;
-              color:#fff;
-              padding:14px 18px;
-              border-radius:14px;
-              font-weight:800;
-              cursor:pointer;
-              font-size:15px;
-            ">Retour à Home</button>
-          </div>
-        </div>
-      `;
-      try {
-        history.replaceState({}, "", "meeting-room.html?expired=1");
-      } catch (_) {}
-      const btn = document.getElementById("goNeutralPageBtn");
-      if (btn) {
-        btn.addEventListener("click", () => {
-          window.location.replace("index.html");
-        });
-      }
+      return isOwnerEmail() && !!currentRoomMeta && currentRoomMeta.ownerId === currentUser.uid;
     }
 
     function roomPath(roomId) {
@@ -831,6 +754,86 @@
 
     function chatPath(roomId) {
       return `meetingRooms/${roomId}/chat`;
+    }
+
+    function randomRoomId(length = 14) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+      let out = "";
+      const arr = new Uint32Array(length);
+      window.crypto.getRandomValues(arr);
+      for (let i = 0; i < length; i++) {
+        out += chars[arr[i] % chars.length];
+      }
+      return out;
+    }
+
+    function getProfileName() {
+      return currentProfile?.displayName || currentUser?.displayName || "Utilisateur";
+    }
+
+    async function bindPresence() {
+      if (presenceStarted || !currentUser) return;
+      presenceStarted = true;
+
+      const connectedRef = ref(db, ".info/connected");
+      const presenceRef = ref(db, `users/${currentUser.uid}/presence`);
+
+      onValue(connectedRef, async (snap) => {
+        if (snap.val() === true) {
+          await onDisconnect(presenceRef).set({
+            online: false,
+            lastSeen: Date.now(),
+            roomId: ""
+          });
+
+          await set(presenceRef, {
+            online: true,
+            lastSeen: Date.now(),
+            roomId: currentRoomId || ""
+          });
+        }
+      });
+    }
+
+    async function startLocalMedia() {
+      if (localStream) return true;
+
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true
+        });
+
+        meetingLocalVideo.srcObject = localStream;
+        videoPlaceholder.classList.add("hidden");
+        videoGrid.classList.remove("hidden");
+        micEnabled = true;
+        camEnabled = true;
+        updateMediaButtons();
+        return true;
+      } catch (error) {
+        console.error(error);
+        alert("Impossible d’accéder à la caméra ou au micro.");
+        return false;
+      }
+    }
+
+    function stopLocalMedia() {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+      }
+      localStream = null;
+      meetingLocalVideo.srcObject = null;
+      videoGrid.classList.add("hidden");
+      videoPlaceholder.classList.remove("hidden");
+      micEnabled = true;
+      camEnabled = true;
+      updateMediaButtons();
+    }
+
+    function updateMediaButtons() {
+      toggleMicBtn.textContent = micEnabled ? "Micro ON" : "Micro OFF";
+      toggleCamBtn.textContent = camEnabled ? "Caméra ON" : "Caméra OFF";
     }
 
     function updateVisibilityByRole() {
@@ -855,89 +858,6 @@
       leaveRoomBtn.classList.toggle("hidden", !joinedRoom);
       toggleMicBtn.classList.toggle("hidden", !joinedRoom);
       toggleCamBtn.classList.toggle("hidden", !joinedRoom);
-    }
-
-    function randomRoomId(length = 14) {
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
-      let out = "";
-      const arr = new Uint32Array(length);
-      window.crypto.getRandomValues(arr);
-      for (let i = 0; i < length; i++) {
-        out += chars[arr[i] % chars.length];
-      }
-      return out;
-    }
-
-    function getProfileName() {
-      return currentProfile?.displayName || currentUser?.displayName || "Utilisateur";
-    }
-
-    async function bindPresence() {
-      if (!currentUser || presenceBound) return;
-      presenceBound = true;
-
-      const connectedRef = ref(db, ".info/connected");
-      const presenceRef = ref(db, `users/${currentUser.uid}/presence`);
-
-      onValue(connectedRef, async (snap) => {
-        if (snap.val() === true) {
-          await onDisconnect(presenceRef).set({
-            online: false,
-            lastSeen: Date.now(),
-            roomId: ""
-          });
-
-          await update(ref(db, `users/${currentUser.uid}`), {
-            presence: {
-              online: true,
-              lastSeen: Date.now(),
-              roomId: currentRoomId || ""
-            }
-          });
-        }
-      });
-    }
-
-    function updateMediaButtons() {
-      toggleMicBtn.textContent = micEnabled ? "Micro ON" : "Micro OFF";
-      toggleCamBtn.textContent = camEnabled ? "Caméra ON" : "Caméra OFF";
-    }
-
-    async function startLocalMedia() {
-      if (localStream) return true;
-
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true
-        });
-
-        meetingLocalVideo.srcObject = localStream;
-        videoPlaceholder.classList.add("hidden");
-        localVideoWrap.classList.remove("hidden");
-        localVideoNote.textContent = "Caméra locale active. Tu es bien dans la salle.";
-        micEnabled = true;
-        camEnabled = true;
-        updateMediaButtons();
-        return true;
-      } catch (error) {
-        console.error(error);
-        alert("Impossible d’accéder à la caméra ou au micro.");
-        return false;
-      }
-    }
-
-    function stopLocalMedia() {
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-      }
-      localStream = null;
-      meetingLocalVideo.srcObject = null;
-      localVideoWrap.classList.add("hidden");
-      videoPlaceholder.classList.remove("hidden");
-      micEnabled = true;
-      camEnabled = true;
-      updateMediaButtons();
     }
 
     function renderRoomMeta() {
@@ -1097,7 +1017,7 @@
 
       const snap = await get(ref(db, roomPath(roomId)));
       if (!snap.exists()) {
-        showExpiredPage("Cette salle n’existe pas ou n’est plus disponible.");
+        alert("Cette salle n’existe pas ou n’est plus disponible.");
         return;
       }
 
@@ -1106,12 +1026,12 @@
       updateVisibilityByRole();
 
       if (Date.now() > (currentRoomMeta.expiresAt || 0)) {
-        showExpiredPage("Le lien de réunion a expiré.");
+        alert("Le lien de réunion a expiré.");
         return;
       }
 
       if (currentRoomMeta.status === "closed") {
-        showExpiredPage("Cette salle a été fermée par l’administrateur.");
+        alert("Cette salle a été fermée par l’administrateur.");
         return;
       }
 
@@ -1123,20 +1043,9 @@
 
     function subscribeRoomRealtime(roomId) {
       onValue(ref(db, roomPath(roomId)), (snap) => {
-        if (!snap.exists()) {
-          showExpiredPage("Cette salle n’est plus disponible.");
-          return;
-        }
+        if (!snap.exists()) return;
         currentRoomMeta = snap.val() || {};
         renderRoomMeta();
-
-        if (Date.now() > (currentRoomMeta.expiresAt || 0)) {
-          showExpiredPage("Le lien de réunion a expiré.");
-          return;
-        }
-        if (currentRoomMeta.status === "closed") {
-          showExpiredPage("Cette salle a été fermée par l’administrateur.");
-        }
       });
     }
 
@@ -1305,12 +1214,12 @@
       if (!currentRoomMeta || !currentRoomId || !currentUser) return;
 
       if (Date.now() > (currentRoomMeta.expiresAt || 0)) {
-        showExpiredPage("Le lien de réunion a expiré.");
+        alert("Le lien de réunion a expiré.");
         return;
       }
 
       if (currentRoomMeta.status === "closed") {
-        showExpiredPage("Cette salle a été fermée.");
+        alert("Cette salle a été fermée.");
         return;
       }
 
@@ -1411,7 +1320,7 @@
       myName.textContent = currentProfile.displayName || user.displayName || "Utilisateur";
     }
 
-    async function toggleMic() {
+    function toggleMic() {
       if (!localStream) return;
       micEnabled = !micEnabled;
       localStream.getAudioTracks().forEach(track => {
@@ -1420,7 +1329,7 @@
       updateMediaButtons();
     }
 
-    async function toggleCam() {
+    function toggleCam() {
       if (!localStream) return;
       camEnabled = !camEnabled;
       localStream.getVideoTracks().forEach(track => {
