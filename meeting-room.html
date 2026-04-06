@@ -830,22 +830,22 @@
         {
           urls: "turn:standard.relay.metered.ca:80",
           username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          credential: "xzI7qJDBCvqPJt7e"
         },
         {
           urls: "turn:standard.relay.metered.ca:80?transport=tcp",
           username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          credential: "xzI7qJDBCvqPJt7e"
         },
         {
           urls: "turn:standard.relay.metered.ca:443",
           username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          credential: "xzI7qJDBCvqPJt7e"
         },
         {
           urls: "turns:standard.relay.metered.ca:443?transport=tcp",
           username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          credential: "xzI7qJDBCvqPJt7e"
         }
       ],
       iceCandidatePoolSize: 10
@@ -932,6 +932,7 @@
 
     let participantsCache = {};
     let waitingCache = {};
+    let approvedCache = {};
     let signalingUnsubs = [];
     let roomRealtimeUnsubs = [];
     let subscribedRoomId = "";
@@ -1016,6 +1017,10 @@
 
     function waitingPath(roomId, uid) {
       return `meetingRooms/${roomId}/waiting/${uid}`;
+    }
+
+    function approvedPath(roomId, uid) {
+      return `meetingRooms/${roomId}/approved/${uid}`;
     }
 
     function chatPath(roomId) {
@@ -1143,14 +1148,360 @@
         card.appendChild(row);
       }
 
+      const duration = Number(options.duration || 6000);
       host.appendChild(card);
 
-      const duration = Number(options.duration || 6000);
       if (!options.persist) {
         setTimeout(() => {
           if (card.isConnected) card.remove();
         }, duration);
       }
+    }
+
+    function stopMeter() {
+      if (meterAnimationFrame) {
+        cancelAnimationFrame(meterAnimationFrame);
+        meterAnimationFrame = null;
+      }
+      if (mediaSourceNode) {
+        try { mediaSourceNode.disconnect(); } catch (_) {}
+        mediaSourceNode = null;
+      }
+      analyser = null;
+      if (audioContext) {
+        try { audioContext.close(); } catch (_) {}
+        audioContext = null;
+      }
+      micMeterFill.style.width = "0%";
+    }
+
+    function startMeter(stream) {
+      stopMeter();
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        mediaSourceNode = audioContext.createMediaStreamSource(stream);
+        mediaSourceNode.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        const tick = () => {
+          if (!analyser) return;
+          analyser.getByteFrequencyData(dataArray);
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+          const avg = sum / dataArray.length;
+          const pct = Math.max(2, Math.min(100, Math.round((avg / 255) * 100)));
+          micMeterFill.style.width = `${pct}%`;
+          meterAnimationFrame = requestAnimationFrame(tick);
+        };
+
+        tick();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function forceTracksEnabled(stream) {
+      if (!stream) return;
+      micEnabled = true;
+      camEnabled = true;
+      const audioTracks = stream.getAudioTracks();
+      const videoTracks = stream.getVideoTracks();
+      audioTracks.forEach(track => track.enabled = true);
+      videoTracks.forEach(track => track.enabled = true);
+      updateMediaButtons();
+    }
+
+    function getVideoGridMarkup() {
+      let html = "";
+
+      if (localStream) {
+        html += `
+          <div class="video-tile">
+            <h4>
+              <span>Toi</span>
+              <span>${screenStream ? "Partage actif" : ""}</span>
+            </h4>
+            <video id="localVideoTile" autoplay muted playsinline></video>
+          </div>
+        `;
+      }
+
+      for (const [uid] of remoteStreams.entries()) {
+        const meta = participantsCache[uid] || {};
+        html += `
+          <div class="video-tile">
+            <h4>
+              <span>${escapeHtml(meta.displayName || meta.email || uid)}</span>
+              <span>${meta.isSharingScreen ? "Écran partagé" : ""}</span>
+            </h4>
+            <video data-remote-video="${uid}" autoplay playsinline></video>
+          </div>
+        `;
+      }
+
+      return html;
+    }
+
+    function renderVideoStage() {
+      const hasAnyVideo = !!localStream || remoteStreams.size > 0;
+
+      if (!hasAnyVideo) {
+        videoGrid.classList.add("hidden");
+        videoPlaceholder.classList.remove("hidden");
+        videoGrid.innerHTML = "";
+        return;
+      }
+
+      videoPlaceholder.classList.add("hidden");
+      videoGrid.classList.remove("hidden");
+      videoGrid.innerHTML = getVideoGridMarkup();
+
+      const localEl = document.getElementById("localVideoTile");
+      if (localEl && localStream) {
+        localEl.srcObject = localStream;
+        localEl.muted = true;
+        localEl.play().catch(() => {});
+      }
+
+      for (const [uid, stream] of remoteStreams.entries()) {
+        const remoteEl = document.querySelector(`[data-remote-video="${uid}"]`);
+        if (remoteEl) {
+          remoteEl.srcObject = stream;
+          remoteEl.autoplay = true;
+          remoteEl.playsInline = true;
+          remoteEl.muted = false;
+          remoteEl.play().catch(() => {});
+        }
+      }
+    }
+
+    function renderScreenShareUI() {
+      const activeScreenSharer = Object.values(participantsCache).find(p => p && p.isSharingScreen);
+      if (!activeScreenSharer) {
+        screenShareBox.classList.remove("active");
+        screenShareVideo.srcObject = null;
+        return;
+      }
+
+      screenShareBox.classList.add("active");
+      screenShareLabel.textContent = `Partage d’écran : ${activeScreenSharer.displayName || activeScreenSharer.email || "Participant"}`;
+
+      if (activeScreenSharer.uid === currentUser?.uid && screenStream) {
+        screenShareVideo.srcObject = screenStream;
+      } else if (remoteStreams.has(activeScreenSharer.uid)) {
+        screenShareVideo.srcObject = remoteStreams.get(activeScreenSharer.uid);
+      } else {
+        screenShareVideo.srcObject = null;
+      }
+    }
+
+    function updateMediaButtons() {
+      toggleMicBtn.textContent = micEnabled ? "Micro ON" : "Micro OFF";
+      toggleCamBtn.textContent = camEnabled ? "Caméra ON" : "Caméra OFF";
+    }
+
+    async function startLocalMedia(forceFresh = false) {
+      if (forceFresh && localStream) {
+        try { localStream.getTracks().forEach(track => track.stop()); } catch (_) {}
+        localStream = null;
+      }
+
+      if (localStream) {
+        forceTracksEnabled(localStream);
+        renderVideoStage();
+        startMeter(localStream);
+        mediaTestStatus.textContent = "Caméra et micro actifs.";
+        updateVisibilityByRole();
+        return true;
+      }
+
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          },
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 24, max: 30 }
+          }
+        });
+
+        forceTracksEnabled(localStream);
+        startMeter(localStream);
+        mediaTestStatus.textContent = "Caméra et micro actifs.";
+        renderVideoStage();
+        updateVisibilityByRole();
+        return true;
+      } catch (error) {
+        console.error(error);
+        mediaTestStatus.textContent = "Impossible d’accéder à la caméra ou au micro.";
+        alert("Impossible d’accéder à la caméra ou au micro.");
+        return false;
+      }
+    }
+
+    async function stopScreenShare() {
+      if (!screenStream) return;
+
+      try {
+        screenStream.getTracks().forEach(track => track.stop());
+      } catch (_) {}
+
+      screenStream = null;
+      shareScreenBtn.classList.remove("hidden");
+      stopShareScreenBtn.classList.add("hidden");
+
+      if (currentRoomId && currentUser && joinedRoom) {
+        await update(ref(participantPath(currentRoomId, currentUser.uid), db), {
+          isSharingScreen: false,
+          updatedAt: Date.now()
+        }).catch(() => {});
+      }
+
+      renderScreenShareUI();
+      await replaceTracksOnPeers();
+      renderVideoStage();
+    }
+
+    function stopLocalMedia() {
+      if (localStream) {
+        try { localStream.getTracks().forEach(track => track.stop()); } catch (_) {}
+      }
+      localStream = null;
+      micEnabled = true;
+      camEnabled = true;
+      updateMediaButtons();
+      stopMeter();
+      mediaTestStatus.textContent = "Test arrêté.";
+      renderVideoStage();
+      updateVisibilityByRole();
+    }
+
+    function updateVisibilityByRole() {
+      if (isOwnerEmail()) {
+        meetingNavLink.classList.remove("hidden");
+        ownerPanel.classList.remove("hidden");
+        guestInfoPanel.classList.add("hidden");
+      } else {
+        ownerPanel.classList.add("hidden");
+        guestInfoPanel.classList.remove("hidden");
+        if (getRoomQueryParam()) {
+          meetingNavLink.classList.remove("hidden");
+        } else {
+          meetingNavLink.classList.add("hidden");
+        }
+      }
+
+      waitingRoomPanel.classList.toggle("hidden", !isRoomOwner());
+      joinCurrentRoomBtn.classList.toggle("hidden", !isRoomOwner() || !currentRoomId);
+      toggleMicBtn.classList.toggle("hidden", !localStream);
+      toggleCamBtn.classList.toggle("hidden", !localStream);
+      leaveRoomBtn.classList.toggle("hidden", !joinedRoom && !isInWaitingRoom);
+      shareScreenBtn.classList.toggle("hidden", !joinedRoom || !localStream || !!screenStream);
+      stopShareScreenBtn.classList.toggle("hidden", !screenStream);
+      toggleMiniModeBtn.classList.toggle("hidden", !localStream);
+      approveAllBtn.classList.toggle("hidden", !isRoomOwner());
+      closeRoomBtn.classList.toggle("hidden", !isRoomOwner());
+    }
+
+    function renderRoomMeta() {
+      if (!currentRoomMeta) {
+        roomMeta.innerHTML = `<div class="empty-note">Aucune salle ouverte.</div>`;
+        meetingTitle.textContent = "Salle de réunion professionnelle";
+        meetingSubtitle.textContent = "Le propriétaire crée le lien et l’envoie aux participants.";
+        stageTitle.textContent = "Salle non rejointe";
+        stageText.textContent = "Cette page gère l’accès, l’expiration, la salle d’attente et l’organisation de la réunion.";
+        roomDot.className = "dot";
+        roomStatusText.textContent = "Aucune salle";
+        if (!isOwnerEmail()) guestJoinNote.style.display = "none";
+        updateVisibilityByRole();
+        renderVideoStage();
+        renderScreenShareUI();
+        return;
+      }
+
+      const expired = Date.now() > (currentRoomMeta.expiresAt || 0);
+      const closed = currentRoomMeta.status === "closed";
+      const waitingEnabled = !!currentRoomMeta.waitingRoomEnabled;
+
+      meetingTitle.textContent = currentRoomMeta.title || "Salle de réunion";
+      meetingSubtitle.textContent = isRoomOwner()
+        ? "Tu es le propriétaire de cette salle."
+        : `Salle créée par ${currentRoomMeta.ownerDisplayName || "l’administrateur"}.`;
+
+      roomMeta.innerHTML = `
+        <div style="line-height:1.7;">
+          <div><strong>Titre :</strong> ${escapeHtml(currentRoomMeta.title || "—")}</div>
+          <div><strong>Créée le :</strong> ${escapeHtml(formatDate(currentRoomMeta.createdAt) || "—")}</div>
+          <div><strong>Expire le :</strong> ${escapeHtml(formatDate(currentRoomMeta.expiresAt) || "—")}</div>
+          <div><strong>Salle d’attente :</strong> ${waitingEnabled ? "Oui" : "Non"}</div>
+          <div><strong>Mot de passe :</strong> ${currentRoomMeta.hasPassword ? "Oui" : "Non"}</div>
+          <div><strong>Statut :</strong> ${closed ? "Fermée" : expired ? "Expirée" : "Ouverte"}</div>
+          <div><strong>Capacité conseillée :</strong> ${MAX_PARTICIPANTS} participants maximum</div>
+        </div>
+      `;
+
+      if (closed) {
+        roomDot.className = "dot red";
+        roomStatusText.textContent = "Salle fermée";
+        stageTitle.textContent = "Salle fermée";
+        stageText.textContent = "Cette salle a été fermée par le propriétaire.";
+        joinedRoom = false;
+        isInWaitingRoom = false;
+        closeAllPeers();
+        stopLocalMedia();
+        updateVisibilityByRole();
+        return;
+      }
+
+      if (expired) {
+        roomDot.className = "dot red";
+        roomStatusText.textContent = "Lien expiré";
+        stageTitle.textContent = "Lien expiré";
+        stageText.textContent = "Le délai de validité de cette salle est dépassé.";
+        joinedRoom = false;
+        isInWaitingRoom = false;
+        closeAllPeers();
+        stopLocalMedia();
+        updateVisibilityByRole();
+        return;
+      }
+
+      if (joinedRoom) {
+        roomDot.className = "dot online";
+        roomStatusText.textContent = "Salle rejointe";
+        stageTitle.textContent = "Réunion active";
+        stageText.textContent = isRoomOwner()
+          ? "Tu gères actuellement cette salle. Les invités déjà acceptés peuvent revenir avec le même lien sans nouvelle autorisation."
+          : "Tu es dans la salle. Si tu quittes, tu peux revenir avec le même lien tant que la réunion n’a pas expiré.";
+      } else if (isInWaitingRoom) {
+        roomDot.className = "dot warn";
+        roomStatusText.textContent = "En salle d’attente";
+        stageTitle.textContent = "En attente d’approbation";
+        stageText.textContent = "Le propriétaire doit encore t’autoriser à entrer. Tu peux déjà tester ta caméra et ton micro.";
+      } else {
+        roomDot.className = "dot warn";
+        roomStatusText.textContent = "Salle ouverte";
+        stageTitle.textContent = "Salle prête à être rejointe";
+        stageText.textContent = "La salle est disponible. Tu peux préparer et tester ton matériel avant d’entrer.";
+      }
+
+      if (!isOwnerEmail()) {
+        guestJoinNote.style.display = "block";
+        guestJoinNote.textContent = waitingEnabled
+          ? "Cette salle utilise une salle d’attente. Une fois accepté une première fois, tu pourras revenir sans nouvelle autorisation."
+          : "Tu peux rejoindre directement cette salle tant que le lien est valide.";
+      }
+
+      updateVisibilityByRole();
+      renderVideoStage();
+      renderScreenShareUI();
     }
 
     function renderRecentRooms(items = []) {
@@ -1251,349 +1602,6 @@
       }).catch(() => {});
     }
 
-    function stopMeter() {
-      if (meterAnimationFrame) {
-        cancelAnimationFrame(meterAnimationFrame);
-        meterAnimationFrame = null;
-      }
-      if (mediaSourceNode) {
-        try { mediaSourceNode.disconnect(); } catch (_) {}
-        mediaSourceNode = null;
-      }
-      analyser = null;
-      if (audioContext) {
-        try { audioContext.close(); } catch (_) {}
-        audioContext = null;
-      }
-      micMeterFill.style.width = "0%";
-    }
-
-    function startMeter(stream) {
-      stopMeter();
-
-      try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        mediaSourceNode = audioContext.createMediaStreamSource(stream);
-        mediaSourceNode.connect(analyser);
-
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        const tick = () => {
-          if (!analyser) return;
-          analyser.getByteFrequencyData(dataArray);
-          let sum = 0;
-          for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-          const avg = sum / dataArray.length;
-          const pct = Math.max(2, Math.min(100, Math.round((avg / 255) * 100)));
-          micMeterFill.style.width = `${pct}%`;
-          meterAnimationFrame = requestAnimationFrame(tick);
-        };
-
-        tick();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    function getVideoGridMarkup() {
-      let html = "";
-
-      if (localStream) {
-        html += `
-          <div class="video-tile">
-            <h4>
-              <span>Toi</span>
-              <span>${screenStream ? "Partage actif" : ""}</span>
-            </h4>
-            <video id="localVideoTile" autoplay muted playsinline></video>
-          </div>
-        `;
-      }
-
-      for (const [uid] of remoteStreams.entries()) {
-        const meta = participantsCache[uid] || {};
-        html += `
-          <div class="video-tile">
-            <h4>
-              <span>${escapeHtml(meta.displayName || meta.email || uid)}</span>
-              <span>${meta.isSharingScreen ? "Écran partagé" : ""}</span>
-            </h4>
-            <video data-remote-video="${uid}" autoplay playsinline></video>
-          </div>
-        `;
-      }
-
-      return html;
-    }
-
-    function renderVideoStage() {
-      const hasAnyVideo = !!localStream || remoteStreams.size > 0;
-
-      if (!hasAnyVideo) {
-        videoGrid.classList.add("hidden");
-        videoPlaceholder.classList.remove("hidden");
-        videoGrid.innerHTML = "";
-        return;
-      }
-
-      videoPlaceholder.classList.add("hidden");
-      videoGrid.classList.remove("hidden");
-      videoGrid.innerHTML = getVideoGridMarkup();
-
-      const localEl = document.getElementById("localVideoTile");
-      if (localEl && localStream) {
-        localEl.srcObject = localStream;
-        localEl.muted = true;
-        localEl.play().catch(() => {});
-      }
-
-      for (const [uid, stream] of remoteStreams.entries()) {
-        const remoteEl = document.querySelector(`[data-remote-video="${uid}"]`);
-        if (remoteEl) {
-          remoteEl.srcObject = stream;
-          remoteEl.autoplay = true;
-          remoteEl.playsInline = true;
-          remoteEl.muted = false;
-          remoteEl.play().catch(() => {});
-        }
-      }
-    }
-
-    function renderScreenShareUI() {
-      const activeScreenSharer = Object.values(participantsCache).find(p => p && p.isSharingScreen);
-      if (!activeScreenSharer) {
-        screenShareBox.classList.remove("active");
-        screenShareVideo.srcObject = null;
-        return;
-      }
-
-      screenShareBox.classList.add("active");
-      screenShareLabel.textContent = `Partage d’écran : ${activeScreenSharer.displayName || activeScreenSharer.email || "Participant"}`;
-
-      if (activeScreenSharer.uid === currentUser?.uid && screenStream) {
-        screenShareVideo.srcObject = screenStream;
-      } else if (remoteStreams.has(activeScreenSharer.uid)) {
-        screenShareVideo.srcObject = remoteStreams.get(activeScreenSharer.uid);
-      } else {
-        screenShareVideo.srcObject = null;
-      }
-    }
-
-    async function startLocalMedia() {
-      if (localStream) {
-        renderVideoStage();
-        startMeter(localStream);
-        mediaTestStatus.textContent = "Caméra et micro actifs.";
-        updateVisibilityByRole();
-        return true;
-      }
-
-      try {
-        localStream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-          },
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            frameRate: { ideal: 24, max: 30 }
-          }
-        });
-
-        micEnabled = true;
-        camEnabled = true;
-        updateMediaButtons();
-        startMeter(localStream);
-        mediaTestStatus.textContent = "Caméra et micro actifs.";
-        renderVideoStage();
-        updateVisibilityByRole();
-
-        if (joinedRoom) {
-          await replaceTracksOnPeers();
-        }
-
-        return true;
-      } catch (error) {
-        console.error(error);
-        mediaTestStatus.textContent = "Impossible d’accéder à la caméra ou au micro.";
-        alert("Impossible d’accéder à la caméra ou au micro.");
-        return false;
-      }
-    }
-
-    async function stopScreenShare() {
-      if (!screenStream) return;
-
-      try {
-        screenStream.getTracks().forEach(track => track.stop());
-      } catch (_) {}
-
-      screenStream = null;
-      shareScreenBtn.classList.remove("hidden");
-      stopShareScreenBtn.classList.add("hidden");
-
-      if (currentRoomId && currentUser && joinedRoom) {
-        await update(ref(db, participantPath(currentRoomId, currentUser.uid)), {
-          isSharingScreen: false,
-          updatedAt: Date.now()
-        }).catch(() => {});
-      }
-
-      renderScreenShareUI();
-      await replaceTracksOnPeers();
-      renderVideoStage();
-    }
-
-    function stopLocalMedia() {
-      if (localStream) {
-        try { localStream.getTracks().forEach(track => track.stop()); } catch (_) {}
-      }
-      localStream = null;
-      micEnabled = true;
-      camEnabled = true;
-      updateMediaButtons();
-      stopMeter();
-      mediaTestStatus.textContent = "Test arrêté.";
-
-      stopScreenShare().catch(() => {});
-      renderVideoStage();
-      updateVisibilityByRole();
-    }
-
-    function updateMediaButtons() {
-      toggleMicBtn.textContent = micEnabled ? "Micro ON" : "Micro OFF";
-      toggleCamBtn.textContent = camEnabled ? "Caméra ON" : "Caméra OFF";
-    }
-
-    function updateVisibilityByRole() {
-      if (isOwnerEmail()) {
-        meetingNavLink.classList.remove("hidden");
-        ownerPanel.classList.remove("hidden");
-        guestInfoPanel.classList.add("hidden");
-      } else {
-        ownerPanel.classList.add("hidden");
-        guestInfoPanel.classList.remove("hidden");
-        if (getRoomQueryParam()) {
-          meetingNavLink.classList.remove("hidden");
-        } else {
-          meetingNavLink.classList.add("hidden");
-        }
-      }
-
-      waitingRoomPanel.classList.toggle("hidden", !isRoomOwner());
-      joinCurrentRoomBtn.classList.toggle("hidden", !isRoomOwner() || !currentRoomId);
-      toggleMicBtn.classList.toggle("hidden", !localStream);
-      toggleCamBtn.classList.toggle("hidden", !localStream);
-      leaveRoomBtn.classList.toggle("hidden", !joinedRoom && !isInWaitingRoom);
-      shareScreenBtn.classList.toggle("hidden", !joinedRoom || !localStream || !!screenStream);
-      stopShareScreenBtn.classList.toggle("hidden", !screenStream);
-      toggleMiniModeBtn.classList.toggle("hidden", !localStream);
-      approveAllBtn.classList.toggle("hidden", !isRoomOwner());
-      closeRoomBtn.classList.toggle("hidden", !isRoomOwner());
-    }
-
-    function renderRoomMeta() {
-      if (!currentRoomMeta) {
-        roomMeta.innerHTML = `<div class="empty-note">Aucune salle ouverte.</div>`;
-        meetingTitle.textContent = "Salle de réunion professionnelle";
-        meetingSubtitle.textContent = "Le propriétaire crée le lien et l’envoie aux participants.";
-        stageTitle.textContent = "Salle non rejointe";
-        stageText.textContent = "Cette page gère l’accès, l’expiration, la salle d’attente et l’organisation de la réunion.";
-        roomDot.className = "dot";
-        roomStatusText.textContent = "Aucune salle";
-        if (!isOwnerEmail()) guestJoinNote.style.display = "none";
-        updateVisibilityByRole();
-        renderVideoStage();
-        renderScreenShareUI();
-        return;
-      }
-
-      const expired = Date.now() > (currentRoomMeta.expiresAt || 0);
-      const closed = currentRoomMeta.status === "closed";
-      const waitingEnabled = !!currentRoomMeta.waitingRoomEnabled;
-
-      meetingTitle.textContent = currentRoomMeta.title || "Salle de réunion";
-      meetingSubtitle.textContent = isRoomOwner()
-        ? "Tu es le propriétaire de cette salle."
-        : `Salle créée par ${currentRoomMeta.ownerDisplayName || "l’administrateur"}.`;
-
-      roomMeta.innerHTML = `
-        <div style="line-height:1.7;">
-          <div><strong>Titre :</strong> ${escapeHtml(currentRoomMeta.title || "—")}</div>
-          <div><strong>Créée le :</strong> ${escapeHtml(formatDate(currentRoomMeta.createdAt) || "—")}</div>
-          <div><strong>Expire le :</strong> ${escapeHtml(formatDate(currentRoomMeta.expiresAt) || "—")}</div>
-          <div><strong>Salle d’attente :</strong> ${waitingEnabled ? "Oui" : "Non"}</div>
-          <div><strong>Mot de passe :</strong> ${currentRoomMeta.hasPassword ? "Oui" : "Non"}</div>
-          <div><strong>Statut :</strong> ${closed ? "Fermée" : expired ? "Expirée" : "Ouverte"}</div>
-          <div><strong>Capacité conseillée :</strong> ${MAX_PARTICIPANTS} participants maximum</div>
-        </div>
-      `;
-
-      if (closed) {
-        roomDot.className = "dot red";
-        roomStatusText.textContent = "Salle fermée";
-        stageTitle.textContent = "Salle fermée";
-        stageText.textContent = "Cette salle a été fermée par le propriétaire.";
-        joinedRoom = false;
-        isInWaitingRoom = false;
-        closeAllPeers();
-        stopLocalMedia();
-        updateVisibilityByRole();
-        renderVideoStage();
-        renderScreenShareUI();
-        return;
-      }
-
-      if (expired) {
-        roomDot.className = "dot red";
-        roomStatusText.textContent = "Lien expiré";
-        stageTitle.textContent = "Lien expiré";
-        stageText.textContent = "Le délai de validité de cette salle est dépassé.";
-        joinedRoom = false;
-        isInWaitingRoom = false;
-        closeAllPeers();
-        stopLocalMedia();
-        updateVisibilityByRole();
-        renderVideoStage();
-        renderScreenShareUI();
-        return;
-      }
-
-      if (joinedRoom) {
-        roomDot.className = "dot online";
-        roomStatusText.textContent = "Salle rejointe";
-        stageTitle.textContent = "Réunion active";
-        stageText.textContent = isRoomOwner()
-          ? "Tu gères actuellement cette salle. Les invités peuvent entrer et la visioconférence se met à jour automatiquement."
-          : "Tu es dans la salle. Les nouveaux participants apparaissent automatiquement, sans recharger la page.";
-      } else if (isInWaitingRoom) {
-        roomDot.className = "dot warn";
-        roomStatusText.textContent = "En salle d’attente";
-        stageTitle.textContent = "En attente d’approbation";
-        stageText.textContent = "Le propriétaire doit encore t’autoriser à entrer. Tu peux déjà tester ta caméra et ton micro.";
-      } else {
-        roomDot.className = "dot warn";
-        roomStatusText.textContent = "Salle ouverte";
-        stageTitle.textContent = "Salle prête à être rejointe";
-        stageText.textContent = "La salle est disponible. Tu peux préparer et tester ton matériel avant d’entrer.";
-      }
-
-      if (!isOwnerEmail()) {
-        guestJoinNote.style.display = "block";
-        guestJoinNote.textContent = waitingEnabled
-          ? "Cette salle utilise une salle d’attente. Après ta demande, l’administrateur devra t’accepter."
-          : "Tu peux rejoindre directement cette salle tant que le lien est valide.";
-      }
-
-      updateVisibilityByRole();
-      renderVideoStage();
-      renderScreenShareUI();
-    }
-
     function clearRoomRealtimeSubscriptions() {
       roomRealtimeUnsubs.forEach(unsub => {
         try { unsub(); } catch (_) {}
@@ -1607,152 +1615,6 @@
 
       subscribedRoomId = "";
       seenWaitingRequestIds.clear();
-    }
-
-    function startRoomRealtimeSubscriptions(roomId) {
-      if (!roomId) return;
-      if (subscribedRoomId === roomId) return;
-
-      clearRoomRealtimeSubscriptions();
-      subscribedRoomId = roomId;
-
-      roomRealtimeUnsubs.push(subscribeRoomRealtime(roomId));
-      roomRealtimeUnsubs.push(subscribeParticipants(roomId));
-      roomRealtimeUnsubs.push(subscribeWaiting(roomId));
-      roomRealtimeUnsubs.push(subscribeChat(roomId));
-      subscribeSignals(roomId);
-    }
-
-    async function restoreMyRoomState(roomId) {
-      if (!roomId || !currentUser) return;
-
-      try {
-        const [participantSnap, waitingSnap] = await Promise.all([
-          get(ref(db, participantPath(roomId, currentUser.uid))),
-          get(ref(db, waitingPath(roomId, currentUser.uid)))
-        ]);
-
-        if (participantSnap.exists()) {
-          joinedRoom = true;
-          isInWaitingRoom = false;
-          await startLocalMedia();
-          await syncPresenceRoomId();
-          renderRoomMeta();
-          updateVisibilityByRole();
-          return;
-        }
-
-        if (waitingSnap.exists()) {
-          joinedRoom = false;
-          isInWaitingRoom = true;
-          renderRoomMeta();
-          updateVisibilityByRole();
-          return;
-        }
-
-        joinedRoom = false;
-        isInWaitingRoom = false;
-        renderRoomMeta();
-        updateVisibilityByRole();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    async function createRoom() {
-      if (!isOwnerEmail()) return;
-
-      const title = roomTitleInput.value.trim() || "Salle de réunion";
-      const expiresInMinutes = Number(roomExpiryInput.value || "60");
-      const roomPassword = roomPasswordInput.value;
-      const waitingEnabled = !!waitingRoomInput.checked;
-
-      const roomId = randomRoomId();
-      const now = Date.now();
-      const expiresAt = now + expiresInMinutes * 60 * 1000;
-
-      const roomData = {
-        roomId,
-        title,
-        ownerId: currentUser.uid,
-        ownerEmail: currentUser.email || "",
-        ownerDisplayName: getProfileName(),
-        createdAt: now,
-        updatedAt: now,
-        expiresAt,
-        waitingRoomEnabled: waitingEnabled,
-        hasPassword: !!roomPassword,
-        password: roomPassword || "",
-        status: "open"
-      };
-
-      createRoomBtn.disabled = true;
-
-      try {
-        await set(ref(db, roomPath(roomId)), roomData);
-
-        currentRoomId = roomId;
-        currentRoomMeta = roomData;
-
-        const shareLink = buildRoomLink(roomId);
-        lastGeneratedRoomLink = shareLink;
-        roomLinkBox.style.display = "block";
-        roomLinkBox.textContent = shareLink;
-        copyRoomLinkBtn.classList.remove("hidden");
-
-        try {
-          history.replaceState({}, "", `meeting-room.html?room=${encodeURIComponent(roomId)}`);
-        } catch (_) {}
-
-        startRoomRealtimeSubscriptions(roomId);
-        await startLocalMedia();
-        await joinAsApprovedParticipant();
-
-        renderRoomMeta();
-        updateVisibilityByRole();
-        showToast("Salle créée. Les nouvelles demandes d’entrée apparaîtront maintenant automatiquement.");
-      } catch (error) {
-        console.error(error);
-        alert("Impossible de créer la salle.");
-      } finally {
-        createRoomBtn.disabled = false;
-      }
-    }
-
-    async function loadRoom(roomId) {
-      if (!roomId) {
-        currentRoomId = "";
-        currentRoomMeta = null;
-        clearRoomRealtimeSubscriptions();
-        renderRoomMeta();
-        updateVisibilityByRole();
-        return;
-      }
-
-      currentRoomId = roomId;
-
-      const snap = await get(ref(db, roomPath(roomId)));
-      if (!snap.exists()) {
-        alert("Cette salle n’existe pas ou n’est plus disponible.");
-        return;
-      }
-
-      currentRoomMeta = snap.val() || {};
-      startRoomRealtimeSubscriptions(roomId);
-      await restoreMyRoomState(roomId);
-
-      renderRoomMeta();
-      updateVisibilityByRole();
-
-      if (Date.now() > (currentRoomMeta.expiresAt || 0)) {
-        alert("Le lien de réunion a expiré.");
-        return;
-      }
-
-      if (currentRoomMeta.status === "closed") {
-        alert("Cette salle a été fermée par l’administrateur.");
-        return;
-      }
     }
 
     function subscribeRoomRealtime(roomId) {
@@ -1811,9 +1673,10 @@
         if (amIParticipant && !joinedRoom) {
           joinedRoom = true;
           isInWaitingRoom = false;
-          await startLocalMedia();
+          await startLocalMedia(true);
+          await replaceTracksOnPeers().catch(() => {});
           await syncPresenceRoomId();
-          showToast("Tu as été admis dans la salle.");
+          showToast("Tu as été admis ou réintégré dans la salle.");
         }
 
         if (!amIParticipant && joinedRoom && currentUser && !isRoomOwner()) {
@@ -1932,6 +1795,193 @@
       });
     }
 
+    function subscribeApproved(roomId) {
+      return onValue(ref(db, `${roomPath(roomId)}/approved`), (snap) => {
+        approvedCache = snap.val() || {};
+      });
+    }
+
+    function subscribeChat(roomId) {
+      return onValue(ref(db, chatPath(roomId)), (snap) => {
+        const data = snap.val() || {};
+        const items = Object.values(data).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+        if (!items.length) {
+          chatMessages.innerHTML = `
+            <div class="chat-msg">
+              <div class="chat-msg-head"><span>Système</span><span>—</span></div>
+              <div class="chat-msg-body">Aucun message pour le moment.</div>
+            </div>
+          `;
+          return;
+        }
+
+        chatMessages.innerHTML = items.map(msg => `
+          <div class="chat-msg">
+            <div class="chat-msg-head">
+              <span>${escapeHtml(msg.displayName || "Utilisateur")}</span>
+              <span>${escapeHtml(formatDate(msg.createdAt) || "")}</span>
+            </div>
+            <div class="chat-msg-body">${escapeHtml(msg.text || "")}</div>
+          </div>
+        `).join("");
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      });
+    }
+
+    function startRoomRealtimeSubscriptions(roomId) {
+      if (!roomId) return;
+      if (subscribedRoomId === roomId) return;
+
+      clearRoomRealtimeSubscriptions();
+      subscribedRoomId = roomId;
+
+      roomRealtimeUnsubs.push(subscribeRoomRealtime(roomId));
+      roomRealtimeUnsubs.push(subscribeParticipants(roomId));
+      roomRealtimeUnsubs.push(subscribeWaiting(roomId));
+      roomRealtimeUnsubs.push(subscribeApproved(roomId));
+      roomRealtimeUnsubs.push(subscribeChat(roomId));
+      subscribeSignals(roomId);
+    }
+
+    async function restoreMyRoomState(roomId) {
+      if (!roomId || !currentUser) return;
+
+      try {
+        const [participantSnap, waitingSnap, approvedSnap] = await Promise.all([
+          get(ref(db, participantPath(roomId, currentUser.uid))),
+          get(ref(db, waitingPath(roomId, currentUser.uid))),
+          get(ref(db, approvedPath(roomId, currentUser.uid)))
+        ]);
+
+        if (approvedSnap.exists()) {
+          approvedCache[currentUser.uid] = approvedSnap.val() || {};
+        }
+
+        if (participantSnap.exists()) {
+          joinedRoom = true;
+          isInWaitingRoom = false;
+          await startLocalMedia(true);
+          await syncPresenceRoomId();
+          renderRoomMeta();
+          updateVisibilityByRole();
+          return;
+        }
+
+        if (waitingSnap.exists()) {
+          joinedRoom = false;
+          isInWaitingRoom = true;
+          renderRoomMeta();
+          updateVisibilityByRole();
+          return;
+        }
+
+        joinedRoom = false;
+        isInWaitingRoom = false;
+        renderRoomMeta();
+        updateVisibilityByRole();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function createRoom() {
+      if (!isOwnerEmail()) return;
+
+      const title = roomTitleInput.value.trim() || "Salle de réunion";
+      const expiresInMinutes = Number(roomExpiryInput.value || "60");
+      const roomPassword = roomPasswordInput.value;
+      const waitingEnabled = !!waitingRoomInput.checked;
+
+      const roomId = randomRoomId();
+      const now = Date.now();
+      const expiresAt = now + expiresInMinutes * 60 * 1000;
+
+      const roomData = {
+        roomId,
+        title,
+        ownerId: currentUser.uid,
+        ownerEmail: currentUser.email || "",
+        ownerDisplayName: getProfileName(),
+        createdAt: now,
+        updatedAt: now,
+        expiresAt,
+        waitingRoomEnabled: waitingEnabled,
+        hasPassword: !!roomPassword,
+        password: roomPassword || "",
+        status: "open"
+      };
+
+      createRoomBtn.disabled = true;
+
+      try {
+        await set(ref(db, roomPath(roomId)), roomData);
+
+        currentRoomId = roomId;
+        currentRoomMeta = roomData;
+
+        const shareLink = buildRoomLink(roomId);
+        lastGeneratedRoomLink = shareLink;
+        roomLinkBox.style.display = "block";
+        roomLinkBox.textContent = shareLink;
+        copyRoomLinkBtn.classList.remove("hidden");
+
+        try {
+          history.replaceState({}, "", `meeting-room.html?room=${encodeURIComponent(roomId)}`);
+        } catch (_) {}
+
+        startRoomRealtimeSubscriptions(roomId);
+        await startLocalMedia(true);
+        await joinAsApprovedParticipant();
+
+        renderRoomMeta();
+        updateVisibilityByRole();
+        showToast("Salle créée. Les personnes déjà acceptées pourront revenir avec le même lien.");
+      } catch (error) {
+        console.error(error);
+        alert("Impossible de créer la salle.");
+      } finally {
+        createRoomBtn.disabled = false;
+      }
+    }
+
+    async function loadRoom(roomId) {
+      if (!roomId) {
+        currentRoomId = "";
+        currentRoomMeta = null;
+        clearRoomRealtimeSubscriptions();
+        renderRoomMeta();
+        updateVisibilityByRole();
+        return;
+      }
+
+      currentRoomId = roomId;
+
+      const snap = await get(ref(db, roomPath(roomId)));
+      if (!snap.exists()) {
+        alert("Cette salle n’existe pas ou n’est plus disponible.");
+        return;
+      }
+
+      currentRoomMeta = snap.val() || {};
+      startRoomRealtimeSubscriptions(roomId);
+      await restoreMyRoomState(roomId);
+
+      renderRoomMeta();
+      updateVisibilityByRole();
+
+      if (Date.now() > (currentRoomMeta.expiresAt || 0)) {
+        alert("Le lien de réunion a expiré.");
+        return;
+      }
+
+      if (currentRoomMeta.status === "closed") {
+        alert("Cette salle a été fermée par l’administrateur.");
+        return;
+      }
+    }
+
     async function acceptWaitingUser(uid) {
       if (!isRoomOwner() || !currentRoomId || !uid) return;
 
@@ -1944,6 +1994,14 @@
         alert(`Capacité atteinte. Maximum conseillé: ${MAX_PARTICIPANTS}.`);
         return;
       }
+
+      await set(ref(db, approvedPath(currentRoomId, uid)), {
+        uid,
+        displayName: data.displayName || "Utilisateur",
+        email: data.email || "",
+        approvedAt: Date.now(),
+        approvedBy: currentUser.uid
+      });
 
       await set(ref(db, participantPath(currentRoomId, uid)), {
         uid,
@@ -1973,6 +2031,14 @@
         const participantCount = Object.keys(participantsCache || {}).length;
         if (!participantsCache[uid] && participantCount >= MAX_PARTICIPANTS) break;
 
+        await set(ref(db, approvedPath(currentRoomId, uid)), {
+          uid,
+          displayName: val.displayName || "Utilisateur",
+          email: val.email || "",
+          approvedAt: Date.now(),
+          approvedBy: currentUser.uid
+        });
+
         await set(ref(db, participantPath(currentRoomId, uid)), {
           uid,
           displayName: val.displayName || "Utilisateur",
@@ -1989,7 +2055,7 @@
     async function joinAsApprovedParticipant() {
       if (!currentRoomId || !currentUser) return;
 
-      const mediaOk = await startLocalMedia();
+      const mediaOk = await startLocalMedia(true);
       if (!mediaOk) return;
 
       const participantCount = Object.keys(participantsCache || {}).length;
@@ -1997,6 +2063,14 @@
         alert(`La réunion a atteint la capacité conseillée (${MAX_PARTICIPANTS}).`);
         return;
       }
+
+      await set(ref(db, approvedPath(currentRoomId, currentUser.uid)), {
+        uid: currentUser.uid,
+        displayName: getProfileName(),
+        email: currentUser.email || "",
+        approvedAt: approvedCache[currentUser.uid]?.approvedAt || Date.now(),
+        approvedBy: approvedCache[currentUser.uid]?.approvedBy || currentUser.uid
+      });
 
       await set(ref(db, participantPath(currentRoomId, currentUser.uid)), {
         uid: currentUser.uid,
@@ -2061,7 +2135,7 @@
         return;
       }
 
-      const mediaOk = await startLocalMedia();
+      const mediaOk = await startLocalMedia(true);
       if (!mediaOk) return;
 
       if (currentRoomMeta.hasPassword) {
@@ -2071,6 +2145,14 @@
           alert("Mot de passe incorrect.");
           return;
         }
+      }
+
+      const alreadyApproved = !!approvedCache[currentUser.uid];
+
+      if (alreadyApproved) {
+        await joinAsApprovedParticipant();
+        showToast("Retour dans la réunion autorisé automatiquement.");
+        return;
       }
 
       if (currentRoomMeta.waitingRoomEnabled && !isRoomOwner()) {
@@ -2134,42 +2216,6 @@
       chatInput.value = "";
     }
 
-    function subscribeChat(roomId) {
-      return onValue(ref(db, chatPath(roomId)), (snap) => {
-        const data = snap.val() || {};
-        const items = Object.values(data).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-
-        if (!items.length) {
-          chatMessages.innerHTML = `
-            <div class="chat-msg">
-              <div class="chat-msg-head"><span>Système</span><span>—</span></div>
-              <div class="chat-msg-body">Aucun message pour le moment.</div>
-            </div>
-          `;
-          return;
-        }
-
-        chatMessages.innerHTML = items.map(msg => `
-          <div class="chat-msg">
-            <div class="chat-msg-head">
-              <span>${escapeHtml(msg.displayName || "Utilisateur")}</span>
-              <span>${escapeHtml(formatDate(msg.createdAt) || "")}</span>
-            </div>
-            <div class="chat-msg-body">${escapeHtml(msg.text || "")}</div>
-          </div>
-        `).join("");
-
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      });
-    }
-
-    async function loadMyProfile(user) {
-      const snap = await get(ref(db, "users/" + user.uid));
-      currentProfile = snap.exists() ? (snap.val() || {}) : {};
-      setAvatar(currentProfile, user);
-      myName.textContent = currentProfile.displayName || user.displayName || "Utilisateur";
-    }
-
     function toggleMic() {
       if (!localStream) return;
       micEnabled = !micEnabled;
@@ -2206,19 +2252,14 @@
 
       for (const pc of peerConnections.values()) {
         const senders = pc.getSenders();
-
         const audioTrack = stream.getAudioTracks()[0] || null;
         const videoTrack = stream.getVideoTracks()[0] || null;
 
         const audioSender = senders.find(s => s.track && s.track.kind === "audio");
         const videoSender = senders.find(s => s.track && s.track.kind === "video");
 
-        if (audioSender) {
-          await audioSender.replaceTrack(audioTrack).catch(() => {});
-        }
-        if (videoSender) {
-          await videoSender.replaceTrack(videoTrack).catch(() => {});
-        }
+        if (audioSender) await audioSender.replaceTrack(audioTrack).catch(() => {});
+        if (videoSender) await videoSender.replaceTrack(videoTrack).catch(() => {});
       }
 
       renderVideoStage();
@@ -2338,10 +2379,8 @@
       };
 
       pc.onconnectionstatechange = () => {
-        if (["failed", "closed", "disconnected"].includes(pc.connectionState)) {
-          renderVideoStage();
-          renderScreenShareUI();
-        }
+        renderVideoStage();
+        renderScreenShareUI();
       };
 
       if (shouldCreateOffer) {
@@ -2430,7 +2469,6 @@
           type: data.type,
           sdp: data.sdp
         }));
-
         await flushPendingCandidates(data.from);
         await remove(ref(db, `${signalRoot(currentRoomId)}/answers/${messageId}`)).catch(() => {});
       } catch (e) {
@@ -2528,6 +2566,13 @@
       pendingCandidatesMap.clear();
     }
 
+    async function loadMyProfile(user) {
+      const snap = await get(ref(db, "users/" + user.uid));
+      currentProfile = snap.exists() ? (snap.val() || {}) : {};
+      setAvatar(currentProfile, user);
+      myName.textContent = currentProfile.displayName || user.displayName || "Utilisateur";
+    }
+
     createRoomBtn.addEventListener("click", createRoom);
 
     copyRoomLinkBtn.addEventListener("click", async () => {
@@ -2541,7 +2586,7 @@
     });
 
     previewMediaBtn.addEventListener("click", async () => {
-      await startLocalMedia();
+      await startLocalMedia(true);
       renderVideoStage();
     });
 
@@ -2609,13 +2654,7 @@
       await loadRoom(roomId);
     });
 
-    window.addEventListener("beforeunload", async () => {
-      try {
-        if (currentRoomId && currentUser && joinedRoom) {
-          await remove(ref(db, participantPath(currentRoomId, currentUser.uid)));
-        }
-      } catch (_) {}
-
+    window.addEventListener("beforeunload", () => {
       clearRoomRealtimeSubscriptions();
       closeAllPeers();
       stopLocalMedia();
