@@ -931,11 +931,18 @@
     let meterAnimationFrame = null;
 
     let participantsCache = {};
+    let waitingCache = {};
     let signalingUnsubs = [];
+    let roomRealtimeUnsubs = [];
+    let subscribedRoomId = "";
+    let recentRoomsUnsub = null;
+
     const peerConnections = new Map();
     const remoteStreams = new Map();
     const processedCandidateIds = new Set();
+    const pendingCandidatesMap = new Map();
     const makingOfferMap = new Map();
+    const seenWaitingRequestIds = new Set();
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
@@ -1024,9 +1031,7 @@
       let out = "";
       const arr = new Uint32Array(length);
       window.crypto.getRandomValues(arr);
-      for (let i = 0; i < length; i++) {
-        out += chars[arr[i] % chars.length];
-      }
+      for (let i = 0; i < length; i++) out += chars[arr[i] % chars.length];
       return out;
     }
 
@@ -1045,7 +1050,6 @@
 
     function toggleMiniMode(forceState = null) {
       const nextState = forceState === null ? !isMiniMode : !!forceState;
-
       isMiniMode = nextState;
 
       if (isMiniMode) {
@@ -1056,6 +1060,96 @@
         centerCard.classList.remove("mini-mode");
         miniBadge.classList.remove("show");
         toggleMiniModeBtn.textContent = "Mode mini";
+      }
+    }
+
+    function ensureToastHost() {
+      let host = document.getElementById("meetingToastHost");
+      if (host) return host;
+
+      host = document.createElement("div");
+      host.id = "meetingToastHost";
+      host.style.position = "fixed";
+      host.style.top = "86px";
+      host.style.right = "18px";
+      host.style.zIndex = "10050";
+      host.style.display = "flex";
+      host.style.flexDirection = "column";
+      host.style.gap = "10px";
+      host.style.maxWidth = "380px";
+      document.body.appendChild(host);
+      return host;
+    }
+
+    function showToast(message, options = {}) {
+      const host = ensureToastHost();
+      const card = document.createElement("div");
+      card.style.background = "#ffffff";
+      card.style.border = "1px solid #d9e5f2";
+      card.style.borderRadius = "18px";
+      card.style.boxShadow = "0 16px 36px rgba(7,31,66,0.16)";
+      card.style.padding = "14px";
+      card.style.color = "#0b2340";
+
+      const body = document.createElement("div");
+      body.style.fontSize = "14px";
+      body.style.fontWeight = "700";
+      body.style.lineHeight = "1.55";
+      body.textContent = message;
+      card.appendChild(body);
+
+      if (options.actions?.length) {
+        const row = document.createElement("div");
+        row.style.display = "flex";
+        row.style.gap = "8px";
+        row.style.flexWrap = "wrap";
+        row.style.marginTop = "10px";
+
+        options.actions.forEach(action => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = action.label;
+          btn.style.border = "none";
+          btn.style.borderRadius = "12px";
+          btn.style.padding = "10px 12px";
+          btn.style.fontWeight = "800";
+          btn.style.cursor = "pointer";
+          btn.style.background = action.kind === "danger" ? "#df4b4b" : "#0f4d92";
+          btn.style.color = "#fff";
+          btn.addEventListener("click", async () => {
+            try {
+              await action.onClick?.();
+            } catch (e) {
+              console.error(e);
+            }
+            card.remove();
+          });
+          row.appendChild(btn);
+        });
+
+        const closeBtn = document.createElement("button");
+        closeBtn.type = "button";
+        closeBtn.textContent = "Fermer";
+        closeBtn.style.border = "none";
+        closeBtn.style.borderRadius = "12px";
+        closeBtn.style.padding = "10px 12px";
+        closeBtn.style.fontWeight = "800";
+        closeBtn.style.cursor = "pointer";
+        closeBtn.style.background = "#eef4fb";
+        closeBtn.style.color = "#0b2340";
+        closeBtn.addEventListener("click", () => card.remove());
+        row.appendChild(closeBtn);
+
+        card.appendChild(row);
+      }
+
+      host.appendChild(card);
+
+      const duration = Number(options.duration || 6000);
+      if (!options.persist) {
+        setTimeout(() => {
+          if (card.isConnected) card.remove();
+        }, duration);
       }
     }
 
@@ -1103,7 +1197,9 @@
     }
 
     function subscribeRecentRooms() {
-      onValue(ref(db, "meetingRooms"), (snap) => {
+      if (recentRoomsUnsub) recentRoomsUnsub();
+
+      recentRoomsUnsub = onValue(ref(db, "meetingRooms"), (snap) => {
         const data = snap.val() || {};
         const items = Object.values(data)
           .filter(room => room && room.roomId)
@@ -1142,6 +1238,17 @@
           }
         }
       });
+    }
+
+    async function syncPresenceRoomId() {
+      if (!currentUser) return;
+      await update(ref(db, `users/${currentUser.uid}`), {
+        presence: {
+          online: true,
+          lastSeen: Date.now(),
+          roomId: joinedRoom ? currentRoomId : ""
+        }
+      }).catch(() => {});
     }
 
     function stopMeter() {
@@ -1265,11 +1372,12 @@
       screenShareBox.classList.add("active");
       screenShareLabel.textContent = `Partage d’écran : ${activeScreenSharer.displayName || activeScreenSharer.email || "Participant"}`;
 
-      if (activeScreenSharer.uid === currentUser.uid && screenStream) {
+      if (activeScreenSharer.uid === currentUser?.uid && screenStream) {
         screenShareVideo.srcObject = screenStream;
       } else if (remoteStreams.has(activeScreenSharer.uid)) {
-        const stream = remoteStreams.get(activeScreenSharer.uid);
-        screenShareVideo.srcObject = stream;
+        screenShareVideo.srcObject = remoteStreams.get(activeScreenSharer.uid);
+      } else {
+        screenShareVideo.srcObject = null;
       }
     }
 
@@ -1303,6 +1411,11 @@
         mediaTestStatus.textContent = "Caméra et micro actifs.";
         renderVideoStage();
         updateVisibilityByRole();
+
+        if (joinedRoom) {
+          await replaceTracksOnPeers();
+        }
+
         return true;
       } catch (error) {
         console.error(error);
@@ -1323,7 +1436,7 @@
       shareScreenBtn.classList.remove("hidden");
       stopShareScreenBtn.classList.add("hidden");
 
-      if (currentRoomId && currentUser) {
+      if (currentRoomId && currentUser && joinedRoom) {
         await update(ref(db, participantPath(currentRoomId, currentUser.uid)), {
           isSharingScreen: false,
           updatedAt: Date.now()
@@ -1347,15 +1460,7 @@
       mediaTestStatus.textContent = "Test arrêté.";
 
       stopScreenShare().catch(() => {});
-
-      for (const [, pc] of peerConnections.entries()) {
-        try { pc.close(); } catch (_) {}
-      }
-      peerConnections.clear();
-      makingOfferMap.clear();
-      remoteStreams.clear();
       renderVideoStage();
-      renderScreenShareUI();
       updateVisibilityByRole();
     }
 
@@ -1435,6 +1540,8 @@
         stageText.textContent = "Cette salle a été fermée par le propriétaire.";
         joinedRoom = false;
         isInWaitingRoom = false;
+        closeAllPeers();
+        stopLocalMedia();
         updateVisibilityByRole();
         renderVideoStage();
         renderScreenShareUI();
@@ -1448,6 +1555,8 @@
         stageText.textContent = "Le délai de validité de cette salle est dépassé.";
         joinedRoom = false;
         isInWaitingRoom = false;
+        closeAllPeers();
+        stopLocalMedia();
         updateVisibilityByRole();
         renderVideoStage();
         renderScreenShareUI();
@@ -1459,8 +1568,8 @@
         roomStatusText.textContent = "Salle rejointe";
         stageTitle.textContent = "Réunion active";
         stageText.textContent = isRoomOwner()
-          ? "Tu gères actuellement cette salle. Les invités peuvent entrer et la visioconférence fonctionne pour plusieurs personnes."
-          : "Tu es dans la salle. Tu peux parler, voir les autres et partager ton écran.";
+          ? "Tu gères actuellement cette salle. Les invités peuvent entrer et la visioconférence se met à jour automatiquement."
+          : "Tu es dans la salle. Les nouveaux participants apparaissent automatiquement, sans recharger la page.";
       } else if (isInWaitingRoom) {
         roomDot.className = "dot warn";
         roomStatusText.textContent = "En salle d’attente";
@@ -1483,6 +1592,71 @@
       updateVisibilityByRole();
       renderVideoStage();
       renderScreenShareUI();
+    }
+
+    function clearRoomRealtimeSubscriptions() {
+      roomRealtimeUnsubs.forEach(unsub => {
+        try { unsub(); } catch (_) {}
+      });
+      roomRealtimeUnsubs = [];
+
+      signalingUnsubs.forEach(unsub => {
+        try { unsub(); } catch (_) {}
+      });
+      signalingUnsubs = [];
+
+      subscribedRoomId = "";
+      seenWaitingRequestIds.clear();
+    }
+
+    function startRoomRealtimeSubscriptions(roomId) {
+      if (!roomId) return;
+      if (subscribedRoomId === roomId) return;
+
+      clearRoomRealtimeSubscriptions();
+      subscribedRoomId = roomId;
+
+      roomRealtimeUnsubs.push(subscribeRoomRealtime(roomId));
+      roomRealtimeUnsubs.push(subscribeParticipants(roomId));
+      roomRealtimeUnsubs.push(subscribeWaiting(roomId));
+      roomRealtimeUnsubs.push(subscribeChat(roomId));
+      subscribeSignals(roomId);
+    }
+
+    async function restoreMyRoomState(roomId) {
+      if (!roomId || !currentUser) return;
+
+      try {
+        const [participantSnap, waitingSnap] = await Promise.all([
+          get(ref(db, participantPath(roomId, currentUser.uid))),
+          get(ref(db, waitingPath(roomId, currentUser.uid)))
+        ]);
+
+        if (participantSnap.exists()) {
+          joinedRoom = true;
+          isInWaitingRoom = false;
+          await startLocalMedia();
+          await syncPresenceRoomId();
+          renderRoomMeta();
+          updateVisibilityByRole();
+          return;
+        }
+
+        if (waitingSnap.exists()) {
+          joinedRoom = false;
+          isInWaitingRoom = true;
+          renderRoomMeta();
+          updateVisibilityByRole();
+          return;
+        }
+
+        joinedRoom = false;
+        isInWaitingRoom = false;
+        renderRoomMeta();
+        updateVisibilityByRole();
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     async function createRoom() {
@@ -1530,11 +1704,13 @@
           history.replaceState({}, "", `meeting-room.html?room=${encodeURIComponent(roomId)}`);
         } catch (_) {}
 
+        startRoomRealtimeSubscriptions(roomId);
         await startLocalMedia();
         await joinAsApprovedParticipant();
 
         renderRoomMeta();
         updateVisibilityByRole();
+        showToast("Salle créée. Les nouvelles demandes d’entrée apparaîtront maintenant automatiquement.");
       } catch (error) {
         console.error(error);
         alert("Impossible de créer la salle.");
@@ -1547,6 +1723,7 @@
       if (!roomId) {
         currentRoomId = "";
         currentRoomMeta = null;
+        clearRoomRealtimeSubscriptions();
         renderRoomMeta();
         updateVisibilityByRole();
         return;
@@ -1561,6 +1738,9 @@
       }
 
       currentRoomMeta = snap.val() || {};
+      startRoomRealtimeSubscriptions(roomId);
+      await restoreMyRoomState(roomId);
+
       renderRoomMeta();
       updateVisibilityByRole();
 
@@ -1573,27 +1753,37 @@
         alert("Cette salle a été fermée par l’administrateur.");
         return;
       }
-
-      subscribeRoomRealtime(roomId);
-      subscribeParticipants(roomId);
-      subscribeWaiting(roomId);
-      subscribeChat(roomId);
-      subscribeSignals(roomId);
     }
 
     function subscribeRoomRealtime(roomId) {
-      onValue(ref(db, roomPath(roomId)), (snap) => {
-        if (!snap.exists()) return;
+      return onValue(ref(db, roomPath(roomId)), async (snap) => {
+        if (!snap.exists()) {
+          currentRoomMeta = null;
+          renderRoomMeta();
+          return;
+        }
+
         currentRoomMeta = snap.val() || {};
         renderRoomMeta();
+
+        const expired = Date.now() > (currentRoomMeta.expiresAt || 0);
+        const closed = currentRoomMeta.status === "closed";
+
+        if ((expired || closed) && joinedRoom) {
+          joinedRoom = false;
+          isInWaitingRoom = false;
+          closeAllPeers();
+          stopLocalMedia();
+          await syncPresenceRoomId();
+          renderRoomMeta();
+        }
       });
     }
 
     function subscribeParticipants(roomId) {
-      onValue(ref(db, `${roomPath(roomId)}/participants`), async (snap) => {
+      return onValue(ref(db, `${roomPath(roomId)}/participants`), async (snap) => {
         const data = snap.val() || {};
         participantsCache = data;
-
         const items = Object.values(data);
 
         if (!items.length) {
@@ -1616,9 +1806,22 @@
           `).join("");
         }
 
-        if (isInWaitingRoom && data[currentUser.uid]) {
+        const amIParticipant = !!data[currentUser?.uid];
+
+        if (amIParticipant && !joinedRoom) {
           joinedRoom = true;
           isInWaitingRoom = false;
+          await startLocalMedia();
+          await syncPresenceRoomId();
+          showToast("Tu as été admis dans la salle.");
+        }
+
+        if (!amIParticipant && joinedRoom && currentUser && !isRoomOwner()) {
+          joinedRoom = false;
+          isInWaitingRoom = false;
+          closeAllPeers();
+          stopLocalMedia();
+          await syncPresenceRoomId();
         }
 
         renderVideoStage();
@@ -1641,53 +1844,91 @@
               closePeer(uid);
             }
           }
+        } else {
+          closeAllPeers();
         }
       });
     }
 
     function subscribeWaiting(roomId) {
-      onValue(ref(db, `${roomPath(roomId)}/waiting`), (snap) => {
+      return onValue(ref(db, `${roomPath(roomId)}/waiting`), (snap) => {
         const data = snap.val() || {};
+        waitingCache = data;
         const items = Object.entries(data).map(([uid, val]) => ({ uid, ...(val || {}) }));
 
         if (!items.length) {
           waitingList.innerHTML = `<div class="empty-note">Aucune personne en attente.</div>`;
-          return;
+        } else {
+          waitingList.innerHTML = items.map(item => `
+            <div class="mini-item">
+              <div class="mini-item-head">
+                <div>
+                  <div class="mini-name">${escapeHtml(item.displayName || "Utilisateur")}</div>
+                  <div class="mini-sub">${escapeHtml(item.email || "")}</div>
+                </div>
+                <span class="status-pill" style="background:#fff3e8;color:#b45309;">
+                  <span class="dot warn"></span>en attente
+                </span>
+              </div>
+              <div class="mini-sub">Demande : ${escapeHtml(formatDate(item.requestedAt) || "—")}</div>
+              ${isRoomOwner() ? `
+                <div class="action-row">
+                  <button class="main-btn" type="button" data-accept="${item.uid}">Accepter</button>
+                  <button class="danger-btn" type="button" data-refuse="${item.uid}">Refuser</button>
+                </div>
+              ` : ""}
+            </div>
+          `).join("");
         }
 
-        waitingList.innerHTML = items.map(item => `
-          <div class="mini-item">
-            <div class="mini-item-head">
-              <div>
-                <div class="mini-name">${escapeHtml(item.displayName || "Utilisateur")}</div>
-                <div class="mini-sub">${escapeHtml(item.email || "")}</div>
-              </div>
-              <span class="status-pill" style="background:#fff3e8;color:#b45309;">
-                <span class="dot warn"></span>en attente
-              </span>
-            </div>
-            <div class="mini-sub">Demande : ${escapeHtml(formatDate(item.requestedAt) || "—")}</div>
-            ${isRoomOwner() ? `
-              <div class="action-row">
-                <button class="main-btn" type="button" data-accept="${item.uid}">Accepter</button>
-                <button class="danger-btn" type="button" data-refuse="${item.uid}">Refuser</button>
-              </div>
-            ` : ""}
-          </div>
-        `).join("");
+        if (data[currentUser?.uid] && !joinedRoom) {
+          isInWaitingRoom = true;
+        }
+
+        if (!data[currentUser?.uid] && isInWaitingRoom && !participantsCache[currentUser?.uid]) {
+          isInWaitingRoom = false;
+        }
 
         if (isRoomOwner()) {
+          items.forEach(item => {
+            const key = `${roomId}_${item.uid}`;
+            if (!seenWaitingRequestIds.has(key)) {
+              seenWaitingRequestIds.add(key);
+              showToast(
+                `${item.displayName || "Un utilisateur"} demande à entrer dans la réunion.`,
+                {
+                  persist: true,
+                  actions: [
+                    {
+                      label: "Accepter",
+                      onClick: async () => acceptWaitingUser(item.uid)
+                    },
+                    {
+                      label: "Refuser",
+                      kind: "danger",
+                      onClick: async () => refuseWaitingUser(item.uid)
+                    }
+                  ]
+                }
+              );
+            }
+          });
+
           document.querySelectorAll("[data-accept]").forEach(btn => {
             btn.addEventListener("click", async () => {
               await acceptWaitingUser(btn.dataset.accept);
             });
           });
+
           document.querySelectorAll("[data-refuse]").forEach(btn => {
             btn.addEventListener("click", async () => {
               await refuseWaitingUser(btn.dataset.refuse);
             });
           });
         }
+
+        renderRoomMeta();
+        updateVisibilityByRole();
       });
     }
 
@@ -1699,7 +1940,7 @@
       const data = snap.val() || {};
 
       const participantCount = Object.keys(participantsCache || {}).length;
-      if (participantCount >= MAX_PARTICIPANTS) {
+      if (!participantsCache[uid] && participantCount >= MAX_PARTICIPANTS) {
         alert(`Capacité atteinte. Maximum conseillé: ${MAX_PARTICIPANTS}.`);
         return;
       }
@@ -1730,7 +1971,7 @@
 
       for (const [uid, val] of entries) {
         const participantCount = Object.keys(participantsCache || {}).length;
-        if (participantCount >= MAX_PARTICIPANTS) break;
+        if (!participantsCache[uid] && participantCount >= MAX_PARTICIPANTS) break;
 
         await set(ref(db, participantPath(currentRoomId, uid)), {
           uid,
@@ -1740,6 +1981,7 @@
           isSharingScreen: false,
           updatedAt: Date.now()
         });
+
         await remove(ref(db, waitingPath(currentRoomId, uid)));
       }
     }
@@ -1769,16 +2011,17 @@
       isInWaitingRoom = false;
       toggleMiniMode(false);
 
-      await update(ref(db, `users/${currentUser.uid}`), {
-        presence: {
-          online: true,
-          lastSeen: Date.now(),
-          roomId: currentRoomId
-        }
-      });
-
+      await syncPresenceRoomId();
       renderRoomMeta();
       updateVisibilityByRole();
+
+      const others = Object.keys(participantsCache || {})
+        .filter(uid => uid !== currentUser.uid)
+        .slice(0, MAX_PARTICIPANTS - 1);
+
+      for (const uid of others) {
+        await ensurePeerConnection(uid, shouldInitiateOffer(uid));
+      }
     }
 
     async function leaveCurrentRoom() {
@@ -1792,22 +2035,21 @@
 
       await stopScreenShare().catch(() => {});
       closeAllPeers();
+      stopLocalMedia();
       toggleMiniMode(false);
 
-      await update(ref(db, `users/${currentUser.uid}`), {
-        presence: {
-          online: true,
-          lastSeen: Date.now(),
-          roomId: ""
-        }
-      }).catch(() => {});
-
+      await syncPresenceRoomId();
       renderRoomMeta();
       updateVisibilityByRole();
     }
 
     async function joinRoomFlow() {
       if (!currentRoomMeta || !currentRoomId || !currentUser) return;
+
+      if (joinedRoom) {
+        renderRoomMeta();
+        return;
+      }
 
       if (Date.now() > (currentRoomMeta.expiresAt || 0)) {
         alert("Le lien de réunion a expiré.");
@@ -1838,11 +2080,13 @@
           email: currentUser.email || "",
           requestedAt: Date.now()
         });
+
         isInWaitingRoom = true;
         joinedRoom = false;
         toggleMiniMode(false);
         renderRoomMeta();
         updateVisibilityByRole();
+        showToast("Demande envoyée. L’administrateur la verra automatiquement.");
         return;
       }
 
@@ -1864,7 +2108,9 @@
       isInWaitingRoom = false;
       await stopScreenShare().catch(() => {});
       closeAllPeers();
+      stopLocalMedia();
       toggleMiniMode(false);
+      await syncPresenceRoomId();
       renderRoomMeta();
     }
 
@@ -1889,7 +2135,7 @@
     }
 
     function subscribeChat(roomId) {
-      onValue(ref(db, chatPath(roomId)), (snap) => {
+      return onValue(ref(db, chatPath(roomId)), (snap) => {
         const data = snap.val() || {};
         const items = Object.values(data).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
@@ -2011,6 +2257,43 @@
       }
     }
 
+    function queuePendingCandidate(remoteUid, messageId, data) {
+      if (!pendingCandidatesMap.has(remoteUid)) {
+        pendingCandidatesMap.set(remoteUid, []);
+      }
+      pendingCandidatesMap.get(remoteUid).push({ messageId, data });
+    }
+
+    async function flushPendingCandidates(remoteUid) {
+      const pc = peerConnections.get(remoteUid);
+      if (!pc || !pc.remoteDescription) return;
+
+      const queued = pendingCandidatesMap.get(remoteUid) || [];
+      if (!queued.length) return;
+
+      const remaining = [];
+
+      for (const item of queued) {
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate({
+            candidate: item.data.candidate,
+            sdpMid: item.data.sdpMid,
+            sdpMLineIndex: item.data.sdpMLineIndex
+          }));
+          await remove(ref(db, `${signalRoot(currentRoomId)}/candidates/${item.messageId}`)).catch(() => {});
+        } catch (e) {
+          console.error(e);
+          remaining.push(item);
+        }
+      }
+
+      if (remaining.length) {
+        pendingCandidatesMap.set(remoteUid, remaining);
+      } else {
+        pendingCandidatesMap.delete(remoteUid);
+      }
+    }
+
     async function ensurePeerConnection(remoteUid, shouldCreateOffer = false) {
       if (!joinedRoom || !localStream || !remoteUid || remoteUid === currentUser.uid) return;
       if (peerConnections.has(remoteUid)) return;
@@ -2042,7 +2325,7 @@
       };
 
       pc.onicecandidate = async (event) => {
-        if (!event.candidate) return;
+        if (!event.candidate || !currentRoomId) return;
         const msgRef = push(ref(db, `${signalRoot(currentRoomId)}/candidates`));
         await set(msgRef, {
           from: currentUser.uid,
@@ -2055,8 +2338,10 @@
       };
 
       pc.onconnectionstatechange = () => {
-        renderVideoStage();
-        renderScreenShareUI();
+        if (["failed", "closed", "disconnected"].includes(pc.connectionState)) {
+          renderVideoStage();
+          renderScreenShareUI();
+        }
       };
 
       if (shouldCreateOffer) {
@@ -2085,6 +2370,7 @@
 
     async function handleOffer(messageId, data) {
       if (!data || data.to !== currentUser.uid || data.from === currentUser.uid) return;
+      if (!joinedRoom) return;
 
       const remoteUid = data.from;
       let pc = peerConnections.get(remoteUid);
@@ -2093,22 +2379,26 @@
         await ensurePeerConnection(remoteUid, false);
         pc = peerConnections.get(remoteUid);
       }
-
       if (!pc) return;
 
       try {
-        const offerCollision =
-          makingOfferMap.get(remoteUid) ||
-          pc.signalingState !== "stable";
+        const polite = !shouldInitiateOffer(remoteUid);
+        const offerCollision = makingOfferMap.get(remoteUid) || pc.signalingState !== "stable";
+
+        if (offerCollision && !polite) {
+          return;
+        }
 
         if (offerCollision) {
-          return;
+          await pc.setLocalDescription({ type: "rollback" }).catch(() => {});
         }
 
         await pc.setRemoteDescription(new RTCSessionDescription({
           type: data.type,
           sdp: data.sdp
         }));
+
+        await flushPendingCandidates(remoteUid);
 
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
@@ -2130,16 +2420,18 @@
 
     async function handleAnswer(messageId, data) {
       if (!data || data.to !== currentUser.uid || data.from === currentUser.uid) return;
+      if (!joinedRoom) return;
 
       const pc = peerConnections.get(data.from);
       if (!pc) return;
-      if (pc.currentRemoteDescription) return;
 
       try {
         await pc.setRemoteDescription(new RTCSessionDescription({
           type: data.type,
           sdp: data.sdp
         }));
+
+        await flushPendingCandidates(data.from);
         await remove(ref(db, `${signalRoot(currentRoomId)}/answers/${messageId}`)).catch(() => {});
       } catch (e) {
         console.error(e);
@@ -2148,13 +2440,22 @@
 
     async function handleCandidate(messageId, data) {
       if (!data || data.to !== currentUser.uid || data.from === currentUser.uid) return;
+      if (!joinedRoom) return;
 
       const uniq = `${messageId}_${data.from}_${data.to}`;
       if (processedCandidateIds.has(uniq)) return;
       processedCandidateIds.add(uniq);
 
-      const pc = peerConnections.get(data.from);
-      if (!pc || !pc.remoteDescription) return;
+      let pc = peerConnections.get(data.from);
+      if (!pc) {
+        await ensurePeerConnection(data.from, false);
+        pc = peerConnections.get(data.from);
+      }
+
+      if (!pc || !pc.remoteDescription) {
+        queuePendingCandidate(data.from, messageId, data);
+        return;
+      }
 
       try {
         await pc.addIceCandidate(new RTCIceCandidate({
@@ -2165,11 +2466,14 @@
         await remove(ref(db, `${signalRoot(currentRoomId)}/candidates/${messageId}`)).catch(() => {});
       } catch (e) {
         console.error(e);
+        queuePendingCandidate(data.from, messageId, data);
       }
     }
 
     function subscribeSignals(roomId) {
-      signalingUnsubs.forEach(fn => fn());
+      signalingUnsubs.forEach(fn => {
+        try { fn(); } catch (_) {}
+      });
       signalingUnsubs = [];
 
       const offersUnsub = onValue(ref(db, `${signalRoot(roomId)}/offers`), async (snap) => {
@@ -2207,6 +2511,7 @@
       peerConnections.delete(uid);
       makingOfferMap.delete(uid);
       remoteStreams.delete(uid);
+      pendingCandidatesMap.delete(uid);
       renderVideoStage();
       renderScreenShareUI();
     }
@@ -2215,9 +2520,12 @@
       for (const uid of [...peerConnections.keys()]) {
         closePeer(uid);
       }
-      signalingUnsubs.forEach(fn => fn());
+      signalingUnsubs.forEach(fn => {
+        try { fn(); } catch (_) {}
+      });
       signalingUnsubs = [];
       processedCandidateIds.clear();
+      pendingCandidatesMap.clear();
     }
 
     createRoomBtn.addEventListener("click", createRoom);
@@ -2308,6 +2616,7 @@
         }
       } catch (_) {}
 
+      clearRoomRealtimeSubscriptions();
       closeAllPeers();
       stopLocalMedia();
     });
