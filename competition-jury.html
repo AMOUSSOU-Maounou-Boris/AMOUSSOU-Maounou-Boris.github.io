@@ -1,1 +1,120 @@
-ad
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Salle Jury | Boris Research Hub</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eaf5ff;color:#0b2340}a{text-decoration:none;color:inherit}
+.top{background:#082e5b;color:#fff;padding:16px 20px;position:sticky;top:0;z-index:10}.topin{max-width:1450px;margin:auto;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.nav{display:flex;gap:14px;flex-wrap:wrap;font-weight:700}
+.wrap{max-width:1450px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:300px 1fr;gap:18px}
+.card{background:#fff;border:1px solid #d9e5f2;border-radius:22px;box-shadow:0 14px 34px rgba(7,31,66,.1)}.side,.mainsec{padding:18px}.main{display:flex;flex-direction:column;gap:18px}
+h2{margin:0 0 12px;color:#082e5b}input,textarea{width:100%;padding:12px 13px;border:1px solid #c9d7e7;border-radius:14px;font-size:15px}textarea{min-height:100px;resize:vertical}
+.btn{border:none;border-radius:14px;padding:11px 14px;font-weight:800;cursor:pointer}.btn.blue{background:#1557a6;color:#fff}.btn.gray{background:#eaf1f9;color:#082e5b}
+.box{border:1px solid #d9e5f2;border-radius:16px;background:#fbfdff;padding:14px}.row{display:flex;gap:10px;flex-wrap:wrap}
+.feed{display:grid;gap:10px;max-height:380px;overflow:auto}.item{border:1px solid #d9e5f2;border-radius:15px;background:#fbfdff;padding:12px 14px}.small{font-size:13px;color:#6b7d93}
+.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #e4edf7;text-align:left;font-size:14px;vertical-align:top}.table th{background:#f3f8ff;color:#082e5b}
+.pill{display:inline-flex;padding:7px 11px;border-radius:999px;font-weight:800;font-size:12px}.online{background:#eaf9ee;color:#0b7f34}.offline{background:#eef3f8;color:#60738c}.exam{background:#fff4df;color:#9a6600}
+@media(max-width:1200px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="topin">
+    <div style="font-weight:900">Salle Jury</div>
+    <div class="nav">
+      <a href="insights.html">Insights</a>
+      <a href="competition.html">Concours</a>
+      <a href="competition-jury.html">Jury</a>
+      <a href="competition-admin.html" id="adminLink" style="display:none;">⚙ Admin</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <aside class="card side">
+    <div class="box">
+      <div style="font-weight:900;margin-bottom:8px">Espace jury</div>
+      <div class="small">Tu vois l’activité, les réponses, les scores et les présences, sans voir l’argent ni les paramètres sensibles.</div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="box">
+      <div style="font-weight:900;margin-bottom:8px">Recherche candidat</div>
+      <input id="searchCandidates" placeholder="Code candidat, nom, email...">
+    </div>
+    <div style="height:14px"></div>
+    <div class="row">
+      <button class="btn blue" id="refreshBtn">Actualiser</button>
+      <button class="btn gray" id="logoutBtn">Déconnexion</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="card mainsec">
+      <h2>Présence en direct</h2>
+      <div id="presenceList" class="feed"></div>
+    </section>
+
+    <section class="card mainsec">
+      <h2>Activité récente et alertes</h2>
+      <div id="eventsFeed" class="feed"></div>
+    </section>
+
+    <section class="card mainsec">
+      <h2>Candidats et résultats</h2>
+      <div style="overflow:auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Candidat</th>
+              <th>Statut</th>
+              <th>Score</th>
+              <th>Surveillance</th>
+              <th>Réponses</th>
+              <th>Note jury</th>
+            </tr>
+          </thead>
+          <tbody id="participantsTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { ref, get, set, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const CONFIG={competitionId:"chemistry_challenge_2026",adminEmail:"borisamoussou01@gmail.com"};
+const el=id=>document.getElementById(id);
+let currentUser=null,participants={},presence={},events=[],juryNotes={};
+
+function safeEmail(email=""){return email.trim().toLowerCase().replace(/[.#$[\]]/g,"_")}
+function html(v=""){return String(v||"").replace(/[<>"']/g,"")}
+async function syncPresence(state="online"){if(!currentUser)return;const pRef=ref(db,`competitions/${CONFIG.competitionId}/presence/${currentUser.uid}`);await set(pRef,{uid:currentUser.uid,email:currentUser.email||"",displayName:currentUser.displayName||currentUser.email||"Jury",role:(currentUser.email||"").toLowerCase()===CONFIG.adminEmail?"admin":"jury",page:"competition-jury",state,lastSeen:Date.now()});try{onDisconnect(pRef).update({state:"offline",lastSeen:Date.now()})}catch(e){}}
+async function isAllowedJury(user){if(!user)return false;if((user.email||"").toLowerCase()===CONFIG.adminEmail)return true;const s=await get(ref(db,`competitions/${CONFIG.competitionId}/juryAccessByEmail/${safeEmail(user.email||"")}`));return s.exists()}
+function renderPresence(){const box=el("presenceList");box.innerHTML="";let vals=Object.values(presence||{}).sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));if(!vals.length){box.innerHTML='<div class="item">Aucune présence.</div>';return}vals.forEach(p=>{const cls=p.state==="online"?"online":p.state==="in_exam"?"exam":"offline";const d=document.createElement("div");d.className="item";d.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-weight:900">${html(p.displayName||p.email||p.uid)}</div><div class="small">${html(p.role||"")} • ${html(p.page||"")} • ${html(p.candidateCode||"")}</div><div class="small">${new Date(p.lastSeen||Date.now()).toLocaleString("fr-FR")}</div></div><div class="pill ${cls}">${html(p.state||"offline")}</div></div>`;box.appendChild(d)})}
+function renderEvents(){const box=el("eventsFeed");box.innerHTML="";if(!events.length){box.innerHTML='<div class="item">Aucun événement.</div>';return}events.slice(0,80).forEach(ev=>{const d=document.createElement("div");d.className="item";d.innerHTML=`<div style="font-weight:900">${html(ev.type||"event")} — ${html(ev.candidateCode||ev.displayName||ev.email||"")}</div><div class="small">${html(ev.role||"")} • ${html(ev.page||"")} • ${new Date(ev.at||Date.now()).toLocaleString("fr-FR")}</div><div class="small">${html(JSON.stringify(ev.details||{}))}</div>`;box.appendChild(d)})}
+async function showAnswers(uid){const s=await get(ref(db,`competitions/${CONFIG.competitionId}/answers/${uid}`));if(!s.exists()){alert("Aucune réponse.");return}let out=[];Object.entries(s.val()||{}).forEach(([qid,a])=>out.push(`${qid} | choix: ${a.selectedText||a.selectedIndex} | correct: ${a.correctText||a.correctIndex} | ${a.correct?"OK":"FAUX"}`));alert(out.join("\n"))}
+async function saveJuryNote(uid){const txt=prompt("Note jury / observation sur ce candidat :");if(txt===null)return;await set(ref(db,`competitions/${CONFIG.competitionId}/juryNotes/${uid}/${currentUser.uid}`),{juryEmail:currentUser.email||"",note:txt,at:Date.now()});alert("Note enregistrée.")}
+function renderParticipants(){const q=(el("searchCandidates").value||"").toLowerCase().trim();const tb=el("participantsTable");tb.innerHTML="";Object.entries(participants||{}).forEach(([uid,d])=>{const h=[d.candidateCode,d.fullName,d.email,d.country,d.institution].join(" ").toLowerCase();if(q&&!h.includes(q))return;const suspicious=events.filter(e=>e.uid===uid&&["copy_detected","paste_detected","cut_detected","visibility_change","contextmenu_blocked"].includes(e.type)).length;const tr=document.createElement("tr");tr.innerHTML=`<td><strong>${html(d.candidateCode||"")}</strong><br><span class="small">${html(d.fullName||"")}<br>${html(d.email||"")}</span></td><td>${html(d.status||"pending")}</td><td>${d.score??"-"} / ${d.totalQuestions??"-"}</td><td><span class="small">Warnings: ${d.warnings||0}<br>Suspicious: ${suspicious}</span></td><td><button class="btn blue" data-a="answers">Voir réponses</button></td><td><button class="btn gray" data-a="note">Ajouter note</button></td>`;tr.querySelector('[data-a="answers"]').onclick=()=>showAnswers(uid);tr.querySelector('[data-a="note"]').onclick=()=>saveJuryNote(uid);tb.appendChild(tr)})}
+
+el("logoutBtn").onclick=async()=>{await signOut(auth);location.href="insights.html"};
+el("refreshBtn").onclick=()=>location.reload();
+el("searchCandidates").oninput=renderParticipants;
+
+onAuthStateChanged(auth,async user=>{
+if(!user){location.href="login.html";return}
+currentUser=user;
+if((user.email||"").toLowerCase()===CONFIG.adminEmail)el("adminLink").style.display="inline-block";
+const allowed=await isAllowedJury(user);
+if(!allowed){location.href="insights.html";return}
+await syncPresence("online");
+onValue(ref(db,`competitions/${CONFIG.competitionId}/participants`),s=>{participants=s.val()||{};renderParticipants()});
+onValue(ref(db,`competitions/${CONFIG.competitionId}/presence`),s=>{presence=s.val()||{};renderPresence()});
+onValue(ref(db,`competitions/${CONFIG.competitionId}/events`),s=>{let arr=[];s.forEach(c=>arr.push(c.val()));arr.sort((a,b)=>(b.at||0)-(a.at||0));events=arr;renderEvents();renderParticipants()});
+});
+</script>
+</body>
+</html>
