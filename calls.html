@@ -654,7 +654,7 @@
 
         <div class="video-card">
           <h4 id="remoteVideoLabel">Participant</h4>
-          <video id="remoteVideo" autoplay playsinline></video>
+          <video id="remoteVideo" autoplay playsinline muted></video>
           <div class="audio-only-box" id="remoteAudioBox" style="display:none;">Flux audio distant</div>
         </div>
       </div>
@@ -751,6 +751,7 @@
     let currentCallId = "";
     let peerConnection = null;
     let processedRemoteCandidateIds = new Set();
+    let pendingRemoteCandidates = [];
     let unsubscribeCandidates = null;
     let unsubscribeAnswer = null;
     let unsubscribeSession = null;
@@ -768,29 +769,24 @@
 
     const rtcConfig = {
       iceServers: [
-        { urls: "stun:stun.relay.metered.ca:80" },
         {
-          urls: "turn:standard.relay.metered.ca:80",
+          urls: [
+            "turn:standard.relay.metered.ca:80",
+            "turn:standard.relay.metered.ca:80?transport=tcp",
+            "turn:standard.relay.metered.ca:443",
+            "turns:standard.relay.metered.ca:443?transport=tcp"
+          ],
           username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          credential: "xzI7qJDBCvqPJt7e"
         },
         {
-          urls: "turn:standard.relay.metered.ca:80?transport=tcp",
-          username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
-        },
-        {
-          urls: "turn:standard.relay.metered.ca:443",
-          username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
-        },
-        {
-          urls: "turns:standard.relay.metered.ca:443?transport=tcp",
-          username: "5ff54ce1d293fa306e56fe05",
-          credential: "xzI7qJDBCvqPJt7e",
+          urls: "stun:stun.relay.metered.ca:80"
         }
       ],
-      iceCandidatePoolSize: 10
+      iceTransportPolicy: "relay",
+      bundlePolicy: "max-bundle",
+      rtcpMuxPolicy: "require",
+      iceCandidatePoolSize: 0
     };
 
     function resetActivityTimer() {
@@ -875,7 +871,7 @@
         </div>
         <div class="video-card">
           <h4 id="remoteVideoLabel">${escapeHtml(remoteName)}</h4>
-          <video id="remoteVideo" autoplay playsinline style="${isVideo ? "" : "display:none;"}"></video>
+          <video id="remoteVideo" autoplay playsinline muted style="${isVideo ? "" : "display:none;"}"></video>
           <div class="audio-only-box" id="remoteAudioBox" style="${isVideo ? "display:none;" : ""}">Flux audio distant</div>
         </div>
       `;
@@ -1154,6 +1150,7 @@
         unsubscribeSession = null;
       }
       processedRemoteCandidateIds = new Set();
+      pendingRemoteCandidates = [];
     }
 
     async function destroyCallArtifacts(callId) {
@@ -1225,9 +1222,33 @@
       }, 400);
     }
 
+    async function flushPendingRemoteCandidates() {
+      if (!peerConnection || !peerConnection.remoteDescription) return;
+      if (!pendingRemoteCandidates.length) return;
+
+      const queue = [...pendingRemoteCandidates];
+      pendingRemoteCandidates = [];
+
+      for (const cand of queue) {
+        try {
+          await peerConnection.addIceCandidate(new RTCIceCandidate({
+            candidate: cand.candidate,
+            sdpMid: cand.sdpMid ?? null,
+            sdpMLineIndex: cand.sdpMLineIndex ?? null
+          }));
+          appendCallLog("ICE candidate distant ajouté.");
+        } catch (e) {
+          console.error("ICE error:", e);
+          appendCallLog("Erreur ajout ICE distant.");
+        }
+      }
+    }
+
     async function createPeerConnection(remoteUid) {
       peerConnection = new RTCPeerConnection(rtcConfig);
       currentRemoteStream = new MediaStream();
+      processedRemoteCandidateIds = new Set();
+      pendingRemoteCandidates = [];
 
       if (remoteVideoEl) {
         remoteVideoEl.srcObject = currentRemoteStream;
@@ -1241,18 +1262,18 @@
 
         if (stream) {
           currentRemoteStream = stream;
-
           if (remoteVideoEl) {
             remoteVideoEl.srcObject = stream;
+            remoteVideoEl.muted = false;
             remoteVideoEl.onloadedmetadata = () => {
               remoteVideoEl.play().catch(() => {});
             };
           }
         } else if (event.track) {
           currentRemoteStream.addTrack(event.track);
-
           if (remoteVideoEl) {
             remoteVideoEl.srcObject = currentRemoteStream;
+            remoteVideoEl.muted = false;
             remoteVideoEl.onloadedmetadata = () => {
               remoteVideoEl.play().catch(() => {});
             };
@@ -1265,16 +1286,21 @@
 
       peerConnection.onicecandidate = async (event) => {
         if (!event.candidate || !currentCallId || !currentUser) return;
+
+        const c = event.candidate;
+        if (!c.candidate) return;
+
         try {
           const candidateRef = push(ref(db, `callCandidates/${currentCallId}/${currentUser.uid}`));
           await set(candidateRef, {
-            candidate: event.candidate.candidate,
-            sdpMid: event.candidate.sdpMid,
-            sdpMLineIndex: event.candidate.sdpMLineIndex,
+            candidate: c.candidate,
+            sdpMid: c.sdpMid ?? null,
+            sdpMLineIndex: c.sdpMLineIndex ?? null,
             createdAt: Date.now()
           });
         } catch (e) {
           console.error(e);
+          appendCallLog("Erreur écriture ICE candidate.");
         }
       };
 
@@ -1288,6 +1314,10 @@
           callModalStatus.textContent = "Connexion établie ✅";
           setStatus("Appel en cours.");
           appendCallLog("Connexion WebRTC établie.");
+          if (remoteVideoEl) {
+            remoteVideoEl.muted = false;
+            remoteVideoEl.play().catch(() => {});
+          }
         }
         if (state === "failed") {
           callModalStatus.textContent = "Connexion échouée";
@@ -1316,16 +1346,26 @@
         const candidates = snap.val() || {};
         for (const [id, cand] of Object.entries(candidates)) {
           if (processedRemoteCandidateIds.has(id)) continue;
+          if (!cand || !cand.candidate) continue;
+          if (!peerConnection) continue;
+
           processedRemoteCandidateIds.add(id);
+
+          if (!peerConnection.remoteDescription) {
+            pendingRemoteCandidates.push(cand);
+            continue;
+          }
 
           try {
             await peerConnection.addIceCandidate(new RTCIceCandidate({
               candidate: cand.candidate,
-              sdpMid: cand.sdpMid,
-              sdpMLineIndex: cand.sdpMLineIndex
+              sdpMid: cand.sdpMid ?? null,
+              sdpMLineIndex: cand.sdpMLineIndex ?? null
             }));
+            appendCallLog("ICE candidate distant ajouté.");
           } catch (e) {
             console.error("ICE error:", e);
+            appendCallLog("Erreur ajout ICE distant.");
           }
         }
       });
@@ -1350,6 +1390,7 @@
 
       if (currentRemoteStream && remoteVideoEl) {
         remoteVideoEl.srcObject = currentRemoteStream;
+        remoteVideoEl.muted = false;
         remoteVideoEl.onloadedmetadata = () => {
           remoteVideoEl.play().catch(() => {});
         };
@@ -1432,10 +1473,12 @@ Heure : ${formatDate(Date.now())}`;
               type: ans.type,
               sdp: ans.sdp
             }));
+            await flushPendingRemoteCandidates();
             callModalStatus.textContent = "Connexion à l’appel...";
             appendCallLog("Réponse distante reçue.");
           } catch (e) {
             console.error(e);
+            appendCallLog("Erreur définition réponse distante.");
           }
         });
 
@@ -1530,6 +1573,7 @@ Heure : ${formatDate(Date.now())}`;
           type: offer.type,
           sdp: offer.sdp
         }));
+        await flushPendingRemoteCandidates();
 
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
