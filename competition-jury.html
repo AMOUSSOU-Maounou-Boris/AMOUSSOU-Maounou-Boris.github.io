@@ -45,12 +45,12 @@
     }
 
     .topbar-inner{
-      max-width:1500px;
+      max-width:1550px;
       margin:0 auto;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:26px;
+      gap:24px;
       flex-wrap:wrap;
       font-weight:700;
       font-size:15px;
@@ -84,11 +84,11 @@
     }
 
     .page{
-      max-width:1500px;
+      max-width:1550px;
       margin:12px auto 40px;
       padding:0 18px;
       display:grid;
-      grid-template-columns:290px 1fr;
+      grid-template-columns:300px 1fr;
       gap:18px;
       align-items:start;
     }
@@ -267,7 +267,7 @@
 
     .stats-grid{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:repeat(6,1fr);
       gap:14px;
       margin-top:22px;
     }
@@ -302,6 +302,12 @@
       color:var(--nav);
     }
 
+    .section h3{
+      margin:0 0 12px;
+      font-size:20px;
+      color:var(--nav);
+    }
+
     .section p{
       margin:0 0 14px;
       color:var(--muted);
@@ -313,6 +319,24 @@
       grid-template-columns:1.2fr .8fr .8fr .8fr;
       gap:12px;
       margin-bottom:16px;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+
+    .grid-3{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+    }
+
+    .grid-4{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
     }
 
     input, select, textarea{
@@ -329,6 +353,14 @@
     textarea{
       resize:vertical;
       min-height:110px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:800;
+      color:var(--nav);
+      font-size:14px;
     }
 
     .btn-row{
@@ -379,21 +411,42 @@
       margin-bottom:14px;
     }
 
-    .candidate-id{
-      color:var(--muted);
-      font-size:13px;
-      margin-top:6px;
-    }
-
     .candidate-name{
       font-weight:900;
       font-size:21px;
       color:var(--nav);
+      margin-bottom:6px;
+    }
+
+    .candidate-id{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .click-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .text-link{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#edf4fc;
+      color:var(--blue-dark);
+      font-weight:800;
+      font-size:13px;
+      text-decoration:none;
     }
 
     .candidate-meta{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:repeat(5,1fr);
       gap:10px;
       margin-bottom:14px;
     }
@@ -436,6 +489,9 @@
     .tag-approved{ background:#eaf9ee; color:#0b7f34; }
     .tag-rejected{ background:#ffe9e9; color:#b62727; }
     .tag-none{ background:#eef3f8; color:#5f738c; }
+    .tag-open{ background:#eaf9ee; color:#0b7f34; }
+    .tag-close{ background:#ffe9e9; color:#b62727; }
+    .tag-live{ background:#edf4ff; color:#0f4d92; }
 
     .detail-grid{
       display:grid;
@@ -496,9 +552,16 @@
       font-size:14px;
     }
 
+    .small-note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      margin-top:8px;
+    }
+
     .hidden{ display:none !important; }
 
-    @media (max-width:1250px){
+    @media (max-width:1350px){
       .page{
         grid-template-columns:1fr;
       }
@@ -506,23 +569,29 @@
         position:static;
       }
       .stats-grid{
-        grid-template-columns:repeat(2,1fr);
+        grid-template-columns:repeat(3,1fr);
       }
       .toolbar{
         grid-template-columns:1fr 1fr;
       }
       .candidate-meta{
-        grid-template-columns:repeat(2,1fr);
+        grid-template-columns:repeat(3,1fr);
       }
-      .detail-grid, .jury-grid{
+      .detail-grid,
+      .grid-2,
+      .jury-grid{
+        grid-template-columns:1fr;
+      }
+      .grid-3{
         grid-template-columns:1fr;
       }
     }
 
-    @media (max-width:800px){
+    @media (max-width:900px){
       .stats-grid,
       .toolbar,
-      .candidate-meta{
+      .candidate-meta,
+      .grid-4{
         grid-template-columns:1fr;
       }
       .hero h1{
@@ -568,6 +637,7 @@
 
       <a class="side-btn" href="competition.html">Voir côté candidat</a>
       <a class="side-btn" href="competition-admin.html">Voir côté admin</a>
+      <a class="side-btn" href="insights.html">Aller vers Insights</a>
       <a class="side-btn" href="messages.html">Messages</a>
       <a class="side-btn" href="profile.html">Mon compte</a>
       <button class="side-btn red" id="logoutBtn">Déconnexion</button>
@@ -577,17 +647,17 @@
 
         <div class="hub-card">
           <h4>Rôle du jury</h4>
-          <p>Le jury consulte les dossiers, donne un avis, propose une recommandation et laisse une note qualitative.</p>
+          <p>Le jury consulte les dossiers, ajoute un avis, une recommandation, une note et transmet une évaluation à l’administration.</p>
         </div>
 
         <div class="hub-card">
-          <h4>Décision finale</h4>
-          <p>La validation définitive du candidat et la délivrance du certificat restent sous contrôle de l’admin.</p>
+          <h4>Autorisation admin</h4>
+          <p>Seuls les emails autorisés par <strong>borisamoussou01@gmail.com</strong> peuvent accéder pleinement à cette page.</p>
         </div>
 
         <div class="hub-card">
           <h4>Pages liées</h4>
-          <p>Cette page partage les mêmes données Firebase que <strong>competition.html</strong> et <strong>competition-admin.html</strong>.</p>
+          <p>Cette page partage les données avec <strong>competition.html</strong>, <strong>competition-admin.html</strong> et les publications peuvent être relayées via <strong>Insights</strong>.</p>
         </div>
       </div>
     </aside>
@@ -596,14 +666,13 @@
       <section class="card hero">
         <div class="hero-top">
           <div>
-            <h1>Interface du jury — Chem Challenge</h1>
+            <h1 id="heroChallengeTitle">Interface du jury — Chem Challenge</h1>
             <p>
-              Depuis cet espace, le jury peut consulter les candidatures,
-              apprécier les profils, ajouter des commentaires,
-              recommander une décision et transmettre une évaluation structurée à l’administration.
+              Depuis cet espace, le jury peut consulter les candidatures, apprécier les profils,
+              ajouter des commentaires, recommander une décision et transmettre une évaluation structurée à l’administration.
             </p>
           </div>
-          <div class="hero-badge">Avis jury</div>
+          <div class="hero-badge" id="heroEditionBadge">Édition en cours</div>
         </div>
 
         <div class="stats-grid">
@@ -616,12 +685,56 @@
             <div class="value" id="statPending">0</div>
           </div>
           <div class="stat-box">
+            <div class="label">Approuvés</div>
+            <div class="value" id="statApproved">0</div>
+          </div>
+          <div class="stat-box">
             <div class="label">Avis saisis</div>
             <div class="value" id="statReviewed">0</div>
           </div>
           <div class="stat-box">
+            <div class="label">Tests en cours</div>
+            <div class="value" id="statInProgress">0</div>
+          </div>
+          <div class="stat-box">
             <div class="label">Tests terminés</div>
             <div class="value" id="statCompleted">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>État du challenge</h2>
+
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Configuration active</h3>
+            <div class="grid-2">
+              <div class="mini-data">
+                <div class="k">Nom du challenge</div>
+                <div class="v" id="currentChallengeTitle">-</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Édition</div>
+                <div class="v" id="currentChallengeEdition">-</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Inscriptions</div>
+                <div class="v"><span class="status-tag tag-none" id="currentRegistrationStatusTag">-</span></div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Épreuve</div>
+                <div class="v"><span class="status-tag tag-none" id="currentExamStatusTag">-</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Annonce admin</h3>
+            <div class="notice" id="currentAnnouncementText">Aucune annonce pour le moment.</div>
+            <div class="small-note">
+              Ce bloc lit les paramètres définis depuis <strong>competition-admin.html</strong>.
+            </div>
           </div>
         </div>
       </section>
@@ -692,7 +805,9 @@
 
     const statTotal = document.getElementById("statTotal");
     const statPending = document.getElementById("statPending");
+    const statApproved = document.getElementById("statApproved");
     const statReviewed = document.getElementById("statReviewed");
+    const statInProgress = document.getElementById("statInProgress");
     const statCompleted = document.getElementById("statCompleted");
 
     const searchInput = document.getElementById("searchInput");
@@ -701,10 +816,20 @@
     const refreshBtn = document.getElementById("refreshBtn");
     const candidateList = document.getElementById("candidateList");
 
+    const currentChallengeTitle = document.getElementById("currentChallengeTitle");
+    const currentChallengeEdition = document.getElementById("currentChallengeEdition");
+    const currentRegistrationStatusTag = document.getElementById("currentRegistrationStatusTag");
+    const currentExamStatusTag = document.getElementById("currentExamStatusTag");
+    const currentAnnouncementText = document.getElementById("currentAnnouncementText");
+    const heroChallengeTitle = document.getElementById("heroChallengeTitle");
+    const heroEditionBadge = document.getElementById("heroEditionBadge");
+
     let currentUser = null;
     let currentProfile = {};
     let participantsMap = {};
     let juryReviewsMap = {};
+    let competitionSettings = null;
+    let juryAllowedMap = {};
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
@@ -715,40 +840,69 @@
       return new Date(ts).toLocaleString("fr-FR");
     }
 
-    function loadJuryProfile(uid) {
-      return get(ref(db, `users/${uid}`)).then((snap) => {
-        if (!snap.exists()) return;
-        const data = snap.val() || {};
-        currentProfile = data;
-
-        const displayName = data.fullName || data.name || auth.currentUser?.displayName || "Membre du jury";
-        const email = auth.currentUser?.email || "";
-        const photo = data.photoURL || data.profilePhoto || data.avatar || "";
-
-        userNameEl.textContent = displayName;
-        userEmailEl.textContent = email;
-        avatarFallback.textContent = displayName.split(" ").map(v => v[0]).slice(0,2).join("").toUpperCase() || "JY";
-
-        if (photo) {
-          userAvatar.src = photo;
-          userAvatar.classList.remove("hidden");
-          avatarFallback.classList.add("hidden");
-        }
-      });
+    function emailKey(email = "") {
+      return email.toLowerCase().replace(/\./g, ",");
     }
 
     function getStatusTagClass(status) {
       if (status === "approved") return "tag-approved";
       if (status === "rejected") return "tag-rejected";
       if (status === "pending") return "tag-pending";
+      if (status === "open") return "tag-open";
+      if (status === "closed") return "tag-close";
       return "tag-none";
+    }
+
+    function setOpenCloseTag(el, status) {
+      el.className = "status-tag " + getStatusTagClass(status);
+      el.textContent = status === "open" ? "Ouvert" : "Fermé";
+    }
+
+    function applySettingsToUI(settings = null) {
+      const s = settings || {};
+      const title = sanitizeText(s.challengeTitle || "Chem Challenge");
+      const edition = sanitizeText(s.editionTitle || "Chem Challenge 2026");
+      const regStatus = sanitizeText(s.registrationStatus || "open");
+      const examStatus = sanitizeText(s.examStatus || "open");
+      const announcement = sanitizeText(s.announcement || "");
+
+      currentChallengeTitle.textContent = title;
+      currentChallengeEdition.textContent = edition;
+      heroChallengeTitle.textContent = `Interface du jury — ${title}`;
+      heroEditionBadge.textContent = edition;
+      setOpenCloseTag(currentRegistrationStatusTag, regStatus);
+      setOpenCloseTag(currentExamStatusTag, examStatus);
+      currentAnnouncementText.textContent = announcement || "Aucune annonce pour le moment.";
+    }
+
+    async function loadJuryProfile(uid) {
+      const snap = await get(ref(db, `users/${uid}`));
+      if (!snap.exists()) return;
+      const data = snap.val() || {};
+      currentProfile = data;
+
+      const displayName = data.fullName || data.name || auth.currentUser?.displayName || "Membre du jury";
+      const email = auth.currentUser?.email || "";
+      const photo = data.photoURL || data.profilePhoto || data.avatar || "";
+
+      userNameEl.textContent = displayName;
+      userEmailEl.textContent = email;
+      avatarFallback.textContent = displayName.split(" ").map(v => v[0]).slice(0,2).join("").toUpperCase() || "JY";
+
+      if (photo) {
+        userAvatar.src = photo;
+        userAvatar.classList.remove("hidden");
+        avatarFallback.classList.add("hidden");
+      }
     }
 
     function computeStats(filteredIds = null) {
       const ids = filteredIds || Object.keys(participantsMap);
       let total = 0;
       let pending = 0;
+      let approved = 0;
       let reviewed = 0;
+      let inProgress = 0;
       let completed = 0;
 
       ids.forEach((uid) => {
@@ -756,13 +910,17 @@
         if (!p) return;
         total++;
         if (p.status === "pending") pending++;
+        if (p.status === "approved") approved++;
         if (juryReviewsMap[uid]) reviewed++;
+        if (p.examMeta?.inProgress || (p.examStarted && !p.examCompleted)) inProgress++;
         if (p.examCompleted) completed++;
       });
 
       statTotal.textContent = total;
       statPending.textContent = pending;
+      statApproved.textContent = approved;
       statReviewed.textContent = reviewed;
+      statInProgress.textContent = inProgress;
       statCompleted.textContent = completed;
     }
 
@@ -859,6 +1017,7 @@
       candidateList.innerHTML = ids.map((uid) => {
         const p = participantsMap[uid] || {};
         const jury = juryReviewsMap[uid] || {};
+        const examMeta = p.examMeta || {};
 
         const registrationStatusClass = getStatusTagClass(p.status || "none");
         const registrationStatusText =
@@ -866,18 +1025,37 @@
           p.status === "rejected" ? "Inscription refusée" :
           p.status === "pending" ? "En attente" : "Sans statut";
 
+        const liveStatus = examMeta?.inProgress || (p.examStarted && !p.examCompleted) ? "live" : (p.examCompleted ? "completed" : "idle");
+        const liveText =
+          liveStatus === "live" ? "Test en cours" :
+          liveStatus === "completed" ? "Test terminé" : "Pas encore lancé";
+
+        const safeName = sanitizeText(p.fullName || "Participant");
+        const safeEmail = sanitizeText(p.email || "");
+        const safeUid = sanitizeText(uid);
+
         return `
           <div class="candidate-card">
             <div class="candidate-top">
               <div>
-                <div class="candidate-name">${sanitizeText(p.fullName || "Participant")}</div>
+                <div class="candidate-name">${safeName}</div>
                 <div class="candidate-id">
-                  ${sanitizeText(p.email || "-")} · ${sanitizeText(p.candidateCode || "-")}
+                  ${safeEmail} · ${sanitizeText(p.candidateCode || "-")}
+                </div>
+
+                <div class="click-links">
+                  <a class="text-link" href="profile.html?uid=${encodeURIComponent(safeUid)}">Voir le compte</a>
+                  <a class="text-link" href="messages.html?uid=${encodeURIComponent(safeUid)}">Envoyer un message</a>
                 </div>
               </div>
 
-              <div class="status-tag ${registrationStatusClass}">
-                ${registrationStatusText}
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <div class="status-tag ${registrationStatusClass}">
+                  ${registrationStatusText}
+                </div>
+                <div class="status-tag ${liveStatus === "live" ? "tag-live" : "tag-none"}">
+                  ${liveText}
+                </div>
               </div>
             </div>
 
@@ -898,6 +1076,10 @@
                 <div class="k">Résultat test</div>
                 <div class="v">${p.score != null ? `${p.score}/${p.totalQuestions || "-"}` : "Non disponible"}</div>
               </div>
+              <div class="mini-data">
+                <div class="k">Progression test</div>
+                <div class="v">${examMeta.currentQuestionIndex != null ? `${examMeta.currentQuestionIndex}/${p.totalQuestions || 12}` : "-"}</div>
+              </div>
             </div>
 
             <div class="detail-grid">
@@ -905,34 +1087,46 @@
                 <strong>Établissement / département</strong>
                 <span>${sanitizeText(p.institution || "-")} ${p.department ? "· " + sanitizeText(p.department) : ""}</span>
               </div>
+
               <div class="detail-box">
-                <strong>Contact / langue</strong>
-                <span>Téléphone : ${sanitizeText(p.phone || "-")}
-Langue : ${sanitizeText(p.preferredLanguage || "-")}
-Nationalité : ${sanitizeText(p.nationality || "-")}</span>
+                <strong>Suivi du test</strong>
+                <span>
+État : ${liveText}
+Temps restant : ${examMeta.timeLeft != null ? examMeta.timeLeft + " s" : "-"}
+Avertissements : ${examMeta.warnings != null ? examMeta.warnings : "-"}
+Dernière mise à jour : ${formatDateTime(examMeta.updatedAt || p.updatedAt)}
+                </span>
               </div>
+
               <div class="detail-box">
                 <strong>Motivation</strong>
                 <span>${sanitizeText(p.motivation || "-")}</span>
               </div>
+
               <div class="detail-box">
                 <strong>Attentes / expérience</strong>
                 <span>${sanitizeText(p.expectations || "-")}
 
 ${sanitizeText(p.experience || "-")}</span>
               </div>
+
               <div class="detail-box">
                 <strong>Spécialisation / niveau déclaré</strong>
-                <span>Spécialité : ${sanitizeText(p.specialization || "-")}
+                <span>
+Spécialité : ${sanitizeText(p.specialization || "-")}
 Niveau estimé : ${sanitizeText(p.chemistryLevel || "-")}
-Besoins particuliers : ${sanitizeText(p.specialNeeds || "-")}</span>
+Besoins particuliers : ${sanitizeText(p.specialNeeds || "-")}
+                </span>
               </div>
+
               <div class="detail-box">
                 <strong>Dernier avis jury enregistré</strong>
-                <span>Recommandation : ${sanitizeText(jury.recommendation || p.juryRecommendation || "-")}
+                <span>
+Recommandation : ${sanitizeText(jury.recommendation || p.juryRecommendation || "-")}
 Score jury : ${jury.score != null ? jury.score : (p.juryScore != null ? p.juryScore : "-")}
 Commentaires : ${sanitizeText(jury.notes || p.juryNotes || "-")}
-Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}</span>
+Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}
+                </span>
               </div>
             </div>
 
@@ -941,7 +1135,7 @@ Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}</span>
 
               <div class="jury-grid">
                 <div>
-                  <label for="juryRecommendation-${uid}" style="display:block; margin-bottom:8px; font-weight:800; color:var(--nav);">Recommandation</label>
+                  <label for="juryRecommendation-${uid}">Recommandation</label>
                   <select id="juryRecommendation-${uid}">
                     <option value="" ${!(jury.recommendation || p.juryRecommendation) ? "selected" : ""}>Choisir</option>
                     <option value="Tres favorable" ${(jury.recommendation || p.juryRecommendation) === "Tres favorable" ? "selected" : ""}>Très favorable</option>
@@ -952,13 +1146,13 @@ Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}</span>
                 </div>
 
                 <div>
-                  <label for="juryScore-${uid}" style="display:block; margin-bottom:8px; font-weight:800; color:var(--nav);">Score jury /10</label>
+                  <label for="juryScore-${uid}">Score jury /10</label>
                   <input id="juryScore-${uid}" type="number" min="0" max="10" step="0.5" value="${jury.score != null ? jury.score : (p.juryScore != null ? p.juryScore : "")}" placeholder="Ex. 8.5" />
                 </div>
               </div>
 
               <div style="margin-top:12px;">
-                <label for="juryNotes-${uid}" style="display:block; margin-bottom:8px; font-weight:800; color:var(--nav);">Commentaires du jury</label>
+                <label for="juryNotes-${uid}">Commentaires du jury</label>
                 <textarea id="juryNotes-${uid}" placeholder="Ajoute ici ton appréciation, les points forts, les réserves ou toute remarque utile pour l’administration.">${sanitizeText(jury.notes || p.juryNotes || "")}</textarea>
               </div>
 
@@ -984,6 +1178,21 @@ Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}</span>
     }
 
     function startListeners() {
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/settings`), (snap) => {
+        competitionSettings = snap.exists() ? (snap.val() || {}) : null;
+        applySettingsToUI(competitionSettings || {
+          challengeTitle: "Chem Challenge",
+          editionTitle: "Chem Challenge 2026",
+          registrationStatus: "open",
+          examStatus: "open",
+          announcement: ""
+        });
+      });
+
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/juryAllowedEmails`), (snap) => {
+        juryAllowedMap = snap.exists() ? (snap.val() || {}) : {};
+      });
+
       onValue(ref(db, `competitions/${CONFIG.competitionId}/participants`), (snap) => {
         participantsMap = snap.exists() ? (snap.val() || {}) : {};
         renderCandidates();
@@ -1013,11 +1222,23 @@ Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}</span>
 
       currentUser = user;
 
+      const lowerEmail = (user.email || "").toLowerCase();
+      const isAdmin = lowerEmail === CONFIG.adminEmail.toLowerCase();
+
+      const allowedSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/juryAllowedEmails/${emailKey(lowerEmail)}`));
+      const isAllowedJury = allowedSnap.exists();
+
+      if (!isAdmin && !isAllowedJury) {
+        alert("Accès refusé. Cette page est réservée aux jurys autorisés par l’administrateur.");
+        window.location.href = "competition.html";
+        return;
+      }
+
       userNameEl.textContent = user.displayName || "Membre du jury";
       userEmailEl.textContent = user.email || "";
-      juryStatusText.textContent = (user.email || "").toLowerCase() === CONFIG.adminEmail.toLowerCase()
+      juryStatusText.textContent = isAdmin
         ? "Accès jury + admin principal"
-        : "Accès jury concours";
+        : "Accès jury autorisé";
 
       await loadJuryProfile(user.uid);
       startListeners();
