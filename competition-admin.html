@@ -1,513 +1,194 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Concours | Boris Research Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    *{box-sizing:border-box;}
-
-    :root{
-      --bg:#eaf5ff;
-      --card:#ffffff;
-      --nav:#082e5b;
-      --text:#0b2340;
-      --muted:#6b7d93;
-      --line:#d9e5f2;
-      --blue:#2f8cff;
-      --green:#18c34a;
-      --red:#df4b4b;
-      --orange:#ff9f1a;
-      --radius:18px;
-    }
-
-    body{
-      margin:0;
-      font-family:Arial;
-      background:var(--bg);
-      color:var(--text);
-    }
-
-    .topbar{
-      background:var(--nav);
-      color:#fff;
-      padding:18px;
-      text-align:center;
-      font-weight:bold;
-    }
-
-    .container{
-      max-width:1400px;
-      margin:20px auto;
-      padding:15px;
-    }
-
-    .card{
-      background:var(--card);
-      border-radius:var(--radius);
-      padding:20px;
-      margin-bottom:20px;
-      box-shadow:0 10px 25px rgba(0,0,0,0.08);
-    }
-
-    h2{
-      margin-top:0;
-    }
-
-    .btn{
-      padding:10px 14px;
-      border:none;
-      border-radius:10px;
-      cursor:pointer;
-      font-weight:bold;
-    }
-
-    .btn.green{background:var(--green);color:#fff;}
-    .btn.red{background:var(--red);color:#fff;}
-    .btn.blue{background:var(--blue);color:#fff;}
-    .btn.orange{background:var(--orange);color:#fff;}
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
-    }
-
-    th, td{
-      padding:10px;
-      border-bottom:1px solid #ddd;
-      text-align:left;
-      font-size:14px;
-    }
-
-    th{
-      background:#f0f6ff;
-    }
-
-    input, select{
-      padding:10px;
-      width:100%;
-      border-radius:10px;
-      border:1px solid #ccc;
-      margin-top:5px;
-    }
-
-    .status{
-      font-weight:bold;
-    }
-
-    .green{color:green;}
-    .red{color:red;}
-    .orange{color:orange;}
-
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Concours | Boris Research Hub</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eaf5ff;color:#0b2340}a{text-decoration:none;color:inherit}
+.top{background:#082e5b;color:#fff;padding:16px 20px;position:sticky;top:0;z-index:10}.topin{max-width:1450px;margin:auto;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.nav{display:flex;gap:14px;flex-wrap:wrap;font-weight:700}
+.wrap{max-width:1450px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:320px 1fr;gap:18px}
+.card{background:#fff;border:1px solid #d9e5f2;border-radius:22px;box-shadow:0 14px 34px rgba(7,31,66,.1)}.side,.mainsec{padding:18px}
+.main{display:flex;flex-direction:column;gap:18px}
+h2{margin:0 0 12px;color:#082e5b}input,select,textarea{width:100%;padding:12px 13px;border:1px solid #c9d7e7;border-radius:14px;font-size:15px}textarea{min-height:110px;resize:vertical}
+.btn{border:none;border-radius:14px;padding:11px 14px;font-weight:800;cursor:pointer}.btn.blue{background:#1557a6;color:#fff}.btn.green{background:#18c34a;color:#fff}.btn.red{background:#df4b4b;color:#fff}.btn.orange{background:#ff9f1a;color:#fff}.btn.gray{background:#eaf1f9;color:#082e5b}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.box{border:1px solid #d9e5f2;border-radius:16px;background:#fbfdff;padding:14px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #e4edf7;text-align:left;font-size:14px;vertical-align:top}.table th{background:#f3f8ff;color:#082e5b}
+.pill{display:inline-flex;padding:7px 11px;border-radius:999px;font-weight:800;font-size:12px}.online{background:#eaf9ee;color:#0b7f34}.offline{background:#eef3f8;color:#60738c}.exam{background:#fff4df;color:#9a6600}
+.feed{display:grid;gap:10px;max-height:360px;overflow:auto}.item{border:1px solid #d9e5f2;border-radius:15px;background:#fbfdff;padding:12px 14px}.small{font-size:13px;color:#6b7d93}.stat{font-size:28px;font-weight:900;color:#082e5b}
+@media(max-width:1200px){.wrap{grid-template-columns:1fr}.grid2,.grid3{grid-template-columns:1fr}}
+</style>
 </head>
-
 <body>
-
-<div class="topbar">
-  ADMIN CONCOURS - BORIS RESEARCH HUB
+<div class="top">
+  <div class="topin">
+    <div style="font-weight:900">Competition Admin</div>
+    <div class="nav">
+      <a href="insights.html">Insights</a>
+      <a href="competition.html">Concours</a>
+      <a href="competition-jury.html">Jury</a>
+      <a href="competition-admin.html">⚙ Admin</a>
+    </div>
+  </div>
 </div>
 
-<div class="container">
+<div class="wrap">
+  <aside class="card side">
+    <div class="box">
+      <div style="font-weight:900;margin-bottom:8px">Administrateur principal</div>
+      <div id="adminEmail">borisamoussou01@gmail.com</div>
+      <div class="small" style="margin-top:6px">Tu vois les paiements, les jurys, les candidats, les activités et les réponses.</div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="grid2">
+      <div class="box"><div class="small">Participants</div><div class="stat" id="statParticipants">0</div></div>
+      <div class="box"><div class="small">Jurys autorisés</div><div class="stat" id="statJury">0</div></div>
+      <div class="box"><div class="small">En ligne</div><div class="stat" id="statOnline">0</div></div>
+      <div class="box"><div class="small">Événements</div><div class="stat" id="statEvents">0</div></div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="box">
+      <div style="font-weight:900;margin-bottom:8px">Actions rapides</div>
+      <div class="row">
+        <button class="btn blue" id="refreshAllBtn">Actualiser</button>
+        <button class="btn gray" id="logoutBtn">Déconnexion</button>
+      </div>
+    </div>
+  </aside>
 
-  <!-- PARAMETRES -->
-  <div class="card">
-    <h2>⚙️ Paramètres du concours</h2>
+  <main class="main">
+    <section class="card mainsec">
+      <h2>Paramètres du concours</h2>
+      <div class="grid3">
+        <div><label>Titre</label><input id="contestTitle"></div>
+        <div><label>Inscriptions ouvertes</label><select id="contestOpen"><option value="true">Oui</option><option value="false">Non</option></select></div>
+        <div><label>Classement public</label><select id="showRanking"><option value="true">Oui</option><option value="false">Non</option></select></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn blue" id="saveSettingsBtn">Enregistrer</button>
+      </div>
+    </section>
 
-    <label>Titre du concours</label>
-    <input id="contestTitle" placeholder="Chemistry Challenge 2026">
+    <section class="card mainsec">
+      <h2>Paramètres de paiement</h2>
+      <div class="grid2">
+        <div><label>Bénéficiaire</label><input id="payName"></div>
+        <div><label>Compte / IBAN</label><input id="payIban"></div>
+        <div><label>Mobile Money / Wave</label><input id="payMobile"></div>
+        <div><label>PayPal</label><input id="payPaypal"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn blue" id="savePaymentBtn">Sauvegarder</button>
+      </div>
+    </section>
 
-    <label>Activer les inscriptions</label>
-    <select id="contestOpen">
-      <option value="true">Oui</option>
-      <option value="false">Non</option>
-    </select>
+    <section class="card mainsec">
+      <h2>Gestion du jury</h2>
+      <div class="grid2">
+        <div><label>Email du jury</label><input id="juryEmail" placeholder="exemple@domaine.com"></div>
+        <div style="display:flex;align-items:end"><button class="btn green" id="addJuryBtn">Ajouter / autoriser jury</button></div>
+      </div>
+      <div style="height:12px"></div>
+      <div id="juryList" class="feed"></div>
+    </section>
 
-    <label>Afficher classement public</label>
-    <select id="showRanking">
-      <option value="true">Oui</option>
-      <option value="false">Non</option>
-    </select>
+    <section class="card mainsec">
+      <h2>Présence en direct</h2>
+      <div id="presenceList" class="feed"></div>
+    </section>
 
-    <br><br>
-    <button class="btn blue" onclick="saveSettings()">Enregistrer</button>
-  </div>
+    <section class="card mainsec">
+      <h2>Activité récente</h2>
+      <div id="eventsFeed" class="feed"></div>
+    </section>
 
+    <section class="card mainsec">
+      <h2>Participants</h2>
+      <div class="grid2">
+        <div><input id="searchParticipants" placeholder="Rechercher nom, email, code, pays..."></div>
+        <div><select id="filterStatus"><option value="">Tous les statuts</option><option value="approved">approved</option><option value="pending">pending</option><option value="rejected">rejected</option></select></div>
+      </div>
+      <div style="height:12px"></div>
+      <div style="overflow:auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Candidat</th>
+              <th>Paiement</th>
+              <th>Statut</th>
+              <th>Score</th>
+              <th>Surveillance</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="participantsTable"></tbody>
+        </table>
+      </div>
+    </section>
 
-  <!-- PAIEMENTS -->
-  <div class="card">
-    <h2>💰 Paramètres de paiement</h2>
-
-    <label>Nom du bénéficiaire</label>
-    <input id="payName">
-
-    <label>IBAN / Compte</label>
-    <input id="payIban">
-
-    <label>Mobile Money / Wave / Autre</label>
-    <input id="payMobile">
-
-    <label>PayPal</label>
-    <input id="payPaypal">
-
-    <button class="btn blue" onclick="savePayment()">Sauvegarder paiements</button>
-  </div>
-
-
-  <!-- PARTICIPANTS -->
-  <div class="card">
-    <h2>👥 Participants</h2>
-
-    <input id="search" placeholder="Rechercher...">
-
-    <table>
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Email</th>
-          <th>Paiement</th>
-          <th>Statut</th>
-          <th>Score</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="participantsTable"></tbody>
-    </table>
-  </div>
-
-
-  <!-- EXPORT -->
-  <div class="card">
-    <h2>📤 Export</h2>
-    <button class="btn blue" onclick="exportCSV()">Exporter CSV</button>
-  </div>
-
-
-  <!-- GAGNANTS -->
-  <div class="card">
-    <h2>🏆 Publication des gagnants</h2>
-
-    <input id="winnerTitle" placeholder="Titre (ex: Winner Session 1)">
-    <textarea id="winnerText" placeholder="Description gagnant"></textarea>
-
-    <button class="btn green" onclick="publishWinners()">Publier sur Insights</button>
-  </div>
-
+    <section class="card mainsec">
+      <h2>Publication gagnants et certificats</h2>
+      <div class="grid2">
+        <div><label>Titre de publication</label><input id="winnerTitle" placeholder="Gagnants Session 1"></div>
+        <div><label>Code candidat gagnant (optionnel)</label><input id="winnerCandidateCode" placeholder="CHEM-XXXX"></div>
+        <div class="full" style="grid-column:1/-1"><label>Texte</label><textarea id="winnerText"></textarea></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn green" id="publishBtn">Publier sur Insights</button>
+      </div>
+    </section>
+  </main>
 </div>
 
 <script type="module">
 import { auth, db } from "./firebase-config.js";
-import {
-  ref, get, set, update, onValue
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { ref, get, set, update, remove, onValue, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const CONFIG={competitionId:"chemistry_challenge_2026",adminEmail:"borisamoussou01@gmail.com"};
+const el=id=>document.getElementById(id);
+let participants={},presence={},events=[],juryMap={};
 
+function safeEmail(email=""){return email.trim().toLowerCase().replace(/[.#$[\]]/g,"_")}
+function html(v=""){return String(v||"").replace(/[<>"']/g,"")}
+function openCertificate(name,code,scoreText,kind="participation"){
+const title=kind==="winner"?"CERTIFICAT DE RÉUSSITE":"CERTIFICAT DE PARTICIPATION";
+const txt=kind==="winner"?"a obtenu une distinction dans le concours de chimie":"a participé au concours de chimie";
+const w=window.open("","_blank");w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Certificat</title><style>body{font-family:Georgia,serif;background:#f2f7ff;padding:30px}.sheet{max-width:900px;margin:auto;background:#fff;border:8px solid #0f4d92;padding:40px;text-align:center}.t1{font-size:34px;font-weight:700;color:#082e5b;margin-bottom:10px}.t2{font-size:18px;color:#6b7d93}.name{font-size:36px;font-weight:700;margin:28px 0;color:#0b2340}.line{margin:16px 0;font-size:18px}.footer{display:flex;justify-content:space-between;margin-top:50px}.sign{width:220px;border-top:2px solid #0b2340;padding-top:8px}</style></head><body><div class="sheet"><div class="t1">${title}</div><div class="t2">Boris Chemistry Challenge</div><div class="line">Ce certificat est décerné à</div><div class="name">${html(name)}</div><div class="line">${txt}.</div><div class="line">Code candidat : <strong>${html(code)}</strong></div><div class="line">Score : <strong>${html(scoreText)}</strong></div><div class="line">Date : <strong>${new Date().toLocaleDateString("fr-FR")}</strong></div><div class="footer"><div class="sign">Boris Research Hub</div><div class="sign">Administration</div></div></div><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close()}
+async function saveSettings(){await update(ref(db,`competitions/${CONFIG.competitionId}/settings`),{title:el("contestTitle").value.trim()||"Chemistry Challenge 2026",open:el("contestOpen").value==="true",showRanking:el("showRanking").value==="true",updatedAt:Date.now(),updatedBy:CONFIG.adminEmail});alert("Paramètres enregistrés.")}
+async function savePayment(){await update(ref(db,`competitions/${CONFIG.competitionId}/paymentSettings`),{beneficiaryName:el("payName").value.trim(),iban:el("payIban").value.trim(),mobileMoney:el("payMobile").value.trim(),paypal:el("payPaypal").value.trim(),updatedAt:Date.now(),updatedBy:CONFIG.adminEmail});alert("Paiement sauvegardé.")}
+async function addJury(){const email=el("juryEmail").value.trim().toLowerCase();if(!email){alert("Entre un email.");return}await set(ref(db,`competitions/${CONFIG.competitionId}/juryAccessByEmail/${safeEmail(email)}`),{email,active:true,addedAt:Date.now(),addedBy:CONFIG.adminEmail});el("juryEmail").value="";alert("Jury autorisé.");}
+async function removeJury(email){if(!confirm("Retirer ce jury ?"))return;await remove(ref(db,`competitions/${CONFIG.competitionId}/juryAccessByEmail/${safeEmail(email)}`))}
+async function approve(uid){await update(ref(db,`competitions/${CONFIG.competitionId}/participants/${uid}`),{status:"approved",paymentStatus:"validated",freeAccess:false,updatedAt:Date.now(),adminDecisionBy:CONFIG.adminEmail})}
+async function reject(uid){await update(ref(db,`competitions/${CONFIG.competitionId}/participants/${uid}`),{status:"rejected",paymentStatus:"refused",freeAccess:false,updatedAt:Date.now(),adminDecisionBy:CONFIG.adminEmail})}
+async function freeAccess(uid){await update(ref(db,`competitions/${CONFIG.competitionId}/participants/${uid}`),{status:"approved",paymentStatus:"free",freeAccess:true,updatedAt:Date.now(),adminDecisionBy:CONFIG.adminEmail})}
+async function deleteCandidate(uid){if(!confirm("Supprimer ce candidat du concours ?"))return;await remove(ref(db,`competitions/${CONFIG.competitionId}/participants/${uid}`));await remove(ref(db,`competitions/${CONFIG.competitionId}/leaderboard/${uid}`));await remove(ref(db,`competitions/${CONFIG.competitionId}/answers/${uid}`))}
+async function publishWinners(){const title=el("winnerTitle").value.trim(),text=el("winnerText").value.trim(),code=el("winnerCandidateCode").value.trim();if(!title||!text){alert("Remplis le titre et le texte.");return}const postId=String(Date.now());await set(ref(db,"posts/"+postId),{authorEmail:CONFIG.adminEmail,authorName:"Competition Admin",title,text,candidateCode:code||"",type:"competition_winner",visibility:"members",createdAt:Date.now(),source:"competition-admin"});alert("Publication envoyée vers Insights.")}
+async function showAnswers(uid){const s=await get(ref(db,`competitions/${CONFIG.competitionId}/answers/${uid}`));if(!s.exists()){alert("Aucune réponse enregistrée.");return}let out=[];Object.entries(s.val()||{}).forEach(([qid,a])=>out.push(`${qid} | choix: ${a.selectedText||a.selectedIndex} | correct: ${a.correctText||a.correctIndex} | ${a.correct?"OK":"FAUX"}`));alert(out.join("\n"))}
+function renderJury(){const box=el("juryList");box.innerHTML="";const vals=Object.values(juryMap||{});el("statJury").textContent=vals.length; if(!vals.length){box.innerHTML='<div class="item">Aucun jury autorisé.</div>';return}vals.forEach(j=>{const d=document.createElement("div");d.className="item";d.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-weight:900">${html(j.email||"")}</div><div class="small">Ajouté le ${new Date(j.addedAt||Date.now()).toLocaleString("fr-FR")}</div></div><button class="btn red" data-mail="${html(j.email||"")}">Retirer</button></div>`;d.querySelector("button").onclick=()=>removeJury(j.email);box.appendChild(d)})}
+function renderPresence(){const box=el("presenceList");box.innerHTML="";const vals=Object.values(presence||{}).sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));el("statOnline").textContent=vals.filter(v=>v.state==="online"||v.state==="in_exam").length; if(!vals.length){box.innerHTML='<div class="item">Aucune présence enregistrée.</div>';return}vals.forEach(p=>{const cls=p.state==="online"?"online":p.state==="in_exam"?"exam":"offline";const d=document.createElement("div");d.className="item";d.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-weight:900">${html(p.displayName||p.email||p.uid)}</div><div class="small">${html(p.role||"")} • ${html(p.page||"")} • ${html(p.candidateCode||"")}</div><div class="small">Dernière activité : ${new Date(p.lastSeen||Date.now()).toLocaleString("fr-FR")}</div></div><div class="pill ${cls}">${html(p.state||"offline")}</div></div>`;box.appendChild(d)})}
+function renderEvents(){const box=el("eventsFeed");box.innerHTML="";el("statEvents").textContent=events.length; if(!events.length){box.innerHTML='<div class="item">Aucun événement.</div>';return}events.slice(0,80).forEach(ev=>{const d=document.createElement("div");d.className="item";d.innerHTML=`<div style="font-weight:900">${html(ev.type||"event")} — ${html(ev.displayName||ev.email||ev.uid||"")}</div><div class="small">${html(ev.role||"")} • ${html(ev.page||"")} • ${new Date(ev.at||Date.now()).toLocaleString("fr-FR")}</div><div class="small">${html(JSON.stringify(ev.details||{}))}</div>`;box.appendChild(d)})}
+function renderParticipants(){const tb=el("participantsTable");tb.innerHTML="";const q=(el("searchParticipants").value||"").toLowerCase().trim();const fs=el("filterStatus").value||"";const vals=Object.entries(participants||{});el("statParticipants").textContent=vals.length;if(!vals.length){tb.innerHTML='<tr><td colspan="6">Aucun participant.</td></tr>';return}vals.forEach(([uid,d])=>{const h=[d.fullName,d.email,d.country,d.institution,d.category,d.candidateCode].join(" ").toLowerCase();if(q&&!h.includes(q))return;if(fs&&d.status!==fs)return;const suspicious=events.filter(e=>e.uid===uid&&["copy_detected","paste_detected","cut_detected","visibility_change","contextmenu_blocked"].includes(e.type)).length;const tr=document.createElement("tr");const paymentLabel=d.paymentStatus==="validated"?"Validé":d.paymentStatus==="free"?"Gratuit":d.paymentStatus==="refused"?"Refusé":d.paymentRef?"En attente":"Non soumis";tr.innerHTML=`<td><strong>${html(d.fullName||"")}</strong><br><span class="small">${html(d.email||"")}<br>${html(d.candidateCode||"")}</span></td><td><strong>${paymentLabel}</strong><br><span class="small">${html(d.paymentMethod||"")} ${d.paymentRef?"• "+html(d.paymentRef):""}</span></td><td>${html(d.status||"pending")}</td><td>${d.score??"-"} / ${d.totalQuestions??"-"}</td><td><span class="small">Warnings: ${d.warnings||0}<br>Événements suspects: ${suspicious}</span></td><td><div class="row"><button class="btn green" data-a="approve">✔</button><button class="btn orange" data-a="free">🎁</button><button class="btn red" data-a="reject">✖</button><button class="btn gray" data-a="answers">Réponses</button><button class="btn blue" data-a="cert">Certif</button><button class="btn red" data-a="delete">🗑</button></div></td>`;tr.querySelectorAll("button").forEach(b=>{b.onclick=()=>{const a=b.dataset.a;if(a==="approve")approve(uid);if(a==="free")freeAccess(uid);if(a==="reject")reject(uid);if(a==="answers")showAnswers(uid);if(a==="delete")deleteCandidate(uid);if(a==="cert")openCertificate(d.fullName||"Participant",d.candidateCode||"",`${d.score??"-"}/${d.totalQuestions??"-"}`,d.score&&d.score>=Math.ceil((d.totalQuestions||0)*0.8)?"winner":"participation")}});tb.appendChild(tr)})}
 
-const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+el("saveSettingsBtn").onclick=saveSettings;
+el("savePaymentBtn").onclick=savePayment;
+el("addJuryBtn").onclick=addJury;
+el("publishBtn").onclick=publishWinners;
+el("refreshAllBtn").onclick=()=>location.reload();
+el("logoutBtn").onclick=async()=>{await signOut(auth);location.href="insights.html"};
+el("searchParticipants").oninput=renderParticipants;
+el("filterStatus").onchange=renderParticipants;
 
-let participantsData = {};
-
-onAuthStateChanged(auth, async (user)=>{
-  if(!user || user.email !== ADMIN_EMAIL){
-    window.location.href = "insights.html";
-    return;
-  }
-
-  loadParticipants();
-  loadSettings();
+onAuthStateChanged(auth,async user=>{
+if(!user||((user.email||"").toLowerCase()!==CONFIG.adminEmail)){location.href="insights.html";return}
+const settingsSnap=await get(ref(db,`competitions/${CONFIG.competitionId}/settings`));if(settingsSnap.exists()){const s=settingsSnap.val()||{};el("contestTitle").value=s.title||"Chemistry Challenge 2026";el("contestOpen").value=String(s.open??true);el("showRanking").value=String(s.showRanking??true)}else{el("contestTitle").value="Chemistry Challenge 2026";el("contestOpen").value="true";el("showRanking").value="true"}
+const paySnap=await get(ref(db,`competitions/${CONFIG.competitionId}/paymentSettings`));if(paySnap.exists()){const p=paySnap.val()||{};el("payName").value=p.beneficiaryName||"";el("payIban").value=p.iban||"";el("payMobile").value=p.mobileMoney||"";el("payPaypal").value=p.paypal||""}
+onValue(ref(db,`competitions/${CONFIG.competitionId}/participants`),s=>{participants=s.val()||{};renderParticipants()});
+onValue(ref(db,`competitions/${CONFIG.competitionId}/presence`),s=>{presence=s.val()||{};renderPresence()});
+onValue(ref(db,`competitions/${CONFIG.competitionId}/juryAccessByEmail`),s=>{juryMap=s.val()||{};renderJury()});
+onValue(ref(db,`competitions/${CONFIG.competitionId}/events`),s=>{let arr=[];s.forEach(c=>arr.push(c.val()));arr.sort((a,b)=>(b.at||0)-(a.at||0));events=arr;renderEvents();renderParticipants()});
 });
-
-
-async function loadParticipants(){
-  const snapshot = await get(ref(db,"competitions/chemistry_challenge_2026/participants"));
-
-  if(!snapshot.exists()) return;
-
-  participantsData = snapshot.val();
-  renderTable();
-}
-
-
-function renderTable(){
-  const table = document.getElementById("participantsTable");
-  table.innerHTML = "";
-
-  Object.entries(participantsData).forEach(([uid,data])=>{
-
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${data.fullName || ""}</td>
-      <td>${data.email || ""}</td>
-      <td>${data.paymentRef || "—"}</td>
-      <td class="status">${data.status || "pending"}</td>
-      <td>${data.score ?? "-"}</td>
-      <td>
-        <button class="btn green" onclick="approve('${uid}')">✔</button>
-        <button class="btn red" onclick="reject('${uid}')">✖</button>
-        <button class="btn orange" onclick="freeAccess('${uid}')">🎁</button>
-        <button class="btn red" onclick="deleteUser('${uid}')">🗑</button>
-      </td>
-    `;
-
-    table.appendChild(tr);
-  });
-}
-  async function loadSettings(){
-    const settingsSnap = await get(ref(db, "competitions/chemistry_challenge_2026/settings"));
-    if(settingsSnap.exists()){
-      const s = settingsSnap.val() || {};
-      document.getElementById("contestTitle").value = s.title || "Chemistry Challenge 2026";
-      document.getElementById("contestOpen").value = String(s.open ?? true);
-      document.getElementById("showRanking").value = String(s.showRanking ?? true);
-    } else {
-      document.getElementById("contestTitle").value = "Chemistry Challenge 2026";
-      document.getElementById("contestOpen").value = "true";
-      document.getElementById("showRanking").value = "true";
-    }
-
-    const paymentSnap = await get(ref(db, "competitions/chemistry_challenge_2026/paymentSettings"));
-    if(paymentSnap.exists()){
-      const p = paymentSnap.val() || {};
-      document.getElementById("payName").value = p.beneficiaryName || "";
-      document.getElementById("payIban").value = p.iban || "";
-      document.getElementById("payMobile").value = p.mobileMoney || "";
-      document.getElementById("payPaypal").value = p.paypal || "";
-    }
-  }
-
-  async function saveSettings(){
-    const payload = {
-      title: document.getElementById("contestTitle").value.trim() || "Chemistry Challenge 2026",
-      open: document.getElementById("contestOpen").value === "true",
-      showRanking: document.getElementById("showRanking").value === "true",
-      updatedAt: Date.now(),
-      updatedBy: ADMIN_EMAIL
-    };
-
-    await update(ref(db, "competitions/chemistry_challenge_2026/settings"), payload);
-    alert("Paramètres du concours enregistrés.");
-  }
-
-  async function savePayment(){
-    const payload = {
-      beneficiaryName: document.getElementById("payName").value.trim(),
-      iban: document.getElementById("payIban").value.trim(),
-      mobileMoney: document.getElementById("payMobile").value.trim(),
-      paypal: document.getElementById("payPaypal").value.trim(),
-      updatedAt: Date.now(),
-      updatedBy: ADMIN_EMAIL
-    };
-
-    await update(ref(db, "competitions/chemistry_challenge_2026/paymentSettings"), payload);
-    alert("Paramètres de paiement sauvegardés.");
-  }
-
-  async function approve(uid){
-    await update(ref(db, `competitions/chemistry_challenge_2026/participants/${uid}`), {
-      status: "approved",
-      paymentStatus: "validated",
-      freeAccess: false,
-      updatedAt: Date.now(),
-      adminDecisionBy: ADMIN_EMAIL
-    });
-    await loadParticipants();
-  }
-
-  async function reject(uid){
-    await update(ref(db, `competitions/chemistry_challenge_2026/participants/${uid}`), {
-      status: "rejected",
-      paymentStatus: "refused",
-      freeAccess: false,
-      updatedAt: Date.now(),
-      adminDecisionBy: ADMIN_EMAIL
-    });
-    await loadParticipants();
-  }
-
-  async function freeAccess(uid){
-    await update(ref(db, `competitions/chemistry_challenge_2026/participants/${uid}`), {
-      status: "approved",
-      paymentStatus: "free",
-      freeAccess: true,
-      updatedAt: Date.now(),
-      adminDecisionBy: ADMIN_EMAIL
-    });
-    await loadParticipants();
-  }
-
-  async function deleteUser(uid){
-    const ok = confirm("Supprimer cette inscription du concours ?");
-    if(!ok) return;
-
-    await set(ref(db, `competitions/chemistry_challenge_2026/participants/${uid}`), null);
-    await set(ref(db, `competitions/chemistry_challenge_2026/leaderboard/${uid}`), null);
-    await loadParticipants();
-  }
-
-  function exportCSV(){
-    const rows = [
-      [
-        "uid",
-        "candidateCode",
-        "fullName",
-        "email",
-        "schoolLevel",
-        "institution",
-        "country",
-        "phone",
-        "category",
-        "paymentMethod",
-        "paymentRef",
-        "paymentStatus",
-        "status",
-        "freeAccess",
-        "score",
-        "totalQuestions"
-      ]
-    ];
-
-    Object.entries(participantsData).forEach(([uid, d]) => {
-      rows.push([
-        uid,
-        d.candidateCode || "",
-        d.fullName || "",
-        d.email || "",
-        d.schoolLevel || "",
-        d.institution || "",
-        d.country || "",
-        d.phone || "",
-        d.category || "",
-        d.paymentMethod || "",
-        d.paymentRef || "",
-        d.paymentStatus || "",
-        d.status || "",
-        d.freeAccess ? "true" : "false",
-        d.score ?? "",
-        d.totalQuestions ?? ""
-      ]);
-    });
-
-    const csv = rows.map(row =>
-      row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(",")
-    ).join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "competition_participants.csv";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  async function publishWinners(){
-    const title = document.getElementById("winnerTitle").value.trim();
-    const text = document.getElementById("winnerText").value.trim();
-
-    if(!title || !text){
-      alert("Merci de remplir le titre et la description.");
-      return;
-    }
-
-    const postRef = ref(db, "posts/" + Date.now());
-    await set(postRef, {
-      authorEmail: ADMIN_EMAIL,
-      authorName: "Competition Admin",
-      title,
-      text,
-      type: "competition_winner",
-      createdAt: Date.now(),
-      visibility: "members",
-      source: "competition-admin"
-    });
-
-    alert("Publication envoyée vers Insights.");
-  }
-
-  async function ensureJuryStructure(){
-    const jurySnap = await get(ref(db, "competitions/chemistry_challenge_2026/jury"));
-    if(!jurySnap.exists()){
-      await set(ref(db, "competitions/chemistry_challenge_2026/jury"), {
-        enabled: false,
-        anonymousMode: true,
-        members: {}
-      });
-    }
-  }
-
-  function renderSearchFiltered(){
-    const q = (document.getElementById("search").value || "").toLowerCase().trim();
-    const table = document.getElementById("participantsTable");
-    table.innerHTML = "";
-
-    Object.entries(participantsData).forEach(([uid, data]) => {
-      const haystack = [
-        data.fullName || "",
-        data.email || "",
-        data.paymentRef || "",
-        data.status || "",
-        data.category || "",
-        data.institution || "",
-        data.country || "",
-        data.candidateCode || ""
-      ].join(" ").toLowerCase();
-
-      if(q && !haystack.includes(q)) return;
-
-      const paymentLabel =
-        data.paymentStatus === "validated" ? "Validé" :
-        data.paymentStatus === "refused" ? "Refusé" :
-        data.paymentStatus === "free" ? "Gratuit" :
-        data.paymentRef ? "En attente" : "Non soumis";
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${data.fullName || ""}<br><small>${data.candidateCode || ""}</small></td>
-        <td>${data.email || ""}</td>
-        <td>
-          <div><strong>${paymentLabel}</strong></div>
-          <div style="font-size:12px;color:#6b7d93;">${data.paymentMethod || "—"} ${data.paymentRef ? "• " + data.paymentRef : ""}</div>
-        </td>
-        <td class="status">${data.status || "pending"}</td>
-        <td>${data.score ?? "-"}</td>
-        <td>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="btn green" onclick="approve('${uid}')">✔</button>
-            <button class="btn red" onclick="reject('${uid}')">✖</button>
-            <button class="btn orange" onclick="freeAccess('${uid}')">🎁</button>
-            <button class="btn red" onclick="deleteUser('${uid}')">🗑</button>
-          </div>
-        </td>
-      `;
-      table.appendChild(tr);
-    });
-  }
-
-  document.getElementById("search").addEventListener("input", renderSearchFiltered);
-
-  const oldRenderTable = renderTable;
-  renderTable = renderSearchFiltered;
-
-  await ensureJuryStructure();
-
-  window.saveSettings = saveSettings;
-  window.savePayment = savePayment;
-  window.approve = approve;
-  window.reject = reject;
-  window.freeAccess = freeAccess;
-  window.deleteUser = deleteUser;
-  window.exportCSV = exportCSV;
-  window.publishWinners = publishWinners;
 </script>
-
 </body>
-</html>  
+</html>
