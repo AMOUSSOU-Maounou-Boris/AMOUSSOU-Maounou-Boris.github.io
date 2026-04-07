@@ -2428,6 +2428,8 @@
       try { await reload(user); } catch (e) { console.error(e); }
 
       if (isAdminEmail(user.email || "")) {
+      const adminLink = document.getElementById("adminLink");
+      if (adminLink) adminLink.style.display = "inline-block";
         await ensureAdminProfile(user);
         currentUser = user;
         await loadCurrentUserData();
@@ -2470,7 +2472,7 @@
         showAuthMessage(status === "rejected"
           ? "Ton compte a été refusé par l’administrateur."
           : "Ton compte est encore en attente d’approbation.");
-        return;
+         return;
       }
 
       currentUser = user;
