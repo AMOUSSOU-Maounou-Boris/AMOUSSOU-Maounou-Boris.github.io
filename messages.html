@@ -345,7 +345,7 @@
     .chat-shell{
       overflow:hidden;
       display:grid;
-      grid-template-rows:auto auto 1fr auto auto;
+      grid-template-rows:auto 1fr auto auto auto;
       min-height:760px;
       background:linear-gradient(180deg,#f9fcff 0%, #f3f8fd 100%);
     }
@@ -402,12 +402,18 @@
     }
 
     .typing-mount{
-      min-height:36px;
-      padding:0 20px;
+      min-height:0;
+      padding:0;
       display:flex;
       align-items:center;
-      background:#f7fbff;
+      background:transparent;
     }
+
+    .typing-inline-wrap{
+      padding:0 20px 10px;
+      background:linear-gradient(180deg,#f9fcff 0%, #f1f7fd 100%);
+    }
+
     .typing-line{
       display:inline-flex;
       align-items:center;
@@ -997,8 +1003,6 @@
           </div>
         </div>
 
-        <div class="typing-mount" id="typingMount"></div>
-
         <div class="chat-messages" id="chatMessages">
           <div class="empty-state">
             Sélectionne un membre à gauche.<br>
@@ -1014,7 +1018,7 @@
         <div class="composer-card">
           <div class="selection-bar" id="selectionBar">
             <button class="secondary-btn" id="cancelSelectionBtn" type="button">Annuler sélection</button>
-            <button class="danger-btn" id="deleteSelectedBtn" type="button">Supprimer sélection</button>
+            <button class="danger-btn" id="deleteSelectedBtn" type="button">Supprimer de ma boîte</button>
           </div>
 
           <div class="composer-top">
@@ -1038,6 +1042,10 @@
           <div class="composer-bottom">
             <textarea id="messageInput" class="message-input" placeholder="Écris ton message ici..."></textarea>
             <button class="send-btn" id="sendBtn" type="button">Envoyer</button>
+          </div>
+
+          <div class="typing-inline-wrap">
+            <div class="typing-mount" id="typingMount"></div>
           </div>
 
           <div class="composer-note" id="composerNote">
@@ -1353,6 +1361,10 @@
       return age <= DELETE_WINDOW_MS;
     }
 
+    function isDeletedForMe(msg) {
+      return !!(msg && msg.deletedForUsers && currentUser && msg.deletedForUsers[currentUser.uid]);
+    }
+
     function closeAllMenus() {
       document.querySelectorAll(".message-menu.open").forEach(menu => {
         menu.classList.remove("open");
@@ -1395,7 +1407,8 @@
         attachmentType: val.attachmentType || "",
         attachmentUrl: val.attachmentUrl || "",
         attachmentName: val.attachmentName || "",
-        deletedForAll: !!val.deletedForAll
+        deletedForAll: !!val.deletedForAll,
+        deletedForUsers: val.deletedForUsers || {}
       };
     }
 
@@ -1524,17 +1537,19 @@
         return;
       }
 
-      if (!messagesCache.length) {
+      const visibleMessages = messagesCache.filter(msg => !isDeletedForMe(msg));
+
+      if (!visibleMessages.length) {
         chatMessages.innerHTML = `
           <div class="empty-state">
             Aucun message récent pour le moment.<br>
-            Seuls les ${LAST_MESSAGES_LIMIT} derniers messages sont chargés pour réduire le coût.
+            Tu vois seulement les ${LAST_MESSAGES_LIMIT} derniers messages pour réduire le coût.
           </div>
         `;
         return;
       }
 
-      chatMessages.innerHTML = messagesCache.map(msg => {
+      chatMessages.innerHTML = visibleMessages.map(msg => {
         const isMe = msg.senderId === currentUser.uid;
         const sender = usersCache[msg.senderId] || {};
         const replyHtml = msg.replyTo && msg.replyTo.text
@@ -1566,8 +1581,9 @@
                       <button type="button" data-reply="${msg.id}">Répondre</button>
                       <button type="button" data-forward="${msg.id}">Transférer</button>
                       <button type="button" data-select="${msg.id}">${isSelected ? "Décocher" : "Sélectionner"}</button>
+                      <button type="button" data-delete-me="${msg.id}">Supprimer de ma boîte</button>
                       ${!isMe ? `<button type="button" data-report="${msg.id}">Signaler</button>` : ""}
-                      ${canDelete ? `<button type="button" class="danger" data-delete="${msg.id}">Supprimer</button>` : ""}
+                      ${canDelete ? `<button type="button" class="danger" data-delete="${msg.id}">Supprimer pour tous</button>` : ""}
                     </div>
                   </div>
                 </div>
@@ -1640,6 +1656,14 @@
           else selectedMessageIds.add(id);
           toggleSelectionBar();
           renderMessages();
+        });
+      });
+
+      document.querySelectorAll("[data-delete-me]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.dataset.deleteMe;
+          await deleteMessageForMe(id);
+          closeAllMenus();
         });
       });
 
@@ -1721,6 +1745,7 @@
         blockedUsers = (currentUser && allBlocks[currentUser.uid]) ? allBlocks[currentUser.uid] : {};
         renderMembersList();
         updateComposerState();
+        updateSelectedHeader();
       });
     }
 
@@ -1901,6 +1926,7 @@
         audioCallBtn.classList.add("hidden");
         videoCallBtn.classList.add("hidden");
         chatOptionsBtn.classList.add("hidden");
+        blockUserBtn.textContent = "Bloquer";
         return;
       }
 
@@ -1919,6 +1945,7 @@
 
       inviteBtn.classList.remove("hidden");
       chatOptionsBtn.classList.remove("hidden");
+      blockUserBtn.textContent = isBlockedByMe(selectedUserId) ? "Débloquer" : "Bloquer";
 
       if (blocked) {
         chatSubtitle.textContent = "Discussion bloquée : l’un d’entre vous a bloqué l’autre.";
@@ -1964,6 +1991,7 @@
         stickerBtn.disabled = true;
         voiceNoteBtn.disabled = true;
         composerNote.textContent = "Choisis d’abord une personne.";
+        clearTypingLine();
         return;
       }
 
@@ -2056,18 +2084,23 @@
         const val = snap.val() || {};
         if (val.typing) {
           const name = selectedUserProfile?.displayName || "Cette personne";
-          renderTypingLine(`${name} est en train d’écrire`);
+          if (val.mode === "voice") {
+            renderTypingLine(`${name} enregistre un vocal`);
+          } else {
+            renderTypingLine(`${name} est en train d’écrire`);
+          }
         } else {
           clearTypingLine();
         }
       });
     }
 
-    async function setTypingState(isTyping) {
+    async function setTypingState(isTyping, mode = "text") {
       if (!currentChatId || !currentUser || !selectedUserId || !canChatWith(selectedUserId)) return;
       try {
         await update(ref(db, `messageTyping/${currentChatId}/${currentUser.uid}`), {
           typing: isTyping,
+          mode: isTyping ? mode : "",
           updatedAt: Date.now()
         });
       } catch (e) {
@@ -2082,6 +2115,7 @@
       let hasUpdates = false;
 
       messagesCache.forEach(msg => {
+        if (isDeletedForMe(msg)) return;
         if (msg.senderId === selectedUserId && !(msg.readBy && msg.readBy[currentUser.uid])) {
           updates[`privateMessages/${currentChatId}/${msg.id}/readBy/${currentUser.uid}`] = Date.now();
           hasUpdates = true;
@@ -2185,75 +2219,10 @@
           blockedAt: Date.now()
         });
       }
+
+      updateSelectedHeader();
+      updateComposerState();
       closeModal(optionsModal);
-    }
-
-    async function sendMessage({ text = "", sticker = "", attachment = null } = {}) {
-      if (!selectedUserId || !currentChatId || !currentUser) return;
-      if (!canChatWith(selectedUserId)) return;
-
-      const finalText = text.trim();
-      if (!finalText && !sticker && !attachment) return;
-
-      sendBtn.disabled = true;
-
-      try {
-        const msgRef = push(ref(db, `privateMessages/${currentChatId}`));
-        const payload = {
-          senderId: currentUser.uid,
-          receiverId: selectedUserId,
-          text: finalText,
-          sticker: sticker || "",
-          createdAt: Date.now(),
-          readBy: {
-            [currentUser.uid]: Date.now()
-          }
-        };
-
-        if (replyTarget) {
-          payload.replyTo = {
-            id: replyTarget.id,
-            text: replyTarget.text || ""
-          };
-        }
-
-        if (attachment) {
-          payload.attachmentType = attachment.type;
-          payload.attachmentUrl = attachment.url;
-          payload.attachmentName = attachment.name || "";
-        }
-
-        await set(msgRef, payload);
-
-        const unreadSnap = await get(ref(db, `unreadCountsByUser/${selectedUserId}/${currentUser.uid}`));
-        const currentUnread = Number(unreadSnap.val() || 0);
-
-        await update(ref(db), {
-          [`privateThreads/${currentUser.uid}/${selectedUserId}`]: {
-            uid: selectedUserId,
-            lastMessage: finalText || sticker || attachment?.name || "Pièce jointe",
-            lastSenderId: currentUser.uid,
-            updatedAt: Date.now()
-          },
-          [`privateThreads/${selectedUserId}/${currentUser.uid}`]: {
-            uid: currentUser.uid,
-            lastMessage: finalText || sticker || attachment?.name || "Pièce jointe",
-            lastSenderId: currentUser.uid,
-            updatedAt: Date.now()
-          },
-          [`unreadCountsByUser/${selectedUserId}/${currentUser.uid}`]: currentUnread + 1
-        });
-
-        messageInput.value = "";
-        replyTarget = null;
-        renderReplyPreview();
-        await setTypingState(false);
-      } catch (e) {
-        console.error(e);
-        alert("Impossible d’envoyer le message.");
-      } finally {
-        sendBtn.disabled = false;
-      }
     }
 
     async function deleteMessageForAll(messageId) {
@@ -2272,19 +2241,24 @@
       });
     }
 
+    async function deleteMessageForMe(messageId) {
+      if (!currentChatId || !messageId || !currentUser) return;
+      await update(ref(db, `privateMessages/${currentChatId}/${messageId}/deletedForUsers`), {
+        [currentUser.uid]: Date.now()
+      });
+    }
+
     async function deleteSelectedMessages() {
-      if (!currentChatId || selectedMessageIds.size === 0) return;
+      if (!currentChatId || selectedMessageIds.size === 0 || !currentUser) return;
 
       const promises = [...selectedMessageIds].map(async (id) => {
-        const msg = messagesCache.find(m => m.id === id);
-        if (msg && canDeleteMessage(msg)) {
-          await deleteMessageForAll(id);
-        }
+        await deleteMessageForMe(id);
       });
 
       await Promise.all(promises);
       clearSelection();
       toggleSelectionBar();
+      renderMessages();
     }
 
     async function forwardMessage() {
@@ -2319,7 +2293,8 @@
       closeModal(forwardModal);
       forwardMessageTarget = null;
     }
-        async function sendReport() {
+
+    async function sendReport() {
       if (!reportMessageTarget || !selectedUserProfile || !currentUser) return;
 
       const reportRef = push(ref(db, "reports"));
@@ -2410,8 +2385,7 @@
       if (voiceNoteBtn) voiceNoteBtn.textContent = "Vocal";
       stopVoiceTimer();
     }
-
-    async function handleVoiceNoteRecording() {
+        async function handleVoiceNoteRecording() {
       if (!canChatWith(selectedUserId)) return;
 
       if (!navigator.mediaDevices || !window.MediaRecorder) {
@@ -2476,6 +2450,9 @@
               console.error(e);
               alert("Impossible d’envoyer le vocal.");
             } finally {
+              try {
+                await setTypingState(false);
+              } catch (e) {}
               await cleanupVoiceRecorderState(false);
             }
           };
@@ -2484,9 +2461,13 @@
           isRecordingVoice = true;
           voiceNoteBtn.textContent = "Arrêter vocal";
           startVoiceTimer();
+          await setTypingState(true, "voice");
         } catch (e) {
           console.error(e);
           alert("Impossible d’accéder au micro.");
+          try {
+            await setTypingState(false);
+          } catch (err) {}
           await cleanupVoiceRecorderState(false);
         }
 
@@ -2495,6 +2476,75 @@
 
       if (voiceMediaRecorder && voiceMediaRecorder.state !== "inactive") {
         await cleanupVoiceRecorderState(true);
+      }
+    }
+
+    async function sendMessage({ text = "", sticker = "", attachment = null } = {}) {
+      if (!selectedUserId || !currentChatId || !currentUser) return;
+      if (!canChatWith(selectedUserId)) return;
+
+      const finalText = text.trim();
+      if (!finalText && !sticker && !attachment) return;
+
+      sendBtn.disabled = true;
+
+      try {
+        const msgRef = push(ref(db, `privateMessages/${currentChatId}`));
+        const payload = {
+          senderId: currentUser.uid,
+          receiverId: selectedUserId,
+          text: finalText,
+          sticker: sticker || "",
+          createdAt: Date.now(),
+          readBy: {
+            [currentUser.uid]: Date.now()
+          }
+        };
+
+        if (replyTarget) {
+          payload.replyTo = {
+            id: replyTarget.id,
+            text: replyTarget.text || ""
+          };
+        }
+
+        if (attachment) {
+          payload.attachmentType = attachment.type;
+          payload.attachmentUrl = attachment.url;
+          payload.attachmentName = attachment.name || "";
+        }
+
+        await set(msgRef, payload);
+
+        const unreadSnap = await get(ref(db, `unreadCountsByUser/${selectedUserId}/${currentUser.uid}`));
+        const currentUnread = Number(unreadSnap.val() || 0);
+
+        await update(ref(db), {
+          [`privateThreads/${currentUser.uid}/${selectedUserId}`]: {
+            uid: selectedUserId,
+            lastMessage: finalText || sticker || attachment?.name || "Pièce jointe",
+            lastSenderId: currentUser.uid,
+            updatedAt: Date.now()
+          },
+          [`privateThreads/${selectedUserId}/${currentUser.uid}`]: {
+            uid: currentUser.uid,
+            lastMessage: finalText || sticker || attachment?.name || "Pièce jointe",
+            lastSenderId: currentUser.uid,
+            updatedAt: Date.now()
+          },
+          [`unreadCountsByUser/${selectedUserId}/${currentUser.uid}`]: currentUnread + 1
+        });
+
+        messageInput.value = "";
+        replyTarget = null;
+        renderReplyPreview();
+        await setTypingState(false);
+        isCurrentlyTyping = false;
+      } catch (e) {
+        console.error(e);
+        alert("Impossible d’envoyer le message.");
+      } finally {
+        sendBtn.disabled = false;
       }
     }
 
@@ -2573,6 +2623,7 @@
     chatOptionsBtn.addEventListener("click", () => {
       if (!selectedUserId || !selectedUserProfile) return;
       optionsModalText.textContent = `Discussion avec ${selectedUserProfile.displayName || "ce contact"}.`;
+      blockUserBtn.textContent = isBlockedByMe(selectedUserId) ? "Débloquer" : "Bloquer";
       openModal(optionsModal);
     });
 
@@ -2604,6 +2655,9 @@
           voiceMediaRecorder.onstop = null;
         }
       } catch (e) {}
+      try {
+        await setTypingState(false);
+      } catch (err) {}
       await cleanupVoiceRecorderState(false);
     });
 
@@ -2656,7 +2710,7 @@
       if (!canChatWith(selectedUserId)) return;
       if (!isCurrentlyTyping) {
         isCurrentlyTyping = true;
-        await setTypingState(true);
+        await setTypingState(true, "text");
       }
       clearTimeout(typingTimer);
       typingTimer = setTimeout(async () => {
@@ -2680,6 +2734,9 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
+        try {
+          await setTypingState(false);
+        } catch (e) {}
         await cleanupVoiceRecorderState(false);
         window.location.href = "insights.html";
         return;
@@ -2688,6 +2745,9 @@
       const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
       if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
         try { await signOut(auth); } catch (e) {}
+        try {
+          await setTypingState(false);
+        } catch (err) {}
         await cleanupVoiceRecorderState(false);
         window.location.href = "insights.html";
         return;
@@ -2719,6 +2779,9 @@
     });
 
     window.addEventListener("beforeunload", async () => {
+      try {
+        await setTypingState(false);
+      } catch (e) {}
       try {
         await cleanupVoiceRecorderState(false);
       } catch (e) {}
