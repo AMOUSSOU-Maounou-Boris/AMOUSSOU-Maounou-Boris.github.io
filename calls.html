@@ -1237,15 +1237,26 @@
       }
 
       peerConnection.ontrack = (event) => {
-        const incomingStream = event.streams && event.streams[0] ? event.streams[0] : null;
-        if (incomingStream) {
-          if (remoteVideoEl && remoteVideoEl.srcObject !== incomingStream) {
-            remoteVideoEl.srcObject = incomingStream;
+        const stream = event.streams && event.streams[0] ? event.streams[0] : null;
+
+        if (stream) {
+          currentRemoteStream = stream;
+
+          if (remoteVideoEl) {
+            remoteVideoEl.srcObject = stream;
+            remoteVideoEl.onloadedmetadata = () => {
+              remoteVideoEl.play().catch(() => {});
+            };
           }
-          currentRemoteStream = incomingStream;
         } else if (event.track) {
           currentRemoteStream.addTrack(event.track);
-          if (remoteVideoEl) remoteVideoEl.srcObject = currentRemoteStream;
+
+          if (remoteVideoEl) {
+            remoteVideoEl.srcObject = currentRemoteStream;
+            remoteVideoEl.onloadedmetadata = () => {
+              remoteVideoEl.play().catch(() => {});
+            };
+          }
         }
 
         callModalStatus.textContent = "Flux distant reçu.";
@@ -1330,8 +1341,18 @@
         if (remoteAudioBoxEl) remoteAudioBoxEl.style.display = "flex";
       }
 
-      if (currentLocalStream && mode === "video" && localVideoEl) {
+      if (currentLocalStream && localVideoEl) {
         localVideoEl.srcObject = currentLocalStream;
+        localVideoEl.onloadedmetadata = () => {
+          localVideoEl.play().catch(() => {});
+        };
+      }
+
+      if (currentRemoteStream && remoteVideoEl) {
+        remoteVideoEl.srcObject = currentRemoteStream;
+        remoteVideoEl.onloadedmetadata = () => {
+          remoteVideoEl.play().catch(() => {});
+        };
       }
 
       muteBtn.textContent = "Couper micro";
