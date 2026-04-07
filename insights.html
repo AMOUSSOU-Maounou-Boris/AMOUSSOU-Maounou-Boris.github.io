@@ -2428,9 +2428,14 @@
 
       try { await reload(user); } catch (e) { console.error(e); }
 
-      if (isAdminEmail(user.email || "")) {
       const adminLink = document.getElementById("adminLink");
+      const juryLink = document.getElementById("juryLink");
+      if (adminLink) adminLink.style.display = "none";
+      if (juryLink) juryLink.style.display = "none";
+
+      if (isAdminEmail(user.email || "")) {
       if (adminLink) adminLink.style.display = "inline-block";
+      if (juryLink) juryLink.style.display = "inline-block";
         await ensureAdminProfile(user);
         currentUser = user;
         await loadCurrentUserData();
@@ -2454,6 +2459,10 @@
         return;
       }
 
+      const juryEmailKey = (user.email || "").toLowerCase().replace(/[.#$[\]]/g, "_");
+      const jurySnap = await get(ref(db, "competitions/chemistry_challenge_2026/juryAccessByEmail/" + juryEmailKey));
+      if (jurySnap.exists() && juryLink) juryLink.style.display = "inline-block";
+
       const snap = await get(ref(db, "users/" + user.uid));
       if (!snap.exists()) {
         try { await signOut(auth); } catch (e) {}
@@ -2473,11 +2482,11 @@
         showAuthMessage(status === "rejected"
           ? "Ton compte a été refusé par l’administrateur."
           : "Ton compte est encore en attente d’approbation.");
-         return;
+        return;
       }
 
       currentUser = user;
-      currentUserData = { uid:user.uid, ...userData };
+      currentUserData = { uid: user.uid, ...userData };
 
       setUIConnected(true);
       bindActivityEvents();
