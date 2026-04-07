@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chem Challenge | Boris Research Hub</title>
+  <title>Concours | Boris Research Hub</title>
   <style>
     * { box-sizing: border-box; }
 
@@ -448,6 +448,11 @@
       color:#fff;
     }
 
+    .btn.red{
+      background:var(--red);
+      color:#fff;
+    }
+
     .status-box{
       padding:16px;
       border-radius:16px;
@@ -471,6 +476,7 @@
       font-size:13px;
       font-weight:800;
       margin-bottom:8px;
+      white-space:nowrap;
     }
 
     .tag-pending{ background:#fff4df; color:#9a6600; }
@@ -478,6 +484,8 @@
     .tag-rejected{ background:#ffe9e9; color:#b62727; }
     .tag-none{ background:#eef3f8; color:#5f738c; }
     .tag-issued{ background:#fff7dd; color:#866102; }
+    .tag-open{ background:#eaf9ee; color:#0b7f34; }
+    .tag-close{ background:#ffe9e9; color:#b62727; }
 
     .exam-shell{
       display:none;
@@ -692,6 +700,7 @@
       color:var(--muted);
       font-size:14px;
       line-height:1.55;
+      white-space:pre-wrap;
     }
 
     .result-box{
@@ -718,6 +727,7 @@
       color:var(--muted);
       line-height:1.6;
       font-size:14px;
+      white-space:pre-wrap;
     }
 
     .certificate-shell{
@@ -920,6 +930,8 @@
       <a href="calls.html">Appels</a>
       <a href="meeting-room.html">Salle de réunion</a>
       <a href="competition.html" class="active">Concours</a>
+      <a href="competition-admin.html">Administration concours</a>
+      <a href="competition-jury.html">Jury concours</a>
       <a href="profile.html"><span class="nav-online-dot"></span>Mon compte</a>
     </div>
   </div>
@@ -953,17 +965,17 @@
 
         <div class="hub-card">
           <h4>Organisation liée</h4>
-          <p>Cette page est conçue pour fonctionner avec <strong>competition-admin.html</strong> et <strong>competition-jury.html</strong>.</p>
+          <p>Cette page fonctionne avec <strong>competition-admin.html</strong> et <strong>competition-jury.html</strong>.</p>
         </div>
 
         <div class="hub-card">
           <h4>Contrôle administrateur</h4>
-          <p>L’adresse <strong>borisamoussou01@gmail.com</strong> peut centraliser l’approbation, le jury et la délivrance du certificat.</p>
+          <p>L’adresse <strong>borisamoussou01@gmail.com</strong> garde le contrôle des inscriptions, du jury, des résultats et des certificats.</p>
         </div>
 
         <div class="hub-card">
           <h4>Expérience candidat</h4>
-          <p>Inscription détaillée, test simple, suivi du statut, demande de certificat et affichage du certificat final.</p>
+          <p>Inscription détaillée, test, suivi du statut, demande de certificat, et affichage du certificat final.</p>
         </div>
       </div>
     </aside>
@@ -972,8 +984,8 @@
       <section class="card hero">
         <div class="hero-top">
           <div>
-            <h1>Chem Challenge</h1>
-            <p>
+            <h1 id="heroChallengeTitle">Chem Challenge</h1>
+            <p id="heroChallengeText">
               Bienvenue dans l’espace officiel du concours de chimie. Cette interface permet
               l’inscription des candidats, le suivi du dossier, l’accès à l’épreuve,
               la consultation du classement et la demande de certificat.
@@ -981,7 +993,7 @@
               sont liés aux pages <strong>competition-admin.html</strong> et <strong>competition-jury.html</strong>.
             </p>
           </div>
-          <div class="hero-badge">Édition académique</div>
+          <div class="hero-badge" id="heroEditionBadge">Édition académique</div>
         </div>
 
         <div class="info-grid">
@@ -1002,6 +1014,11 @@
             <div class="value">Admin uniquement</div>
           </div>
         </div>
+      </section>
+
+      <section class="card section">
+        <h2>Annonce officielle</h2>
+        <div class="notice" id="announcementBox">Aucune annonce pour le moment.</div>
       </section>
 
       <section class="card section">
@@ -1045,8 +1062,23 @@
             </div>
             <div class="list-item">
               <strong>Base commune</strong>
-              <span>Les trois pages partageront les mêmes chemins Firebase pour garder une vraie cohérence.</span>
+              <span>Les trois pages partagent les mêmes chemins Firebase pour garder une vraie cohérence.</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section" id="challengeStatusSection">
+        <h2>État du challenge</h2>
+        <div class="status-box">
+          <strong>Paramètres actuels</strong>
+          <div class="btn-row" style="margin-top:0;">
+            <div class="status-tag tag-none" id="registrationStatusTag">Inscriptions : -</div>
+            <div class="status-tag tag-none" id="examStatusTag">Épreuve : -</div>
+            <div class="status-tag tag-none" id="resultVisibilityTag">Résultats : -</div>
+          </div>
+          <div class="hint" id="challengeStatusText" style="margin-top:10px;">
+            Les paramètres du challenge seront affichés ici.
           </div>
         </div>
       </section>
@@ -1235,6 +1267,8 @@
           <div class="hint" style="margin-bottom:10px;">
             • être connecté au site<br>
             • avoir une inscription approuvée<br>
+            • inscriptions ouvertes ou déjà dossier enregistré<br>
+            • épreuve ouverte par l’admin<br>
             • une seule tentative<br>
             • temps limité<br>
             • changement répété d’onglet = avertissement puis soumission automatique
@@ -1346,8 +1380,8 @@
         <div id="certificateCard" class="certificate-shell hidden">
           <div class="certificate-header">
             <div>
-              <div class="certificate-brand">Chem Challenge</div>
-              <div class="certificate-sub">Certificat officiel</div>
+              <div class="certificate-brand" id="certificateBrand">Chem Challenge</div>
+              <div class="certificate-sub" id="certificateEditionText">Certificat officiel</div>
             </div>
 
             <div>
@@ -1412,7 +1446,7 @@
       <h3 class="right-title">Informations concours</h3>
 
       <div class="mini-box">
-        <h4>Édition</h4>
+        <h4>Challenge</h4>
         <p id="editionLabel">Chem Challenge 2026</p>
       </div>
 
@@ -1424,7 +1458,7 @@
       <div class="mini-box">
         <h4>Liaison des 3 pages</h4>
         <p>
-          Les données candidates, jury, validation et certificat seront partagées avec
+          Les données candidates, jury, validation et certificat sont partagées avec
           <strong>competition-admin.html</strong> et <strong>competition-jury.html</strong>.
         </p>
       </div>
@@ -1442,6 +1476,11 @@
           Le certificat contient le nom, la photo, la date, un numéro de vérification
           et la signature officielle.
         </p>
+      </div>
+
+      <div class="mini-box">
+        <h4>Annonce</h4>
+        <p id="sidebarAnnouncement">Aucune annonce pour le moment.</p>
       </div>
     </aside>
   </div>
@@ -1466,7 +1505,8 @@
 
     const CONFIG = {
       competitionId: "chem_challenge_2026",
-      competitionTitle: "Chem Challenge 2026",
+      defaultTitle: "Chem Challenge",
+      defaultEdition: "Chem Challenge 2026",
       durationMinutes: 20,
       totalQuestionsToAsk: 12,
       maxWarnings: 3,
@@ -1498,6 +1538,16 @@
     const avatarFallback = document.getElementById("avatarFallback");
     const memberStatusText = document.getElementById("memberStatusText");
     const logoutBtn = document.getElementById("logoutBtn");
+
+    const heroChallengeTitle = document.getElementById("heroChallengeTitle");
+    const heroEditionBadge = document.getElementById("heroEditionBadge");
+    const announcementBox = document.getElementById("announcementBox");
+    const sidebarAnnouncement = document.getElementById("sidebarAnnouncement");
+    const editionLabel = document.getElementById("editionLabel");
+    const registrationStatusTag = document.getElementById("registrationStatusTag");
+    const examStatusTag = document.getElementById("examStatusTag");
+    const resultVisibilityTag = document.getElementById("resultVisibilityTag");
+    const challengeStatusText = document.getElementById("challengeStatusText");
 
     const fullName = document.getElementById("fullName");
     const displayName = document.getElementById("displayName");
@@ -1553,6 +1603,8 @@
 
     const certificateNotIssued = document.getElementById("certificateNotIssued");
     const certificateCard = document.getElementById("certificateCard");
+    const certificateBrand = document.getElementById("certificateBrand");
+    const certificateEditionText = document.getElementById("certificateEditionText");
     const certificatePhoto = document.getElementById("certificatePhoto");
     const certificatePhotoFallback = document.getElementById("certificatePhotoFallback");
     const certificateStudentName = document.getElementById("certificateStudentName");
@@ -1564,12 +1616,12 @@
     const certificateIssuedInfo = document.getElementById("certificateIssuedInfo");
 
     const leaderboardBox = document.getElementById("leaderboardBox");
-    const editionLabel = document.getElementById("editionLabel");
-    editionLabel.textContent = CONFIG.competitionTitle;
 
     let currentUser = null;
     let currentRegistration = null;
     let currentProfile = {};
+    let competitionSettings = null;
+
     let examQuestions = [];
     let currentQuestionIndex = 0;
     let selectedAnswerIndex = null;
@@ -1617,6 +1669,52 @@
       const m = String(d.getMonth()+1).padStart(2, "0");
       const dd = String(d.getDate()).padStart(2, "0");
       return `CC-${y}${m}${dd}-${clean}`;
+    }
+
+    function applyTag(el, className, text) {
+      el.className = "status-tag " + className;
+      el.textContent = text;
+    }
+
+    function applySettingsToUI(settings = null) {
+      const s = settings || {};
+      const title = sanitizeText(s.challengeTitle || CONFIG.defaultTitle);
+      const edition = sanitizeText(s.editionTitle || CONFIG.defaultEdition);
+      const regStatus = sanitizeText(s.registrationStatus || "open");
+      const examStatus = sanitizeText(s.examStatus || "open");
+      const resultVisibility = sanitizeText(s.resultVisibility || "hidden");
+      const announcement = sanitizeText(s.announcement || "");
+
+      heroChallengeTitle.textContent = title;
+      heroEditionBadge.textContent = edition;
+      editionLabel.textContent = edition;
+      announcementBox.textContent = announcement || "Aucune annonce pour le moment.";
+      sidebarAnnouncement.textContent = announcement || "Aucune annonce pour le moment.";
+
+      applyTag(registrationStatusTag, regStatus === "open" ? "tag-open" : "tag-close", `Inscriptions : ${regStatus === "open" ? "Ouvertes" : "Fermées"}`);
+      applyTag(examStatusTag, examStatus === "open" ? "tag-open" : "tag-close", `Épreuve : ${examStatus === "open" ? "Ouverte" : "Fermée"}`);
+      applyTag(resultVisibilityTag, resultVisibility === "visible" ? "tag-open" : "tag-none", `Résultats : ${resultVisibility === "visible" ? "Visibles" : "Masqués"}`);
+
+      challengeStatusText.textContent =
+        `Challenge : ${title} | Édition : ${edition} | Inscriptions : ${regStatus === "open" ? "ouvertes" : "fermées"} | Épreuve : ${examStatus === "open" ? "ouverte" : "fermée"} | Résultats : ${resultVisibility === "visible" ? "visibles" : "masqués"}.`;
+
+      certificateBrand.textContent = title;
+      certificateEditionText.textContent = edition;
+    }
+
+    function canRegisterNow() {
+      const regStatus = sanitizeText(competitionSettings?.registrationStatus || "open");
+      return regStatus === "open";
+    }
+
+    function canStartExamNow() {
+      const examStatus = sanitizeText(competitionSettings?.examStatus || "open");
+      return examStatus === "open";
+    }
+
+    function canShowLeaderboard() {
+      const resultVisibility = sanitizeText(competitionSettings?.resultVisibility || "hidden");
+      return resultVisibility === "visible";
     }
 
     function setRegistrationStatus(type, text) {
@@ -1684,6 +1782,11 @@
     async function registerCompetition() {
       if (!currentUser) {
         alert("Tu dois être connecté.");
+        return;
+      }
+
+      if (!canRegisterNow() && !currentRegistration) {
+        alert("Les inscriptions sont actuellement fermées par l’administrateur.");
         return;
       }
 
@@ -1771,7 +1874,10 @@
       const snap = await get(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`));
       if (!snap.exists()) {
         currentRegistration = null;
-        setRegistrationStatus("none", "Remplis le formulaire puis soumets ton dossier.");
+        setRegistrationStatus("none", canRegisterNow()
+          ? "Remplis le formulaire puis soumets ton dossier."
+          : "Les inscriptions sont actuellement fermées par l’administrateur."
+        );
         startExamBtn.disabled = true;
         return;
       }
@@ -1810,7 +1916,13 @@
         );
         startExamBtn.disabled = true;
       } else if (currentRegistration.status === "approved") {
-        if (currentRegistration.hasPlayed || currentRegistration.examCompleted) {
+        if (!canStartExamNow() && !(currentRegistration.examStarted && !currentRegistration.examCompleted)) {
+          setRegistrationStatus(
+            "approved",
+            `Ton inscription est approuvée, mais l’épreuve est actuellement fermée par l’administrateur. Référence candidat : ${currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)}.`
+          );
+          startExamBtn.disabled = true;
+        } else if (currentRegistration.hasPlayed || currentRegistration.examCompleted) {
           setRegistrationStatus(
             "approved",
             `Ton inscription est approuvée. Ta tentative a déjà été utilisée. Score enregistré : ${currentRegistration.score ?? 0}/${currentRegistration.totalQuestions || CONFIG.totalQuestionsToAsk}.`
@@ -1897,7 +2009,15 @@
         percent,
         finishReason: reason,
         submittedAt: Date.now(),
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        examMeta: {
+          startedAt: Date.now(),
+          updatedAt: Date.now(),
+          currentQuestionIndex: total,
+          warnings,
+          timeLeft: 0,
+          inProgress: false
+        }
       });
 
       await set(ref(db, `competitions/${CONFIG.competitionId}/leaderboard/${currentUser.uid}`), {
@@ -1946,6 +2066,7 @@
       examTimer = setInterval(async () => {
         timeLeft--;
         timerBox.textContent = `Temps restant : ${formatTime(timeLeft)}`;
+        await saveExamProgress();
 
         if (timeLeft <= 0) {
           clearInterval(examTimer);
@@ -1956,6 +2077,11 @@
 
     async function startExam() {
       if (!currentUser || !currentRegistration) return;
+
+      if (!canStartExamNow()) {
+        alert("L’épreuve est actuellement fermée par l’administrateur.");
+        return;
+      }
 
       if (currentRegistration.status !== "approved") {
         alert("Ton inscription n’est pas encore approuvée.");
@@ -1981,7 +2107,15 @@
         examCompleted: false,
         hasPlayed: false,
         startedAt: Date.now(),
-        updatedAt: Date.now()
+        updatedAt: Date.now(),
+        examMeta: {
+          startedAt: Date.now(),
+          updatedAt: Date.now(),
+          currentQuestionIndex: 0,
+          warnings: 0,
+          timeLeft,
+          inProgress: true
+        }
       });
 
       updateWarningUI();
@@ -2071,6 +2205,10 @@
       certificateNotIssued.classList.add("hidden");
       certificateCard.classList.remove("hidden");
 
+      const settings = competitionSettings || {};
+      const title = sanitizeText(cert.competitionTitle || settings.challengeTitle || CONFIG.defaultTitle);
+      const edition = sanitizeText(cert.editionTitle || settings.editionTitle || CONFIG.defaultEdition);
+
       const finalName = sanitizeText(cert.fullName || currentRegistration?.fullName || "Participant");
       const finalLevel = sanitizeText(cert.roleLabel || currentRegistration?.schoolLevel || "-");
       const finalInstitution = sanitizeText(cert.institution || currentRegistration?.institution || "-");
@@ -2079,8 +2217,10 @@
       const issuedOn = formatDate(cert.issuedAt || Date.now());
       const resultLine = cert.score != null && cert.totalQuestions != null ? ` Score obtenu : ${cert.score}/${cert.totalQuestions}.` : "";
 
+      certificateBrand.textContent = title;
+      certificateEditionText.textContent = edition;
       certificateStudentName.textContent = finalName;
-      certificateMainText.textContent = `Ce certificat est décerné à ${finalName} pour sa ${finalMention.toLowerCase()} au Chem Challenge.${resultLine}`;
+      certificateMainText.textContent = `Ce certificat est décerné à ${finalName} pour sa ${finalMention.toLowerCase()} au ${title}.${resultLine}`;
       certificateDate.textContent = issuedOn;
       certificateLevel.textContent = finalLevel;
       certificateInstitution.textContent = finalInstitution;
@@ -2102,6 +2242,11 @@
     }
 
     async function loadLeaderboard() {
+      if (!canShowLeaderboard()) {
+        leaderboardBox.innerHTML = `<div class="notice">Le classement est actuellement masqué par l’administrateur.</div>`;
+        return;
+      }
+
       const boardQuery = query(
         ref(db, `competitions/${CONFIG.competitionId}/leaderboard`),
         orderByChild("percent"),
@@ -2109,6 +2254,11 @@
       );
 
       onValue(boardQuery, (snap) => {
+        if (!canShowLeaderboard()) {
+          leaderboardBox.innerHTML = `<div class="notice">Le classement est actuellement masqué par l’administrateur.</div>`;
+          return;
+        }
+
         if (!snap.exists()) {
           leaderboardBox.innerHTML = `<div class="notice">Aucun résultat disponible pour le moment.</div>`;
           return;
@@ -2191,6 +2341,24 @@
       });
     }
 
+    function startSettingsListener() {
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/settings`), async (snap) => {
+        competitionSettings = snap.exists() ? (snap.val() || {}) : {
+          challengeTitle: CONFIG.defaultTitle,
+          editionTitle: CONFIG.defaultEdition,
+          registrationStatus: "open",
+          examStatus: "open",
+          resultVisibility: "hidden",
+          announcement: ""
+        };
+
+        applySettingsToUI(competitionSettings);
+        await loadRegistrationStatus();
+        await loadCertificateStatus();
+        await loadLeaderboard();
+      });
+    }
+
     logoutBtn.addEventListener("click", async () => {
       await signOut(auth);
       window.location.href = "login.html";
@@ -2210,7 +2378,6 @@
     nextQuestionBtn.addEventListener("click", handleNextQuestion);
 
     setupAntiCheat();
-    loadLeaderboard();
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -2219,13 +2386,16 @@
       }
 
       currentUser = user;
+
       userNameEl.textContent = user.displayName || "Membre";
       userEmailEl.textContent = user.email || "Utilisateur connecté";
       memberStatusText.textContent = "Espace concours privé";
 
       await loadUserProfile(user.uid);
+      startSettingsListener();
       await loadRegistrationStatus();
       await loadCertificateStatus();
+      await loadLeaderboard();
     });
   </script>
 </body>
