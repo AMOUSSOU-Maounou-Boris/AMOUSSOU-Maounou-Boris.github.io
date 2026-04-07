@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Concours | Boris Research Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    *{box-sizing:border-box;}
+
+    :root{
+      --bg:#eaf5ff;
+      --card:#ffffff;
+      --nav:#082e5b;
+      --text:#0b2340;
+      --muted:#6b7d93;
+      --line:#d9e5f2;
+      --blue:#2f8cff;
+      --green:#18c34a;
+      --red:#df4b4b;
+      --orange:#ff9f1a;
+      --radius:18px;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .topbar{
+      background:var(--nav);
+      color:#fff;
+      padding:18px;
+      text-align:center;
+      font-weight:bold;
+    }
+
+    .container{
+      max-width:1400px;
+      margin:20px auto;
+      padding:15px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:20px;
+      margin-bottom:20px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    h2{
+      margin-top:0;
+    }
+
+    .btn{
+      padding:10px 14px;
+      border:none;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+
+    .btn.green{background:var(--green);color:#fff;}
+    .btn.red{background:var(--red);color:#fff;}
+    .btn.blue{background:var(--blue);color:#fff;}
+    .btn.orange{background:var(--orange);color:#fff;}
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+    }
+
+    th, td{
+      padding:10px;
+      border-bottom:1px solid #ddd;
+      text-align:left;
+      font-size:14px;
+    }
+
+    th{
+      background:#f0f6ff;
+    }
+
+    input, select{
+      padding:10px;
+      width:100%;
+      border-radius:10px;
+      border:1px solid #ccc;
+      margin-top:5px;
+    }
+
+    .status{
+      font-weight:bold;
+    }
+
+    .green{color:green;}
+    .red{color:red;}
+    .orange{color:orange;}
+
+  </style>
+</head>
+
+<body>
+
+<div class="topbar">
+  ADMIN CONCOURS - BORIS RESEARCH HUB
+</div>
+
+<div class="container">
+
+  <!-- PARAMETRES -->
+  <div class="card">
+    <h2>⚙️ Paramètres du concours</h2>
+
+    <label>Titre du concours</label>
+    <input id="contestTitle" placeholder="Chemistry Challenge 2026">
+
+    <label>Activer les inscriptions</label>
+    <select id="contestOpen">
+      <option value="true">Oui</option>
+      <option value="false">Non</option>
+    </select>
+
+    <label>Afficher classement public</label>
+    <select id="showRanking">
+      <option value="true">Oui</option>
+      <option value="false">Non</option>
+    </select>
+
+    <br><br>
+    <button class="btn blue" onclick="saveSettings()">Enregistrer</button>
+  </div>
+
+
+  <!-- PAIEMENTS -->
+  <div class="card">
+    <h2>💰 Paramètres de paiement</h2>
+
+    <label>Nom du bénéficiaire</label>
+    <input id="payName">
+
+    <label>IBAN / Compte</label>
+    <input id="payIban">
+
+    <label>Mobile Money / Wave / Autre</label>
+    <input id="payMobile">
+
+    <label>PayPal</label>
+    <input id="payPaypal">
+
+    <button class="btn blue" onclick="savePayment()">Sauvegarder paiements</button>
+  </div>
+
+
+  <!-- PARTICIPANTS -->
+  <div class="card">
+    <h2>👥 Participants</h2>
+
+    <input id="search" placeholder="Rechercher...">
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Paiement</th>
+          <th>Statut</th>
+          <th>Score</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="participantsTable"></tbody>
+    </table>
+  </div>
+
+
+  <!-- EXPORT -->
+  <div class="card">
+    <h2>📤 Export</h2>
+    <button class="btn blue" onclick="exportCSV()">Exporter CSV</button>
+  </div>
+
+
+  <!-- GAGNANTS -->
+  <div class="card">
+    <h2>🏆 Publication des gagnants</h2>
+
+    <input id="winnerTitle" placeholder="Titre (ex: Winner Session 1)">
+    <textarea id="winnerText" placeholder="Description gagnant"></textarea>
+
+    <button class="btn green" onclick="publishWinners()">Publier sur Insights</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import {
+  ref, get, set, update, onValue
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+
+let participantsData = {};
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user || user.email !== ADMIN_EMAIL){
+    window.location.href = "insights.html";
+    return;
+  }
+
+  loadParticipants();
+  loadSettings();
+});
+
+
+async function loadParticipants(){
+  const snapshot = await get(ref(db,"competitions/chemistry_challenge_2026/participants"));
+
+  if(!snapshot.exists()) return;
+
+  participantsData = snapshot.val();
+  renderTable();
+}
+
+
+function renderTable(){
+  const table = document.getElementById("participantsTable");
+  table.innerHTML = "";
+
+  Object.entries(participantsData).forEach(([uid,data])=>{
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${data.fullName || ""}</td>
+      <td>${data.email || ""}</td>
+      <td>${data.paymentRef || "—"}</td>
+      <td class="status">${data.status || "pending"}</td>
+      <td>${data.score ?? "-"}</td>
+      <td>
+        <button class="btn green" onclick="approve('${uid}')">✔</button>
+        <button class="btn red" onclick="reject('${uid}')">✖</button>
+        <button class="btn orange" onclick="freeAccess('${uid}')">🎁</button>
+        <button class="btn red" onclick="deleteUser('${uid}')">🗑</button>
+      </td>
+    `;
+
+    table.appendChild(tr);
+  });
+}
+  async function loadSettings(){
+    const settingsSnap = await get(ref(db, "competitions/chemistry_challenge_2026/settings"));
+    if(settingsSnap.exists()){
+      const s = settingsSnap.val() || {};
+      document.getElementById("contestTitle").value = s.title || "Chemistry Challenge 2026";
+      document.getElementById("contestOpen").value = String(s.open ?? true);
+      document.getElementById("showRanking").value = String(s.showRanking ?? true);
+    } else {
+      document.getElementById("contestTitle").value = "Chemistry Challenge 2026";
+      document.getElementById("contestOpen").value = "true";
+      document.getElementById("showRanking").value = "true";
+    }
+
+    const paymentSnap = await get(ref(db, "competitions/chemistry_challenge_2026/paymentSettings"));
+    if(paymentSnap.exists()){
+      const p = paymentSnap.val() || {};
+      document.getElementById("payName").value = p.beneficiaryName || "";
+      document.getElementById("payIban").value = p.iban || "";
+      document.getElementById("payMobile").value = p.mobileMoney || "";
+      document.getElementById("payPaypal").value = p.paypal || "";
+    }
+  }
+
+  async function saveSettings(){
+    const payload = {
+      title: document.getElementById("contestTitle").value.trim() || "Chemistry Challenge 2026",
+      open: document.getElementById("contestOpen").value === "true",
+      showRanking: document.getElementById("showRanking").value === "true",
+      updatedAt: Date.now(),
+      updatedBy: ADMIN_EMAIL
+    };
+
+    await update(ref(db, "competitions/chemistry_challenge_2026/settings"), payload);
+    alert("Paramètres du concours enregistrés.");
+  }
+
+  async function savePayment(){
+    const payload = {
+      beneficiaryName: document.getElementById("payName").value.trim(),
+      iban: document.getElementById("payIban").value.trim(),
+      mobileMoney: document.getElementById("payMobile").value.trim(),
+      paypal: document.getElementById("payPaypal").value.trim(),
+      updatedAt: Date.now(),
+      updatedBy: ADMIN_EMAIL
+    };
+
+    await update(ref(db, "competitions/chemistry_challenge_2026/paymentSettings"), payload);
+    alert("Paramètres de paiement sauvegardés.");
+  }
+
+  async function approve(uid){
+    await update(ref(db, `competitions/chemistry_challenge_2026/participants/${uid}`), {
+      status: "approved",
+      paymentStatus: "validated",
+      freeAccess: false,
+      updatedAt: Date.now(),
+      adminDecisionBy: ADMIN_EMAIL
+    });
+    await loadParticipants();
+  }
+
+  async function reject(uid){
+    await update(ref(db, `competitions/chemistry_challenge_2026/participants/${uid}`), {
+      status: "rejected",
+      paymentStatus: "refused",
+      freeAccess: false,
+      updatedAt: Date.now(),
+      adminDecisionBy: ADMIN_EMAIL
+    });
+    await loadParticipants();
+  }
+
+  async function freeAccess(uid){
+    await update(ref(db, `competitions/chemistry_challenge_2026/participants/${uid}`), {
+      status: "approved",
+      paymentStatus: "free",
+      freeAccess: true,
+      updatedAt: Date.now(),
+      adminDecisionBy: ADMIN_EMAIL
+    });
+    await loadParticipants();
+  }
+
+  async function deleteUser(uid){
+    const ok = confirm("Supprimer cette inscription du concours ?");
+    if(!ok) return;
+
+    await set(ref(db, `competitions/chemistry_challenge_2026/participants/${uid}`), null);
+    await set(ref(db, `competitions/chemistry_challenge_2026/leaderboard/${uid}`), null);
+    await loadParticipants();
+  }
+
+  function exportCSV(){
+    const rows = [
+      [
+        "uid",
+        "candidateCode",
+        "fullName",
+        "email",
+        "schoolLevel",
+        "institution",
+        "country",
+        "phone",
+        "category",
+        "paymentMethod",
+        "paymentRef",
+        "paymentStatus",
+        "status",
+        "freeAccess",
+        "score",
+        "totalQuestions"
+      ]
+    ];
+
+    Object.entries(participantsData).forEach(([uid, d]) => {
+      rows.push([
+        uid,
+        d.candidateCode || "",
+        d.fullName || "",
+        d.email || "",
+        d.schoolLevel || "",
+        d.institution || "",
+        d.country || "",
+        d.phone || "",
+        d.category || "",
+        d.paymentMethod || "",
+        d.paymentRef || "",
+        d.paymentStatus || "",
+        d.status || "",
+        d.freeAccess ? "true" : "false",
+        d.score ?? "",
+        d.totalQuestions ?? ""
+      ]);
+    });
+
+    const csv = rows.map(row =>
+      row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(",")
+    ).join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "competition_participants.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function publishWinners(){
+    const title = document.getElementById("winnerTitle").value.trim();
+    const text = document.getElementById("winnerText").value.trim();
+
+    if(!title || !text){
+      alert("Merci de remplir le titre et la description.");
+      return;
+    }
+
+    const postRef = ref(db, "posts/" + Date.now());
+    await set(postRef, {
+      authorEmail: ADMIN_EMAIL,
+      authorName: "Competition Admin",
+      title,
+      text,
+      type: "competition_winner",
+      createdAt: Date.now(),
+      visibility: "members",
+      source: "competition-admin"
+    });
+
+    alert("Publication envoyée vers Insights.");
+  }
+
+  async function ensureJuryStructure(){
+    const jurySnap = await get(ref(db, "competitions/chemistry_challenge_2026/jury"));
+    if(!jurySnap.exists()){
+      await set(ref(db, "competitions/chemistry_challenge_2026/jury"), {
+        enabled: false,
+        anonymousMode: true,
+        members: {}
+      });
+    }
+  }
+
+  function renderSearchFiltered(){
+    const q = (document.getElementById("search").value || "").toLowerCase().trim();
+    const table = document.getElementById("participantsTable");
+    table.innerHTML = "";
+
+    Object.entries(participantsData).forEach(([uid, data]) => {
+      const haystack = [
+        data.fullName || "",
+        data.email || "",
+        data.paymentRef || "",
+        data.status || "",
+        data.category || "",
+        data.institution || "",
+        data.country || "",
+        data.candidateCode || ""
+      ].join(" ").toLowerCase();
+
+      if(q && !haystack.includes(q)) return;
+
+      const paymentLabel =
+        data.paymentStatus === "validated" ? "Validé" :
+        data.paymentStatus === "refused" ? "Refusé" :
+        data.paymentStatus === "free" ? "Gratuit" :
+        data.paymentRef ? "En attente" : "Non soumis";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${data.fullName || ""}<br><small>${data.candidateCode || ""}</small></td>
+        <td>${data.email || ""}</td>
+        <td>
+          <div><strong>${paymentLabel}</strong></div>
+          <div style="font-size:12px;color:#6b7d93;">${data.paymentMethod || "—"} ${data.paymentRef ? "• " + data.paymentRef : ""}</div>
+        </td>
+        <td class="status">${data.status || "pending"}</td>
+        <td>${data.score ?? "-"}</td>
+        <td>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn green" onclick="approve('${uid}')">✔</button>
+            <button class="btn red" onclick="reject('${uid}')">✖</button>
+            <button class="btn orange" onclick="freeAccess('${uid}')">🎁</button>
+            <button class="btn red" onclick="deleteUser('${uid}')">🗑</button>
+          </div>
+        </td>
+      `;
+      table.appendChild(tr);
+    });
+  }
+
+  document.getElementById("search").addEventListener("input", renderSearchFiltered);
+
+  const oldRenderTable = renderTable;
+  renderTable = renderSearchFiltered;
+
+  await ensureJuryStructure();
+
+  window.saveSettings = saveSettings;
+  window.savePayment = savePayment;
+  window.approve = approve;
+  window.reject = reject;
+  window.freeAccess = freeAccess;
+  window.deleteUser = deleteUser;
+  window.exportCSV = exportCSV;
+  window.publishWinners = publishWinners;
+</script>
+
+</body>
+</html>  
