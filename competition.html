@@ -1,1783 +1,286 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Concours | Boris Research Hub</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    :root{
-      --bg:#eaf5ff;
-      --card:#ffffff;
-      --nav:#082e5b;
-      --text:#0b2340;
-      --muted:#6b7d93;
-      --line:#d9e5f2;
-      --blue:#2f8cff;
-      --blue-dark:#0f4d92;
-      --green:#18c34a;
-      --red:#df4b4b;
-      --orange:#ff9f1a;
-      --soft:#f4f8fc;
-      --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
-      --radius:22px;
-    }
-
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-
-    a{ text-decoration:none; color:inherit; }
-
-    .topbar{
-      background:var(--nav);
-      color:#fff;
-      padding:18px 28px;
-      position:sticky;
-      top:0;
-      z-index:1000;
-      box-shadow:0 6px 16px rgba(0,0,0,.08);
-    }
-
-    .topbar-inner{
-      max-width:1400px;
-      margin:0 auto;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:28px;
-      flex-wrap:wrap;
-      font-weight:700;
-      font-size:15px;
-    }
-
-    .topbar a{
-      opacity:.95;
-      position:relative;
-      padding-bottom:6px;
-    }
-
-    .topbar a.active::after{
-      content:"";
-      position:absolute;
-      left:0;
-      right:0;
-      bottom:0;
-      height:3px;
-      background:#fff;
-      border-radius:3px;
-    }
-
-    .nav-online-dot{
-      display:inline-block;
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:var(--green);
-      margin-right:8px;
-      vertical-align:middle;
-    }
-
-    .page{
-      max-width:1400px;
-      margin:12px auto 40px;
-      padding:0 18px;
-      display:grid;
-      grid-template-columns:280px 1fr 300px;
-      gap:18px;
-      align-items:start;
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-
-    .sidebar, .rightbar{
-      padding:18px;
-      position:sticky;
-      top:88px;
-    }
-
-    .profile-box{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      margin-bottom:18px;
-    }
-
-    .avatar{
-      width:66px;
-      height:66px;
-      border-radius:50%;
-      object-fit:cover;
-      background:#dbe9f6;
-      border:1px solid var(--line);
-    }
-
-    .avatar-placeholder{
-      width:66px;
-      height:66px;
-      border-radius:50%;
-      background:#dbe9f6;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:800;
-      font-size:20px;
-      color:var(--blue-dark);
-      border:1px solid var(--line);
-    }
-
-    .profile-name{
-      font-size:16px;
-      font-weight:800;
-      line-height:1.4;
-    }
-
-    .status-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 14px;
-      border-radius:999px;
-      background:#edf9f0;
-      color:#137a33;
-      font-weight:700;
-      font-size:14px;
-      margin-bottom:18px;
-    }
-
-    .status-pill .dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:var(--green);
-    }
-
-    .side-btn{
-      display:block;
-      width:100%;
-      text-align:center;
-      padding:16px 14px;
-      margin:10px 0;
-      border:none;
-      border-radius:16px;
-      background:#e8eef6;
-      color:var(--text);
-      font-weight:800;
-      font-size:15px;
-      cursor:pointer;
-      transition:.2s ease;
-    }
-
-    .side-btn:hover{ transform:translateY(-1px); }
-    .side-btn.red{ background:#e74c4c; color:#fff; }
-
-    .menu-title{
-      font-size:18px;
-      font-weight:900;
-      margin:6px 0 14px;
-    }
-
-    .hub-card{
-      padding:14px;
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:#fdfefe;
-      margin-bottom:12px;
-    }
-
-    .hub-card h4{
-      margin:0 0 8px;
-      font-size:16px;
-    }
-
-    .hub-card p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.45;
-      font-size:14px;
-    }
-
-    .main{
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-
-    .hero{
-      padding:24px;
-    }
-
-    .hero-top{
-      display:flex;
-      justify-content:space-between;
-      gap:18px;
-      align-items:flex-start;
-      flex-wrap:wrap;
-    }
-
-    .hero h1{
-      margin:0 0 10px;
-      font-size:40px;
-      line-height:1.08;
-      color:var(--nav);
-    }
-
-    .hero p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.65;
-      font-size:16px;
-    }
-
-    .hero-badge{
-      background:#eaf2ff;
-      color:var(--blue-dark);
-      border:1px solid #c8daf7;
-      padding:10px 14px;
-      border-radius:999px;
-      font-weight:800;
-      white-space:nowrap;
-    }
-
-    .info-grid{
-      display:grid;
-      grid-template-columns:repeat(4, 1fr);
-      gap:14px;
-      margin-top:22px;
-    }
-
-    .info-box{
-      background:#f9fbfe;
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px;
-    }
-
-    .info-box .label{
-      color:var(--muted);
-      font-size:13px;
-      margin-bottom:8px;
-    }
-
-    .info-box .value{
-      font-weight:900;
-      font-size:18px;
-      color:var(--nav);
-      line-height:1.35;
-    }
-
-    .section{
-      padding:22px;
-    }
-
-    .section h2{
-      margin:0 0 12px;
-      font-size:28px;
-      color:var(--nav);
-    }
-
-    .section h3{
-      margin:0 0 12px;
-      font-size:20px;
-      color:var(--nav);
-    }
-
-    .section p{
-      margin:0 0 14px;
-      color:var(--muted);
-      line-height:1.65;
-    }
-
-    .two-col{
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:18px;
-    }
-
-    .list{
-      display:grid;
-      gap:12px;
-    }
-
-    .list-item{
-      padding:14px 16px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      background:#fbfdff;
-    }
-
-    .list-item strong{
-      display:block;
-      margin-bottom:6px;
-      color:var(--nav);
-      font-size:16px;
-    }
-
-    .list-item span{
-      color:var(--muted);
-      line-height:1.5;
-      font-size:14px;
-    }
-
-    .pricing{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:14px;
-    }
-
-    .price-card{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:18px;
-      background:#fbfdff;
-    }
-
-    .price-card.highlight{
-      border:2px solid #9fc0ef;
-      background:#f3f8ff;
-    }
-
-    .price-card h4{
-      margin:0 0 10px;
-      font-size:18px;
-      color:var(--nav);
-    }
-
-    .price{
-      font-size:32px;
-      font-weight:900;
-      margin-bottom:8px;
-    }
-
-    .small{
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.55;
-    }
-
-    .form-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
-    .field.full{ grid-column:1 / -1; }
-
-    label{
-      font-weight:800;
-      font-size:14px;
-      color:var(--nav);
-    }
-
-    input, select, textarea{
-      width:100%;
-      border:1px solid #c9d7e7;
-      background:#fff;
-      padding:14px 15px;
-      border-radius:15px;
-      outline:none;
-      font-size:15px;
-      color:var(--text);
-    }
-
-    textarea{
-      resize:vertical;
-      min-height:110px;
-    }
-
-    .hint{
-      font-size:13px;
-      color:var(--muted);
-      line-height:1.5;
-    }
-
-    .check-row{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      padding:12px 14px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      background:#f9fbfe;
-    }
-
-    .check-row input{
-      width:18px;
-      height:18px;
-      margin-top:2px;
-    }
-
-    .btn-row{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-top:14px;
-    }
-
-    .btn{
-      border:none;
-      border-radius:16px;
-      padding:14px 18px;
-      font-weight:900;
-      font-size:15px;
-      cursor:pointer;
-      transition:.2s ease;
-    }
-
-    .btn:hover{ transform:translateY(-1px); }
-
-    .btn.primary{
-      background:#1557a6;
-      color:#fff;
-    }
-
-    .btn.secondary{
-      background:#eaf1f9;
-      color:var(--nav);
-    }
-
-    .btn.green{
-      background:var(--green);
-      color:#fff;
-    }
-
-    .btn.red{
-      background:var(--red);
-      color:#fff;
-    }
-
-    .btn.orange{
-      background:var(--orange);
-      color:#fff;
-    }
-
-    .status-box{
-      padding:16px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:#fbfdff;
-      margin-top:12px;
-    }
-
-    .status-box strong{
-      display:block;
-      margin-bottom:8px;
-      color:var(--nav);
-    }
-
-    .status-tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:800;
-      margin-bottom:8px;
-    }
-
-    .tag-pending{ background:#fff4df; color:#9a6600; }
-    .tag-approved{ background:#eaf9ee; color:#0b7f34; }
-    .tag-rejected{ background:#ffe9e9; color:#b62727; }
-    .tag-none{ background:#eef3f8; color:#5f738c; }
-
-    .exam-shell{
-      display:none;
-      padding:22px;
-    }
-
-    .exam-top{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-bottom:18px;
-    }
-
-    .exam-top h2{
-      margin:0;
-      font-size:28px;
-      color:var(--nav);
-    }
-
-    .timer{
-      background:#eff6ff;
-      color:var(--blue-dark);
-      border:1px solid #cadeff;
-      padding:12px 16px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:16px;
-    }
-
-    .warning-pill{
-      background:#fff4df;
-      color:#8f6100;
-      border:1px solid #f3d49e;
-      padding:10px 14px;
-      border-radius:999px;
-      font-weight:800;
-      font-size:14px;
-    }
-
-    .progress{
-      height:12px;
-      background:#edf3fa;
-      border-radius:999px;
-      overflow:hidden;
-      margin-bottom:16px;
-      border:1px solid var(--line);
-    }
-
-    .progress-bar{
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg, #2f8cff, #0f4d92);
-      transition:width .2s ease;
-    }
-
-    .question-card{
-      border:1px solid var(--line);
-      background:#fbfdff;
-      border-radius:20px;
-      padding:20px;
-    }
-
-    .question-meta{
-      font-size:14px;
-      color:var(--muted);
-      margin-bottom:10px;
-      font-weight:700;
-    }
-
-    .question-text{
-      font-size:24px;
-      color:var(--nav);
-      font-weight:900;
-      line-height:1.35;
-      margin-bottom:18px;
-    }
-
-    .options{
-      display:grid;
-      gap:12px;
-    }
-
-    .option{
-      border:1px solid #cfdceb;
-      background:#fff;
-      border-radius:16px;
-      padding:14px 16px;
-      cursor:pointer;
-      transition:.15s ease;
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-    }
-
-    .option:hover{
-      border-color:#96b6e0;
-      background:#f7fbff;
-    }
-
-    .option.selected{
-      border:2px solid #2f8cff;
-      background:#eef6ff;
-    }
-
-    .option-bullet{
-      width:24px;
-      height:24px;
-      border-radius:50%;
-      background:#e7eef7;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      color:var(--nav);
-      flex:0 0 24px;
-      margin-top:1px;
-    }
-
-    .exam-actions{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-      margin-top:16px;
-      flex-wrap:wrap;
-    }
-
-    .exam-note{
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.5;
-    }
-
-    .leaderboard{
-      display:grid;
-      gap:12px;
-      margin-top:10px;
-    }
-
-    .leader-item{
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px 16px;
-      background:#fbfdff;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-    }
-
-    .leader-left{
-      display:flex;
-      gap:12px;
-      align-items:center;
-    }
-
-    .rank{
-      width:38px;
-      height:38px;
-      border-radius:50%;
-      background:#e9f2ff;
-      color:var(--blue-dark);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-    }
-
-    .leader-name{
-      font-weight:900;
-      color:var(--nav);
-      margin-bottom:4px;
-    }
-
-    .leader-sub{
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .leader-score{
-      font-size:22px;
-      font-weight:900;
-      color:var(--nav);
-      white-space:nowrap;
-    }
-
-    .right-title{
-      margin:0 0 12px;
-      font-size:18px;
-      font-weight:900;
-      color:var(--nav);
-    }
-
-    .mini-box{
-      border:1px solid var(--line);
-      background:#fbfdff;
-      border-radius:18px;
-      padding:14px;
-      margin-bottom:14px;
-    }
-
-    .mini-box h4{
-      margin:0 0 8px;
-      font-size:16px;
-      color:var(--nav);
-    }
-
-    .mini-box p{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.55;
-    }
-
-    .result-box{
-      display:none;
-      border:1px solid var(--line);
-      background:#fbfdff;
-      border-radius:18px;
-      padding:18px;
-      margin-top:14px;
-    }
-
-    .result-score{
-      font-size:42px;
-      font-weight:900;
-      color:var(--nav);
-      margin:8px 0;
-    }
-
-    .notice{
-      padding:14px 16px;
-      border:1px dashed #c6d8ea;
-      background:#f9fbfe;
-      border-radius:16px;
-      color:var(--muted);
-      line-height:1.6;
-      font-size:14px;
-    }
-
-    .hidden{ display:none !important; }
-
-    @media (max-width:1200px){
-      .page{
-        grid-template-columns:1fr;
-      }
-      .sidebar,.rightbar{
-        position:static;
-      }
-    }
-
-    @media (max-width:900px){
-      .info-grid,
-      .pricing,
-      .form-grid,
-      .two-col{
-        grid-template-columns:1fr;
-      }
-      .hero h1{ font-size:32px; }
-      .question-text{ font-size:21px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Concours | Boris Research Hub</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eaf5ff;color:#0b2340}a{text-decoration:none;color:inherit}
+.topbar{background:#082e5b;color:#fff;padding:16px 20px;position:sticky;top:0;z-index:10}
+.topbar-inner{max-width:1400px;margin:0 auto;display:flex;gap:20px;justify-content:center;align-items:center;flex-wrap:wrap;font-weight:700}
+.topbar a.active{border-bottom:3px solid #fff;padding-bottom:6px}
+.wrap{max-width:1400px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:280px 1fr 300px;gap:18px}
+.card{background:#fff;border:1px solid #d9e5f2;border-radius:22px;box-shadow:0 14px 34px rgba(7,31,66,.1)}
+.side,.right{padding:18px;position:sticky;top:82px;height:fit-content}
+.main{display:flex;flex-direction:column;gap:18px}
+.hero,.section,.exam-shell{padding:22px}
+.hero h1,.section h2{margin:0 0 12px;color:#082e5b}
+.hero p,.section p,.muted{color:#6b7d93;line-height:1.6}
+.btn{border:none;border-radius:16px;padding:13px 16px;font-weight:800;cursor:pointer}
+.btn.primary{background:#1557a6;color:#fff}.btn.secondary{background:#eaf1f9;color:#082e5b}.btn.green{background:#18c34a;color:#fff}.btn.red{background:#df4b4b;color:#fff}.btn.orange{background:#ff9f1a;color:#fff}
+input,select,textarea{width:100%;padding:13px 14px;border:1px solid #c9d7e7;border-radius:14px;font-size:15px}
+textarea{min-height:110px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}
+.box{border:1px solid #d9e5f2;border-radius:16px;background:#fbfdff;padding:14px}
+.status{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;font-weight:800;font-size:13px}
+.status.none{background:#eef3f8;color:#5f738c}.status.pending{background:#fff4df;color:#9a6600}.status.approved{background:#eaf9ee;color:#0b7f34}.status.rejected{background:#ffe9e9;color:#b62727}
+.badge{display:inline-flex;gap:8px;align-items:center;padding:10px 14px;border-radius:999px;background:#eaf2ff;color:#0f4d92;font-weight:800}
+.list{display:grid;gap:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.avatar{width:64px;height:64px;border-radius:50%;background:#dbe9f6;display:flex;align-items:center;justify-content:center;font-weight:900;color:#0f4d92}
+.exam-shell{display:none}
+.progress{height:12px;background:#edf3fa;border-radius:999px;overflow:hidden;border:1px solid #d9e5f2}.progress-bar{height:100%;width:0;background:linear-gradient(90deg,#2f8cff,#0f4d92)}
+.question{font-size:24px;font-weight:900;color:#082e5b;line-height:1.35;margin:10px 0 18px}
+.options{display:grid;gap:10px}.option{border:1px solid #cfdceb;background:#fff;border-radius:16px;padding:14px;cursor:pointer;display:flex;gap:12px;align-items:flex-start}.option:hover{background:#f7fbff}.option.selected{border:2px solid #2f8cff;background:#eef6ff}
+.option-bullet{width:24px;height:24px;border-radius:50%;background:#e7eef7;display:flex;align-items:center;justify-content:center;font-weight:900;flex:0 0 24px}
+.timer{background:#eff6ff;color:#0f4d92;border:1px solid #cadeff;padding:12px 16px;border-radius:999px;font-weight:900}
+.warn{background:#fff4df;color:#8f6100;border:1px solid #f3d49e;padding:10px 14px;border-radius:999px;font-weight:800}
+.result{display:none;margin-top:16px}
+.table{display:grid;gap:10px}
+.item{border:1px solid #d9e5f2;border-radius:16px;padding:12px 14px;background:#fbfdff}
+.small{font-size:13px;color:#6b7d93}
+.hidden{display:none!important}
+@media(max-width:1200px){.wrap{grid-template-columns:1fr}.side,.right{position:static}}
+@media(max-width:800px){.grid2{grid-template-columns:1fr}.question{font-size:20px}}
+</style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="topbar-inner">
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="research.html">Research</a>
-      <a href="cv.html">Resume</a>
-      <a href="contact.html">Contact</a>
-      <a href="insights.html">Insights</a>
-      <a href="messages.html">Messages</a>
-      <a href="calls.html">Appels</a>
-      <a href="meeting-room.html">Salle de réunion</a>
-      <a href="competition.html" class="active">Concours</a>
-      <a href="profile.html"><span class="nav-online-dot"></span>Mon compte</a>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="research.html">Research</a>
+    <a href="cv.html">Resume</a>
+    <a href="contact.html">Contact</a>
+    <a href="insights.html">Insights</a>
+    <a href="messages.html">Messages</a>
+    <a href="calls.html">Appels</a>
+    <a href="meeting-room.html">Salle de réunion</a>
+    <a href="competition.html" class="active">Concours</a>
+    <a href="competition-jury.html" id="juryLink" style="display:none;">Jury</a>
+    <a href="competition-admin.html" id="adminLink" style="display:none;">⚙ Admin</a>
+    <a href="profile.html">Mon compte</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <aside class="card side">
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+      <div class="avatar" id="avatarBox">BR</div>
+      <div>
+        <div style="font-weight:900" id="userName">Membre</div>
+        <div class="small" id="userEmail">Connexion...</div>
+      </div>
     </div>
-  </div>
+    <div class="badge" id="memberBadge">Espace concours privé</div>
+    <div style="height:12px"></div>
+    <a class="btn secondary" style="display:block;text-align:center" href="insights.html">Retour Insights</a>
+    <div style="height:10px"></div>
+    <button class="btn red" id="logoutBtn" style="width:100%">Déconnexion</button>
+    <div style="height:18px"></div>
+    <div class="box">
+      <div style="font-weight:900;margin-bottom:8px">Fair Play</div>
+      <div class="small">Une seule tentative, activité surveillée, alertes remontées à l’admin et au jury.</div>
+    </div>
+  </aside>
 
-  <div class="page">
-    <aside class="card sidebar">
-      <div class="profile-box">
-        <img id="userAvatar" class="avatar hidden" alt="Profil">
-        <div id="avatarFallback" class="avatar-placeholder">BR</div>
+  <main class="main">
+    <section class="card hero">
+      <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
         <div>
-          <div class="profile-name" id="userName">Membre</div>
-          <div style="color: var(--muted); font-size: 14px; margin-top: 6px;" id="userEmail">Connexion en cours...</div>
+          <h1 id="heroTitle">Boris Chemistry Challenge</h1>
+          <p id="heroText">Inscription, validation, paiement ou accès gratuit, puis épreuve sécurisée avec suivi d’activité.</p>
+        </div>
+        <div class="badge" id="editionBadge">Édition 2026</div>
+      </div>
+    </section>
+
+    <section class="card section">
+      <h2>Inscription</h2>
+      <p>Ton inscription doit être validée avant de lancer l’épreuve. L’administrateur peut aussi t’accorder un accès gratuit.</p>
+      <div class="grid2">
+        <div><label>Nom complet</label><input id="fullName"></div>
+        <div><label>Niveau</label><select id="schoolLevel"><option value="">Choisir</option><option>Lyceen</option><option>Licence</option><option>Master</option><option>Doctorat</option><option>Autre</option></select></div>
+        <div><label>Établissement</label><input id="institution"></div>
+        <div><label>Pays</label><input id="country"></div>
+        <div><label>Téléphone</label><input id="phone"></div>
+        <div><label>Catégorie</label><select id="category"><option value="">Choisir</option><option>Lyceen</option><option>Etudiant</option><option>International</option></select></div>
+        <div><label>Mode de paiement</label><select id="paymentMethod"><option value="">Choisir</option><option>Paypal</option><option>Wave</option><option>MobileMoney</option><option>Virement</option><option>Autre</option></select></div>
+        <div><label>Référence de paiement</label><input id="paymentRef"></div>
+        <div class="full"><label>Motivation</label><textarea id="motivation"></textarea></div>
+        <div class="full box"><label style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" id="agreeRules" style="width:18px;height:18px;margin-top:2px"><span>J’accepte le règlement et je comprends qu’une seule tentative est autorisée.</span></label></div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn primary" id="registerBtn">Soumettre mon inscription</button>
+        <button class="btn secondary" id="refreshBtn">Actualiser</button>
+      </div>
+      <div class="box" style="margin-top:14px">
+        <div style="font-weight:900;margin-bottom:8px">Statut d’inscription</div>
+        <div id="registrationTag" class="status none">Aucune inscription</div>
+        <div id="registrationText" class="small" style="margin-top:8px">Remplis le formulaire puis soumets.</div>
+      </div>
+    </section>
+
+    <section class="card section">
+      <h2>Accès à l’épreuve</h2>
+      <div class="box">
+        <div class="small" style="margin-bottom:10px">Conditions : inscription approuvée, paiement validé ou accès gratuit, une seule tentative, activité surveillée.</div>
+        <div class="row">
+          <button class="btn green" id="startExamBtn" disabled>Commencer l’épreuve</button>
+          <button class="btn orange" id="fullscreenBtn">Plein écran</button>
         </div>
       </div>
+    </section>
 
-      <div class="status-pill"><span class="dot"></span><span id="memberStatusText">Espace concours privé</span></div>
-
-      <a class="side-btn" href="profile.html">Mon compte</a>
-      <a class="side-btn" href="messages.html">Messages</a>
-      <a class="side-btn" href="calls.html">Appels</a>
-      <a class="side-btn" href="meeting-room.html">Salle de réunion</a>
-      <button class="side-btn red" id="logoutBtn">Déconnexion</button>
-
-      <div style="margin-top:22px;">
-        <div class="menu-title">Academic Hub</div>
-
-        <div class="hub-card">
-          <h4>Competition Hub</h4>
-          <p>Compétitions scientifiques en chimie, évaluation, classement et récompenses.</p>
-        </div>
-
-        <div class="hub-card">
-          <h4>Mode low cost</h4>
-          <p>Inscription simple, validation manuelle et concours léger sans vidéo pour limiter les coûts.</p>
-        </div>
-
-        <div class="hub-card">
-          <h4>Fair Play</h4>
-          <p>Temps limité, une seule tentative, mélange des questions et suivi des anomalies simples.</p>
+    <section class="card exam-shell" id="examSection">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+        <h2 style="margin:0">Épreuve de chimie</h2>
+        <div class="row">
+          <div class="warn" id="warningCounter">Avertissements : 0 / 3</div>
+          <div class="timer" id="timerBox">Temps restant : 20:00</div>
         </div>
       </div>
-    </aside>
-
-    <main class="main">
-      <section class="card hero" id="homeBlock">
-        <div class="hero-top">
-          <div>
-            <h1>Boris Chemistry Challenge</h1>
-            <p>
-              Un concours scientifique en chimie pensé pour les élèves et étudiants.
-              Le format est simple, sérieux, motivant et adapté à un budget réduit.
-              Les participants s’inscrivent, règlent leurs frais, attendent la validation,
-              puis passent l’épreuve directement depuis leur espace connecté.
-            </p>
-          </div>
-          <div class="hero-badge">1 à 2 éditions / an</div>
+      <div style="height:16px"></div>
+      <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+      <div style="height:16px"></div>
+      <div class="box">
+        <div class="small" id="questionMeta">Question 1 / 12</div>
+        <div class="question" id="questionText">Chargement...</div>
+        <div class="options" id="optionsBox"></div>
+        <div class="row" style="justify-content:space-between;margin-top:16px">
+          <div class="small">Pas de retour arrière. Les actions suspectes sont journalisées.</div>
+          <button class="btn primary" id="nextQuestionBtn" disabled>Question suivante</button>
         </div>
-
-        <div class="info-grid">
-          <div class="info-box">
-            <div class="label">Discipline</div>
-            <div class="value">Chimie uniquement</div>
-          </div>
-          <div class="info-box">
-            <div class="label">Format</div>
-            <div class="value">QCM chronométré</div>
-          </div>
-          <div class="info-box">
-            <div class="label">Accès</div>
-            <div class="value">Membres connectés</div>
-          </div>
-          <div class="info-box">
-            <div class="label">Récompenses</div>
-            <div class="value">Lots + certificats</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card section">
-        <h2>Organisation recommandée</h2>
-        <div class="two-col">
-          <div class="list">
-            <div class="list-item">
-              <strong>1. Inscription</strong>
-              <span>Le candidat remplit ses informations académiques et accepte le règlement.</span>
-            </div>
-            <div class="list-item">
-              <strong>2. Participation</strong>
-              <span>Il paie les frais selon sa catégorie puis soumet sa référence de paiement sur le site.</span>
-            </div>
-            <div class="list-item">
-              <strong>3. Validation</strong>
-              <span>L’administrateur valide l’inscription dans Firebase avant l’ouverture du concours.</span>
-            </div>
-            <div class="list-item">
-              <strong>4. Épreuve</strong>
-              <span>Le participant connecté lance le QCM, avec une seule tentative et un temps limité.</span>
-            </div>
-            <div class="list-item">
-              <strong>5. Résultats</strong>
-              <span>Le score est enregistré automatiquement puis affiché dans le classement.</span>
-            </div>
-          </div>
-
-          <div class="list">
-            <div class="list-item">
-              <strong>Modèle conseillé</strong>
-              <span>Une édition principale par an, éventuellement une seconde plus courte en milieu d’année.</span>
-            </div>
-            <div class="list-item">
-              <strong>Public cible</strong>
-              <span>Lycéens scientifiques, étudiants de licence, master ou classes préparatoires selon ton choix.</span>
-            </div>
-            <div class="list-item">
-              <strong>Thèmes possibles</strong>
-              <span>Chimie générale, analytique, organique, physicochimie, environnement et chimie verte.</span>
-            </div>
-            <div class="list-item">
-              <strong>Low cost</strong>
-              <span>Validation manuelle, QCM léger, pas de visioconférence obligatoire, très peu de stockage.</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card section">
-        <h2>Frais de participation et récompenses</h2>
-        <div class="pricing">
-          <div class="price-card">
-            <h4>Lycéen</h4>
-            <div class="price">2 €</div>
-            <div class="small">Prix accessible pour encourager la participation à faible coût.</div>
-          </div>
-
-          <div class="price-card highlight">
-            <h4>Étudiant</h4>
-            <div class="price">5 €</div>
-            <div class="small">La formule la plus logique pour ton concours principal.</div>
-          </div>
-
-          <div class="price-card">
-            <h4>International / externe</h4>
-            <div class="price">8 €</div>
-            <div class="small">Option possible si tu veux ouvrir le concours à d’autres pays ou structures.</div>
-          </div>
-        </div>
-
-        <div class="notice" style="margin-top:16px;">
-          Exemple de récompenses : 1er prix = 50 €, 2e = 30 €, 3e = 20 €, puis certificats numériques pour les finalistes.
-          Tu peux aussi offrir une mise en avant sur la page Insights ou une publication spéciale sur le site.
-        </div>
-      </section>
-
-      <section class="card section" id="registrationSection">
-        <h2>Inscription au concours</h2>
-        <p>
-          Cette inscription est réservée aux membres connectés. Le compte doit idéalement être vérifié par email.
-          Une fois inscrit, tu pourras suivre ton statut depuis cette page.
-        </p>
-
-        <div class="form-grid">
-          <div class="field">
-            <label for="fullName">Nom complet</label>
-            <input id="fullName" type="text" placeholder="Ex. Maounou Boris Amoussou" />
-          </div>
-
-          <div class="field">
-            <label for="schoolLevel">Niveau</label>
-            <select id="schoolLevel">
-              <option value="">Choisir</option>
-              <option value="Lyceen">Lycéen</option>
-              <option value="Licence">Licence</option>
-              <option value="Master">Master</option>
-              <option value="Doctorat">Doctorat</option>
-              <option value="Autre">Autre</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="institution">Établissement</label>
-            <input id="institution" type="text" placeholder="Nom de l’établissement" />
-          </div>
-
-          <div class="field">
-            <label for="country">Pays</label>
-            <input id="country" type="text" placeholder="Ex. France" />
-          </div>
-
-          <div class="field">
-            <label for="phone">Téléphone / WhatsApp</label>
-            <input id="phone" type="text" placeholder="Numéro de contact" />
-          </div>
-
-          <div class="field">
-            <label for="category">Catégorie de participation</label>
-            <select id="category">
-              <option value="">Choisir</option>
-              <option value="Lyceen">Lycéen - 2 €</option>
-              <option value="Etudiant">Étudiant - 5 €</option>
-              <option value="International">International / externe - 8 €</option>
-            </select>
-          </div>
-
-          <div class="field full">
-            <label for="motivation">Motivation</label>
-            <textarea id="motivation" placeholder="Pourquoi veux-tu participer à ce concours de chimie ?"></textarea>
-          </div>
-
-          <div class="field">
-            <label for="paymentMethod">Mode de paiement</label>
-            <select id="paymentMethod">
-              <option value="">Choisir</option>
-              <option value="Paypal">PayPal</option>
-              <option value="Wave">Wave</option>
-              <option value="MobileMoney">Mobile Money</option>
-              <option value="Virement">Virement</option>
-              <option value="Autre">Autre</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="paymentRef">Référence de paiement</label>
-            <input id="paymentRef" type="text" placeholder="Transaction, reçu ou référence" />
-          </div>
-
-          <div class="field full">
-            <div class="check-row">
-              <input id="agreeRules" type="checkbox" />
-              <div class="hint">
-                J’accepte le règlement du concours, j’atteste que mes informations sont exactes et je comprends qu’une seule tentative est autorisée pendant l’épreuve.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button class="btn primary" id="registerBtn">Soumettre mon inscription</button>
-          <button class="btn secondary" id="refreshStatusBtn">Actualiser mon statut</button>
-        </div>
-
-        <div class="status-box" id="registrationStatusBox">
-          <strong>Statut d’inscription</strong>
-          <div class="status-tag tag-none" id="registrationTag">Aucune inscription enregistrée</div>
-          <div class="hint" id="registrationText">
-            Remplis le formulaire ci-dessus puis soumets ton inscription.
-          </div>
-        </div>
-      </section>
-
-      <section class="card section" id="contestAccessSection">
-        <h2>Accès à l’épreuve</h2>
-        <p>
-          Le concours ne peut être lancé qu’après validation de ton inscription. Quand l’administrateur approuve
-          ton dossier, le bouton de démarrage s’active ici.
-        </p>
-
-        <div class="status-box">
-          <strong>Conditions d’accès</strong>
-          <div class="hint" style="margin-bottom:10px;">
-            • être connecté au site<br>
-            • inscription approuvée<br>
-            • une seule tentative<br>
-            • temps limité<br>
-            • changement répété d’onglet = avertissement puis soumission automatique
-          </div>
-
-          <div class="btn-row">
-            <button class="btn green" id="startExamBtn" disabled>Commencer l’épreuve</button>
-            <button class="btn orange" id="fullscreenBtn">Passer en plein écran</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="card exam-shell" id="examSection">
-        <div class="exam-top">
-          <h2>Épreuve de chimie</h2>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <div class="warning-pill" id="warningCounter">Avertissements : 0 / 3</div>
-            <div class="timer" id="timerBox">Temps restant : 20:00</div>
-          </div>
-        </div>
-
-        <div class="progress">
-          <div class="progress-bar" id="progressBar"></div>
-        </div>
-
-        <div class="question-card">
-          <div class="question-meta" id="questionMeta">Question 1 / 12</div>
-          <div class="question-text" id="questionText">Chargement...</div>
-          <div class="options" id="optionsBox"></div>
-
-          <div class="exam-actions">
-            <div class="exam-note">
-              Choisis une réponse puis passe à la question suivante. Le retour arrière est volontairement bloqué.
-            </div>
-            <button class="btn primary" id="nextQuestionBtn" disabled>Question suivante</button>
-          </div>
-        </div>
-
-        <div class="result-box" id="resultBox">
-          <strong>Épreuve terminée</strong>
-          <div class="result-score" id="resultScore">0 / 12</div>
-          <div class="hint" id="resultText">Ton score a été enregistré avec succès.</div>
-        </div>
-      </section>
-
-      <section class="card section">
-        <h2>Classement</h2>
-        <p>Le classement ci-dessous affiche les meilleurs scores enregistrés pour l’édition en cours.</p>
-        <div class="leaderboard" id="leaderboardBox">
-          <div class="notice">Aucun résultat disponible pour le moment.</div>
-        </div>
-      </section>
-    </main>
-
-    <aside class="card rightbar">
-      <h3 class="right-title">Informations concours</h3>
-
-      <div class="mini-box">
-        <h4>Édition</h4>
-        <p id="editionLabel">Chemistry Challenge 2026</p>
       </div>
-
-      <div class="mini-box">
-        <h4>Durée</h4>
-        <p>20 minutes, 12 questions à choix unique.</p>
+      <div class="box result" id="resultBox">
+        <div style="font-weight:900">Épreuve terminée</div>
+        <div id="resultScore" style="font-size:38px;font-weight:900;color:#082e5b;margin:8px 0">0 / 12</div>
+        <div class="small" id="resultText">Ton score a été enregistré.</div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn secondary" id="certificateBtn">Télécharger mon certificat</button>
+        </div>
       </div>
-
-      <div class="mini-box">
-        <h4>Protection</h4>
-        <p>Questions mélangées, une tentative, sauvegarde du score et avertissements en cas de sortie de page.</p>
-      </div>
-
-      <div class="mini-box">
-        <h4>Validation administrative</h4>
-        <p>
-          Pour limiter les coûts, le paiement est vérifié manuellement. Une fois approuvé, l’accès au concours s’ouvre automatiquement.
-        </p>
-      </div>
-
-      <div class="mini-box">
-        <h4>Conseil</h4>
-        <p>Pense à publier ici la date officielle, les règles, et le mode de paiement réel que tu choisiras.</p>
-      </div>
-    </aside>
-  </div>
-
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import {
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      ref,
-      get,
-      set,
-      update,
-      push,
-      onValue,
-      query,
-      orderByChild,
-      limitToLast
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const CONFIG = {
-      competitionId: "chemistry_challenge_2026",
-      competitionTitle: "Chemistry Challenge 2026",
-      durationMinutes: 20,
-      totalQuestionsToAsk: 12,
-      maxWarnings: 3
-    };
-
-    const QUESTION_BANK = [
-      {
-        id: "q1",
-        text: "Quel est le pH approximatif d’une solution neutre à 25 °C ?",
-        options: ["1", "3", "7", "14"],
-        answer: 2
-      },
-      {
-        id: "q2",
-        text: "Quelle grandeur s’exprime en mol·L⁻¹ ?",
-        options: ["La masse molaire", "La concentration molaire", "La densité", "Le rendement"],
-        answer: 1
-      },
-      {
-        id: "q3",
-        text: "Quel ion est responsable du caractère acide en solution aqueuse ?",
-        options: ["Na⁺", "OH⁻", "H₃O⁺", "Cl⁻"],
-        answer: 2
-      },
-      {
-        id: "q4",
-        text: "Le numéro atomique correspond :",
-        options: ["Au nombre de neutrons", "Au nombre d’électrons de valence", "Au nombre de protons", "À la masse atomique"],
-        answer: 2
-      },
-      {
-        id: "q5",
-        text: "Quel gaz est généralement libéré lorsqu’un acide réagit avec un carbonate ?",
-        options: ["O₂", "CO₂", "H₂", "N₂"],
-        answer: 1
-      },
-      {
-        id: "q6",
-        text: "Quelle verrerie est la plus adaptée pour préparer précisément une solution fille ?",
-        options: ["Bécher", "Éprouvette", "Fiole jaugée", "Cristallisoir"],
-        answer: 2
-      },
-      {
-        id: "q7",
-        text: "Dans une réaction d’oxydoréduction, l’oxydant est l’espèce qui :",
-        options: ["Perd des électrons", "Gagne des électrons", "Donne des protons", "Augmente le pH"],
-        answer: 1
-      },
-      {
-        id: "q8",
-        text: "L’unité SI de la pression est :",
-        options: ["bar", "atm", "pascal", "torr"],
-        answer: 2
-      },
-      {
-        id: "q9",
-        text: "Quel type de liaison relie généralement Na⁺ et Cl⁻ dans NaCl ?",
-        options: ["Covalente polaire", "Hydrogène", "Ionique", "Métallique"],
-        answer: 2
-      },
-      {
-        id: "q10",
-        text: "Le catalyseur agit principalement en :",
-        options: ["Augmentant l’énergie d’activation", "Diminuant l’énergie d’activation", "Changeant le bilan de matière", "Empêchant toute réaction secondaire"],
-        answer: 1
-      },
-      {
-        id: "q11",
-        text: "Quelle loi relie pression et volume d’un gaz à température constante ?",
-        options: ["Loi de Boyle-Mariotte", "Loi de Raoult", "Loi de Hess", "Loi de Faraday"],
-        answer: 0
-      },
-      {
-        id: "q12",
-        text: "Un composé organique saturé ne contient que des liaisons :",
-        options: ["Simples", "Doubles", "Triples", "Aromatiques uniquement"],
-        answer: 0
-      },
-      {
-        id: "q13",
-        text: "Quel métal est couramment utilisé comme conducteur dans un circuit électrochimique ?",
-        options: ["Cuivre", "Soufre", "Carbone amorphe uniquement", "Silice"],
-        answer: 0
-      },
-      {
-        id: "q14",
-        text: "Quelle espèce est une base selon Brønsted ?",
-        options: ["Une espèce qui capte un proton", "Une espèce qui cède un proton", "Une espèce neutre uniquement", "Une espèce qui perd un neutron"],
-        answer: 0
-      },
-      {
-        id: "q15",
-        text: "La formule de l’acide sulfurique est :",
-        options: ["HCl", "H₂SO₄", "HNO₃", "H₃PO₄"],
-        answer: 1
-      },
-      {
-        id: "q16",
-        text: "Dans un titrage, le point d’équivalence correspond au moment où :",
-        options: ["Le volume est nul", "Les réactifs sont introduits en proportions stœchiométriques", "Le pH vaut toujours 7", "La solution devient incolore"],
-        answer: 1
-      }
-    ];
-
-    const userNameEl = document.getElementById("userName");
-    const userEmailEl = document.getElementById("userEmail");
-    const userAvatar = document.getElementById("userAvatar");
-    const avatarFallback = document.getElementById("avatarFallback");
-    const memberStatusText = document.getElementById("memberStatusText");
-
-    const logoutBtn = document.getElementById("logoutBtn");
-
-    const fullName = document.getElementById("fullName");
-    const schoolLevel = document.getElementById("schoolLevel");
-    const institution = document.getElementById("institution");
-    const country = document.getElementById("country");
-    const phone = document.getElementById("phone");
-    const category = document.getElementById("category");
-    const motivation = document.getElementById("motivation");
-    const paymentMethod = document.getElementById("paymentMethod");
-    const paymentRef = document.getElementById("paymentRef");
-    const agreeRules = document.getElementById("agreeRules");
-
-    const registerBtn = document.getElementById("registerBtn");
-    const refreshStatusBtn = document.getElementById("refreshStatusBtn");
-
-    const registrationTag = document.getElementById("registrationTag");
-    const registrationText = document.getElementById("registrationText");
-    const startExamBtn = document.getElementById("startExamBtn");
-    const fullscreenBtn = document.getElementById("fullscreenBtn");
-
-    const examSection = document.getElementById("examSection");
-    const timerBox = document.getElementById("timerBox");
-    const warningCounter = document.getElementById("warningCounter");
-    const progressBar = document.getElementById("progressBar");
-    const questionMeta = document.getElementById("questionMeta");
-    const questionText = document.getElementById("questionText");
-    const optionsBox = document.getElementById("optionsBox");
-    const nextQuestionBtn = document.getElementById("nextQuestionBtn");
-    const resultBox = document.getElementById("resultBox");
-    const resultScore = document.getElementById("resultScore");
-    const resultText = document.getElementById("resultText");
-
-    const leaderboardBox = document.getElementById("leaderboardBox");
-    const editionLabel = document.getElementById("editionLabel");
-    editionLabel.textContent = CONFIG.competitionTitle;
-
-    let currentUser = null;
-    let currentRegistration = null;
-    let examQuestions = [];
-    let currentQuestionIndex = 0;
-    let selectedAnswerIndex = null;
-    let score = 0;
-    let examTimer = null;
-    let timeLeft = CONFIG.durationMinutes * 60;
-    let warnings = 0;
-    let examStarted = false;
-    let examFinished = false;
-
-    function sanitizeText(value = "") {
-      return String(value).replace(/[<>"']/g, "");
-    }
-
-    function shuffleArray(arr) {
-      const copy = [...arr];
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy;
-    }
-
-    function makeCandidateCode(uid) {
-      const clean = uid.replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toUpperCase();
-      return `CHEM-${clean}`;
-    }
-
-    function setRegistrationStatus(type, text) {
-      registrationTag.className = "status-tag";
-      if (type === "pending") {
-        registrationTag.classList.add("tag-pending");
-        registrationTag.textContent = "En attente de validation";
-      } else if (type === "approved") {
-        registrationTag.classList.add("tag-approved");
-        registrationTag.textContent = "Inscription approuvée";
-      } else if (type === "rejected") {
-        registrationTag.classList.add("tag-rejected");
-        registrationTag.textContent = "Inscription refusée";
-      } else {
-        registrationTag.classList.add("tag-none");
-        registrationTag.textContent = "Aucune inscription enregistrée";
-      }
-      registrationText.textContent = text;
-    }
-
-    function formatTime(totalSeconds) {
-      const min = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
-      const sec = (totalSeconds % 60).toString().padStart(2, "0");
-      return `${min}:${sec}`;
-    }
-
-    function renderQuestion() {
-      const q = examQuestions[currentQuestionIndex];
-      if (!q) return;
-
-      questionMeta.textContent = `Question ${currentQuestionIndex + 1} / ${examQuestions.length}`;
-      questionText.textContent = q.text;
-      progressBar.style.width = `${((currentQuestionIndex) / examQuestions.length) * 100}%`;
-
-      optionsBox.innerHTML = "";
-      selectedAnswerIndex = null;
-      nextQuestionBtn.disabled = true;
-
-      q.options.forEach((opt, i) => {
-        const div = document.createElement("div");
-        div.className = "option";
-        div.innerHTML = `
-          <div class="option-bullet">${String.fromCharCode(65 + i)}</div>
-          <div>${opt}</div>
-        `;
-        div.addEventListener("click", () => {
-          document.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
-          div.classList.add("selected");
-          selectedAnswerIndex = i;
-          nextQuestionBtn.disabled = false;
-        });
-        optionsBox.appendChild(div);
-      });
-    }
-
-    function updateWarningUI() {
-      warningCounter.textContent = `Avertissements : ${warnings} / ${CONFIG.maxWarnings}`;
-    }
-
-    async function saveExamProgress() {
-      if (!currentUser) return;
-      const refPath = ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}/examMeta`);
-      await update(refPath, {
-        startedAt: Date.now(),
-        updatedAt: Date.now(),
-        currentQuestionIndex,
-        warnings,
-        timeLeft,
-        inProgress: examStarted && !examFinished
-      });
-    }
-
-    async function finalizeExam(reason = "completed") {
-      if (examFinished || !currentUser) return;
-
-      examFinished = true;
-      examStarted = false;
-      clearInterval(examTimer);
-      progressBar.style.width = "100%";
-      nextQuestionBtn.disabled = true;
-
-      const total = examQuestions.length;
-      const percent = Math.round((score / total) * 100);
-
-      const participantRef = ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`);
-      await update(participantRef, {
-        examStarted: true,
-        examCompleted: true,
-        hasPlayed: true,
-        score,
-        totalQuestions: total,
-        percent,
-        finishReason: reason,
-        submittedAt: Date.now()
-      });
-
-      const boardRef = ref(db, `competitions/${CONFIG.competitionId}/leaderboard/${currentUser.uid}`);
-      await set(boardRef, {
-        uid: currentUser.uid,
-        displayName: sanitizeText(currentRegistration?.fullName || currentUser.displayName || "Participant"),
-        candidateCode: currentRegistration?.candidateCode || makeCandidateCode(currentUser.uid),
-        score,
-        totalQuestions: total,
-        percent,
-        submittedAt: Date.now()
-      });
-
-      resultBox.style.display = "block";
-      resultScore.textContent = `${score} / ${total}`;
-      resultText.textContent =
-        reason === "warnings_limit"
-          ? "Ton épreuve a été soumise automatiquement après trop d’avertissements."
-          : reason === "timeout"
-          ? "Le temps est écoulé. Ton épreuve a été soumise automatiquement."
-          : "Ton score a été enregistré avec succès.";
-
-      startExamBtn.disabled = true;
-      loadLeaderboard();
-      await loadRegistrationStatus();
-    }
-
-    async function handleNextQuestion() {
-      if (selectedAnswerIndex === null) return;
-
-      const current = examQuestions[currentQuestionIndex];
-      if (selectedAnswerIndex === current.answer) score++;
-
-      currentQuestionIndex++;
-      await saveExamProgress();
-
-      if (currentQuestionIndex >= examQuestions.length) {
-        await finalizeExam("completed");
-        return;
-      }
-
-      renderQuestion();
-    }
-
-    function startTimer() {
-      timerBox.textContent = `Temps restant : ${formatTime(timeLeft)}`;
-      examTimer = setInterval(async () => {
-        timeLeft--;
-        timerBox.textContent = `Temps restant : ${formatTime(timeLeft)}`;
-
-        if (timeLeft <= 0) {
-          clearInterval(examTimer);
-          await finalizeExam("timeout");
-        }
-      }, 1000);
-    }
-
-    async function startExam() {
-      if (!currentUser || !currentRegistration) return;
-
-      if (currentRegistration.status !== "approved") {
-        alert("Ton inscription n’est pas encore approuvée.");
-        return;
-      }
-
-      if (currentRegistration.hasPlayed || currentRegistration.examCompleted) {
-        alert("Tu as déjà utilisé ta tentative pour cette édition.");
-        return;
-      }
-
-      examQuestions = shuffleArray(QUESTION_BANK).slice(0, CONFIG.totalQuestionsToAsk);
-      currentQuestionIndex = 0;
-      score = 0;
-      warnings = 0;
-      timeLeft = CONFIG.durationMinutes * 60;
-      examStarted = true;
-      examFinished = false;
-      resultBox.style.display = "none";
-
-      await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`), {
-        examStarted: true,
-        examCompleted: false,
-        hasPlayed: false,
-        startedAt: Date.now(),
-        updatedAt: Date.now()
-      });
-
-      updateWarningUI();
-      examSection.style.display = "block";
-      examSection.scrollIntoView({ behavior: "smooth", block: "start" });
-
-      renderQuestion();
-      startTimer();
-      await saveExamProgress();
-    }
-
-    async function registerCompetition() {
-      if (!currentUser) {
-        alert("Tu dois être connecté.");
-        return;
-      }
-
-      if (!currentUser.emailVerified) {
-        alert("Merci de vérifier d’abord ton adresse email avant l’inscription.");
-        return;
-      }
-
-      const data = {
-        fullName: sanitizeText(fullName.value.trim()),
-        schoolLevel: sanitizeText(schoolLevel.value),
-        institution: sanitizeText(institution.value.trim()),
-        country: sanitizeText(country.value.trim()),
-        phone: sanitizeText(phone.value.trim()),
-        category: sanitizeText(category.value),
-        motivation: sanitizeText(motivation.value.trim()),
-        paymentMethod: sanitizeText(paymentMethod.value),
-        paymentRef: sanitizeText(paymentRef.value.trim())
-      };
-
-      if (!data.fullName || !data.schoolLevel || !data.institution || !data.country || !data.phone || !data.category || !data.motivation || !data.paymentMethod || !data.paymentRef) {
-        alert("Merci de remplir tous les champs.");
-        return;
-      }
-
-      if (!agreeRules.checked) {
-        alert("Tu dois accepter le règlement du concours.");
-        return;
-      }
-
-      const participantRef = ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`);
-
-      const existingSnap = await get(participantRef);
-      const existing = existingSnap.exists() ? existingSnap.val() : null;
-
-      const payload = {
-        uid: currentUser.uid,
-        email: currentUser.email || "",
-        fullName: data.fullName,
-        schoolLevel: data.schoolLevel,
-        institution: data.institution,
-        country: data.country,
-        phone: data.phone,
-        category: data.category,
-        motivation: data.motivation,
-        paymentMethod: data.paymentMethod,
-        paymentRef: data.paymentRef,
-        candidateCode: existing?.candidateCode || makeCandidateCode(currentUser.uid),
-        status: existing?.status && existing.status !== "rejected" ? existing.status : "pending",
-        createdAt: existing?.createdAt || Date.now(),
-        updatedAt: Date.now(),
-        examStarted: existing?.examStarted || false,
-        examCompleted: existing?.examCompleted || false,
-        hasPlayed: existing?.hasPlayed || false,
-        score: existing?.score ?? null
-      };
-
-      await set(participantRef, payload);
-
-      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
-        type: "registration_submitted",
-        uid: currentUser.uid,
-        fullName: payload.fullName,
-        candidateCode: payload.candidateCode,
-        at: Date.now()
-      });
-
-      alert("Inscription enregistrée avec succès. Elle sera validée après vérification.");
-      await loadRegistrationStatus();
-    }
-
-    async function loadRegistrationStatus() {
-      if (!currentUser) return;
-
-      const snap = await get(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`));
-      if (!snap.exists()) {
-        currentRegistration = null;
-        setRegistrationStatus("none", "Remplis le formulaire ci-dessus puis soumets ton inscription.");
-        startExamBtn.disabled = true;
-        return;
-      }
-
-      currentRegistration = snap.val();
-
-      fullName.value = currentRegistration.fullName || "";
-      schoolLevel.value = currentRegistration.schoolLevel || "";
-      institution.value = currentRegistration.institution || "";
-      country.value = currentRegistration.country || "";
-      phone.value = currentRegistration.phone || "";
-      category.value = currentRegistration.category || "";
-      motivation.value = currentRegistration.motivation || "";
-      paymentMethod.value = currentRegistration.paymentMethod || "";
-      paymentRef.value = currentRegistration.paymentRef || "";
-
-      if (currentRegistration.status === "pending") {
-        setRegistrationStatus(
-          "pending",
-          `Ton inscription a bien été reçue. Référence candidat : ${currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)}. Attends la validation administrative.`
-        );
-        startExamBtn.disabled = true;
-      } else if (currentRegistration.status === "approved") {
-        if (currentRegistration.hasPlayed || currentRegistration.examCompleted) {
-          setRegistrationStatus(
-            "approved",
-            `Ton inscription est approuvée. Tentative déjà utilisée. Ton score enregistré est ${currentRegistration.score ?? 0}/${currentRegistration.totalQuestions || CONFIG.totalQuestionsToAsk}.`
-          );
-          startExamBtn.disabled = true;
-        } else {
-          setRegistrationStatus(
-            "approved",
-            `Ton inscription est approuvée. Tu peux maintenant lancer l’épreuve quand tu es prêt. Référence candidat : ${currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)}.`
-          );
-          startExamBtn.disabled = false;
-        }
-      } else if (currentRegistration.status === "rejected") {
-        setRegistrationStatus(
-          "rejected",
-          "Ton inscription a été refusée ou doit être corrigée. Mets à jour les informations demandées puis renvoie ton dossier."
-        );
-        startExamBtn.disabled = true;
-      } else {
-        setRegistrationStatus("none", "Aucune inscription enregistrée.");
-        startExamBtn.disabled = true;
-      }
-    }
-
-    async function loadUserProfile(uid) {
-      const userSnap = await get(ref(db, `users/${uid}`));
-      if (!userSnap.exists()) return;
-
-      const data = userSnap.val() || {};
-      const displayName = data.fullName || data.name || auth.currentUser?.displayName || "Membre";
-      const email = auth.currentUser?.email || "";
-      const photo = data.photoURL || data.profilePhoto || data.avatar || "";
-
-      userNameEl.textContent = displayName;
-      userEmailEl.textContent = email;
-      avatarFallback.textContent = displayName.split(" ").map(v => v[0]).slice(0,2).join("").toUpperCase() || "BR";
-
-      if (photo) {
-        userAvatar.src = photo;
-        userAvatar.classList.remove("hidden");
-        avatarFallback.classList.add("hidden");
-      }
-    }
-
-    async function loadLeaderboard() {
-      const boardQuery = query(
-        ref(db, `competitions/${CONFIG.competitionId}/leaderboard`),
-        orderByChild("percent"),
-        limitToLast(20)
-      );
-
-      onValue(boardQuery, (snap) => {
-        if (!snap.exists()) {
-          leaderboardBox.innerHTML = `<div class="notice">Aucun résultat disponible pour le moment.</div>`;
-          return;
-        }
-
-        const arr = [];
-        snap.forEach(child => arr.push(child.val()));
-        arr.sort((a, b) => {
-          if ((b.percent || 0) !== (a.percent || 0)) return (b.percent || 0) - (a.percent || 0);
-          return (a.submittedAt || 0) - (b.submittedAt || 0);
-        });
-
-        leaderboardBox.innerHTML = "";
-        arr.slice(0, 10).forEach((item, index) => {
-          const div = document.createElement("div");
-          div.className = "leader-item";
-          div.innerHTML = `
-            <div class="leader-left">
-              <div class="rank">${index + 1}</div>
-              <div>
-                <div class="leader-name">${sanitizeText(item.displayName || item.candidateCode || "Participant")}</div>
-                <div class="leader-sub">${sanitizeText(item.candidateCode || "")}</div>
-              </div>
-            </div>
-            <div class="leader-score">${item.score || 0} / ${item.totalQuestions || CONFIG.totalQuestionsToAsk}</div>
-          `;
-          leaderboardBox.appendChild(div);
-        });
-      });
-    }
-
-    async function requestFullscreenMode() {
-      const root = document.documentElement;
-      try {
-        if (root.requestFullscreen) {
-          await root.requestFullscreen();
-        }
-      } catch (e) {
-        console.warn("Fullscreen non activé :", e);
-      }
-    }
-
-    function setupAntiCheat() {
-      document.addEventListener("contextmenu", (e) => {
-        if (examStarted && !examFinished) e.preventDefault();
-      });
-
-      document.addEventListener("copy", (e) => {
-        if (examStarted && !examFinished) e.preventDefault();
-      });
-
-      document.addEventListener("cut", (e) => {
-        if (examStarted && !examFinished) e.preventDefault();
-      });
-
-      document.addEventListener("paste", (e) => {
-        if (examStarted && !examFinished) e.preventDefault();
-      });
-
-      document.addEventListener("visibilitychange", async () => {
-        if (!examStarted || examFinished) return;
-        if (document.hidden) {
-          warnings++;
-          updateWarningUI();
-          await saveExamProgress();
-
-          if (warnings >= CONFIG.maxWarnings) {
-            alert("Trop d’avertissements. L’épreuve va être soumise automatiquement.");
-            await finalizeExam("warnings_limit");
-          } else {
-            alert(`Attention : changement d’onglet détecté (${warnings}/${CONFIG.maxWarnings}).`);
-          }
-        }
-      });
-
-      window.addEventListener("beforeunload", (e) => {
-        if (examStarted && !examFinished) {
-          e.preventDefault();
-          e.returnValue = "";
-        }
-      });
-    }
-
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-      window.location.href = "login.html";
-    });
-
-    registerBtn.addEventListener("click", registerCompetition);
-    refreshStatusBtn.addEventListener("click", loadRegistrationStatus);
-    fullscreenBtn.addEventListener("click", requestFullscreenMode);
-    startExamBtn.addEventListener("click", async () => {
-      await requestFullscreenMode();
-      await startExam();
-    });
-    nextQuestionBtn.addEventListener("click", handleNextQuestion);
-
-    setupAntiCheat();
-    loadLeaderboard();
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      currentUser = user;
-      userNameEl.textContent = user.displayName || "Membre";
-      userEmailEl.textContent = user.email || "Utilisateur connecté";
-      memberStatusText.textContent = "Espace concours privé";
-
-      await loadUserProfile(user.uid);
-      await loadRegistrationStatus();
-    });
-  </script>
+    </section>
+
+    <section class="card section">
+      <h2>Classement</h2>
+      <div id="leaderboardBox" class="table"><div class="item">Aucun résultat disponible.</div></div>
+    </section>
+  </main>
+
+  <aside class="card right">
+    <div class="box">
+      <div style="font-weight:900;margin-bottom:8px">Infos concours</div>
+      <div class="small" id="paymentInfo">Les informations de paiement apparaîtront ici si l’admin les a configurées.</div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="box">
+      <div style="font-weight:900;margin-bottom:8px">Mon code candidat</div>
+      <div id="myCandidateCode" class="small">—</div>
+    </div>
+    <div style="height:14px"></div>
+    <div class="box">
+      <div style="font-weight:900;margin-bottom:8px">Mon activité</div>
+      <div class="small">Copie, collage, changements d’onglet et tentatives suspectes sont enregistrés.</div>
+    </div>
+  </aside>
+</div>
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { ref, get, set, update, push, query, orderByChild, limitToLast, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const CONFIG={competitionId:"chemistry_challenge_2026",adminEmail:"borisamoussou01@gmail.com",durationMinutes:20,totalQuestionsToAsk:12,maxWarnings:3};
+const QUESTIONS=[
+{id:"q1",text:"Quel est le pH approximatif d’une solution neutre à 25 °C ?",options:["1","3","7","14"],answer:2},
+{id:"q2",text:"Quelle grandeur s’exprime en mol·L⁻¹ ?",options:["La masse molaire","La concentration molaire","La densité","Le rendement"],answer:1},
+{id:"q3",text:"Quel ion est responsable du caractère acide en solution aqueuse ?",options:["Na⁺","OH⁻","H₃O⁺","Cl⁻"],answer:2},
+{id:"q4",text:"Le numéro atomique correspond :",options:["Au nombre de neutrons","Au nombre d’électrons de valence","Au nombre de protons","À la masse atomique"],answer:2},
+{id:"q5",text:"Quel gaz est libéré quand un acide réagit avec un carbonate ?",options:["O₂","CO₂","H₂","N₂"],answer:1},
+{id:"q6",text:"Quelle verrerie prépare précisément une solution fille ?",options:["Bécher","Éprouvette","Fiole jaugée","Cristallisoir"],answer:2},
+{id:"q7",text:"Dans une réaction d’oxydoréduction, l’oxydant :",options:["Perd des électrons","Gagne des électrons","Donne des protons","Augmente le pH"],answer:1},
+{id:"q8",text:"L’unité SI de la pression est :",options:["bar","atm","pascal","torr"],answer:2},
+{id:"q9",text:"Quel type de liaison dans NaCl ?",options:["Covalente polaire","Hydrogène","Ionique","Métallique"],answer:2},
+{id:"q10",text:"Le catalyseur agit principalement en :",options:["Augmentant l’énergie d’activation","Diminuant l’énergie d’activation","Changeant le bilan de matière","Empêchant toute réaction secondaire"],answer:1},
+{id:"q11",text:"Quelle loi relie pression et volume à température constante ?",options:["Boyle-Mariotte","Raoult","Hess","Faraday"],answer:0},
+{id:"q12",text:"Un composé organique saturé contient des liaisons :",options:["Simples","Doubles","Triples","Aromatiques uniquement"],answer:0},
+{id:"q13",text:"La formule de l’acide sulfurique est :",options:["HCl","H₂SO₄","HNO₃","H₃PO₄"],answer:1},
+{id:"q14",text:"Dans un titrage, l’équivalence correspond au moment où :",options:["Le volume est nul","Les réactifs sont stœchiométriques","Le pH vaut toujours 7","La solution devient incolore"],answer:1},
+{id:"q15",text:"Une base de Brønsted est :",options:["Une espèce qui capte un proton","Une espèce qui cède un proton","Une espèce neutre","Une espèce qui perd un neutron"],answer:0},
+{id:"q16",text:"Quel métal est souvent utilisé comme conducteur électrique ?",options:["Cuivre","Soufre","Silice","Phosphore"],answer:0}
+];
+
+const el=id=>document.getElementById(id);
+let currentUser=null,currentProfile=null,currentRegistration=null,currentSettings={open:true,showRanking:true,title:"Chemistry Challenge 2026"},examQuestions=[],currentQuestionIndex=0,selectedAnswerIndex=null,score=0,timeLeft=CONFIG.durationMinutes*60,warnings=0,examStarted=false,examFinished=false,examTimer=null,answersMap={};
+
+function sanitize(v=""){return String(v).replace(/[<>"']/g,"").trim()}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function codeFromUid(uid){return "CHEM-"+uid.replace(/[^a-zA-Z0-9]/g,"").slice(0,8).toUpperCase()}
+function fmtTime(s){const m=Math.floor(s/60).toString().padStart(2,"0");const sec=(s%60).toString().padStart(2,"0");return `${m}:${sec}`}
+function regTag(type,text){const t=el("registrationTag");t.className="status "+type;const map={none:"Aucune inscription",pending:"En attente de validation",approved:"Inscription approuvée",rejected:"Inscription refusée"};t.textContent=map[type]||map.none;el("registrationText").textContent=text}
+async function logEvent(type,details={}){if(!currentUser)return;await push(ref(db,`competitions/${CONFIG.competitionId}/events`),{uid:currentUser.uid,email:currentUser.email||"",displayName:currentRegistration?.fullName||currentProfile?.fullName||currentUser.displayName||"Participant",candidateCode:currentRegistration?.candidateCode||codeFromUid(currentUser.uid),role:"candidate",page:"competition",type,details,at:Date.now()})}
+async function syncPresence(state="online"){if(!currentUser)return;const payload={uid:currentUser.uid,email:currentUser.email||"",displayName:currentRegistration?.fullName||currentProfile?.fullName||currentUser.displayName||"Participant",role:"candidate",page:"competition",state,lastSeen:Date.now(),candidateCode:currentRegistration?.candidateCode||codeFromUid(currentUser.uid)};const presenceRef=ref(db,`competitions/${CONFIG.competitionId}/presence/${currentUser.uid}`);await set(presenceRef,payload);try{onDisconnect(presenceRef).update({state:"offline",lastSeen:Date.now()})}catch(e){}}
+async function loadSettings(){const s=await get(ref(db,`competitions/${CONFIG.competitionId}/settings`));if(s.exists())currentSettings={...currentSettings,...(s.val()||{})};el("heroTitle").textContent=currentSettings.title||"Chemistry Challenge 2026";el("editionBadge").textContent=currentSettings.title||"Édition";const p=await get(ref(db,`competitions/${CONFIG.competitionId}/paymentSettings`));if(p.exists()){const d=p.val()||{};let txt=[];if(d.beneficiaryName)txt.push("Bénéficiaire : "+d.beneficiaryName);if(d.iban)txt.push("Compte/IBAN : "+d.iban);if(d.mobileMoney)txt.push("Mobile Money/Wave : "+d.mobileMoney);if(d.paypal)txt.push("PayPal : "+d.paypal);el("paymentInfo").innerHTML=txt.length?txt.join("<br>"):"Infos de paiement non définies."}}
+async function loadProfile(uid){const s=await get(ref(db,"users/"+uid));currentProfile=s.exists()?(s.val()||{}):{};const name=currentProfile.fullName||currentUser.displayName||"Membre";el("userName").textContent=name;el("userEmail").textContent=currentUser.email||"";el("avatarBox").textContent=name.split(" ").map(v=>v[0]).slice(0,2).join("").toUpperCase()||"BR"}
+async function registerCompetition(){if(!currentUser){alert("Connecte-toi d’abord.");return}if(!currentUser.emailVerified){alert("Vérifie d’abord ton adresse email.");return}if(!currentSettings.open){alert("Les inscriptions sont actuellement fermées.");return}
+const data={fullName:sanitize(el("fullName").value),schoolLevel:sanitize(el("schoolLevel").value),institution:sanitize(el("institution").value),country:sanitize(el("country").value),phone:sanitize(el("phone").value),category:sanitize(el("category").value),motivation:sanitize(el("motivation").value),paymentMethod:sanitize(el("paymentMethod").value),paymentRef:sanitize(el("paymentRef").value)};
+if(Object.values(data).some(v=>!v)){alert("Merci de remplir tous les champs.");return}
+if(!el("agreeRules").checked){alert("Tu dois accepter le règlement.");return}
+const pref=ref(db,`competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`);
+const old=await get(pref);const prev=old.exists()?old.val():{};
+const payload={uid:currentUser.uid,email:currentUser.email||"",candidateCode:prev.candidateCode||codeFromUid(currentUser.uid),status:prev.status&&prev.status!=="rejected"?prev.status:"pending",paymentStatus:prev.paymentStatus||"pending",freeAccess:prev.freeAccess||false,score:prev.score??null,totalQuestions:prev.totalQuestions??null,examStarted:prev.examStarted||false,examCompleted:prev.examCompleted||false,hasPlayed:prev.hasPlayed||false,createdAt:prev.createdAt||Date.now(),updatedAt:Date.now(),...data};
+await set(pref,payload);await logEvent("registration_submitted",{paymentMethod:data.paymentMethod,paymentRef:data.paymentRef});await loadRegistrationStatus();alert("Inscription enregistrée. Attends la validation admin.");}
+async function loadRegistrationStatus(){if(!currentUser)return;const s=await get(ref(db,`competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`));if(!s.exists()){currentRegistration=null;regTag("none","Remplis le formulaire puis soumets.");el("startExamBtn").disabled=true;return}
+currentRegistration=s.val()||{};["fullName","schoolLevel","institution","country","phone","category","motivation","paymentMethod","paymentRef"].forEach(k=>{if(el(k))el(k).value=currentRegistration[k]||""});el("myCandidateCode").textContent=currentRegistration.candidateCode||codeFromUid(currentUser.uid);
+const paymentOkay=currentRegistration.paymentStatus==="validated"||currentRegistration.paymentStatus==="free"||currentRegistration.freeAccess===true;
+if(currentRegistration.status==="pending"){regTag("pending",`Référence candidat : ${currentRegistration.candidateCode||codeFromUid(currentUser.uid)}. Validation en attente.`);el("startExamBtn").disabled=true}
+else if(currentRegistration.status==="rejected"){regTag("rejected","Inscription refusée ou à corriger.");el("startExamBtn").disabled=true}
+else if(currentRegistration.status==="approved"){if(currentRegistration.hasPlayed||currentRegistration.examCompleted){regTag("approved",`Tentative déjà utilisée. Score enregistré : ${currentRegistration.score??0}/${currentRegistration.totalQuestions||CONFIG.totalQuestionsToAsk}.`);el("startExamBtn").disabled=true}else if(!paymentOkay){regTag("approved","Inscription approuvée mais paiement non encore validé.");el("startExamBtn").disabled=true}else{regTag("approved","Inscription approuvée. Tu peux lancer l’épreuve.");el("startExamBtn").disabled=false}}
+await syncPresence("online")}
+function renderQuestion(){const q=examQuestions[currentQuestionIndex];if(!q)return;el("questionMeta").textContent=`Question ${currentQuestionIndex+1} / ${examQuestions.length}`;el("questionText").textContent=q.text;el("progressBar").style.width=`${(currentQuestionIndex/examQuestions.length)*100}%`;selectedAnswerIndex=null;el("nextQuestionBtn").disabled=true;el("optionsBox").innerHTML="";q.options.forEach((opt,i)=>{const d=document.createElement("div");d.className="option";d.innerHTML=`<div class="option-bullet">${String.fromCharCode(65+i)}</div><div>${opt}</div>`;d.onclick=()=>{document.querySelectorAll(".option").forEach(x=>x.classList.remove("selected"));d.classList.add("selected");selectedAnswerIndex=i;el("nextQuestionBtn").disabled=false};el("optionsBox").appendChild(d)})}
+async function saveExamMeta(){if(!currentUser)return;await update(ref(db,`competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`),{updatedAt:Date.now(),currentQuestionIndex,warnings,timeLeft,examStarted,examCompleted:examFinished})}
+async function saveAnswer(){const q=examQuestions[currentQuestionIndex];if(!q||selectedAnswerIndex===null||!currentUser)return;const correct=selectedAnswerIndex===q.answer;answersMap[q.id]={question:q.text,selectedIndex:selectedAnswerIndex,selectedText:q.options[selectedAnswerIndex],correctIndex:q.answer,correctText:q.options[q.answer],correct,at:Date.now()};await set(ref(db,`competitions/${CONFIG.competitionId}/answers/${currentUser.uid}/${q.id}`),answersMap[q.id]);await logEvent("answer_saved",{questionId:q.id,selected:selectedAnswerIndex,correct})}
+async function finalizeExam(reason="completed"){if(examFinished||!currentUser)return;examFinished=true;examStarted=false;clearInterval(examTimer);el("progressBar").style.width="100%";el("nextQuestionBtn").disabled=true;const total=examQuestions.length;const percent=Math.round((score/total)*100);await update(ref(db,`competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`),{examStarted:true,examCompleted:true,hasPlayed:true,score,totalQuestions:total,percent,finishReason:reason,submittedAt:Date.now(),warnings});await set(ref(db,`competitions/${CONFIG.competitionId}/leaderboard/${currentUser.uid}`),{uid:currentUser.uid,displayName:sanitize(currentRegistration?.fullName||currentUser.displayName||"Participant"),candidateCode:currentRegistration?.candidateCode||codeFromUid(currentUser.uid),score,totalQuestions:total,percent,submittedAt:Date.now()});await logEvent("exam_finished",{reason,score,total,warnings});await syncPresence("online");el("resultBox").style.display="block";el("resultScore").textContent=`${score} / ${total}`;el("resultText").textContent=reason==="warnings_limit"?"Épreuve soumise automatiquement après trop d’avertissements.":reason==="timeout"?"Temps écoulé, soumission automatique.":"Ton score a été enregistré.";el("startExamBtn").disabled=true;await loadRegistrationStatus();loadLeaderboard()}
+async function nextQuestion(){if(selectedAnswerIndex===null)return;await saveAnswer();if(selectedAnswerIndex===examQuestions[currentQuestionIndex].answer)score++;currentQuestionIndex++;await saveExamMeta();if(currentQuestionIndex>=examQuestions.length){await finalizeExam("completed");return}renderQuestion()}
+function startTimer(){el("timerBox").textContent=`Temps restant : ${fmtTime(timeLeft)}`;examTimer=setInterval(async()=>{timeLeft--;el("timerBox").textContent=`Temps restant : ${fmtTime(timeLeft)}`;if(timeLeft<=0){clearInterval(examTimer);await finalizeExam("timeout")}},1000)}
+async function startExam(){if(!currentRegistration||currentRegistration.status!=="approved"){alert("Inscription non approuvée.");return}const paymentOkay=currentRegistration.paymentStatus==="validated"||currentRegistration.paymentStatus==="free"||currentRegistration.freeAccess===true;if(!paymentOkay){alert("Paiement non validé.");return}if(currentRegistration.hasPlayed||currentRegistration.examCompleted){alert("Tu as déjà utilisé ta tentative.");return}examQuestions=shuffle(QUESTIONS).slice(0,CONFIG.totalQuestionsToAsk);currentQuestionIndex=0;selectedAnswerIndex=null;score=0;warnings=0;timeLeft=CONFIG.durationMinutes*60;answersMap={};examStarted=true;examFinished=false;el("resultBox").style.display="none";el("examSection").style.display="block";await update(ref(db,`competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`),{examStarted:true,examCompleted:false,hasPlayed:false,startedAt:Date.now(),warnings:0});await logEvent("exam_started",{});await syncPresence("in_exam");renderQuestion();startTimer();window.scrollTo({top:0,behavior:"smooth"})}
+async function requestFull(){try{if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen()}catch(e){}}
+function updateWarnUI(){el("warningCounter").textContent=`Avertissements : ${warnings} / ${CONFIG.maxWarnings}`}
+function setupAntiCheat(){
+document.addEventListener("copy",async e=>{if(examStarted&&!examFinished){e.preventDefault();warnings++;updateWarnUI();await logEvent("copy_detected",{warnings});await saveExamMeta();if(warnings>=CONFIG.maxWarnings){alert("Trop d’avertissements.");await finalizeExam("warnings_limit")}}});
+document.addEventListener("paste",async e=>{if(examStarted&&!examFinished){e.preventDefault();warnings++;updateWarnUI();await logEvent("paste_detected",{warnings});await saveExamMeta();if(warnings>=CONFIG.maxWarnings){alert("Trop d’avertissements.");await finalizeExam("warnings_limit")}}});
+document.addEventListener("cut",async e=>{if(examStarted&&!examFinished){e.preventDefault();warnings++;updateWarnUI();await logEvent("cut_detected",{warnings});await saveExamMeta();if(warnings>=CONFIG.maxWarnings){alert("Trop d’avertissements.");await finalizeExam("warnings_limit")}}});
+document.addEventListener("contextmenu",async e=>{if(examStarted&&!examFinished){e.preventDefault();warnings++;updateWarnUI();await logEvent("contextmenu_blocked",{warnings});await saveExamMeta();if(warnings>=CONFIG.maxWarnings){alert("Trop d’avertissements.");await finalizeExam("warnings_limit")}}});
+document.addEventListener("visibilitychange",async()=>{if(examStarted&&!examFinished&&document.hidden){warnings++;updateWarnUI();await logEvent("visibility_change",{warnings});await saveExamMeta();if(warnings>=CONFIG.maxWarnings){alert("Trop d’avertissements.");await finalizeExam("warnings_limit")}}});
+window.addEventListener("beforeunload",()=>{if(currentUser)set(ref(db,`competitions/${CONFIG.competitionId}/presence/${currentUser.uid}`),{uid:currentUser.uid,email:currentUser.email||"",displayName:currentRegistration?.fullName||currentUser.displayName||"Participant",role:"candidate",page:"competition",state:"offline",lastSeen:Date.now(),candidateCode:currentRegistration?.candidateCode||codeFromUid(currentUser.uid)})})
+}
+function openCertificate(kind="participation"){const name=sanitize(currentRegistration?.fullName||currentUser?.displayName||"Participant");const contest=sanitize(currentSettings.title||"Chemistry Challenge");const code=sanitize(currentRegistration?.candidateCode||codeFromUid(currentUser.uid));const scoreText=currentRegistration?.score!=null?`${currentRegistration.score}/${currentRegistration.totalQuestions||CONFIG.totalQuestionsToAsk}`:"—";const title=kind==="winner"?"CERTIFICAT DE RÉUSSITE":"CERTIFICAT DE PARTICIPATION";const text=kind==="winner"?"a obtenu une distinction dans le concours de chimie":"a participé au concours de chimie";
+const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Certificat</title><style>body{font-family:Georgia,serif;background:#f2f7ff;padding:30px}.sheet{max-width:900px;margin:auto;background:#fff;border:8px solid #0f4d92;padding:40px;text-align:center}.t1{font-size:34px;font-weight:700;color:#082e5b;margin-bottom:10px}.t2{font-size:18px;color:#6b7d93}.name{font-size:36px;font-weight:700;margin:28px 0;color:#0b2340}.line{margin:16px 0;font-size:18px}.footer{display:flex;justify-content:space-between;margin-top:50px}.sign{width:220px;border-top:2px solid #0b2340;padding-top:8px}</style></head><body><div class="sheet"><div class="t1">${title}</div><div class="t2">${contest}</div><div class="line">Ce certificat est décerné à</div><div class="name">${name}</div><div class="line">${text}.</div><div class="line">Code candidat : <strong>${code}</strong></div><div class="line">Score enregistré : <strong>${scoreText}</strong></div><div class="line">Date : <strong>${new Date().toLocaleDateString("fr-FR")}</strong></div><div class="footer"><div class="sign">Boris Research Hub</div><div class="sign">Organisation du concours</div></div></div><script>window.onload=()=>window.print()<\/script></body></html>`;
+const w=window.open("","_blank");w.document.open();w.document.write(html);w.document.close()}
+function loadLeaderboard(){if(currentSettings.showRanking===false){el("leaderboardBox").innerHTML='<div class="item">Classement masqué par l’administrateur.</div>';return}const qy=query(ref(db,`competitions/${CONFIG.competitionId}/leaderboard`),orderByChild("percent"),limitToLast(20));onValue(qy,s=>{if(!s.exists()){el("leaderboardBox").innerHTML='<div class="item">Aucun résultat disponible.</div>';return}let arr=[];s.forEach(c=>arr.push(c.val()));arr.sort((a,b)=>((b.percent||0)-(a.percent||0))||((a.submittedAt||0)-(b.submittedAt||0)));el("leaderboardBox").innerHTML="";arr.slice(0,10).forEach((it,i)=>{const d=document.createElement("div");d.className="item";d.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><div style="font-weight:900">#${i+1} ${sanitize(it.displayName||it.candidateCode||"Participant")}</div><div class="small">${sanitize(it.candidateCode||"")}</div></div><div style="font-size:22px;font-weight:900">${it.score||0}/${it.totalQuestions||CONFIG.totalQuestionsToAsk}</div></div>`;el("leaderboardBox").appendChild(d)})})}
+
+el("logoutBtn").onclick=async()=>{await signOut(auth);location.href="login.html"};
+el("registerBtn").onclick=registerCompetition;
+el("refreshBtn").onclick=loadRegistrationStatus;
+el("fullscreenBtn").onclick=requestFull;
+el("startExamBtn").onclick=async()=>{await requestFull();await startExam()};
+el("nextQuestionBtn").onclick=nextQuestion;
+el("certificateBtn").onclick=()=>openCertificate("participation");
+setupAntiCheat();
+
+onAuthStateChanged(auth,async user=>{
+if(!user){location.href="login.html";return}
+currentUser=user;
+if(user.email===CONFIG.adminEmail){el("adminLink").style.display="inline-block"}
+const juryAllowed=await get(ref(db,`competitions/${CONFIG.competitionId}/juryAccessByEmail/${(user.email||"").replace(/[.#$[\]]/g,"_")}`));
+if(juryAllowed.exists())el("juryLink").style.display="inline-block";
+await loadSettings();
+await loadProfile(user.uid);
+await loadRegistrationStatus();
+await syncPresence("online");
+loadLeaderboard();
+});
+</script>
 </body>
 </html>
