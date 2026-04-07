@@ -45,12 +45,12 @@
     }
 
     .topbar-inner{
-      max-width:1500px;
+      max-width:1550px;
       margin:0 auto;
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:26px;
+      gap:24px;
       flex-wrap:wrap;
       font-weight:700;
       font-size:15px;
@@ -84,11 +84,11 @@
     }
 
     .page{
-      max-width:1500px;
+      max-width:1550px;
       margin:12px auto 40px;
       padding:0 18px;
       display:grid;
-      grid-template-columns:290px 1fr;
+      grid-template-columns:300px 1fr;
       gap:18px;
       align-items:start;
     }
@@ -267,7 +267,7 @@
 
     .stats-grid{
       display:grid;
-      grid-template-columns:repeat(5,1fr);
+      grid-template-columns:repeat(6,1fr);
       gap:14px;
       margin-top:22px;
     }
@@ -302,6 +302,12 @@
       color:var(--nav);
     }
 
+    .section h3{
+      margin:0 0 12px;
+      font-size:20px;
+      color:var(--nav);
+    }
+
     .section p{
       margin:0 0 14px;
       color:var(--muted);
@@ -313,6 +319,24 @@
       grid-template-columns:1.2fr .8fr .8fr .8fr;
       gap:12px;
       margin-bottom:16px;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+
+    .grid-3{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+    }
+
+    .grid-4{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
     }
 
     input, select, textarea{
@@ -329,6 +353,14 @@
     textarea{
       resize:vertical;
       min-height:110px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:800;
+      color:var(--nav);
+      font-size:14px;
     }
 
     .btn-row{
@@ -379,21 +411,42 @@
       margin-bottom:14px;
     }
 
-    .candidate-id{
-      color:var(--muted);
-      font-size:13px;
-      margin-top:6px;
-    }
-
     .candidate-name{
       font-weight:900;
       font-size:21px;
       color:var(--nav);
+      margin-bottom:6px;
+    }
+
+    .candidate-id{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .click-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .text-link{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#edf4fc;
+      color:var(--blue-dark);
+      font-weight:800;
+      font-size:13px;
+      text-decoration:none;
     }
 
     .candidate-meta{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:repeat(5,1fr);
       gap:10px;
       margin-bottom:14px;
     }
@@ -437,6 +490,9 @@
     .tag-rejected{ background:#ffe9e9; color:#b62727; }
     .tag-none{ background:#eef3f8; color:#5f738c; }
     .tag-issued{ background:#fff7dd; color:#866102; }
+    .tag-open{ background:#eaf9ee; color:#0b7f34; }
+    .tag-close{ background:#ffe9e9; color:#b62727; }
+    .tag-live{ background:#edf4ff; color:#0f4d92; }
 
     .detail-grid{
       display:grid;
@@ -469,7 +525,7 @@
 
     .action-grid{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:1fr 1fr 1fr;
       gap:12px;
       margin-top:14px;
     }
@@ -497,9 +553,34 @@
       font-size:14px;
     }
 
+    .small-note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      margin-top:8px;
+    }
+
+    .jury-list{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .jury-item{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fbfdff;
+      padding:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+
     .hidden{ display:none !important; }
 
-    @media (max-width:1250px){
+    @media (max-width:1350px){
       .page{
         grid-template-columns:1fr;
       }
@@ -507,23 +588,29 @@
         position:static;
       }
       .stats-grid{
-        grid-template-columns:repeat(2,1fr);
+        grid-template-columns:repeat(3,1fr);
       }
       .toolbar{
         grid-template-columns:1fr 1fr;
       }
       .candidate-meta{
-        grid-template-columns:repeat(2,1fr);
+        grid-template-columns:repeat(3,1fr);
       }
-      .detail-grid, .action-grid{
+      .detail-grid,
+      .grid-2,
+      .action-grid{
+        grid-template-columns:1fr;
+      }
+      .grid-3{
         grid-template-columns:1fr;
       }
     }
 
-    @media (max-width:800px){
+    @media (max-width:900px){
       .stats-grid,
       .toolbar,
-      .candidate-meta{
+      .candidate-meta,
+      .grid-4{
         grid-template-columns:1fr;
       }
       .hero h1{
@@ -557,7 +644,7 @@
         <img id="userAvatar" class="avatar hidden" alt="Profil">
         <div id="avatarFallback" class="avatar-placeholder">AD</div>
         <div>
-          <div class="profile-name" id="userName">Administration</div>
+          <div class="profile-name" id="userName">Administrateur</div>
           <div style="color: var(--muted); font-size: 14px; margin-top: 6px;" id="userEmail">Connexion en cours...</div>
         </div>
       </div>
@@ -569,6 +656,7 @@
 
       <a class="side-btn" href="competition.html">Voir côté candidat</a>
       <a class="side-btn" href="competition-jury.html">Voir côté jury</a>
+      <a class="side-btn" href="insights.html">Aller vers Insights</a>
       <a class="side-btn" href="messages.html">Messages</a>
       <a class="side-btn" href="profile.html">Mon compte</a>
       <button class="side-btn red" id="logoutBtn">Déconnexion</button>
@@ -578,17 +666,17 @@
 
         <div class="hub-card">
           <h4>Contrôle total</h4>
-          <p>Cette page centralise les inscriptions, décisions, avis du jury, résultats et certificats.</p>
+          <p>Cette page centralise les inscriptions, jury, paramètres du challenge, résultats, certificats et publication vers Insights.</p>
         </div>
 
         <div class="hub-card">
           <h4>Admin principal</h4>
-          <p>Seule l’adresse <strong>borisamoussou01@gmail.com</strong> peut exécuter les actions sensibles de validation et de délivrance.</p>
+          <p>Seule l’adresse <strong>borisamoussou01@gmail.com</strong> peut gérer les actions sensibles.</p>
         </div>
 
         <div class="hub-card">
-          <h4>Liaison Firebase</h4>
-          <p>Les données sont partagées avec <strong>competition.html</strong> et <strong>competition-jury.html</strong>.</p>
+          <h4>Pages liées</h4>
+          <p>Les données sont partagées avec <strong>competition.html</strong>, <strong>competition-jury.html</strong> et peuvent être republiées dans <strong>insights.html</strong>.</p>
         </div>
       </div>
     </aside>
@@ -597,14 +685,14 @@
       <section class="card hero">
         <div class="hero-top">
           <div>
-            <h1>Administration du Chem Challenge</h1>
+            <h1 id="heroChallengeTitle">Administration du Chem Challenge</h1>
             <p>
-              Depuis cet espace, l’administrateur peut approuver ou refuser les candidatures,
-              consulter les avis du jury, suivre les scores, répondre aux demandes de certificat
-              et générer le certificat officiel en un clic.
+              Depuis cet espace, l’administrateur peut modifier le nom du challenge, l’édition,
+              ouvrir ou fermer les inscriptions, autoriser les jurys par email, suivre en direct les candidats pendant le test,
+              publier les résultats, délivrer les certificats et superviser l’ensemble du challenge.
             </p>
           </div>
-          <div class="hero-badge">Contrôle admin central</div>
+          <div class="hero-badge" id="heroEditionBadge">Édition active</div>
         </div>
 
         <div class="stats-grid">
@@ -621,12 +709,188 @@
             <div class="value" id="statApproved">0</div>
           </div>
           <div class="stat-box">
-            <div class="label">Test terminé</div>
+            <div class="label">Tests en cours</div>
+            <div class="value" id="statInProgress">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">Tests terminés</div>
             <div class="value" id="statCompleted">0</div>
           </div>
           <div class="stat-box">
             <div class="label">Certificats délivrés</div>
             <div class="value" id="statIssued">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Paramètres du challenge</h2>
+
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Configuration générale</h3>
+
+            <div class="grid-2">
+              <div>
+                <label for="challengeTitleInput">Nom du challenge</label>
+                <input id="challengeTitleInput" type="text" placeholder="Ex. Chem Challenge" />
+              </div>
+              <div>
+                <label for="challengeEditionInput">Nom de l’édition</label>
+                <input id="challengeEditionInput" type="text" placeholder="Ex. Chemistry Challenge 2026" />
+              </div>
+            </div>
+
+            <div class="grid-3" style="margin-top:12px;">
+              <div>
+                <label for="registrationStatusInput">Inscriptions</label>
+                <select id="registrationStatusInput">
+                  <option value="open">Ouvertes</option>
+                  <option value="closed">Fermées</option>
+                </select>
+              </div>
+              <div>
+                <label for="examStatusInput">Accès à l’épreuve</label>
+                <select id="examStatusInput">
+                  <option value="open">Ouvert</option>
+                  <option value="closed">Fermé</option>
+                </select>
+              </div>
+              <div>
+                <label for="resultVisibilityInput">Résultats publics</label>
+                <select id="resultVisibilityInput">
+                  <option value="hidden">Masqués</option>
+                  <option value="visible">Visibles</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <label for="challengeAnnouncementInput">Message d’annonce</label>
+              <textarea id="challengeAnnouncementInput" placeholder="Message visible ou utile pour le challenge..."></textarea>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn primary" id="saveSettingsBtn">Enregistrer les paramètres</button>
+            </div>
+
+            <div class="small-note">
+              Ces paramètres sont pensés pour être lus aussi par <strong>competition.html</strong> et <strong>competition-jury.html</strong>.
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>État actuel</h3>
+            <div class="grid-2">
+              <div class="mini-data">
+                <div class="k">Challenge</div>
+                <div class="v" id="currentChallengeTitle">-</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Édition</div>
+                <div class="v" id="currentChallengeEdition">-</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Inscriptions</div>
+                <div class="v"><span class="status-tag tag-none" id="currentRegistrationStatusTag">-</span></div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Épreuve</div>
+                <div class="v"><span class="status-tag tag-none" id="currentExamStatusTag">-</span></div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <label>Annonce enregistrée</label>
+              <div class="notice" id="currentAnnouncementText">Aucune annonce pour le moment.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Gestion des membres du jury</h2>
+
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Autoriser un email comme jury</h3>
+
+            <div class="grid-2">
+              <div>
+                <label for="juryEmailInput">Email à autoriser</label>
+                <input id="juryEmailInput" type="email" placeholder="exemple@email.com" />
+              </div>
+              <div>
+                <label for="juryNameInput">Nom du jury</label>
+                <input id="juryNameInput" type="text" placeholder="Nom ou rôle du membre du jury" />
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <label for="juryRoleInput">Rôle / précision</label>
+              <input id="juryRoleInput" type="text" placeholder="Ex. Jury chimie organique, observateur, président du jury..." />
+            </div>
+
+            <div class="btn-row">
+              <button class="btn green" id="addJuryBtn">Autoriser cet email</button>
+            </div>
+
+            <div class="small-note">
+              Le jury ne doit pas être libre. C’est ici que l’admin décide qui peut accéder à <strong>competition-jury.html</strong>.
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Emails jurys autorisés</h3>
+            <div id="juryList" class="jury-list">
+              <div class="notice">Aucun email jury autorisé pour le moment.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Publication des résultats vers Insights</h2>
+
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Préparer la publication</h3>
+
+            <div class="grid-2">
+              <div>
+                <label for="winnerNameInput">Nom du meilleur gagnant</label>
+                <input id="winnerNameInput" type="text" placeholder="Nom du gagnant" />
+              </div>
+              <div>
+                <label for="winnerScoreInput">Score du gagnant</label>
+                <input id="winnerScoreInput" type="text" placeholder="Ex. 12/12" />
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <label for="resultPostTitleInput">Titre de publication</label>
+              <input id="resultPostTitleInput" type="text" placeholder="Ex. Résultats officiels du Chem Challenge 2026" />
+            </div>
+
+            <div style="margin-top:12px;">
+              <label for="resultPostContentInput">Texte de publication</label>
+              <textarea id="resultPostContentInput" placeholder="Texte à publier dans Insights avec coupe, félicitations, classement ou résumé..."></textarea>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn gold" id="publishResultsBtn">Publier vers Insights</button>
+            </div>
+
+            <div class="small-note">
+              Cette publication sera enregistrée dans la base et pourra être relue ou reprise côté Insights.
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Aperçu rapide</h3>
+            <div class="notice" id="resultPreviewBox">
+              🏆 Aucun aperçu pour le moment.
+            </div>
           </div>
         </div>
       </section>
@@ -649,16 +913,17 @@
           </select>
           <button class="btn secondary" id="refreshBtn">Actualiser</button>
         </div>
+
         <div class="notice">
-          Astuce : la validation du candidat et la délivrance du certificat se font ici. Le jury peut seulement recommander et commenter depuis sa propre page.
+          Ici, l’admin voit aussi les candidats qui ont commencé le test, leur progression, le temps restant et les avertissements enregistrés.
         </div>
       </section>
 
       <section class="card section">
-        <h2>Dossiers candidats</h2>
+        <h2>Dossiers candidats et suivi en direct</h2>
         <p>
-          Chaque bloc ci-dessous regroupe les informations soumises par le candidat,
-          les retours éventuels du jury et les actions administratives disponibles.
+          Chaque bloc ci-dessous regroupe le dossier du candidat, son état pendant le test, l’avis du jury, les demandes de certificat
+          et les actions administratives.
         </p>
 
         <div id="candidateList" class="panel-grid">
@@ -681,12 +946,12 @@
       set,
       update,
       push,
-      onValue
+      onValue,
+      remove
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const CONFIG = {
       competitionId: "chem_challenge_2026",
-      competitionTitle: "Chem Challenge 2026",
       adminEmail: "borisamoussou01@gmail.com"
     };
 
@@ -700,8 +965,38 @@
     const statTotal = document.getElementById("statTotal");
     const statPending = document.getElementById("statPending");
     const statApproved = document.getElementById("statApproved");
+    const statInProgress = document.getElementById("statInProgress");
     const statCompleted = document.getElementById("statCompleted");
     const statIssued = document.getElementById("statIssued");
+
+    const challengeTitleInput = document.getElementById("challengeTitleInput");
+    const challengeEditionInput = document.getElementById("challengeEditionInput");
+    const registrationStatusInput = document.getElementById("registrationStatusInput");
+    const examStatusInput = document.getElementById("examStatusInput");
+    const resultVisibilityInput = document.getElementById("resultVisibilityInput");
+    const challengeAnnouncementInput = document.getElementById("challengeAnnouncementInput");
+    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+
+    const currentChallengeTitle = document.getElementById("currentChallengeTitle");
+    const currentChallengeEdition = document.getElementById("currentChallengeEdition");
+    const currentRegistrationStatusTag = document.getElementById("currentRegistrationStatusTag");
+    const currentExamStatusTag = document.getElementById("currentExamStatusTag");
+    const currentAnnouncementText = document.getElementById("currentAnnouncementText");
+    const heroChallengeTitle = document.getElementById("heroChallengeTitle");
+    const heroEditionBadge = document.getElementById("heroEditionBadge");
+
+    const juryEmailInput = document.getElementById("juryEmailInput");
+    const juryNameInput = document.getElementById("juryNameInput");
+    const juryRoleInput = document.getElementById("juryRoleInput");
+    const addJuryBtn = document.getElementById("addJuryBtn");
+    const juryList = document.getElementById("juryList");
+
+    const winnerNameInput = document.getElementById("winnerNameInput");
+    const winnerScoreInput = document.getElementById("winnerScoreInput");
+    const resultPostTitleInput = document.getElementById("resultPostTitleInput");
+    const resultPostContentInput = document.getElementById("resultPostContentInput");
+    const publishResultsBtn = document.getElementById("publishResultsBtn");
+    const resultPreviewBox = document.getElementById("resultPreviewBox");
 
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");
@@ -714,7 +1009,9 @@
     let participantsMap = {};
     let certificateRequestsMap = {};
     let certificatesMap = {};
-    let juryMap = {};
+    let juryReviewsMap = {};
+    let juryAllowedMap = {};
+    let competitionSettings = null;
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
@@ -722,8 +1019,7 @@
 
     function formatDate(ts) {
       if (!ts) return "-";
-      const d = new Date(ts);
-      return d.toLocaleDateString("fr-FR", {
+      return new Date(ts).toLocaleDateString("fr-FR", {
         day: "2-digit",
         month: "long",
         year: "numeric"
@@ -732,8 +1028,11 @@
 
     function formatDateTime(ts) {
       if (!ts) return "-";
-      const d = new Date(ts);
-      return d.toLocaleString("fr-FR");
+      return new Date(ts).toLocaleString("fr-FR");
+    }
+
+    function emailKey(email = "") {
+      return email.toLowerCase().replace(/\./g, ",");
     }
 
     function makeVerificationNumber(uid) {
@@ -750,28 +1049,184 @@
       if (status === "rejected") return "tag-rejected";
       if (status === "issued") return "tag-issued";
       if (status === "pending") return "tag-pending";
+      if (status === "open") return "tag-open";
+      if (status === "closed") return "tag-close";
+      if (status === "live") return "tag-live";
       return "tag-none";
     }
 
-    function loadAdminProfile(uid) {
-      return get(ref(db, `users/${uid}`)).then((snap) => {
-        if (!snap.exists()) return;
-        const data = snap.val() || {};
-        currentProfile = data;
+    function setOpenCloseTag(el, status) {
+      el.className = "status-tag " + getStatusTagClass(status);
+      el.textContent = status === "open" ? "Ouvert" : "Fermé";
+    }
 
-        const displayName = data.fullName || data.name || auth.currentUser?.displayName || "Administration";
-        const email = auth.currentUser?.email || "";
-        const photo = data.photoURL || data.profilePhoto || data.avatar || "";
+    function applySettingsToUI(settings = null) {
+      const s = settings || {};
+      const title = sanitizeText(s.challengeTitle || "Chem Challenge");
+      const edition = sanitizeText(s.editionTitle || "Chem Challenge 2026");
+      const regStatus = sanitizeText(s.registrationStatus || "open");
+      const examStatus = sanitizeText(s.examStatus || "open");
+      const resultVisibility = sanitizeText(s.resultVisibility || "hidden");
+      const announcement = sanitizeText(s.announcement || "");
 
-        userNameEl.textContent = displayName;
-        userEmailEl.textContent = email;
-        avatarFallback.textContent = displayName.split(" ").map(v => v[0]).slice(0,2).join("").toUpperCase() || "AD";
+      challengeTitleInput.value = title;
+      challengeEditionInput.value = edition;
+      registrationStatusInput.value = regStatus;
+      examStatusInput.value = examStatus;
+      resultVisibilityInput.value = resultVisibility;
+      challengeAnnouncementInput.value = announcement;
 
-        if (photo) {
-          userAvatar.src = photo;
-          userAvatar.classList.remove("hidden");
-          avatarFallback.classList.add("hidden");
-        }
+      currentChallengeTitle.textContent = title;
+      currentChallengeEdition.textContent = edition;
+      heroChallengeTitle.textContent = `Administration du ${title}`;
+      heroEditionBadge.textContent = edition;
+      setOpenCloseTag(currentRegistrationStatusTag, regStatus);
+      setOpenCloseTag(currentExamStatusTag, examStatus);
+      currentAnnouncementText.textContent = announcement || "Aucune annonce pour le moment.";
+    }
+
+    async function loadAdminProfile(uid) {
+      const snap = await get(ref(db, `users/${uid}`));
+      if (!snap.exists()) return;
+      const data = snap.val() || {};
+      currentProfile = data;
+
+      const displayName = data.fullName || data.name || auth.currentUser?.displayName || "Administrateur";
+      const email = auth.currentUser?.email || "";
+      const photo = data.photoURL || data.profilePhoto || data.avatar || "";
+
+      userNameEl.textContent = displayName;
+      userEmailEl.textContent = email;
+      avatarFallback.textContent = displayName.split(" ").map(v => v[0]).slice(0,2).join("").toUpperCase() || "AD";
+
+      if (photo) {
+        userAvatar.src = photo;
+        userAvatar.classList.remove("hidden");
+        avatarFallback.classList.add("hidden");
+      }
+    }
+
+    async function saveCompetitionSettings() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const payload = {
+        challengeTitle: sanitizeText(challengeTitleInput.value) || "Chem Challenge",
+        editionTitle: sanitizeText(challengeEditionInput.value) || "Chem Challenge 2026",
+        registrationStatus: sanitizeText(registrationStatusInput.value) || "open",
+        examStatus: sanitizeText(examStatusInput.value) || "open",
+        resultVisibility: sanitizeText(resultVisibilityInput.value) || "hidden",
+        announcement: sanitizeText(challengeAnnouncementInput.value),
+        updatedAt: Date.now(),
+        updatedByEmail: currentUser.email
+      };
+
+      await set(ref(db, `competitions/${CONFIG.competitionId}/settings`), payload);
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "competition_settings_updated",
+        adminEmail: currentUser.email,
+        at: Date.now()
+      });
+
+      alert("Paramètres du challenge enregistrés avec succès.");
+    }
+
+    async function addJuryEmail() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const email = sanitizeText(juryEmailInput.value).toLowerCase();
+      const fullName = sanitizeText(juryNameInput.value);
+      const role = sanitizeText(juryRoleInput.value);
+
+      if (!email) {
+        alert("Merci d’indiquer un email.");
+        return;
+      }
+
+      const key = emailKey(email);
+      const payload = {
+        email,
+        fullName,
+        role,
+        isActive: true,
+        authorizedAt: Date.now(),
+        authorizedByEmail: currentUser.email
+      };
+
+      await set(ref(db, `competitions/${CONFIG.competitionId}/juryAllowedEmails/${key}`), payload);
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "jury_email_authorized",
+        juryEmail: email,
+        adminEmail: currentUser.email,
+        at: Date.now()
+      });
+
+      juryEmailInput.value = "";
+      juryNameInput.value = "";
+      juryRoleInput.value = "";
+    }
+
+    async function removeJuryEmail(key, email) {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      await remove(ref(db, `competitions/${CONFIG.competitionId}/juryAllowedEmails/${key}`));
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "jury_email_removed",
+        juryEmail: email || "",
+        adminEmail: currentUser.email,
+        at: Date.now()
+      });
+    }
+
+    function renderJuryList() {
+      const entries = Object.entries(juryAllowedMap || {});
+      if (!entries.length) {
+        juryList.innerHTML = `<div class="notice">Aucun email jury autorisé pour le moment.</div>`;
+        return;
+      }
+
+      juryList.innerHTML = entries.map(([key, item]) => {
+        const email = sanitizeText(item.email || "");
+        const fullName = sanitizeText(item.fullName || "Membre du jury");
+        const role = sanitizeText(item.role || "-");
+        return `
+          <div class="jury-item">
+            <div>
+              <div style="font-weight:900; color:var(--nav); margin-bottom:6px;">${fullName}</div>
+              <div style="color:var(--muted); font-size:14px; line-height:1.55;">
+                ${email}<br>
+                Rôle : ${role}<br>
+                Autorisé le : ${formatDateTime(item.authorizedAt)}
+              </div>
+              <div class="click-links">
+                <a class="text-link" href="profile.html?email=${encodeURIComponent(email)}">Voir le compte</a>
+                <a class="text-link" href="messages.html?email=${encodeURIComponent(email)}">Envoyer un message</a>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn red" data-remove-jury="${key}" data-jury-email="${email}">Retirer</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-remove-jury]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const key = btn.getAttribute("data-remove-jury");
+          const email = btn.getAttribute("data-jury-email") || "";
+          await removeJuryEmail(key, email);
+        });
       });
     }
 
@@ -869,6 +1324,7 @@
 
       const requestData = certificateRequestsMap[uid] || {};
       const verificationNumber = makeVerificationNumber(uid);
+      const settings = competitionSettings || {};
 
       const certPayload = {
         uid,
@@ -886,7 +1342,8 @@
         issuedAt: Date.now(),
         issuedByEmail: currentUser.email,
         competitionId: CONFIG.competitionId,
-        competitionTitle: CONFIG.competitionTitle
+        competitionTitle: settings.challengeTitle || "Chem Challenge",
+        editionTitle: settings.editionTitle || "Chem Challenge 2026"
       };
 
       await set(ref(db, `competitions/${CONFIG.competitionId}/certificates/${uid}`), certPayload);
@@ -935,11 +1392,69 @@
       });
     }
 
+    async function publishResultsToInsights() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const settings = competitionSettings || {};
+      const winnerName = sanitizeText(winnerNameInput.value);
+      const winnerScore = sanitizeText(winnerScoreInput.value);
+      const postTitle = sanitizeText(resultPostTitleInput.value) || `Résultats officiels du ${sanitizeText(settings.editionTitle || "Chem Challenge")}`;
+      const postContent = sanitizeText(resultPostContentInput.value);
+
+      if (!winnerName && !postContent) {
+        alert("Ajoute au moins un gagnant ou un texte de publication.");
+        return;
+      }
+
+      const finalContent = `🏆 ${winnerName ? "Meilleur gagnant : " + winnerName : ""}
+${winnerScore ? "\nScore : " + winnerScore : ""}
+${postContent ? "\n\n" + postContent : ""}
+`.trim();
+
+      const payload = {
+        source: "competition_admin",
+        competitionId: CONFIG.competitionId,
+        title: postTitle,
+        content: finalContent,
+        winnerName,
+        winnerScore,
+        trophy: "🏆",
+        createdAt: Date.now(),
+        createdByUid: currentUser.uid,
+        createdByEmail: currentUser.email,
+        editionTitle: sanitizeText(settings.editionTitle || "Chem Challenge 2026"),
+        challengeTitle: sanitizeText(settings.challengeTitle || "Chem Challenge")
+      };
+
+      await push(ref(db, `competitionInsightsPosts`), payload);
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "results_published_to_insights",
+        adminEmail: currentUser.email,
+        title: postTitle,
+        at: Date.now()
+      });
+
+      alert("Résultats publiés vers Insights.");
+    }
+
+    function updatePreview() {
+      const winner = sanitizeText(winnerNameInput.value);
+      const score = sanitizeText(winnerScoreInput.value);
+      const text = sanitizeText(resultPostContentInput.value);
+
+      resultPreviewBox.textContent = `🏆 ${winner || "Nom du gagnant"}${score ? " — " + score : ""}${text ? "\n\n" + text : ""}`;
+    }
+
     function computeStats(filteredIds = null) {
       const ids = filteredIds || Object.keys(participantsMap);
       let total = 0;
       let pending = 0;
       let approved = 0;
+      let inProgress = 0;
       let completed = 0;
       let issued = 0;
 
@@ -949,6 +1464,7 @@
         total++;
         if (p.status === "pending") pending++;
         if (p.status === "approved") approved++;
+        if (p.examMeta?.inProgress || (p.examStarted && !p.examCompleted)) inProgress++;
         if (p.examCompleted) completed++;
         if (certificatesMap[uid]) issued++;
       });
@@ -956,6 +1472,7 @@
       statTotal.textContent = total;
       statPending.textContent = pending;
       statApproved.textContent = approved;
+      statInProgress.textContent = inProgress;
       statCompleted.textContent = completed;
       statIssued.textContent = issued;
     }
@@ -1006,7 +1523,8 @@
         const p = participantsMap[uid] || {};
         const req = certificateRequestsMap[uid] || null;
         const cert = certificatesMap[uid] || null;
-        const jury = juryMap[uid] || {};
+        const jury = juryReviewsMap[uid] || {};
+        const examMeta = p.examMeta || {};
 
         const registrationStatusClass = getStatusTagClass(p.status || "none");
         const registrationStatusText =
@@ -1021,19 +1539,34 @@
           certStatus === "rejected" ? "Demande refusée" :
           certStatus === "pending" ? "Demande envoyée" : "Aucune demande";
 
+        const liveStatus = examMeta?.inProgress || (p.examStarted && !p.examCompleted) ? "live" : (p.examCompleted ? "completed" : "idle");
+        const liveText =
+          liveStatus === "live" ? "Test en cours" :
+          liveStatus === "completed" ? "Test terminé" : "Pas encore lancé";
+
+        const safeName = sanitizeText(p.fullName || "Participant");
+        const safeEmail = sanitizeText(p.email || "");
+        const safeUid = sanitizeText(uid);
+
         return `
           <div class="candidate-card">
             <div class="candidate-top">
               <div>
-                <div class="candidate-name">${sanitizeText(p.fullName || "Participant")}</div>
+                <div class="candidate-name">${safeName}</div>
                 <div class="candidate-id">
-                  ${sanitizeText(p.email || "-")} · ${sanitizeText(p.candidateCode || "-")}
+                  ${safeEmail} · ${sanitizeText(p.candidateCode || "-")}
+                </div>
+
+                <div class="click-links">
+                  <a class="text-link" href="profile.html?uid=${encodeURIComponent(safeUid)}">Voir le compte</a>
+                  <a class="text-link" href="messages.html?uid=${encodeURIComponent(safeUid)}">Envoyer un message</a>
                 </div>
               </div>
 
               <div style="display:flex; gap:10px; flex-wrap:wrap;">
                 <div class="status-tag ${registrationStatusClass}">${registrationStatusText}</div>
                 <div class="status-tag ${certStatusClass}">${certStatusText}</div>
+                <div class="status-tag ${liveStatus === "live" ? "tag-live" : "tag-none"}">${liveText}</div>
               </div>
             </div>
 
@@ -1054,33 +1587,50 @@
                 <div class="k">Résultat</div>
                 <div class="v">${p.score != null ? `${p.score}/${p.totalQuestions || "-"}` : "Non disponible"}</div>
               </div>
+              <div class="mini-data">
+                <div class="k">Progression test</div>
+                <div class="v">${examMeta.currentQuestionIndex != null ? `${examMeta.currentQuestionIndex}/${p.totalQuestions || 12}` : "-"}</div>
+              </div>
             </div>
 
             <div class="detail-grid">
               <div class="detail-box">
-                <strong>Établissement / Département</strong>
+                <strong>Établissement / département</strong>
                 <span>${sanitizeText(p.institution || "-")} ${p.department ? "· " + sanitizeText(p.department) : ""}</span>
               </div>
+
               <div class="detail-box">
-                <strong>Contact</strong>
-                <span>Téléphone : ${sanitizeText(p.phone || "-")}\nLangue : ${sanitizeText(p.preferredLanguage || "-")}</span>
+                <strong>Suivi en direct du test</strong>
+                <span>
+État : ${liveText}
+Temps restant : ${examMeta.timeLeft != null ? examMeta.timeLeft + " s" : "-"}
+Avertissements : ${examMeta.warnings != null ? examMeta.warnings : "-"}
+Dernière mise à jour : ${formatDateTime(examMeta.updatedAt || p.updatedAt)}
+                </span>
               </div>
+
               <div class="detail-box">
                 <strong>Motivation</strong>
                 <span>${sanitizeText(p.motivation || "-")}</span>
               </div>
+
               <div class="detail-box">
                 <strong>Attentes / expérience</strong>
-                <span>${sanitizeText(p.expectations || "-")}\n\n${sanitizeText(p.experience || "-")}</span>
+                <span>${sanitizeText(p.expectations || "-")}
+
+${sanitizeText(p.experience || "-")}</span>
               </div>
+
               <div class="detail-box">
                 <strong>Avis du jury</strong>
                 <span>
 Recommandation : ${sanitizeText(jury.recommendation || p.juryRecommendation || "-")}
 Score jury : ${jury.score != null ? jury.score : (p.juryScore != null ? p.juryScore : "-")}
 Commentaires : ${sanitizeText(jury.notes || p.juryNotes || "-")}
+Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}
                 </span>
               </div>
+
               <div class="detail-box">
                 <strong>Certificat / vérification</strong>
                 <span>
@@ -1106,13 +1656,24 @@ Délivré le : ${formatDate(cert?.issuedAt)}
               </div>
 
               <div class="action-box">
+                <h4>Communication rapide</h4>
+                <div class="btn-row">
+                  <a class="btn secondary" href="profile.html?uid=${encodeURIComponent(safeUid)}">Ouvrir son compte</a>
+                  <a class="btn primary" href="messages.html?uid=${encodeURIComponent(safeUid)}">Lui écrire</a>
+                </div>
+                <div class="notice" style="margin-top:12px;">
+                  Utilise ces liens pour tomber sur le compte ou engager une communication directe.
+                </div>
+              </div>
+
+              <div class="action-box">
                 <h4>Certificat officiel</h4>
                 <div class="btn-row">
                   <button class="btn gold" data-action="issueCert" data-uid="${uid}">Délivrer le certificat</button>
                   <button class="btn orange" data-action="rejectCert" data-uid="${uid}">Refuser la demande</button>
                 </div>
                 <div class="notice" style="margin-top:12px;">
-                  Le certificat est généré ici pour apparaître automatiquement dans <strong>competition.html</strong>.
+                  Le certificat délivré ici sera visible automatiquement côté candidat.
                 </div>
               </div>
             </div>
@@ -1140,6 +1701,18 @@ Délivré le : ${formatDate(cert?.issuedAt)}
     }
 
     function startListeners() {
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/settings`), (snap) => {
+        competitionSettings = snap.exists() ? (snap.val() || {}) : null;
+        applySettingsToUI(competitionSettings || {
+          challengeTitle: "Chem Challenge",
+          editionTitle: "Chem Challenge 2026",
+          registrationStatus: "open",
+          examStatus: "open",
+          resultVisibility: "hidden",
+          announcement: ""
+        });
+      });
+
       onValue(ref(db, `competitions/${CONFIG.competitionId}/participants`), (snap) => {
         participantsMap = snap.exists() ? (snap.val() || {}) : {};
         renderCandidates();
@@ -1156,8 +1729,13 @@ Délivré le : ${formatDate(cert?.issuedAt)}
       });
 
       onValue(ref(db, `competitions/${CONFIG.competitionId}/juryReviews`), (snap) => {
-        juryMap = snap.exists() ? (snap.val() || {}) : {};
+        juryReviewsMap = snap.exists() ? (snap.val() || {}) : {};
         renderCandidates();
+      });
+
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/juryAllowedEmails`), (snap) => {
+        juryAllowedMap = snap.exists() ? (snap.val() || {}) : {};
+        renderJuryList();
       });
     }
 
@@ -1165,6 +1743,14 @@ Délivré le : ${formatDate(cert?.issuedAt)}
       await signOut(auth);
       window.location.href = "login.html";
     });
+
+    saveSettingsBtn.addEventListener("click", saveCompetitionSettings);
+    addJuryBtn.addEventListener("click", addJuryEmail);
+    publishResultsBtn.addEventListener("click", publishResultsToInsights);
+
+    winnerNameInput.addEventListener("input", updatePreview);
+    winnerScoreInput.addEventListener("input", updatePreview);
+    resultPostContentInput.addEventListener("input", updatePreview);
 
     refreshBtn.addEventListener("click", renderCandidates);
     searchInput.addEventListener("input", renderCandidates);
