@@ -19,6 +19,8 @@
       --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
       --line:#d9e5f2;
       --soft:#f4f8fc;
+      --gold:#d1a028;
+      --orange:#ff9f1a;
     }
 
     body{
@@ -240,7 +242,8 @@
 
     .panel-card,
     .post-card,
-    .composer-card{
+    .composer-card,
+    .challenge-pub-card{
       background:var(--card);
       border:1px solid #e4edf7;
       border-radius:26px;
@@ -342,7 +345,8 @@
     .danger-btn,
     .ghost-btn,
     .submit-post-btn,
-    .mini-btn{
+    .mini-btn,
+    .challenge-pub-btn{
       border:none;
       border-radius:16px;
       padding:13px 16px;
@@ -364,7 +368,8 @@
 
     .secondary-btn,
     .ghost-btn,
-    .mini-btn{
+    .mini-btn,
+    .challenge-pub-btn{
       background:#eef4fb;
       color:var(--text);
     }
@@ -614,6 +619,16 @@
       word-break:break-word;
       font-size:15px;
       margin-bottom:14px;
+    }
+
+    .post-text a,
+    .comment-text a,
+    .challenge-pub-content a,
+    .challenge-pub-summary a{
+      color:#1557a6;
+      text-decoration:underline;
+      word-break:break-all;
+      font-weight:700;
     }
 
     .post-images{
@@ -883,10 +898,176 @@
       font-family:inherit;
     }
 
+    /* ===== CHALLENGE PUB INSERTION ===== */
+    .challenge-pub-card{
+      padding:20px;
+      margin-bottom:18px;
+      border:1px solid #e4edf7;
+      background:#fffdfa;
+    }
+
+    .challenge-pub-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .challenge-pub-head h2{
+      margin:0 0 6px;
+      font-size:28px;
+      color:#082e5b;
+    }
+
+    .challenge-pub-head p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .challenge-pub-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:#fff4df;
+      color:#8a5a00;
+      border:1px solid #f0d292;
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .challenge-pub-status-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .challenge-pub-mini{
+      border:1px solid #eadfbf;
+      border-radius:16px;
+      background:#fff;
+      padding:14px;
+    }
+
+    .challenge-pub-mini .k{
+      color:#8a7b5a;
+      font-size:12px;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      font-weight:700;
+    }
+
+    .challenge-pub-mini .v{
+      color:#082e5b;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.45;
+      word-break:break-word;
+    }
+
+    .challenge-pub-layout{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:16px;
+    }
+
+    .challenge-pub-panel{
+      border:1px solid #eadfbf;
+      border-radius:18px;
+      background:#fff;
+      padding:16px;
+    }
+
+    .challenge-pub-panel h3{
+      margin:0 0 10px;
+      font-size:18px;
+      color:#082e5b;
+    }
+
+    .challenge-pub-post-title{
+      font-size:22px;
+      font-weight:900;
+      color:#082e5b;
+      line-height:1.35;
+      margin-bottom:10px;
+    }
+
+    .challenge-pub-meta{
+      color:#6b7d93;
+      font-size:13px;
+      line-height:1.6;
+      margin-bottom:12px;
+      white-space:pre-wrap;
+    }
+
+    .challenge-pub-summary{
+      border:1px solid #e6edf7;
+      background:#fcfdff;
+      border-radius:14px;
+      padding:12px 14px;
+      color:#0b2340;
+      line-height:1.7;
+      font-size:14px;
+      white-space:pre-wrap;
+      margin-bottom:12px;
+    }
+
+    .challenge-pub-content{
+      border:1px solid #e6edf7;
+      background:#fcfdff;
+      border-radius:14px;
+      padding:14px;
+      color:#0b2340;
+      line-height:1.8;
+      font-size:14px;
+      white-space:pre-wrap;
+      min-height:160px;
+    }
+
+    .challenge-pub-footer{
+      margin-top:12px;
+      color:#6b7d93;
+      font-size:13px;
+      line-height:1.55;
+      white-space:pre-wrap;
+    }
+
+    .challenge-pub-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .challenge-pub-empty{
+      background:#fff;
+      border:1px dashed #d9e5f2;
+      border-radius:16px;
+      padding:16px;
+      color:#6b7d93;
+      line-height:1.7;
+      font-size:14px;
+      white-space:pre-wrap;
+    }
+
     @media (max-width: 1200px){
       .page{ grid-template-columns:1fr; }
       .left-panel{ position:static; }
       .right-panel{ order:3; }
+    }
+
+    @media (max-width: 980px){
+      .challenge-pub-status-grid,
+      .challenge-pub-layout{
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
@@ -1085,6 +1266,68 @@
         </div>
       </div>
 
+      <!-- ===== CHALLENGE PUB INSERTION START ===== -->
+      <div class="challenge-pub-card" id="challengePubSection">
+        <div class="challenge-pub-head">
+          <div>
+            <h2>Challenge Pub</h2>
+            <p>
+              Cette sous-section affiche automatiquement la publication officielle du concours
+              envoyée depuis l’interface d’administration du challenge.
+            </p>
+          </div>
+          <div class="challenge-pub-badge" id="challengePubTopBadge">Publication concours</div>
+        </div>
+
+        <div class="challenge-pub-status-grid">
+          <div class="challenge-pub-mini">
+            <div class="k">Statut</div>
+            <div class="v" id="challengePubStatus">Aucune publication</div>
+          </div>
+          <div class="challenge-pub-mini">
+            <div class="k">Dernière mise à jour</div>
+            <div class="v" id="challengePubUpdatedAt">-</div>
+          </div>
+          <div class="challenge-pub-mini">
+            <div class="k">Publié par</div>
+            <div class="v" id="challengePubBy">-</div>
+          </div>
+          <div class="challenge-pub-mini">
+            <div class="k">Édition</div>
+            <div class="v" id="challengePubEdition">-</div>
+          </div>
+        </div>
+
+        <div class="challenge-pub-layout">
+          <div class="challenge-pub-panel">
+            <h3>Publication officielle</h3>
+            <div id="challengePubBody">
+              <div class="challenge-pub-empty">Aucune publication concours pour le moment.</div>
+            </div>
+          </div>
+
+          <div class="challenge-pub-panel">
+            <h3>Pages liées</h3>
+            <div class="notice" id="challengePubSideMeta">Aucune donnée publiée.</div>
+
+            <div class="challenge-pub-links">
+              <a class="challenge-pub-btn" href="competition.html">Côté candidat</a>
+              <a class="challenge-pub-btn" href="competition-jury.html">Côté jury</a>
+              <a class="challenge-pub-btn" href="competition-admin.html">Côté admin</a>
+            </div>
+
+            <div style="margin-top:14px;" class="challenge-pub-empty">
+Cette zone est liée à :
+- competition.html
+- competition-admin.html
+- competition-jury.html
+- insights.html → Challenge Pub
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== CHALLENGE PUB INSERTION END ===== -->
+
       <div class="post-grid" id="postGrid">
         <div class="empty-card">Chargement des publications...</div>
       </div>
@@ -1159,6 +1402,7 @@
     const MAX_IMAGE_WIDTH = 1400;
     const MAX_IMAGE_HEIGHT = 1400;
     const JPEG_QUALITY = 0.78;
+    const COMPETITION_ID = "chem_challenge_2026";
 
     const publicTopbar = document.getElementById("publicTopbar");
     const privateTopbar = document.getElementById("privateTopbar");
@@ -1225,6 +1469,15 @@
     const submitReportBtn = document.getElementById("submitReportBtn");
     const reportText = document.getElementById("reportText");
 
+    /* ===== CHALLENGE PUB ELEMENTS ===== */
+    const challengePubTopBadge = document.getElementById("challengePubTopBadge");
+    const challengePubStatus = document.getElementById("challengePubStatus");
+    const challengePubUpdatedAt = document.getElementById("challengePubUpdatedAt");
+    const challengePubBy = document.getElementById("challengePubBy");
+    const challengePubEdition = document.getElementById("challengePubEdition");
+    const challengePubBody = document.getElementById("challengePubBody");
+    const challengePubSideMeta = document.getElementById("challengePubSideMeta");
+
     let currentUser = null;
     let currentUserData = null;
     let activityTimeout = null;
@@ -1238,6 +1491,7 @@
     let pendingImages = [];
     let pendingPdf = null;
     let currentReportPostId = null;
+    let challengePubData = null;
 
     function showAuthMessage(text, ok = false) {
       authMessage.textContent = text;
@@ -1303,6 +1557,17 @@
       const div = document.createElement("div");
       div.textContent = text;
       return div.innerHTML;
+    }
+
+    function linkifyText(text = "") {
+      const safe = escapeHtml(text || "");
+      return safe.replace(
+        /(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi,
+        (match) => {
+          const href = match.startsWith("http") ? match : `https://${match}`;
+          return `<a href="${href}" target="_blank" rel="noopener">${match}</a>`;
+        }
+      );
     }
 
     function formatDate(ts) {
@@ -1539,7 +1804,60 @@
       renderPrivacyStatus();
     }
 
-    async function createAccountFromInvite() {
+    function renderChallengePub(data = null) {
+      if (!data || String(data.visibility || "visible") === "hidden") {
+        challengePubTopBadge.textContent = "Publication concours";
+        challengePubStatus.textContent = data ? "Publication masquée" : "Aucune publication";
+        challengePubUpdatedAt.textContent = data ? formatDate(data.updatedAt || data.createdAt) : "-";
+        challengePubBy.textContent = data ? escapeHtml(data.updatedByEmail || data.createdByEmail || "-") : "-";
+        challengePubEdition.textContent = data ? escapeHtml(data.editionTitle || "-") : "-";
+
+        challengePubBody.innerHTML = `
+          <div class="challenge-pub-empty">
+${data ? "La publication Challenge Pub existe mais elle est actuellement masquée par l’administration." : "Aucune publication concours pour le moment."}
+          </div>
+        `;
+
+        challengePubSideMeta.textContent = data
+          ? `Publication enregistrée mais masquée.\nDernière mise à jour : ${formatDate(data.updatedAt || data.createdAt)}`
+          : "Aucune donnée publiée.";
+        return;
+      }
+
+      const title = escapeHtml(data.title || "Challenge Pub");
+      const badge = escapeHtml(data.badge || "Publication officielle");
+      const winnerName = escapeHtml(data.winnerName || "");
+      const winnerScore = escapeHtml(data.winnerScore || "");
+      const summary = data.summary || "";
+      const content = data.content || "";
+      const footer = escapeHtml(data.footer || "Publication validée par l’administration.");
+      const edition = escapeHtml(data.editionTitle || "Chem Challenge 2026");
+      const by = escapeHtml(data.updatedByEmail || data.createdByEmail || "Administration");
+      const updated = formatDate(data.updatedAt || data.createdAt);
+      const pinned = data.pinned ? "Oui" : "Non";
+
+      challengePubTopBadge.textContent = badge || "Publication concours";
+      challengePubStatus.textContent = "Publication active";
+      challengePubUpdatedAt.textContent = updated;
+      challengePubBy.textContent = by;
+      challengePubEdition.textContent = edition;
+
+      challengePubBody.innerHTML = `
+        <div class="challenge-pub-post-title">${title}</div>
+        <div class="challenge-pub-meta">${winnerName ? "Gagnant : " + winnerName : ""}${winnerScore ? (winnerName ? "<br>" : "") + "Score : " + winnerScore : ""}</div>
+        <div class="challenge-pub-summary">${linkifyText(summary || "Aucun résumé fourni.")}</div>
+        <div class="challenge-pub-content">${linkifyText(content || "Aucun contenu détaillé fourni.")}</div>
+        <div class="challenge-pub-footer">${footer}</div>
+      `;
+
+      challengePubSideMeta.textContent =
+`Statut : visible
+Mis en avant : ${pinned}
+Publié par : ${data.updatedByEmail || data.createdByEmail || "Administration"}
+Mis à jour : ${updated}
+Édition : ${data.editionTitle || "Chem Challenge 2026"}`;
+    }
+        async function createAccountFromInvite() {
       const firstName = signupFirstName.value.trim();
       const lastName = signupLastName.value.trim();
       const country = signupCountry.value.trim();
@@ -1796,7 +2114,7 @@
                   </div>
                   ${currentUser && comment.authorId === currentUser.uid ? `<button class="mini-btn" type="button" data-delete-comment="${post.id}|${comment.id}">Supprimer</button>` : ""}
                 </div>
-                <div class="comment-text">${escapeHtml(comment.text || "")}</div>
+                <div class="comment-text">${linkifyText(comment.text || "")}</div>
                 ${renderCommentAttachment(comment)}
               </div>
             `;
@@ -1826,7 +2144,7 @@
               </div>
             </div>
 
-            <div class="post-text">${escapeHtml(post.text || "")}</div>
+            <div class="post-text">${linkifyText(post.text || "")}</div>
             ${renderPostAttachment(post)}
 
             <div class="post-actions">
@@ -2116,7 +2434,8 @@
       };
       reader.readAsDataURL(file);
     }
-        async function sendResetLink() {
+
+    async function sendResetLink() {
       const email = resetEmail.value.trim().toLowerCase();
       if (!email) {
         showAuthMessage("Entre d’abord ton adresse email.");
@@ -2208,6 +2527,13 @@
       onValue(ref(db, "comments"), (snap) => {
         commentsMap = snap.val() || {};
         renderPosts();
+      });
+    }
+
+    function listenChallengePub() {
+      onValue(ref(db, `competitions/${COMPETITION_ID}/challengePub/latest`), (snap) => {
+        challengePubData = snap.exists() ? (snap.val() || {}) : null;
+        renderChallengePub(challengePubData);
       });
     }
 
@@ -2423,6 +2749,7 @@
         setUIConnected(false);
         showView("login");
         parseInviteToken();
+        listenChallengePub();
         return;
       }
 
@@ -2434,8 +2761,8 @@
       if (juryLink) juryLink.style.display = "none";
 
       if (isAdminEmail(user.email || "")) {
-      if (adminLink) adminLink.style.display = "inline-block";
-      if (juryLink) juryLink.style.display = "inline-block";
+        if (adminLink) adminLink.style.display = "inline-block";
+        if (juryLink) juryLink.style.display = "inline-block";
         await ensureAdminProfile(user);
         currentUser = user;
         await loadCurrentUserData();
@@ -2447,6 +2774,7 @@
         listenPosts();
         listenLikes();
         listenComments();
+        listenChallengePub();
         parseInviteToken();
         return;
       }
@@ -2456,6 +2784,7 @@
         setUIConnected(false);
         showView("login");
         showAuthMessage("Vérifie d’abord ton adresse email avant de te connecter.");
+        listenChallengePub();
         return;
       }
 
@@ -2469,6 +2798,7 @@
         setUIConnected(false);
         showView("login");
         showAuthMessage("Compte introuvable dans la base de données.");
+        listenChallengePub();
         return;
       }
 
@@ -2482,6 +2812,7 @@
         showAuthMessage(status === "rejected"
           ? "Ton compte a été refusé par l’administrateur."
           : "Ton compte est encore en attente d’approbation.");
+        listenChallengePub();
         return;
       }
 
@@ -2499,6 +2830,7 @@
       listenPosts();
       listenLikes();
       listenComments();
+      listenChallengePub();
 
       parseInviteToken();
     });
