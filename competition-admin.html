@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -493,6 +493,7 @@
     .tag-open{ background:#eaf9ee; color:#0b7f34; }
     .tag-close{ background:#ffe9e9; color:#b62727; }
     .tag-live{ background:#edf4ff; color:#0f4d92; }
+    .tag-finished{ background:#ffe9e9; color:#b62727; }
 
     .detail-grid{
       display:grid;
@@ -602,6 +603,151 @@
       gap:12px;
     }
 
+    .live-shell{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:#fbfdff;
+      padding:18px;
+    }
+
+    .live-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .live-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:14px;
+      white-space:nowrap;
+    }
+
+    .live-badge.idle{
+      background:#eef3f8;
+      color:#5f738c;
+    }
+
+    .live-badge.live{
+      background:#ffe6e6;
+      color:#b11818;
+    }
+
+    .live-badge.finished{
+      background:#ffe6e6;
+      color:#b11818;
+    }
+
+    .live-countdown{
+      font-size:36px;
+      font-weight:900;
+      color:var(--green);
+      line-height:1.1;
+      margin:8px 0 4px;
+    }
+
+    .live-countdown.finished{
+      color:var(--red);
+    }
+
+    .announcement-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+      padding:16px;
+      margin-bottom:12px;
+    }
+
+    .announcement-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+
+    .announcement-title{
+      font-weight:900;
+      font-size:18px;
+      color:var(--nav);
+    }
+
+    .announcement-meta{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      margin-top:4px;
+    }
+
+    .announcement-content{
+      color:var(--muted);
+      line-height:1.6;
+      white-space:pre-wrap;
+      margin-top:8px;
+    }
+
+    .badge-hidden{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      background:#fff3cd;
+      color:#856404;
+    }
+
+    .sub-answer-list{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .sub-answer{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .sub-answer strong{
+      display:block;
+      margin-bottom:6px;
+      color:var(--nav);
+      font-size:14px;
+    }
+
+    .sub-answer div{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+      white-space:pre-wrap;
+    }
+
+    details.copy-details{
+      margin-top:12px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      padding:12px 14px;
+    }
+
+    details.copy-details summary{
+      cursor:pointer;
+      font-weight:900;
+      color:var(--nav);
+      outline:none;
+    }
+
     .hidden{ display:none !important; }
 
     @media (max-width:1350px){
@@ -643,6 +789,9 @@
       }
       .hero h1{
         font-size:31px;
+      }
+      .live-countdown{
+        font-size:28px;
       }
     }
   </style>
@@ -753,6 +902,41 @@
       </section>
 
       <section class="card section">
+        <h2>Pilotage temps réel de la compétition</h2>
+
+        <div class="live-shell">
+          <div class="live-head">
+            <div>
+              <div class="live-badge idle" id="liveStatusBadge">Compétition non lancée</div>
+              <div class="live-countdown" id="liveCountdownText">50:00</div>
+              <div class="small-note" id="liveStatusText">
+                Quand l’admin clique sur “Lancer la compétition”, le statut et le chrono apparaissent automatiquement sur les trois pages, sans rechargement.
+              </div>
+            </div>
+
+            <div class="mini-data" style="min-width:250px;">
+              <div class="k">Synchronisation</div>
+              <div class="v" id="liveMetaText">Aucune session active.</div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn green" id="launchCompetitionBtn">Lancer la compétition</button>
+            <button class="btn red" id="finishCompetitionBtn">Terminer maintenant</button>
+            <button class="btn secondary" id="resetCompetitionBtn">Réinitialiser</button>
+          </div>
+
+          <div class="notice" style="margin-top:14px;">
+            • durée synchronisée : <strong>50 min 00 s</strong><br>
+            • statut rouge quand la compétition est lancée<br>
+            • chrono vert pendant le décompte<br>
+            • à la fin : <strong>Terminée, votre candidature est envoyée</strong><br>
+            • les copies remontent automatiquement ici et côté jury pour correction
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
         <h2>Paramètres du challenge</h2>
 
         <div class="grid-2">
@@ -801,6 +985,7 @@
 
             <div class="btn-row">
               <button class="btn primary" id="saveSettingsBtn">Enregistrer les paramètres</button>
+              <button class="btn secondary" id="clearSettingsAnnouncementBtn">Effacer le message</button>
             </div>
 
             <div class="small-note">
@@ -897,6 +1082,42 @@
       </section>
 
       <section class="card section">
+        <h2>Gestion des annonces</h2>
+
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Créer une annonce</h3>
+
+            <div>
+              <label for="announcementTitleInput">Titre</label>
+              <input id="announcementTitleInput" type="text" placeholder="Ex. Informations importantes du jour" />
+            </div>
+
+            <div style="margin-top:12px;">
+              <label for="announcementContentInput">Contenu</label>
+              <textarea id="announcementContentInput" placeholder="Rédige ici une annonce. Elle pourra ensuite être masquée, démasquée ou supprimée."></textarea>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn primary" id="addAnnouncementBtn">Publier l’annonce</button>
+              <button class="btn secondary" id="clearAnnouncementDraftBtn">Effacer</button>
+            </div>
+
+            <div class="small-note">
+              Chaque annonce aura toujours les boutons <strong>Masquer / Démasquer</strong> et <strong>Supprimer</strong>.
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Liste des annonces</h3>
+            <div id="announcementsList">
+              <div class="notice">Aucune annonce enregistrée pour le moment.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
         <h2>Gestion des membres du jury</h2>
 
         <div class="grid-2">
@@ -921,6 +1142,7 @@
 
             <div class="btn-row">
               <button class="btn green" id="addJuryBtn">Autoriser cet email</button>
+              <button class="btn secondary" id="clearJuryFieldsBtn">Effacer</button>
             </div>
 
             <div class="small-note">
@@ -967,6 +1189,7 @@
 
             <div class="btn-row">
               <button class="btn gold" id="publishResultsBtn">Publier vers Insights</button>
+              <button class="btn secondary" id="clearResultPublishBtn">Effacer</button>
             </div>
 
             <div class="small-note">
@@ -1047,6 +1270,7 @@
               <button class="btn primary" id="saveChallengePubBtn">Publier dans Challenge Pub</button>
               <button class="btn orange" id="hideChallengePubBtn">Masquer Challenge Pub</button>
               <button class="btn secondary" id="loadChallengePubBtn">Recharger la publication</button>
+              <button class="btn secondary" id="clearChallengePubBtn">Effacer le brouillon</button>
             </div>
 
             <div class="small-note">
@@ -1082,15 +1306,15 @@
         </div>
 
         <div class="notice">
-          Ici, l’admin voit aussi les candidats qui ont commencé le test, leur progression, le temps restant et les avertissements enregistrés.
+          Ici, l’admin voit aussi les candidats qui ont commencé le test, leur progression, le temps restant, les avertissements enregistrés et les copies remontées automatiquement, y compris les réponses rédigées lorsque le mode mixte QCM + réponse écrite sera actif côté candidat.
         </div>
       </section>
 
       <section class="card section">
         <h2>Dossiers candidats et suivi en direct</h2>
         <p>
-          Chaque bloc ci-dessous regroupe le dossier du candidat, son état pendant le test, l’avis du jury, les demandes de certificat
-          et les actions administratives.
+          Chaque bloc ci-dessous regroupe le dossier du candidat, son état pendant le test, l’avis du jury, les demandes de certificat,
+          les réponses remises et les actions administratives.
         </p>
 
         <div id="candidateList" class="panel-grid">
@@ -1119,7 +1343,8 @@
 
     const CONFIG = {
       competitionId: "chem_challenge_2026",
-      adminEmail: "borisamoussou01@gmail.com"
+      adminEmail: "borisamoussou01@gmail.com",
+      liveDurationSeconds: 50 * 60
     };
 
     const userNameEl = document.getElementById("userName");
@@ -1143,6 +1368,7 @@
     const resultVisibilityInput = document.getElementById("resultVisibilityInput");
     const challengeAnnouncementInput = document.getElementById("challengeAnnouncementInput");
     const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    const clearSettingsAnnouncementBtn = document.getElementById("clearSettingsAnnouncementBtn");
 
     const currentChallengeTitle = document.getElementById("currentChallengeTitle");
     const currentChallengeEdition = document.getElementById("currentChallengeEdition");
@@ -1151,6 +1377,20 @@
     const currentAnnouncementText = document.getElementById("currentAnnouncementText");
     const heroChallengeTitle = document.getElementById("heroChallengeTitle");
     const heroEditionBadge = document.getElementById("heroEditionBadge");
+
+    const liveStatusBadge = document.getElementById("liveStatusBadge");
+    const liveCountdownText = document.getElementById("liveCountdownText");
+    const liveStatusText = document.getElementById("liveStatusText");
+    const liveMetaText = document.getElementById("liveMetaText");
+    const launchCompetitionBtn = document.getElementById("launchCompetitionBtn");
+    const finishCompetitionBtn = document.getElementById("finishCompetitionBtn");
+    const resetCompetitionBtn = document.getElementById("resetCompetitionBtn");
+
+    const announcementTitleInput = document.getElementById("announcementTitleInput");
+    const announcementContentInput = document.getElementById("announcementContentInput");
+    const addAnnouncementBtn = document.getElementById("addAnnouncementBtn");
+    const clearAnnouncementDraftBtn = document.getElementById("clearAnnouncementDraftBtn");
+    const announcementsList = document.getElementById("announcementsList");
 
     const syncChallengePubStatus = document.getElementById("syncChallengePubStatus");
     const syncLastUpdate = document.getElementById("syncLastUpdate");
@@ -1161,6 +1401,7 @@
     const juryNameInput = document.getElementById("juryNameInput");
     const juryRoleInput = document.getElementById("juryRoleInput");
     const addJuryBtn = document.getElementById("addJuryBtn");
+    const clearJuryFieldsBtn = document.getElementById("clearJuryFieldsBtn");
     const juryList = document.getElementById("juryList");
 
     const winnerNameInput = document.getElementById("winnerNameInput");
@@ -1168,6 +1409,7 @@
     const resultPostTitleInput = document.getElementById("resultPostTitleInput");
     const resultPostContentInput = document.getElementById("resultPostContentInput");
     const publishResultsBtn = document.getElementById("publishResultsBtn");
+    const clearResultPublishBtn = document.getElementById("clearResultPublishBtn");
     const resultPreviewBox = document.getElementById("resultPreviewBox");
 
     const challengePubTitleInput = document.getElementById("challengePubTitleInput");
@@ -1182,6 +1424,7 @@
     const saveChallengePubBtn = document.getElementById("saveChallengePubBtn");
     const hideChallengePubBtn = document.getElementById("hideChallengePubBtn");
     const loadChallengePubBtn = document.getElementById("loadChallengePubBtn");
+    const clearChallengePubBtn = document.getElementById("clearChallengePubBtn");
     const challengePubPreviewBox = document.getElementById("challengePubPreviewBox");
     const challengePubMetaBox = document.getElementById("challengePubMetaBox");
 
@@ -1200,6 +1443,11 @@
     let juryAllowedMap = {};
     let competitionSettings = null;
     let challengePubData = null;
+    let announcementsMap = {};
+    let examSubmissionsMap = {};
+    let manualCorrectionsMap = {};
+    let liveControlState = null;
+    let liveCountdownTimer = null;
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
@@ -1217,6 +1465,13 @@
     function formatDateTime(ts) {
       if (!ts) return "-";
       return new Date(ts).toLocaleString("fr-FR");
+    }
+
+    function formatClock(totalSeconds) {
+      const safe = Math.max(0, Number(totalSeconds) || 0);
+      const min = Math.floor(safe / 60).toString().padStart(2, "0");
+      const sec = Math.floor(safe % 60).toString().padStart(2, "0");
+      return `${min}:${sec}`;
     }
 
     function emailKey(email = "") {
@@ -1240,6 +1495,7 @@
       if (status === "open") return "tag-open";
       if (status === "closed") return "tag-close";
       if (status === "live") return "tag-live";
+      if (status === "finished") return "tag-finished";
       return "tag-none";
     }
 
@@ -1319,6 +1575,11 @@ Mis en avant : ${pinned}
       syncLastUpdate.textContent = formatDateTime(data.updatedAt || data.createdAt);
       syncPublishedBy.textContent = sanitizeText(data.updatedByEmail || data.createdByEmail || CONFIG.adminEmail);
       syncVisibility.textContent = visibility === "hidden" ? "Masquée" : "Visible";
+    }
+
+    function clearField(el) {
+      if (!el) return;
+      el.value = "";
     }
 
     async function loadAdminProfile(uid) {
@@ -1814,6 +2075,250 @@ ${postContent ? "\n\n" + postContent : ""}
       resultPreviewBox.textContent = `🏆 ${winner || "Nom du gagnant"}${score ? " — " + score : ""}${text ? "\n\n" + text : ""}`;
     }
 
+    async function addAnnouncement() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const title = sanitizeText(announcementTitleInput.value);
+      const content = sanitizeText(announcementContentInput.value);
+
+      if (!title && !content) {
+        alert("Ajoute au moins un titre ou un contenu.");
+        return;
+      }
+
+      const newRef = push(ref(db, `competitions/${CONFIG.competitionId}/announcements`));
+      await set(newRef, {
+        title: title || "Annonce",
+        content: content || "",
+        hidden: false,
+        createdAt: Date.now(),
+        createdByEmail: currentUser.email,
+        updatedAt: Date.now(),
+        updatedByEmail: currentUser.email
+      });
+
+      announcementTitleInput.value = "";
+      announcementContentInput.value = "";
+    }
+
+    async function toggleAnnouncementVisibility(id, hiddenNow) {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) return;
+
+      await update(ref(db, `competitions/${CONFIG.competitionId}/announcements/${id}`), {
+        hidden: !hiddenNow,
+        updatedAt: Date.now(),
+        updatedByEmail: currentUser.email
+      });
+    }
+
+    async function deleteAnnouncement(id) {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) return;
+
+      const ok = confirm("Voulez-vous vraiment supprimer cette annonce ?");
+      if (!ok) return;
+
+      await remove(ref(db, `competitions/${CONFIG.competitionId}/announcements/${id}`));
+    }
+
+    function renderAnnouncements() {
+      const entries = Object.entries(announcementsMap || {}).sort((a, b) => {
+        return (b[1]?.createdAt || 0) - (a[1]?.createdAt || 0);
+      });
+
+      if (!entries.length) {
+        announcementsList.innerHTML = `<div class="notice">Aucune annonce enregistrée pour le moment.</div>`;
+        return;
+      }
+
+      announcementsList.innerHTML = entries.map(([id, item]) => {
+        const hidden = !!item.hidden;
+        return `
+          <div class="announcement-card">
+            <div class="announcement-head">
+              <div>
+                <div class="announcement-title">${sanitizeText(item.title || "Annonce")}</div>
+                <div class="announcement-meta">
+                  Créée le : ${formatDateTime(item.createdAt)}<br>
+                  Par : ${sanitizeText(item.createdByEmail || CONFIG.adminEmail)}
+                </div>
+              </div>
+
+              <div class="btn-row" style="margin-top:0;">
+                ${hidden ? `<span class="badge-hidden">Masquée</span>` : ``}
+                <button class="btn orange" data-toggle-announcement="${id}" data-hidden="${hidden ? "yes" : "no"}">${hidden ? "Démasquer" : "Masquer"}</button>
+                <button class="btn red" data-delete-announcement="${id}">Supprimer</button>
+              </div>
+            </div>
+
+            <div class="announcement-content">${sanitizeText(item.content || "") || "Aucun contenu."}</div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-toggle-announcement]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-toggle-announcement");
+          const hiddenNow = btn.getAttribute("data-hidden") === "yes";
+          await toggleAnnouncementVisibility(id, hiddenNow);
+        });
+      });
+
+      document.querySelectorAll("[data-delete-announcement]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-delete-announcement");
+          await deleteAnnouncement(id);
+        });
+      });
+    }
+
+    async function launchCompetition() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const now = Date.now();
+      const endsAt = now + (CONFIG.liveDurationSeconds * 1000);
+
+      await set(ref(db, `competitions/${CONFIG.competitionId}/liveControl`), {
+        status: "live",
+        durationSeconds: CONFIG.liveDurationSeconds,
+        startedAt: now,
+        endsAt,
+        finishedAt: null,
+        message: "La compétition est lancée",
+        finishedMessage: "Terminée, votre candidature est envoyée",
+        launchedByEmail: currentUser.email,
+        updatedAt: now
+      });
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "competition_live_started",
+        adminEmail: currentUser.email,
+        startedAt: now,
+        endsAt,
+        at: now
+      });
+    }
+
+    async function finishCompetitionNow() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const now = Date.now();
+
+      await update(ref(db, `competitions/${CONFIG.competitionId}/liveControl`), {
+        status: "finished",
+        finishedAt: now,
+        endsAt: now,
+        message: "La compétition est lancée",
+        finishedMessage: "Terminée, votre candidature est envoyée",
+        updatedAt: now
+      });
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "competition_live_finished_manually",
+        adminEmail: currentUser.email,
+        at: now
+      });
+    }
+
+    async function resetCompetitionLive() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const now = Date.now();
+
+      await set(ref(db, `competitions/${CONFIG.competitionId}/liveControl`), {
+        status: "idle",
+        durationSeconds: CONFIG.liveDurationSeconds,
+        startedAt: null,
+        endsAt: null,
+        finishedAt: null,
+        message: "",
+        finishedMessage: "Terminée, votre candidature est envoyée",
+        launchedByEmail: currentUser.email,
+        updatedAt: now
+      });
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "competition_live_reset",
+        adminEmail: currentUser.email,
+        at: now
+      });
+    }
+
+    async function autoFinishIfExpired(liveData) {
+      if (!liveData || liveData.status !== "live" || !liveData.endsAt) return;
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) return;
+      if (Date.now() < liveData.endsAt) return;
+
+      await update(ref(db, `competitions/${CONFIG.competitionId}/liveControl`), {
+        status: "finished",
+        finishedAt: liveData.endsAt,
+        updatedAt: Date.now()
+      });
+    }
+
+    function stopLiveCountdownTimer() {
+      if (liveCountdownTimer) {
+        clearInterval(liveCountdownTimer);
+        liveCountdownTimer = null;
+      }
+    }
+
+    function renderLiveControl(liveData = null) {
+      stopLiveCountdownTimer();
+
+      const state = liveData || {};
+      const status = sanitizeText(state.status || "idle");
+
+      if (status === "live") {
+        liveStatusBadge.className = "live-badge live";
+        liveStatusBadge.textContent = sanitizeText(state.message || "La compétition est lancée");
+        liveStatusText.textContent = "La compétition est actuellement en cours sur les trois pages. Le chrono descend automatiquement en temps réel.";
+        liveMetaText.textContent = `Lancée par : ${sanitizeText(state.launchedByEmail || CONFIG.adminEmail)} · Début : ${formatDateTime(state.startedAt)} · Fin prévue : ${formatDateTime(state.endsAt)}`;
+
+        const paint = () => {
+          const left = Math.max(0, Math.floor(((state.endsAt || 0) - Date.now()) / 1000));
+          liveCountdownText.textContent = formatClock(left);
+          liveCountdownText.classList.remove("finished");
+          if (left <= 0) {
+            liveCountdownText.textContent = "00:00";
+            autoFinishIfExpired(state);
+          }
+        };
+
+        paint();
+        liveCountdownTimer = setInterval(paint, 1000);
+        return;
+      }
+
+      if (status === "finished") {
+        liveStatusBadge.className = "live-badge finished";
+        liveStatusBadge.textContent = sanitizeText(state.finishedMessage || "Terminée, votre candidature est envoyée");
+        liveCountdownText.textContent = "00:00";
+        liveCountdownText.classList.add("finished");
+        liveStatusText.textContent = "La session est terminée. Les copies doivent déjà être remontées automatiquement pour correction côté admin et jury.";
+        liveMetaText.textContent = `Terminé le : ${formatDateTime(state.finishedAt || state.endsAt)} · Dernière mise à jour : ${formatDateTime(state.updatedAt)}`;
+        return;
+      }
+
+      liveStatusBadge.className = "live-badge idle";
+      liveStatusBadge.textContent = "Compétition non lancée";
+      liveCountdownText.textContent = "50:00";
+      liveCountdownText.classList.remove("finished");
+      liveStatusText.textContent = "Quand l’admin clique sur “Lancer la compétition”, le statut et le chrono apparaissent automatiquement sur les trois pages, sans rechargement.";
+      liveMetaText.textContent = "Aucune session active.";
+    }
+
     function computeStats(filteredIds = null) {
       const ids = filteredIds || Object.keys(participantsMap);
       let total = 0;
@@ -1869,6 +2374,72 @@ ${postContent ? "\n\n" + postContent : ""}
       });
     }
 
+    function renderSubmissionAnswers(submission) {
+      const answers = Array.isArray(submission?.answers) ? submission.answers : [];
+      if (!answers.length) {
+        return `<div class="notice" style="margin-top:10px;">Aucune copie détaillée enregistrée pour le moment.</div>`;
+      }
+
+      return `
+        <div class="sub-answer-list">
+          ${answers.map((ans, idx) => `
+            <div class="sub-answer">
+              <strong>Question ${idx + 1}${ans?.type ? " · " + sanitizeText(ans.type) : ""}</strong>
+              <div>
+Question : ${sanitizeText(ans?.questionText || "-")}
+Réponse envoyée : ${sanitizeText(ans?.answerLabel || ans?.answerText || ans?.typedAnswer || ans?.selectedOption || "-")}
+Bonne réponse : ${sanitizeText(ans?.correctLabel || ans?.correctText || "-")}
+Statut : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === false ? "Incorrect" : "À corriger"}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    async function saveAdminCorrection(uid) {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const scoreEl = document.getElementById(`adminCorrectionScore-${uid}`);
+      const statusEl = document.getElementById(`adminCorrectionStatus-${uid}`);
+      const notesEl = document.getElementById(`adminCorrectionNotes-${uid}`);
+
+      if (!scoreEl || !statusEl || !notesEl) return;
+
+      const manualScoreRaw = sanitizeText(scoreEl.value);
+      const correctionStatus = sanitizeText(statusEl.value || "pending");
+      const notes = sanitizeText(notesEl.value);
+
+      const manualScore = manualScoreRaw === "" ? null : Number(manualScoreRaw);
+      if (manualScoreRaw !== "" && Number.isNaN(manualScore)) {
+        alert("Le score manuel n’est pas valide.");
+        return;
+      }
+
+      await update(ref(db, `competitions/${CONFIG.competitionId}/manualCorrections/${uid}/admin`), {
+        correctedByUid: currentUser.uid,
+        correctedByEmail: currentUser.email,
+        correctedByName: currentProfile.fullName || currentProfile.name || currentUser.displayName || "Admin",
+        manualScore,
+        correctionStatus,
+        notes,
+        updatedAt: Date.now()
+      });
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "admin_manual_correction_saved",
+        uid,
+        adminEmail: currentUser.email,
+        correctionStatus,
+        at: Date.now()
+      });
+
+      alert("Correction admin enregistrée.");
+    }
+
     function renderCandidates() {
       const ids = getFilteredCandidateIds();
       computeStats(ids);
@@ -1890,6 +2461,8 @@ ${postContent ? "\n\n" + postContent : ""}
         const cert = certificatesMap[uid] || null;
         const jury = juryReviewsMap[uid] || {};
         const examMeta = p.examMeta || {};
+        const submission = examSubmissionsMap[uid] || null;
+        const adminCorrection = manualCorrectionsMap?.[uid]?.admin || {};
 
         const registrationStatusClass = getStatusTagClass(p.status || "none");
         const registrationStatusText =
@@ -1912,6 +2485,14 @@ ${postContent ? "\n\n" + postContent : ""}
         const safeName = sanitizeText(p.fullName || "Participant");
         const safeEmail = sanitizeText(p.email || "");
         const safeUid = sanitizeText(uid);
+
+        const submissionSummary = submission
+          ? `Copie reçue le : ${formatDateTime(submission.submittedAt || p.submittedAt)}
+Mode : ${sanitizeText(submission.mode || "mixte")}
+Questions envoyées : ${submission.answerCount != null ? submission.answerCount : (Array.isArray(submission.answers) ? submission.answers.length : "-")}
+Score automatique : ${submission.autoScore != null ? submission.autoScore : (p.score != null ? p.score : "-")}/${submission.totalQuestions != null ? submission.totalQuestions : (p.totalQuestions || "-")}
+Réponses rédigées : ${submission.writtenCount != null ? submission.writtenCount : "0"}`
+          : "Aucune copie détaillée enregistrée pour le moment.";
 
         return `
           <div class="candidate-card">
@@ -1954,7 +2535,7 @@ ${postContent ? "\n\n" + postContent : ""}
               </div>
               <div class="mini-data">
                 <div class="k">Progression test</div>
-                <div class="v">${examMeta.currentQuestionIndex != null ? `${examMeta.currentQuestionIndex}/${p.totalQuestions || 12}` : "-"}</div>
+                <div class="v">${examMeta.currentQuestionIndex != null ? `${examMeta.currentQuestionIndex}/${p.totalQuestions || 50}` : "-"}</div>
               </div>
             </div>
 
@@ -2005,6 +2586,25 @@ Numéro de vérification : ${sanitizeText(cert?.verificationNumber || "-")}
 Délivré le : ${formatDate(cert?.issuedAt)}
                 </span>
               </div>
+
+              <div class="detail-box">
+                <strong>Copie remise automatiquement</strong>
+                <span>${submissionSummary}</span>
+                <details class="copy-details">
+                  <summary>Voir la copie et les réponses</summary>
+                  ${renderSubmissionAnswers(submission)}
+                </details>
+              </div>
+
+              <div class="detail-box">
+                <strong>Correction admin</strong>
+                <span>
+Statut : ${sanitizeText(adminCorrection.correctionStatus || "pending")}
+Note manuelle : ${adminCorrection.manualScore != null ? adminCorrection.manualScore : "-"}
+Commentaires : ${sanitizeText(adminCorrection.notes || "-")}
+Mis à jour : ${formatDateTime(adminCorrection.updatedAt)}
+                </span>
+              </div>
             </div>
 
             <div class="action-grid">
@@ -2042,11 +2642,42 @@ Délivré le : ${formatDate(cert?.issuedAt)}
                 </div>
               </div>
             </div>
+
+            <div class="action-box" style="margin-top:14px;">
+              <h4>Correction détaillée admin</h4>
+
+              <div class="grid-3">
+                <div>
+                  <label for="adminCorrectionScore-${uid}">Note manuelle</label>
+                  <input id="adminCorrectionScore-${uid}" type="number" min="0" step="0.5" value="${adminCorrection.manualScore != null ? adminCorrection.manualScore : ""}" placeholder="Ex. 17.5" />
+                </div>
+
+                <div>
+                  <label for="adminCorrectionStatus-${uid}">Statut de correction</label>
+                  <select id="adminCorrectionStatus-${uid}">
+                    <option value="pending" ${(adminCorrection.correctionStatus || "pending") === "pending" ? "selected" : ""}>En attente</option>
+                    <option value="reviewed" ${(adminCorrection.correctionStatus || "") === "reviewed" ? "selected" : ""}>Corrigée</option>
+                    <option value="needs_revision" ${(adminCorrection.correctionStatus || "") === "needs_revision" ? "selected" : ""}>À revoir</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label>Action</label>
+                  <button class="btn primary" data-save-admin-correction="${uid}" style="width:100%;">Enregistrer la correction</button>
+                </div>
+              </div>
+
+              <div style="margin-top:12px;">
+                <label for="adminCorrectionNotes-${uid}">Commentaires admin</label>
+                <textarea id="adminCorrectionNotes-${uid}" placeholder="Ajoute ici les remarques de correction, y compris pour les réponses écrites à la main.">${sanitizeText(adminCorrection.notes || "")}</textarea>
+              </div>
+            </div>
           </div>
         `;
       }).join("");
 
       bindActionButtons();
+      bindAdminCorrectionButtons();
     }
 
     function bindActionButtons() {
@@ -2065,6 +2696,16 @@ Délivré le : ${formatDate(cert?.issuedAt)}
       });
     }
 
+    function bindAdminCorrectionButtons() {
+      document.querySelectorAll("[data-save-admin-correction]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const uid = btn.getAttribute("data-save-admin-correction");
+          if (!uid) return;
+          await saveAdminCorrection(uid);
+        });
+      });
+    }
+
     function startListeners() {
       onValue(ref(db, `competitions/${CONFIG.competitionId}/settings`), (snap) => {
         competitionSettings = snap.exists() ? (snap.val() || {}) : null;
@@ -2076,6 +2717,11 @@ Délivré le : ${formatDate(cert?.issuedAt)}
           resultVisibility: "hidden",
           announcement: ""
         });
+      });
+
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/liveControl`), (snap) => {
+        liveControlState = snap.exists() ? (snap.val() || {}) : null;
+        renderLiveControl(liveControlState);
       });
 
       onValue(ref(db, `competitions/${CONFIG.competitionId}/participants`), (snap) => {
@@ -2107,6 +2753,21 @@ Délivré le : ${formatDate(cert?.issuedAt)}
         challengePubData = snap.exists() ? (snap.val() || {}) : null;
         renderChallengePubPreview(challengePubData);
       });
+
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/announcements`), (snap) => {
+        announcementsMap = snap.exists() ? (snap.val() || {}) : {};
+        renderAnnouncements();
+      });
+
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/examSubmissions`), (snap) => {
+        examSubmissionsMap = snap.exists() ? (snap.val() || {}) : {};
+        renderCandidates();
+      });
+
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/manualCorrections`), (snap) => {
+        manualCorrectionsMap = snap.exists() ? (snap.val() || {}) : {};
+        renderCandidates();
+      });
     }
 
     logoutBtn.addEventListener("click", async () => {
@@ -2120,6 +2781,40 @@ Délivré le : ${formatDate(cert?.issuedAt)}
     saveChallengePubBtn.addEventListener("click", saveChallengePub);
     hideChallengePubBtn.addEventListener("click", hideChallengePub);
     loadChallengePubBtn.addEventListener("click", () => renderChallengePubPreview(challengePubData));
+    addAnnouncementBtn.addEventListener("click", addAnnouncement);
+
+    launchCompetitionBtn.addEventListener("click", launchCompetition);
+    finishCompetitionBtn.addEventListener("click", finishCompetitionNow);
+    resetCompetitionBtn.addEventListener("click", resetCompetitionLive);
+
+    clearSettingsAnnouncementBtn.addEventListener("click", () => clearField(challengeAnnouncementInput));
+    clearAnnouncementDraftBtn.addEventListener("click", () => {
+      clearField(announcementTitleInput);
+      clearField(announcementContentInput);
+    });
+    clearJuryFieldsBtn.addEventListener("click", () => {
+      clearField(juryEmailInput);
+      clearField(juryNameInput);
+      clearField(juryRoleInput);
+    });
+    clearResultPublishBtn.addEventListener("click", () => {
+      clearField(winnerNameInput);
+      clearField(winnerScoreInput);
+      clearField(resultPostTitleInput);
+      clearField(resultPostContentInput);
+      updatePreview();
+    });
+    clearChallengePubBtn.addEventListener("click", () => {
+      clearField(challengePubTitleInput);
+      challengePubVisibilityInput.value = "visible";
+      clearField(challengePubBadgeInput);
+      clearField(challengePubWinnerInput);
+      clearField(challengePubScoreInput);
+      clearField(challengePubSummaryInput);
+      clearField(challengePubContentInput);
+      clearField(challengePubFooterInput);
+      challengePubPinInput.value = "yes";
+    });
 
     winnerNameInput.addEventListener("input", updatePreview);
     winnerScoreInput.addEventListener("input", updatePreview);
