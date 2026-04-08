@@ -893,6 +893,56 @@
       font-weight:800;
     }
 
+    .challenge-pub-card{
+      border:1px solid var(--line);
+      background:#fbfdff;
+      border-radius:18px;
+      padding:16px;
+      margin-top:14px;
+    }
+
+    .challenge-pub-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .challenge-pub-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#edf4ff;
+      color:#0f4d92;
+      font-weight:800;
+      font-size:13px;
+    }
+
+    .challenge-pub-title{
+      font-size:18px;
+      font-weight:900;
+      color:var(--nav);
+      margin-bottom:6px;
+    }
+
+    .challenge-pub-meta{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      margin-bottom:8px;
+    }
+
+    .challenge-pub-content{
+      color:var(--muted);
+      line-height:1.65;
+      white-space:pre-wrap;
+      font-size:14px;
+    }
+
     .hidden{ display:none !important; }
 
     @media (max-width:1200px){
@@ -925,7 +975,7 @@
       <a href="research.html">Research</a>
       <a href="cv.html">Resume</a>
       <a href="contact.html">Contact</a>
-      <a href="insights.html">Insights</a>
+      <a href="insights.html#challenge-pub">Insights</a>
       <a href="messages.html">Messages</a>
       <a href="calls.html">Appels</a>
       <a href="meeting-room.html">Salle de réunion</a>
@@ -958,6 +1008,7 @@
       <a class="side-btn" href="meeting-room.html">Salle de réunion</a>
       <a class="side-btn" href="competition-admin.html">Administration concours</a>
       <a class="side-btn" href="competition-jury.html">Jury concours</a>
+      <a class="side-btn" href="insights.html#challenge-pub">Challenge Pub</a>
       <button class="side-btn red" id="logoutBtn">Déconnexion</button>
 
       <div style="margin-top:22px;">
@@ -965,17 +1016,17 @@
 
         <div class="hub-card">
           <h4>Organisation liée</h4>
-          <p>Cette page fonctionne avec <strong>competition-admin.html</strong> et <strong>competition-jury.html</strong>.</p>
+          <p>Cette page fonctionne avec <strong>competition-admin.html</strong>, <strong>competition-jury.html</strong> et la sous-section <strong>Challenge Pub</strong> dans <strong>insights.html</strong>.</p>
         </div>
 
         <div class="hub-card">
           <h4>Contrôle administrateur</h4>
-          <p>L’adresse <strong>borisamoussou01@gmail.com</strong> garde le contrôle des inscriptions, du jury, des résultats et des certificats.</p>
+          <p>L’adresse <strong>borisamoussou01@gmail.com</strong> garde le contrôle des inscriptions, du jury, des résultats, de la publication concours et des certificats.</p>
         </div>
 
         <div class="hub-card">
           <h4>Expérience candidat</h4>
-          <p>Inscription détaillée, test, suivi du statut, demande de certificat, et affichage du certificat final.</p>
+          <p>Inscription détaillée, test, suivi du statut, demande de certificat, affichage du certificat final et accès rapide à Challenge Pub.</p>
         </div>
       </div>
     </aside>
@@ -1017,6 +1068,18 @@
       <section class="card section">
         <h2>Annonce officielle</h2>
         <div class="notice" id="announcementBox">Aucune annonce pour le moment.</div>
+
+        <div class="challenge-pub-card">
+          <div class="challenge-pub-head">
+            <div>
+              <div class="challenge-pub-title">Challenge Pub</div>
+              <div class="challenge-pub-meta" id="challengePubMeta">Publication concours synchronisée avec l’administration.</div>
+            </div>
+            <a class="btn secondary" href="insights.html#challenge-pub">Ouvrir dans Insights</a>
+          </div>
+          <div class="challenge-pub-pill" id="challengePubStatus">Aucune publication concours</div>
+          <div class="challenge-pub-content" id="challengePubPreview" style="margin-top:10px;">Aucune publication concours pour le moment.</div>
+        </div>
       </section>
 
       <section class="card section">
@@ -1456,7 +1519,7 @@
       <div class="mini-box">
         <h4>Liaison de votre page</h4>
         <p>
-          Les données candidates, jury, validation et certificat sont partagées avec
+          Les données candidates, jury, validation, Challenge Pub et certificat sont partagées avec
           <strong>vous</strong> et seulement <strong>l'administration</strong>.
         </p>
       </div>
@@ -1479,6 +1542,11 @@
       <div class="mini-box">
         <h4>Annonce</h4>
         <p id="sidebarAnnouncement">Aucune annonce pour le moment.</p>
+      </div>
+
+      <div class="mini-box">
+        <h4>Challenge Pub</h4>
+        <p id="sidebarChallengePub">Aucune publication concours pour le moment.</p>
       </div>
     </aside>
   </div>
@@ -1528,7 +1596,6 @@
       { id:"q14", text:"Quelle espèce est une base selon Brønsted ?", options:["Une espèce qui capte un proton","Une espèce qui cède un proton","Une espèce neutre uniquement","Une espèce qui perd un neutron"], answer:0 },
       { id:"q15", text:"La formule de l’acide sulfurique est :", options:["HCl","H₂SO₄","HNO₃","H₃PO₄"], answer:1 },
       { id:"q16", text:"Dans un titrage, le point d’équivalence correspond au moment où :", options:["Le volume est nul","Les réactifs sont introduits en proportions stœchiométriques","Le pH vaut toujours 7","La solution devient incolore"], answer:1 },
-    
       { id:"q17", text:"Quelle particule possède une charge négative dans l’atome ?", options:["Le proton","Le neutron","L’électron","Le nucléon"], answer:2 },
       { id:"q18", text:"Le symbole chimique du sodium est :", options:["So","Sd","Na","S"], answer:2 },
       { id:"q19", text:"Une solution basique a généralement un pH :", options:["Inférieur à 7","Égal à 7","Supérieur à 7","Toujours égal à 14"], answer:2 },
@@ -1581,6 +1648,11 @@
     const examStatusTag = document.getElementById("examStatusTag");
     const resultVisibilityTag = document.getElementById("resultVisibilityTag");
     const challengeStatusText = document.getElementById("challengeStatusText");
+
+    const challengePubStatus = document.getElementById("challengePubStatus");
+    const challengePubMeta = document.getElementById("challengePubMeta");
+    const challengePubPreview = document.getElementById("challengePubPreview");
+    const sidebarChallengePub = document.getElementById("sidebarChallengePub");
 
     const fullName = document.getElementById("fullName");
     const displayName = document.getElementById("displayName");
@@ -1654,6 +1726,7 @@
     let currentRegistration = null;
     let currentProfile = {};
     let competitionSettings = null;
+    let leaderboardUnsubscribeAttached = false;
 
     let examQuestions = [];
     let currentQuestionIndex = 0;
@@ -1682,6 +1755,11 @@
       if (!ts) return "-";
       const d = new Date(ts);
       return d.toLocaleDateString("fr-FR", { day:"2-digit", month:"long", year:"numeric" });
+    }
+
+    function formatDateTime(ts) {
+      if (!ts) return "-";
+      return new Date(ts).toLocaleString("fr-FR");
     }
 
     function formatTime(totalSeconds) {
@@ -1733,6 +1811,27 @@
 
       certificateBrand.textContent = title;
       certificateEditionText.textContent = edition;
+    }
+
+    function renderChallengePub(data = null) {
+      if (!data) {
+        challengePubStatus.textContent = "Aucune publication concours";
+        challengePubMeta.textContent = "Publication concours synchronisée avec l’administration.";
+        challengePubPreview.textContent = "Aucune publication concours pour le moment.";
+        sidebarChallengePub.textContent = "Aucune publication concours pour le moment.";
+        return;
+      }
+
+      const title = sanitizeText(data.title || "Publication Challenge Pub");
+      const content = sanitizeText(data.content || "");
+      const edition = sanitizeText(data.editionTitle || competitionSettings?.editionTitle || CONFIG.defaultEdition);
+      const by = sanitizeText(data.createdByName || data.createdByEmail || CONFIG.adminEmail);
+      const at = formatDateTime(data.createdAt);
+
+      challengePubStatus.textContent = "Publication concours disponible";
+      challengePubMeta.textContent = `${edition} · Publié le ${at} · Par ${by}`;
+      challengePubPreview.textContent = `${title}${content ? "\n\n" + content : ""}`;
+      sidebarChallengePub.textContent = `${title}${content ? "\n" + content.slice(0, 140) + (content.length > 140 ? "..." : "") : ""}`;
     }
 
     function canRegisterNow() {
@@ -2011,8 +2110,9 @@
 
     async function saveExamProgress() {
       if (!currentUser) return;
+      const prevStartedAt = currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || Date.now();
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}/examMeta`), {
-        startedAt: Date.now(),
+        startedAt: prevStartedAt,
         updatedAt: Date.now(),
         currentQuestionIndex,
         warnings,
@@ -2032,6 +2132,7 @@
 
       const total = examQuestions.length;
       const percent = Math.round((score / total) * 100);
+      const startedAt = currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || Date.now();
 
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`), {
         examStarted: true,
@@ -2044,7 +2145,7 @@
         submittedAt: Date.now(),
         updatedAt: Date.now(),
         examMeta: {
-          startedAt: Date.now(),
+          startedAt,
           updatedAt: Date.now(),
           currentQuestionIndex: total,
           warnings,
@@ -2073,7 +2174,6 @@
           : "Ton score a été enregistré avec succès.";
 
       startExamBtn.disabled = true;
-      loadLeaderboard();
       await loadRegistrationStatus();
       await loadCertificateStatus();
     }
@@ -2274,11 +2374,20 @@
       }
     }
 
-    async function loadLeaderboard() {
+    function startChallengePubListener() {
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`), (snap) => {
+        renderChallengePub(snap.exists() ? (snap.val() || {}) : null);
+      });
+    }
+
+    function loadLeaderboard() {
       if (!canShowLeaderboard()) {
         leaderboardBox.innerHTML = `<div class="notice">Le classement est actuellement masqué par l’administrateur.</div>`;
         return;
       }
+
+      if (leaderboardUnsubscribeAttached) return;
+      leaderboardUnsubscribeAttached = true;
 
       const boardQuery = query(
         ref(db, `competitions/${CONFIG.competitionId}/leaderboard`),
@@ -2388,7 +2497,9 @@
         applySettingsToUI(competitionSettings);
         await loadRegistrationStatus();
         await loadCertificateStatus();
-        await loadLeaderboard();
+
+        if (!leaderboardUnsubscribeAttached) loadLeaderboard();
+        else if (!canShowLeaderboard()) leaderboardBox.innerHTML = `<div class="notice">Le classement est actuellement masqué par l’administrateur.</div>`;
       });
     }
 
@@ -2426,9 +2537,10 @@
 
       await loadUserProfile(user.uid);
       startSettingsListener();
+      startChallengePubListener();
       await loadRegistrationStatus();
       await loadCertificateStatus();
-      await loadLeaderboard();
+      loadLeaderboard();
     });
   </script>
 </body>
