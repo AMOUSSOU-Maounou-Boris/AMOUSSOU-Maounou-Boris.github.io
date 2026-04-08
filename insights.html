@@ -2788,8 +2788,8 @@ Mis à jour : ${updated}
         return;
       }
 
-      const juryEmailKey = (user.email || "").toLowerCase().replace(/[.#$[\]]/g, "_");
-      const jurySnap = await get(ref(db, "competitions/chemistry_challenge_2026/juryAccessByEmail/" + juryEmailKey));
+      const juryEmailKey = (user.email || "").toLowerCase().replace(/\./g, ",");
+      const jurySnap = await get(ref(db, "competitions/chem_challenge_2026/juryAllowedEmails/" + juryEmailKey));
       if (jurySnap.exists() && juryLink) juryLink.style.display = "inline-block";
 
       const snap = await get(ref(db, "users/" + user.uid));
