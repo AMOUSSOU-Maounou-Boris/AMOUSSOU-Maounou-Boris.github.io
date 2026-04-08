@@ -486,6 +486,62 @@
     .tag-issued{ background:#fff7dd; color:#866102; }
     .tag-open{ background:#eaf9ee; color:#0b7f34; }
     .tag-close{ background:#ffe9e9; color:#b62727; }
+    .tag-live-red{ background:#ffe6e6; color:#b11818; }
+    .tag-finished{ background:#ffe6e6; color:#b11818; }
+
+    .live-shell{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:#fbfdff;
+      padding:18px;
+    }
+
+    .live-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .live-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:14px;
+      white-space:nowrap;
+    }
+
+    .live-badge.idle{
+      background:#eef3f8;
+      color:#5f738c;
+    }
+
+    .live-badge.live{
+      background:#ffe6e6;
+      color:#b11818;
+    }
+
+    .live-badge.finished{
+      background:#ffe6e6;
+      color:#b11818;
+    }
+
+    .live-countdown{
+      font-size:36px;
+      font-weight:900;
+      color:var(--green);
+      line-height:1.1;
+      margin:8px 0 4px;
+    }
+
+    .live-countdown.finished{
+      color:var(--red);
+    }
 
     .exam-shell{
       display:none;
@@ -565,6 +621,19 @@
       margin-bottom:18px;
     }
 
+    .question-type-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#edf4ff;
+      color:#0f4d92;
+      font-weight:800;
+      font-size:13px;
+      margin-bottom:12px;
+    }
+
     .options{
       display:grid;
       gap:12px;
@@ -604,6 +673,15 @@
       color:var(--nav);
       flex:0 0 24px;
       margin-top:1px;
+    }
+
+    .written-answer-box{
+      margin-top:8px;
+    }
+
+    .written-answer-box textarea{
+      min-height:180px;
+      background:#fff;
     }
 
     .exam-actions{
@@ -964,6 +1042,7 @@
       .hero h1{ font-size:32px; }
       .question-text{ font-size:21px; }
       .certificate-center .student-name{ font-size:28px; }
+      .live-countdown{ font-size:28px; }
     }
   </style>
 </head>
@@ -1048,7 +1127,7 @@
           </div>
           <div class="info-box">
             <div class="label">Format</div>
-            <div class="value">QCM chronométré</div>
+            <div class="value">QCM + réponses rédigées</div>
           </div>
           <div class="info-box">
             <div class="label">Validation</div>
@@ -1057,6 +1136,27 @@
           <div class="info-box">
             <div class="label">Certificat</div>
             <div class="value">Admin uniquement</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>État temps réel de la compétition</h2>
+
+        <div class="live-shell">
+          <div class="live-head">
+            <div>
+              <div class="live-badge idle" id="liveStatusBadge">Compétition non lancée</div>
+              <div class="live-countdown" id="liveCountdownText">50:00</div>
+              <div class="hint" id="liveStatusText" style="margin-top:6px;">
+                Quand l’admin lance la compétition, l’état et le chrono apparaissent automatiquement ici sans recharger la page.
+              </div>
+            </div>
+
+            <div class="status-box" style="margin-top:0; min-width:250px;">
+              <strong>Session synchronisée</strong>
+              <div class="hint" id="liveMetaText">Aucune session active.</div>
+            </div>
           </div>
         </div>
       </section>
@@ -1096,7 +1196,7 @@
             </div>
             <div class="list-item">
               <strong>4. Lancement du test</strong>
-              <span>Le candidat approuvé accède ensuite à l’épreuve depuis cette page.</span>
+              <span>Le candidat approuvé accède ensuite à l’épreuve depuis cette page, avec synchronisation centralisée par l’admin.</span>
             </div>
             <div class="list-item">
               <strong>5. Demande et émission du certificat</strong>
@@ -1315,7 +1415,7 @@
       <section class="card section" id="contestAccessSection">
         <h2>Accès à l’épreuve</h2>
         <p>
-          L’épreuve devient disponible après validation administrative.
+          L’épreuve devient disponible après validation administrative et lancement par l’admin.
           Le jury peut également laisser une appréciation consultable côté admin.
         </p>
 
@@ -1324,10 +1424,11 @@
           <div class="hint" style="margin-bottom:10px;">
             • être connecté au site<br>
             • avoir une inscription approuvée<br>
-            • inscriptions ouvertes ou déjà dossier enregistré<br>
             • épreuve ouverte par l’admin<br>
+            • compétition effectivement lancée<br>
             • une seule tentative<br>
-            • temps limité<br>
+            • temps limité à 50 minutes<br>
+            • mélange de QCM et de réponses rédigées<br>
             • changement répété d’onglet = avertissement puis soumission automatique
           </div>
 
@@ -1343,7 +1444,7 @@
           <h2>Épreuve de chimie</h2>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <div class="warning-pill" id="warningCounter">Avertissements : 0 / 3</div>
-            <div class="timer" id="timerBox">Temps restant : 20:00</div>
+            <div class="timer" id="timerBox">Temps restant : 50:00</div>
           </div>
         </div>
 
@@ -1352,12 +1453,18 @@
         </div>
 
         <div class="question-card">
-          <div class="question-meta" id="questionMeta">Question 1 / 12</div>
+          <div class="question-meta" id="questionMeta">Question 1 / 50</div>
+          <div class="question-type-pill" id="questionTypePill">Question QCM</div>
           <div class="question-text" id="questionText">Chargement...</div>
           <div class="options" id="optionsBox"></div>
 
+          <div class="written-answer-box hidden" id="writtenAnswerShell">
+            <label for="writtenAnswerInput">Rédige ta réponse ici</label>
+            <textarea id="writtenAnswerInput" placeholder="Écris ta réponse avec tes propres mots."></textarea>
+          </div>
+
           <div class="exam-actions">
-            <div class="exam-note">
+            <div class="exam-note" id="examNoteText">
               Choisis une réponse puis passe à la question suivante. Le retour arrière est bloqué.
             </div>
             <button class="btn primary" id="nextQuestionBtn" disabled>Question suivante</button>
@@ -1366,7 +1473,7 @@
 
         <div class="result-box" id="resultBox">
           <strong>Épreuve terminée</strong>
-          <div class="result-score" id="resultScore">0 / 12</div>
+          <div class="result-score" id="resultScore">0 / 50</div>
           <div class="hint" id="resultText">Ton score a été enregistré avec succès.</div>
         </div>
       </section>
@@ -1509,7 +1616,7 @@
 
       <div class="mini-box">
         <h4>Durée</h4>
-        <p>50 minutes, 50 questions à choix unique.</p>
+        <p>50 minutes, 50 questions, avec quelques réponses rédigées à la main.</p>
       </div>
 
       <div class="mini-box">
@@ -1569,8 +1676,9 @@
       competitionId: "chem_challenge_2026",
       defaultTitle: "Chem Challenge",
       defaultEdition: "Chem Challenge 2026",
-      durationMinutes: 20,
-      totalQuestionsToAsk: 12,
+      durationMinutes: 50,
+      totalQuestionsToAsk: 50,
+      writtenQuestionsCount: 6,
       maxWarnings: 3,
       adminEmail: "borisamoussou01@gmail.com"
     };
@@ -1628,6 +1736,19 @@
       { id:"q50", text:"Dans une expérience, répéter plusieurs fois une mesure permet surtout de :", options:["Changer la loi physique","Améliorer la fiabilité","Supprimer la verrerie","Augmenter la température"], answer:1 }
     ];
 
+    const WRITTEN_PROMPTS = [
+      "Explique brièvement pourquoi la fiole jaugée est plus adaptée qu’un bécher pour préparer une solution précise.",
+      "Explique en quelques lignes la différence entre une solution acide et une solution basique.",
+      "Décris en une ou deux phrases ce qu’est le point d’équivalence lors d’un titrage.",
+      "Explique avec tes mots pourquoi un catalyseur accélère une réaction chimique.",
+      "Donne une courte explication de la différence entre oxydation et réduction.",
+      "Explique pourquoi répéter une mesure améliore la fiabilité d’un résultat expérimental.",
+      "Décris brièvement le rôle d’une électrode de référence en électrochimie.",
+      "Explique avec tes mots ce qu’est une dilution et ce qui change dans la solution.",
+      "Donne une courte définition d’un mélange homogène.",
+      "Explique en quelques lignes pourquoi le pH d’une solution neutre vaut environ 7 à 25 °C."
+    ];
+
     const userNameEl = document.getElementById("userName");
     const userEmailEl = document.getElementById("userEmail");
     const userAvatar = document.getElementById("userAvatar");
@@ -1644,6 +1765,11 @@
     const examStatusTag = document.getElementById("examStatusTag");
     const resultVisibilityTag = document.getElementById("resultVisibilityTag");
     const challengeStatusText = document.getElementById("challengeStatusText");
+
+    const liveStatusBadge = document.getElementById("liveStatusBadge");
+    const liveCountdownText = document.getElementById("liveCountdownText");
+    const liveStatusText = document.getElementById("liveStatusText");
+    const liveMetaText = document.getElementById("liveMetaText");
 
     const challengePubStatus = document.getElementById("challengePubStatus");
     const challengePubMeta = document.getElementById("challengePubMeta");
@@ -1685,8 +1811,12 @@
     const warningCounter = document.getElementById("warningCounter");
     const progressBar = document.getElementById("progressBar");
     const questionMeta = document.getElementById("questionMeta");
+    const questionTypePill = document.getElementById("questionTypePill");
     const questionText = document.getElementById("questionText");
     const optionsBox = document.getElementById("optionsBox");
+    const writtenAnswerShell = document.getElementById("writtenAnswerShell");
+    const writtenAnswerInput = document.getElementById("writtenAnswerInput");
+    const examNoteText = document.getElementById("examNoteText");
     const nextQuestionBtn = document.getElementById("nextQuestionBtn");
     const resultBox = document.getElementById("resultBox");
     const resultScore = document.getElementById("resultScore");
@@ -1722,9 +1852,14 @@
     let currentRegistration = null;
     let currentProfile = {};
     let competitionSettings = null;
+    let liveControlState = null;
     let leaderboardUnsubscribeAttached = false;
+    let liveCountdownTimer = null;
+    let liveControlReady = false;
+    let autoSubmittedByLiveFinish = false;
 
     let examQuestions = [];
+    let examResponses = [];
     let currentQuestionIndex = 0;
     let selectedAnswerIndex = null;
     let score = 0;
@@ -1733,6 +1868,7 @@
     let warnings = 0;
     let examStarted = false;
     let examFinished = false;
+    let examSubmissionSaved = false;
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
@@ -1759,8 +1895,9 @@
     }
 
     function formatTime(totalSeconds) {
-      const min = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
-      const sec = (totalSeconds % 60).toString().padStart(2, "0");
+      const safe = Math.max(0, Math.floor(Number(totalSeconds) || 0));
+      const min = Math.floor(safe / 60).toString().padStart(2, "0");
+      const sec = (safe % 60).toString().padStart(2, "0");
       return `${min}:${sec}`;
     }
 
@@ -1781,6 +1918,13 @@
     function applyTag(el, className, text) {
       el.className = "status-tag " + className;
       el.textContent = text;
+    }
+
+    function stopLiveCountdownTimer() {
+      if (liveCountdownTimer) {
+        clearInterval(liveCountdownTimer);
+        liveCountdownTimer = null;
+      }
     }
 
     function applySettingsToUI(settings = null) {
@@ -1822,7 +1966,7 @@
       const content = sanitizeText(data.content || "");
       const edition = sanitizeText(data.editionTitle || competitionSettings?.editionTitle || CONFIG.defaultEdition);
       const by = sanitizeText(data.createdByName || data.createdByEmail || CONFIG.adminEmail);
-      const at = formatDateTime(data.createdAt);
+      const at = formatDateTime(data.createdAt || data.updatedAt);
 
       challengePubStatus.textContent = "Publication concours disponible";
       challengePubMeta.textContent = `${edition} · Publié le ${at} · Par ${by}`;
@@ -1843,6 +1987,14 @@
     function canShowLeaderboard() {
       const resultVisibility = sanitizeText(competitionSettings?.resultVisibility || "hidden");
       return resultVisibility === "visible";
+    }
+
+    function isLiveCompetitionStarted() {
+      return sanitizeText(liveControlState?.status || "idle") === "live";
+    }
+
+    function isLiveCompetitionFinished() {
+      return sanitizeText(liveControlState?.status || "idle") === "finished";
     }
 
     function setRegistrationStatus(type, text) {
@@ -1883,6 +2035,102 @@
 
     function updateWarningUI() {
       warningCounter.textContent = `Avertissements : ${warnings} / ${CONFIG.maxWarnings}`;
+    }
+
+    function buildExamQuestions() {
+      const qcmQuestions = QUESTION_BANK.map((q) => ({
+        ...q,
+        type: "qcm"
+      }));
+
+      const shuffledIndexes = shuffleArray(Array.from({ length: CONFIG.totalQuestionsToAsk }, (_, i) => i));
+      const chosenWrittenIndexes = shuffledIndexes.slice(0, CONFIG.writtenQuestionsCount);
+
+      return qcmQuestions.map((q, idx) => {
+        if (!chosenWrittenIndexes.includes(idx)) return q;
+
+        const prompt = WRITTEN_PROMPTS[idx % WRITTEN_PROMPTS.length];
+        return {
+          ...q,
+          type: "written",
+          prompt,
+          sampleCorrectText: q.options[q.answer]
+        };
+      });
+    }
+
+    function updateLiveExamAvailabilityUI() {
+      if (!currentRegistration) return;
+
+      if (currentRegistration.status === "approved" && !currentRegistration.hasPlayed && !currentRegistration.examCompleted) {
+        if (!canStartExamNow()) {
+          startExamBtn.disabled = true;
+          return;
+        }
+        startExamBtn.disabled = !isLiveCompetitionStarted();
+      }
+    }
+
+    function renderLiveControl(liveData = null) {
+      stopLiveCountdownTimer();
+      liveControlState = liveData || null;
+      liveControlReady = true;
+
+      const status = sanitizeText(liveData?.status || "idle");
+
+      if (status === "live") {
+        liveStatusBadge.className = "live-badge live";
+        liveStatusBadge.textContent = sanitizeText(liveData?.message || "La compétition est lancée");
+        liveStatusText.textContent = "La compétition est en cours. Le chrono descend automatiquement sans rechargement.";
+        liveMetaText.textContent = `Lancée par : ${sanitizeText(liveData?.launchedByEmail || CONFIG.adminEmail)} · Début : ${formatDateTime(liveData?.startedAt)} · Fin prévue : ${formatDateTime(liveData?.endsAt)}`;
+
+        const paint = () => {
+          const left = Math.max(0, Math.floor(((liveData?.endsAt || 0) - Date.now()) / 1000));
+          liveCountdownText.textContent = formatTime(left);
+          liveCountdownText.classList.remove("finished");
+
+          if (examStarted && !examFinished) {
+            timeLeft = left;
+            timerBox.textContent = `Temps restant : ${formatTime(left)}`;
+            saveExamProgress();
+          }
+
+          if (left <= 0 && examStarted && !examFinished && !autoSubmittedByLiveFinish) {
+            autoSubmittedByLiveFinish = true;
+            finalizeExam("live_finished");
+          }
+        };
+
+        paint();
+        liveCountdownTimer = setInterval(paint, 1000);
+        updateLiveExamAvailabilityUI();
+        return;
+      }
+
+      if (status === "finished") {
+        liveStatusBadge.className = "live-badge finished";
+        liveStatusBadge.textContent = sanitizeText(liveData?.finishedMessage || "Terminée, votre candidature est envoyée");
+        liveCountdownText.textContent = "00:00";
+        liveCountdownText.classList.add("finished");
+        liveStatusText.textContent = "La compétition est terminée. La copie doit être envoyée automatiquement.";
+        liveMetaText.textContent = `Fin : ${formatDateTime(liveData?.finishedAt || liveData?.endsAt)} · Dernière mise à jour : ${formatDateTime(liveData?.updatedAt)}`;
+
+        if (examStarted && !examFinished && !autoSubmittedByLiveFinish) {
+          autoSubmittedByLiveFinish = true;
+          finalizeExam("live_finished");
+        }
+
+        updateLiveExamAvailabilityUI();
+        return;
+      }
+
+      liveStatusBadge.className = "live-badge idle";
+      liveStatusBadge.textContent = "Compétition non lancée";
+      liveCountdownText.textContent = "50:00";
+      liveCountdownText.classList.remove("finished");
+      liveStatusText.textContent = "Quand l’admin lance la compétition, l’état et le chrono apparaissent automatiquement ici sans recharger la page.";
+      liveMetaText.textContent = "Aucune session active.";
+      updateLiveExamAvailabilityUI();
     }
 
     async function loadUserProfile(uid) {
@@ -2044,10 +2292,16 @@
         );
         startExamBtn.disabled = true;
       } else if (currentRegistration.status === "approved") {
-        if (!canStartExamNow() && !(currentRegistration.examStarted && !currentRegistration.examCompleted)) {
+        if (!canStartExamNow()) {
           setRegistrationStatus(
             "approved",
             `Ton inscription est approuvée, mais l’épreuve est actuellement fermée par l’administrateur. Référence candidat : ${currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)}.`
+          );
+          startExamBtn.disabled = true;
+        } else if (!isLiveCompetitionStarted() && !(currentRegistration.examStarted && !currentRegistration.examCompleted)) {
+          setRegistrationStatus(
+            "approved",
+            `Ton inscription est approuvée. Attends que l’administrateur lance officiellement la compétition pour commencer l’épreuve. Référence candidat : ${currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)}.`
           );
           startExamBtn.disabled = true;
         } else if (currentRegistration.hasPlayed || currentRegistration.examCompleted) {
@@ -2061,7 +2315,7 @@
             "approved",
             `Ton inscription est approuvée. Tu peux maintenant passer l’épreuve. Référence candidat : ${currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)}.`
           );
-          startExamBtn.disabled = false;
+          startExamBtn.disabled = !isLiveCompetitionStarted();
         }
       } else if (currentRegistration.status === "rejected") {
         setRegistrationStatus(
@@ -2080,12 +2334,25 @@
       if (!q) return;
 
       questionMeta.textContent = `Question ${currentQuestionIndex + 1} / ${examQuestions.length}`;
-      questionText.textContent = q.text;
+      questionText.textContent = q.type === "written" ? q.prompt : q.text;
       progressBar.style.width = `${(currentQuestionIndex / examQuestions.length) * 100}%`;
 
       optionsBox.innerHTML = "";
+      writtenAnswerInput.value = "";
+      writtenAnswerShell.classList.add("hidden");
       selectedAnswerIndex = null;
       nextQuestionBtn.disabled = true;
+
+      if (q.type === "written") {
+        questionTypePill.textContent = "Question rédigée";
+        writtenAnswerShell.classList.remove("hidden");
+        examNoteText.textContent = "Rédige ta réponse avec tes propres mots puis passe à la question suivante.";
+        writtenAnswerInput.addEventListener("input", handleWrittenInput);
+        return;
+      }
+
+      questionTypePill.textContent = "Question QCM";
+      examNoteText.textContent = "Choisis une réponse puis passe à la question suivante. Le retour arrière est bloqué.";
 
       q.options.forEach((opt, i) => {
         const div = document.createElement("div");
@@ -2104,9 +2371,15 @@
       });
     }
 
+    function handleWrittenInput() {
+      const text = sanitizeText(writtenAnswerInput.value);
+      nextQuestionBtn.disabled = text.length < 3;
+    }
+
     async function saveExamProgress() {
       if (!currentUser) return;
-      const prevStartedAt = currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || Date.now();
+      const prevStartedAt = currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || liveControlState?.startedAt || Date.now();
+
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}/examMeta`), {
         startedAt: prevStartedAt,
         updatedAt: Date.now(),
@@ -2117,18 +2390,48 @@
       });
     }
 
+    async function saveDetailedSubmission(reason = "completed") {
+      if (!currentUser || examSubmissionSaved) return;
+
+      const writtenCount = examResponses.filter(r => r.type === "written").length;
+      const autoScore = score;
+      const total = examQuestions.length;
+
+      await set(ref(db, `competitions/${CONFIG.competitionId}/examSubmissions/${currentUser.uid}`), {
+        uid: currentUser.uid,
+        email: currentUser.email || "",
+        fullName: sanitizeText(currentRegistration?.fullName || currentUser.displayName || "Participant"),
+        displayName: sanitizeText(currentRegistration?.displayName || currentRegistration?.fullName || currentUser.displayName || "Participant"),
+        candidateCode: currentRegistration?.candidateCode || makeCandidateCode(currentUser.uid),
+        submittedAt: Date.now(),
+        startedAt: currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || liveControlState?.startedAt || Date.now(),
+        reason,
+        mode: "mixed_qcm_written",
+        writtenCount,
+        answerCount: examResponses.length,
+        autoScore,
+        totalQuestions: total,
+        answers: examResponses
+      });
+
+      examSubmissionSaved = true;
+    }
+
     async function finalizeExam(reason = "completed") {
       if (examFinished || !currentUser) return;
 
       examFinished = true;
       examStarted = false;
       clearInterval(examTimer);
+      stopLiveCountdownTimer();
       progressBar.style.width = "100%";
       nextQuestionBtn.disabled = true;
 
       const total = examQuestions.length;
       const percent = Math.round((score / total) * 100);
-      const startedAt = currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || Date.now();
+      const startedAt = currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || liveControlState?.startedAt || Date.now();
+
+      await saveDetailedSubmission(reason);
 
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`), {
         examStarted: true,
@@ -2162,22 +2465,63 @@
 
       resultBox.style.display = "block";
       resultScore.textContent = `${score} / ${total}`;
-      resultText.textContent =
-        reason === "warnings_limit"
-          ? "Ton épreuve a été soumise automatiquement après trop d’avertissements."
-          : reason === "timeout"
-          ? "Le temps est écoulé. Ton épreuve a été soumise automatiquement."
-          : "Ton score a été enregistré avec succès.";
 
+      if (reason === "warnings_limit") {
+        resultText.textContent = "Ton épreuve a été soumise automatiquement après trop d’avertissements.";
+      } else if (reason === "timeout") {
+        resultText.textContent = "Le temps est écoulé. Ton épreuve a été soumise automatiquement.";
+      } else if (reason === "live_finished") {
+        resultText.textContent = "Terminée, votre candidature est envoyée.";
+      } else {
+        resultText.textContent = "Ton score a été enregistré avec succès.";
+      }
+
+      timerBox.textContent = `Temps restant : 00:00`;
+      liveStatusBadge.className = "live-badge finished";
+      liveStatusBadge.textContent = "Terminée, votre candidature est envoyée";
+      liveCountdownText.textContent = "00:00";
+      liveCountdownText.classList.add("finished");
+      liveStatusText.textContent = "La compétition est terminée.";
       startExamBtn.disabled = true;
+
       await loadRegistrationStatus();
       await loadCertificateStatus();
     }
 
     async function handleNextQuestion() {
-      if (selectedAnswerIndex === null) return;
       const current = examQuestions[currentQuestionIndex];
-      if (selectedAnswerIndex === current.answer) score++;
+      if (!current) return;
+
+      if (current.type === "written") {
+        const typedAnswer = sanitizeText(writtenAnswerInput.value);
+        if (!typedAnswer) return;
+
+        examResponses.push({
+          questionId: current.id,
+          type: "written",
+          questionText: current.prompt,
+          typedAnswer,
+          correctText: current.sampleCorrectText || "",
+          isCorrect: null
+        });
+      } else {
+        if (selectedAnswerIndex === null) return;
+        const isCorrect = selectedAnswerIndex === current.answer;
+        if (isCorrect) score++;
+
+        examResponses.push({
+          questionId: current.id,
+          type: "qcm",
+          questionText: current.text,
+          selectedOptionIndex: selectedAnswerIndex,
+          selectedOption: current.options[selectedAnswerIndex],
+          answerLabel: `${String.fromCharCode(65 + selectedAnswerIndex)}. ${current.options[selectedAnswerIndex]}`,
+          correctOptionIndex: current.answer,
+          correctOption: current.options[current.answer],
+          correctLabel: `${String.fromCharCode(65 + current.answer)}. ${current.options[current.answer]}`,
+          isCorrect
+        });
+      }
 
       currentQuestionIndex++;
       await saveExamProgress();
@@ -2193,6 +2537,12 @@
     function startTimer() {
       timerBox.textContent = `Temps restant : ${formatTime(timeLeft)}`;
       examTimer = setInterval(async () => {
+        if (isLiveCompetitionFinished()) {
+          clearInterval(examTimer);
+          if (!examFinished) await finalizeExam("live_finished");
+          return;
+        }
+
         timeLeft--;
         timerBox.textContent = `Temps restant : ${formatTime(timeLeft)}`;
         await saveExamProgress();
@@ -2212,6 +2562,11 @@
         return;
       }
 
+      if (!isLiveCompetitionStarted()) {
+        alert("La compétition n’a pas encore été lancée par l’administrateur.");
+        return;
+      }
+
       if (currentRegistration.status !== "approved") {
         alert("Ton inscription n’est pas encore approuvée.");
         return;
@@ -2222,23 +2577,31 @@
         return;
       }
 
-      examQuestions = shuffleArray(QUESTION_BANK).slice(0, CONFIG.totalQuestionsToAsk);
+      examQuestions = buildExamQuestions();
+      examResponses = [];
       currentQuestionIndex = 0;
       score = 0;
       warnings = 0;
-      timeLeft = CONFIG.durationMinutes * 60;
+      examSubmissionSaved = false;
+      autoSubmittedByLiveFinish = false;
+
+      const liveLeftSeconds = Math.max(0, Math.floor(((liveControlState?.endsAt || 0) - Date.now()) / 1000));
+      timeLeft = liveLeftSeconds > 0 ? liveLeftSeconds : CONFIG.durationMinutes * 60;
+
       examStarted = true;
       examFinished = false;
       resultBox.style.display = "none";
+
+      const startedAt = liveControlState?.startedAt || Date.now();
 
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`), {
         examStarted: true,
         examCompleted: false,
         hasPlayed: false,
-        startedAt: Date.now(),
+        startedAt,
         updatedAt: Date.now(),
         examMeta: {
-          startedAt: Date.now(),
+          startedAt,
           updatedAt: Date.now(),
           currentQuestionIndex: 0,
           warnings: 0,
@@ -2499,6 +2862,14 @@
       });
     }
 
+    function startLiveControlListener() {
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/liveControl`), async (snap) => {
+        const data = snap.exists() ? (snap.val() || {}) : null;
+        renderLiveControl(data);
+        await loadRegistrationStatus();
+      });
+    }
+
     logoutBtn.addEventListener("click", async () => {
       await signOut(auth);
       window.location.href = "login.html";
@@ -2533,6 +2904,7 @@
 
       await loadUserProfile(user.uid);
       startSettingsListener();
+      startLiveControlListener();
       startChallengePubListener();
       await loadRegistrationStatus();
       await loadCertificateStatus();
