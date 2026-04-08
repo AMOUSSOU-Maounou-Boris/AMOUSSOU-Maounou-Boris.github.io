@@ -551,7 +551,6 @@
       color:var(--muted);
       line-height:1.6;
       font-size:14px;
-      white-space:pre-wrap;
     }
 
     .small-note{
@@ -1670,6 +1669,29 @@ ${postContent ? "\n\n" + postContent : ""}
 
       await push(ref(db, `competitionInsightsPosts`), payload);
 
+      await set(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`), {
+        competitionId: CONFIG.competitionId,
+        title: postTitle,
+        visibility: "visible",
+        badge: "Publication officielle",
+        winnerName,
+        winnerScore,
+        summary: winnerName || winnerScore
+          ? `Résultats publiés pour ${sanitizeText(settings.editionTitle || "Chem Challenge 2026")}.`
+          : "Publication officielle du concours.",
+        content: finalContent,
+        footer: "Publication validée par l’administration.",
+        pinned: true,
+        editionTitle: sanitizeText(settings.editionTitle || "Chem Challenge 2026"),
+        challengeTitle: sanitizeText(settings.challengeTitle || "Chem Challenge"),
+        createdAt: Date.now(),
+        createdByUid: currentUser.uid,
+        createdByEmail: currentUser.email,
+        updatedAt: Date.now(),
+        updatedByUid: currentUser.uid,
+        updatedByEmail: currentUser.email
+      });
+
       await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
         type: "results_published_to_insights",
         adminEmail: currentUser.email,
@@ -1677,7 +1699,7 @@ ${postContent ? "\n\n" + postContent : ""}
         at: Date.now()
       });
 
-      alert("Résultats publiés vers Insights.");
+      alert("Résultats publiés dans Insights + Challenge Pub.");
     }
 
     async function saveChallengePub() {
