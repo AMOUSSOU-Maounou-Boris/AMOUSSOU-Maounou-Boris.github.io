@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Règlement officiel | Chem Challenge</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root{
+      --bg:#eef6ff;
+      --card:#ffffff;
+      --nav:#082e5b;
+      --text:#0b2340;
+      --muted:#607089;
+      --line:#d8e5f3;
+      --blue:#2f8cff;
+      --blue-dark:#0b57a4;
+      --soft:#f7fbff;
+      --green:#18b66a;
+      --gold:#f2c94c;
+      --danger:#e05b5b;
+      --shadow:0 16px 38px rgba(10, 42, 80, 0.10);
+      --radius:18px;
+      --max:1100px;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#eef6ff 0%,#f7fbff 100%);
+      color:var(--text);
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      background:var(--nav);
+      box-shadow:0 8px 18px rgba(0,0,0,0.12);
+    }
+
+    .topbar-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px 18px;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .topbar a{
+      color:#fff;
+      text-decoration:none;
+      font-size:15px;
+      font-weight:700;
+      opacity:.95;
+    }
+
+    .topbar a:hover,
+    .topbar a.active{
+      color:#9fd0ff;
+    }
+
+    .hero{
+      max-width:var(--max);
+      margin:28px auto 18px;
+      padding:0 18px;
+    }
+
+    .hero-card{
+      background:linear-gradient(135deg, #0a3d77 0%, #115db5 55%, #338fff 100%);
+      color:#fff;
+      border-radius:26px;
+      padding:30px 24px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-card::after{
+      content:"";
+      position:absolute;
+      right:-80px;
+      top:-80px;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.09);
+    }
+
+    .badge{
+      display:inline-block;
+      background:rgba(255,255,255,0.16);
+      border:1px solid rgba(255,255,255,0.22);
+      color:#fff;
+      padding:8px 14px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:14px;
+    }
+
+    h1{
+      margin:0 0 10px;
+      font-size:34px;
+      line-height:1.2;
+    }
+
+    .hero p{
+      margin:0;
+      font-size:16px;
+      line-height:1.7;
+      max-width:780px;
+    }
+
+    .container{
+      max-width:var(--max);
+      margin:0 auto 40px;
+      padding:0 18px 30px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:22px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+
+    .section-title{
+      margin:0 0 14px;
+      font-size:22px;
+      color:var(--blue-dark);
+    }
+
+    .intro{
+      color:var(--muted);
+      line-height:1.7;
+      margin-bottom:10px;
+    }
+
+    .rule-block{
+      background:var(--soft);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:18px;
+      margin:16px 0;
+    }
+
+    .rule-block h3{
+      margin:0 0 10px;
+      font-size:18px;
+      color:var(--blue-dark);
+    }
+
+    .rule-block p{
+      margin:0;
+      line-height:1.7;
+      color:var(--text);
+    }
+
+    .rule-list{
+      margin:0;
+      padding-left:20px;
+      line-height:1.8;
+    }
+
+    .rule-list li{
+      margin-bottom:8px;
+    }
+
+    .info-box{
+      background:#f8fcff;
+      border:1px solid var(--line);
+      border-left:5px solid var(--blue);
+      border-radius:14px;
+      padding:16px;
+      margin-bottom:16px;
+    }
+
+    .info-box strong{
+      display:block;
+      margin-bottom:6px;
+      color:var(--blue-dark);
+    }
+
+    .pill{
+      display:inline-block;
+      padding:7px 12px;
+      border-radius:999px;
+      background:#edf6ff;
+      border:1px solid #cfe3fb;
+      color:var(--blue-dark);
+      font-size:13px;
+      font-weight:700;
+      margin:4px 6px 0 0;
+    }
+
+    .alert{
+      background:#fff9e8;
+      border:1px solid #f1df9f;
+      color:#6a5400;
+      border-radius:14px;
+      padding:14px 16px;
+      line-height:1.6;
+      margin-top:14px;
+    }
+
+    .success{
+      background:#eefcf5;
+      border:1px solid #c8efd9;
+      color:#167748;
+      border-radius:14px;
+      padding:14px 16px;
+      line-height:1.6;
+      margin-top:14px;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:46px;
+      padding:0 18px;
+      border-radius:12px;
+      text-decoration:none;
+      font-weight:700;
+      border:none;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .btn-primary{
+      background:var(--blue);
+      color:#fff;
+    }
+
+    .btn-primary:hover{
+      background:#1f7df0;
+      transform:translateY(-1px);
+    }
+
+    .btn-outline{
+      background:#fff;
+      color:var(--blue-dark);
+      border:1px solid #bdd8f6;
+    }
+
+    .btn-outline:hover{
+      background:#f5faff;
+    }
+
+    .footer-note{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.7;
+    }
+
+    footer{
+      text-align:center;
+      padding:18px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    @media (max-width: 900px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      h1{
+        font-size:28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="research.html">Research</a>
+      <a href="cv.html">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html#challenge-pub">Insights</a>
+      <a href="competition.html" class="active">Concours</a>
+      <a href="competition-jury.html">Jury concours</a>
+      <a href="competition-admin.html">Admin concours</a>
+      <a href="profile.html">Mon compte</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-card">
+      <div class="badge">Document officiel</div>
+      <h1>Règlement officiel du Chem Challenge</h1>
+      <p>
+        Cette page présente les règles générales, les conditions de participation, le déroulement des épreuves,
+        la validation des résultats ainsi que les conditions d’attribution du certificat officiel.
+      </p>
+    </div>
+  </section>
+
+  <main class="container">
+    <div class="grid">
+      <section class="card">
+        <h2 class="section-title">Cadre général</h2>
+        <p class="intro">
+          Le Chem Challenge est une initiative académique et scientifique destinée à encourager l’excellence,
+          l’engagement intellectuel et l’intérêt pour la chimie et les sciences associées.
+        </p>
+
+        <div class="rule-block">
+          <h3>1. Objet du concours</h3>
+          <p>
+            Le concours vise à évaluer les connaissances, les capacités de réflexion, la rigueur scientifique
+            et l’aptitude des participants à répondre à des questions théoriques, appliquées ou pratiques
+            selon le niveau annoncé.
+          </p>
+        </div>
+
+        <div class="rule-block">
+          <h3>2. Conditions de participation</h3>
+          <ul class="rule-list">
+            <li>Le concours est ouvert aux candidats autorisés à s’inscrire sur la plateforme.</li>
+            <li>Chaque participant doit fournir des informations exactes lors de son inscription.</li>
+            <li>Une seule inscription sérieuse par participant est recommandée pour une même session.</li>
+            <li>Le respect des règles du concours est obligatoire avant, pendant et après l’épreuve.</li>
+          </ul>
+        </div>
+
+        <div class="rule-block">
+          <h3>3. Déroulement de l’épreuve</h3>
+          <ul class="rule-list">
+            <li>Le participant doit lire attentivement les consignes avant de commencer.</li>
+            <li>Les réponses doivent être personnelles, claires et conformes aux demandes posées.</li>
+            <li>Certaines questions peuvent exiger une réponse rédigée manuellement par le candidat.</li>
+            <li>Le temps accordé, si indiqué, doit être respecté.</li>
+            <li>Le jury ou l’administration peut invalider toute tentative manifestement non conforme.</li>
+          </ul>
+        </div>
+
+        <div class="rule-block">
+          <h3>4. Authenticité des réponses</h3>
+          <ul class="rule-list">
+            <li>Le participant doit soumettre un travail personnel.</li>
+            <li>Les réponses copiées, frauduleuses, incohérentes ou obtenues par tricherie peuvent être rejetées.</li>
+            <li>En cas de doute, un contrôle complémentaire ou une validation manuelle peut être demandé.</li>
+          </ul>
+        </div>
+
+        <div class="rule-block">
+          <h3>5. Évaluation et validation</h3>
+          <ul class="rule-list">
+            <li>Les réponses sont examinées selon des critères de qualité, exactitude et sérieux.</li>
+            <li>Le jury ou l’administration peut valider, refuser ou demander une vérification supplémentaire.</li>
+            <li>La décision finale sur la validation des résultats appartient à l’organisation du concours.</li>
+          </ul>
+        </div>
+
+        <div class="rule-block">
+          <h3>6. Certificat</h3>
+          <ul class="rule-list">
+            <li>Le certificat n’est délivré qu’aux candidats validés par l’administration ou le jury.</li>
+            <li>Un certificat peut comporter un identifiant ou un code de vérification.</li>
+            <li>La validité d’un certificat peut être vérifiée sur la page officielle de vérification.</li>
+          </ul>
+        </div>
+
+        <div class="rule-block">
+          <h3>7. Réserve de l’organisation</h3>
+          <ul class="rule-list">
+            <li>L’organisation se réserve le droit d’ajuster certains éléments du concours pour des raisons de qualité, sécurité ou cohérence.</li>
+            <li>Toute utilisation abusive, tentative de fraude ou perturbation du système peut entraîner l’exclusion.</li>
+            <li>Le concours conserve son caractère académique, sérieux et pédagogique.</li>
+          </ul>
+        </div>
+
+        <div class="alert">
+          <strong>Important :</strong>
+          la participation au Chem Challenge implique l’acceptation du présent règlement.
+        </div>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="competition.html">Retour au concours</a>
+          <a class="btn btn-outline" href="verify-certificate.html">Vérifier un certificat</a>
+        </div>
+
+        <p class="footer-note">
+          Dernière mise à jour : page officielle du règlement du concours.  
+          Organisation : <strong>Chem Challenge</strong>.
+        </p>
+      </section>
+
+      <aside class="card">
+        <h2 class="section-title">Repères officiels</h2>
+
+        <div class="info-box">
+          <strong>Nature du document</strong>
+          Règlement officiel de référence pour les participants, le jury et l’administration.
+        </div>
+
+        <div class="info-box">
+          <strong>Éléments couverts</strong>
+          Conditions, évaluation, validation, authenticité, certificat, conformité.
+        </div>
+
+        <div class="info-box">
+          <strong>Certificat officiel</strong>
+          Un certificat n’est considéré comme valable que s’il a été validé par l’administration compétente.
+        </div>
+
+        <div style="margin:12px 0 2px;">
+          <span class="pill">Règlement officiel</span>
+          <span class="pill">Concours académique</span>
+          <span class="pill">Résultats validés</span>
+          <span class="pill">Certificat vérifiable</span>
+        </div>
+
+        <div class="success">
+          Cette page améliore immédiatement la crédibilité du concours, car elle donne un cadre officiel, visible et public.
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    © Chem Challenge — Règlement officiel
+  </footer>
+
+</body>
+</html>
