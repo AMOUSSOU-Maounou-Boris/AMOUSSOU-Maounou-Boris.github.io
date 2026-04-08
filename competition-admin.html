@@ -551,6 +551,7 @@
       color:var(--muted);
       line-height:1.6;
       font-size:14px;
+      white-space:pre-wrap;
     }
 
     .small-note{
@@ -576,6 +577,30 @@
       gap:14px;
       align-items:flex-start;
       flex-wrap:wrap;
+    }
+
+    .pub-card{
+      border:1px solid var(--line);
+      background:#fbfdff;
+      border-radius:18px;
+      padding:16px;
+    }
+
+    .pub-preview{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:16px;
+      padding:16px;
+      min-height:150px;
+      white-space:pre-wrap;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .coord-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
     }
 
     .hidden{ display:none !important; }
@@ -604,13 +629,17 @@
       .grid-3{
         grid-template-columns:1fr;
       }
+      .coord-grid{
+        grid-template-columns:1fr 1fr;
+      }
     }
 
     @media (max-width:900px){
       .stats-grid,
       .toolbar,
       .candidate-meta,
-      .grid-4{
+      .grid-4,
+      .coord-grid{
         grid-template-columns:1fr;
       }
       .hero h1{
@@ -627,7 +656,7 @@
       <a href="research.html">Research</a>
       <a href="cv.html">Resume</a>
       <a href="contact.html">Contact</a>
-      <a href="insights.html">Insights</a>
+      <a href="insights.html#challenge-pub">Insights</a>
       <a href="messages.html">Messages</a>
       <a href="calls.html">Appels</a>
       <a href="meeting-room.html">Salle de réunion</a>
@@ -656,6 +685,7 @@
 
       <a class="side-btn" href="competition.html">Voir côté candidat</a>
       <a class="side-btn" href="competition-jury.html">Voir côté jury</a>
+      <a class="side-btn" href="insights.html#challenge-pub">Voir Challenge Pub</a>
       <a class="side-btn" href="insights.html">Aller vers Insights</a>
       <a class="side-btn" href="messages.html">Messages</a>
       <a class="side-btn" href="profile.html">Mon compte</a>
@@ -666,7 +696,7 @@
 
         <div class="hub-card">
           <h4>Contrôle total</h4>
-          <p>Cette page centralise les inscriptions, jury, paramètres du challenge, résultats, certificats et publication vers Insights.</p>
+          <p>Cette page centralise les inscriptions, jury, paramètres du challenge, résultats, certificats, publication concours et liaison avec Insights.</p>
         </div>
 
         <div class="hub-card">
@@ -676,7 +706,7 @@
 
         <div class="hub-card">
           <h4>Pages liées</h4>
-          <p>Les données sont partagées avec <strong>competition.html</strong>, <strong>competition-jury.html</strong> et peuvent être republiées dans <strong>insights.html</strong>.</p>
+          <p>Les données sont partagées avec <strong>competition.html</strong>, <strong>competition-jury.html</strong> et la sous-section <strong>Challenge Pub</strong> de <strong>insights.html</strong>.</p>
         </div>
       </div>
     </aside>
@@ -775,7 +805,7 @@
             </div>
 
             <div class="small-note">
-              Ces paramètres sont pensés pour être lus aussi par <strong>competition.html</strong> et <strong>competition-jury.html</strong>.
+              Ces paramètres sont pensés pour être lus aussi par <strong>competition.html</strong>, <strong>competition-jury.html</strong> et la sous-section <strong>Challenge Pub</strong> dans <strong>insights.html</strong>.
             </div>
           </div>
 
@@ -803,6 +833,65 @@
             <div style="margin-top:12px;">
               <label>Annonce enregistrée</label>
               <div class="notice" id="currentAnnouncementText">Aucune annonce pour le moment.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Coordination des 4 pages</h2>
+        <div class="coord-grid">
+          <div class="mini-data">
+            <div class="k">Page candidat</div>
+            <div class="v">competition.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Page admin</div>
+            <div class="v">competition-admin.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Page jury</div>
+            <div class="v">competition-jury.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Sous-section liée</div>
+            <div class="v">insights.html → Challenge Pub</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>État de synchronisation</h3>
+            <div class="grid-2">
+              <div class="mini-data">
+                <div class="k">Challenge Pub</div>
+                <div class="v" id="syncChallengePubStatus">Aucune publication</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Dernière mise à jour</div>
+                <div class="v" id="syncLastUpdate">-</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Publié par</div>
+                <div class="v" id="syncPublishedBy">-</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Visibilité</div>
+                <div class="v" id="syncVisibility">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Accès rapide</h3>
+            <div class="btn-row">
+              <a class="btn secondary" href="competition.html">Ouvrir côté candidat</a>
+              <a class="btn secondary" href="competition-jury.html">Ouvrir côté jury</a>
+              <a class="btn secondary" href="insights.html#challenge-pub">Ouvrir Challenge Pub</a>
+              <a class="btn secondary" href="insights.html">Ouvrir Insights</a>
+            </div>
+            <div class="small-note">
+              Toute publication Challenge Pub faite ici sera relue automatiquement sur les autres pages liées.
             </div>
           </div>
         </div>
@@ -891,6 +980,85 @@
             <div class="notice" id="resultPreviewBox">
               🏆 Aucun aperçu pour le moment.
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Challenge Pub</h2>
+
+        <div class="grid-2">
+          <div class="pub-card">
+            <h3>Publication concours centralisée</h3>
+
+            <div class="grid-2">
+              <div>
+                <label for="challengePubTitleInput">Titre Challenge Pub</label>
+                <input id="challengePubTitleInput" type="text" placeholder="Ex. Résultats officiels du Chem Challenge 2026" />
+              </div>
+              <div>
+                <label for="challengePubVisibilityInput">Visibilité</label>
+                <select id="challengePubVisibilityInput">
+                  <option value="visible">Visible</option>
+                  <option value="hidden">Masquée</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-3" style="margin-top:12px;">
+              <div>
+                <label for="challengePubBadgeInput">Badge / étiquette</label>
+                <input id="challengePubBadgeInput" type="text" placeholder="Ex. Publication officielle" />
+              </div>
+              <div>
+                <label for="challengePubWinnerInput">Nom du gagnant</label>
+                <input id="challengePubWinnerInput" type="text" placeholder="Nom du meilleur candidat" />
+              </div>
+              <div>
+                <label for="challengePubScoreInput">Score mis en avant</label>
+                <input id="challengePubScoreInput" type="text" placeholder="Ex. 12/12 ou 50/50" />
+              </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <label for="challengePubSummaryInput">Résumé court</label>
+              <textarea id="challengePubSummaryInput" placeholder="Résumé court affichable dans Challenge Pub."></textarea>
+            </div>
+
+            <div style="margin-top:12px;">
+              <label for="challengePubContentInput">Contenu détaillé</label>
+              <textarea id="challengePubContentInput" placeholder="Annonce détaillée, résultats, félicitations, rappel de l’édition, informations utiles..."></textarea>
+            </div>
+
+            <div class="grid-2" style="margin-top:12px;">
+              <div>
+                <label for="challengePubFooterInput">Message de bas de publication</label>
+                <input id="challengePubFooterInput" type="text" placeholder="Ex. Publication validée par l’administration." />
+              </div>
+              <div>
+                <label for="challengePubPinInput">Mettre en avant</label>
+                <select id="challengePubPinInput">
+                  <option value="yes">Oui</option>
+                  <option value="no">Non</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn primary" id="saveChallengePubBtn">Publier dans Challenge Pub</button>
+              <button class="btn orange" id="hideChallengePubBtn">Masquer Challenge Pub</button>
+              <button class="btn secondary" id="loadChallengePubBtn">Recharger la publication</button>
+            </div>
+
+            <div class="small-note">
+              Cette publication est le point central du concours. Elle est relue par <strong>competition.html</strong> et doit être affichée dans <strong>insights.html</strong> sous la sous-section <strong>Challenge Pub</strong>.
+            </div>
+          </div>
+
+          <div class="pub-card">
+            <h3>Aperçu Challenge Pub</h3>
+            <div class="pub-preview" id="challengePubPreviewBox">Aucune publication pour le moment.</div>
+            <div class="small-note" id="challengePubMetaBox" style="margin-top:10px;">Aucune donnée publiée.</div>
           </div>
         </div>
       </section>
@@ -985,6 +1153,11 @@
     const heroChallengeTitle = document.getElementById("heroChallengeTitle");
     const heroEditionBadge = document.getElementById("heroEditionBadge");
 
+    const syncChallengePubStatus = document.getElementById("syncChallengePubStatus");
+    const syncLastUpdate = document.getElementById("syncLastUpdate");
+    const syncPublishedBy = document.getElementById("syncPublishedBy");
+    const syncVisibility = document.getElementById("syncVisibility");
+
     const juryEmailInput = document.getElementById("juryEmailInput");
     const juryNameInput = document.getElementById("juryNameInput");
     const juryRoleInput = document.getElementById("juryRoleInput");
@@ -997,6 +1170,21 @@
     const resultPostContentInput = document.getElementById("resultPostContentInput");
     const publishResultsBtn = document.getElementById("publishResultsBtn");
     const resultPreviewBox = document.getElementById("resultPreviewBox");
+
+    const challengePubTitleInput = document.getElementById("challengePubTitleInput");
+    const challengePubVisibilityInput = document.getElementById("challengePubVisibilityInput");
+    const challengePubBadgeInput = document.getElementById("challengePubBadgeInput");
+    const challengePubWinnerInput = document.getElementById("challengePubWinnerInput");
+    const challengePubScoreInput = document.getElementById("challengePubScoreInput");
+    const challengePubSummaryInput = document.getElementById("challengePubSummaryInput");
+    const challengePubContentInput = document.getElementById("challengePubContentInput");
+    const challengePubFooterInput = document.getElementById("challengePubFooterInput");
+    const challengePubPinInput = document.getElementById("challengePubPinInput");
+    const saveChallengePubBtn = document.getElementById("saveChallengePubBtn");
+    const hideChallengePubBtn = document.getElementById("hideChallengePubBtn");
+    const loadChallengePubBtn = document.getElementById("loadChallengePubBtn");
+    const challengePubPreviewBox = document.getElementById("challengePubPreviewBox");
+    const challengePubMetaBox = document.getElementById("challengePubMetaBox");
 
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");
@@ -1012,6 +1200,7 @@
     let juryReviewsMap = {};
     let juryAllowedMap = {};
     let competitionSettings = null;
+    let challengePubData = null;
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
@@ -1083,6 +1272,54 @@
       setOpenCloseTag(currentRegistrationStatusTag, regStatus);
       setOpenCloseTag(currentExamStatusTag, examStatus);
       currentAnnouncementText.textContent = announcement || "Aucune annonce pour le moment.";
+    }
+
+    function renderChallengePubPreview(data = null) {
+      if (!data) {
+        challengePubPreviewBox.textContent = "Aucune publication pour le moment.";
+        challengePubMetaBox.textContent = "Aucune donnée publiée.";
+        syncChallengePubStatus.textContent = "Aucune publication";
+        syncLastUpdate.textContent = "-";
+        syncPublishedBy.textContent = "-";
+        syncVisibility.textContent = "-";
+        return;
+      }
+
+      const title = sanitizeText(data.title || "Challenge Pub");
+      const badge = sanitizeText(data.badge || "Publication officielle");
+      const winner = sanitizeText(data.winnerName || "");
+      const score = sanitizeText(data.winnerScore || "");
+      const summary = sanitizeText(data.summary || "");
+      const content = sanitizeText(data.content || "");
+      const footer = sanitizeText(data.footer || "");
+      const visibility = sanitizeText(data.visibility || "visible");
+      const pinned = data.pinned ? "Oui" : "Non";
+
+      challengePubTitleInput.value = title;
+      challengePubVisibilityInput.value = visibility;
+      challengePubBadgeInput.value = badge;
+      challengePubWinnerInput.value = winner;
+      challengePubScoreInput.value = score;
+      challengePubSummaryInput.value = summary;
+      challengePubContentInput.value = content;
+      challengePubFooterInput.value = footer;
+      challengePubPinInput.value = data.pinned ? "yes" : "no";
+
+      challengePubPreviewBox.textContent =
+`${title}
+${badge ? "[" + badge + "]" : ""}${winner ? "\nGagnant : " + winner : ""}${score ? "\nScore : " + score : ""}${summary ? "\n\n" + summary : ""}${content ? "\n\n" + content : ""}${footer ? "\n\n" + footer : ""}`;
+
+      challengePubMetaBox.textContent =
+`Publié le : ${formatDateTime(data.updatedAt || data.createdAt)}
+Publié par : ${sanitizeText(data.updatedByEmail || data.createdByEmail || CONFIG.adminEmail)}
+Visibilité : ${visibility}
+Mis en avant : ${pinned}
+Édition : ${sanitizeText(data.editionTitle || competitionSettings?.editionTitle || "Chem Challenge 2026")}`;
+
+      syncChallengePubStatus.textContent = visibility === "hidden" ? "Publication masquée" : "Publication active";
+      syncLastUpdate.textContent = formatDateTime(data.updatedAt || data.createdAt);
+      syncPublishedBy.textContent = sanitizeText(data.updatedByEmail || data.createdByEmail || CONFIG.adminEmail);
+      syncVisibility.textContent = visibility === "hidden" ? "Masquée" : "Visible";
     }
 
     async function loadAdminProfile(uid) {
@@ -1416,6 +1653,8 @@ ${postContent ? "\n\n" + postContent : ""}
 
       const payload = {
         source: "competition_admin",
+        postType: "challenge_pub",
+        section: "challenge_pub",
         competitionId: CONFIG.competitionId,
         title: postTitle,
         content: finalContent,
@@ -1439,6 +1678,110 @@ ${postContent ? "\n\n" + postContent : ""}
       });
 
       alert("Résultats publiés vers Insights.");
+    }
+
+    async function saveChallengePub() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const settings = competitionSettings || {};
+      const title = sanitizeText(challengePubTitleInput.value) || `Résultats officiels du ${sanitizeText(settings.editionTitle || "Chem Challenge 2026")}`;
+      const visibility = sanitizeText(challengePubVisibilityInput.value) || "visible";
+      const badge = sanitizeText(challengePubBadgeInput.value) || "Publication officielle";
+      const winnerName = sanitizeText(challengePubWinnerInput.value);
+      const winnerScore = sanitizeText(challengePubScoreInput.value);
+      const summary = sanitizeText(challengePubSummaryInput.value);
+      const content = sanitizeText(challengePubContentInput.value);
+      const footer = sanitizeText(challengePubFooterInput.value) || "Publication validée par l’administration.";
+      const pinned = challengePubPinInput.value === "yes";
+
+      if (!title && !content && !summary) {
+        alert("Ajoute un titre ou un contenu pour publier dans Challenge Pub.");
+        return;
+      }
+
+      const payload = {
+        competitionId: CONFIG.competitionId,
+        title,
+        visibility,
+        badge,
+        winnerName,
+        winnerScore,
+        summary,
+        content,
+        footer,
+        pinned,
+        editionTitle: sanitizeText(settings.editionTitle || "Chem Challenge 2026"),
+        challengeTitle: sanitizeText(settings.challengeTitle || "Chem Challenge"),
+        createdAt: challengePubData?.createdAt || Date.now(),
+        createdByUid: challengePubData?.createdByUid || currentUser.uid,
+        createdByEmail: challengePubData?.createdByEmail || currentUser.email,
+        updatedAt: Date.now(),
+        updatedByUid: currentUser.uid,
+        updatedByEmail: currentUser.email
+      };
+
+      await set(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`), payload);
+
+      await push(ref(db, `competitionInsightsPosts`), {
+        source: "competition_admin",
+        postType: "challenge_pub",
+        section: "challenge_pub",
+        competitionId: CONFIG.competitionId,
+        title,
+        content: [badge ? `[${badge}]` : "", winnerName ? `Gagnant : ${winnerName}` : "", winnerScore ? `Score : ${winnerScore}` : "", summary, content, footer].filter(Boolean).join("\n\n"),
+        winnerName,
+        winnerScore,
+        visibility,
+        pinned,
+        createdAt: Date.now(),
+        createdByUid: currentUser.uid,
+        createdByEmail: currentUser.email,
+        editionTitle: sanitizeText(settings.editionTitle || "Chem Challenge 2026"),
+        challengeTitle: sanitizeText(settings.challengeTitle || "Chem Challenge")
+      });
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "challenge_pub_updated",
+        adminEmail: currentUser.email,
+        title,
+        visibility,
+        at: Date.now()
+      });
+
+      alert("Challenge Pub a été mis à jour et synchronisé avec les pages liées.");
+    }
+
+    async function hideChallengePub() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const existingSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`));
+      if (!existingSnap.exists()) {
+        alert("Aucune publication Challenge Pub à masquer.");
+        return;
+      }
+
+      const existing = existingSnap.val() || {};
+      await update(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`), {
+        visibility: "hidden",
+        updatedAt: Date.now(),
+        updatedByUid: currentUser.uid,
+        updatedByEmail: currentUser.email
+      });
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "challenge_pub_hidden",
+        adminEmail: currentUser.email,
+        title: existing.title || "",
+        at: Date.now()
+      });
+
+      alert("Challenge Pub a été masqué.");
     }
 
     function updatePreview() {
@@ -1737,6 +2080,11 @@ Délivré le : ${formatDate(cert?.issuedAt)}
         juryAllowedMap = snap.exists() ? (snap.val() || {}) : {};
         renderJuryList();
       });
+
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`), (snap) => {
+        challengePubData = snap.exists() ? (snap.val() || {}) : null;
+        renderChallengePubPreview(challengePubData);
+      });
     }
 
     logoutBtn.addEventListener("click", async () => {
@@ -1747,6 +2095,9 @@ Délivré le : ${formatDate(cert?.issuedAt)}
     saveSettingsBtn.addEventListener("click", saveCompetitionSettings);
     addJuryBtn.addEventListener("click", addJuryEmail);
     publishResultsBtn.addEventListener("click", publishResultsToInsights);
+    saveChallengePubBtn.addEventListener("click", saveChallengePub);
+    hideChallengePubBtn.addEventListener("click", hideChallengePub);
+    loadChallengePubBtn.addEventListener("click", () => renderChallengePubPreview(challengePubData));
 
     winnerNameInput.addEventListener("input", updatePreview);
     winnerScoreInput.addEventListener("input", updatePreview);
