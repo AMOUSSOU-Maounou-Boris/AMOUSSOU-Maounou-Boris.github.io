@@ -550,6 +550,7 @@
       color:var(--muted);
       line-height:1.6;
       font-size:14px;
+      white-space:pre-wrap;
     }
 
     .small-note{
@@ -557,6 +558,30 @@
       font-size:13px;
       line-height:1.55;
       margin-top:8px;
+    }
+
+    .challenge-pub-card{
+      border:1px solid var(--line);
+      background:#fbfdff;
+      border-radius:18px;
+      padding:16px;
+    }
+
+    .challenge-pub-preview{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:16px;
+      padding:16px;
+      min-height:140px;
+      white-space:pre-wrap;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .coord-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
     }
 
     .hidden{ display:none !important; }
@@ -585,13 +610,17 @@
       .grid-3{
         grid-template-columns:1fr;
       }
+      .coord-grid{
+        grid-template-columns:1fr 1fr;
+      }
     }
 
     @media (max-width:900px){
       .stats-grid,
       .toolbar,
       .candidate-meta,
-      .grid-4{
+      .grid-4,
+      .coord-grid{
         grid-template-columns:1fr;
       }
       .hero h1{
@@ -608,7 +637,7 @@
       <a href="research.html">Research</a>
       <a href="cv.html">Resume</a>
       <a href="contact.html">Contact</a>
-      <a href="insights.html">Insights</a>
+      <a href="insights.html#challenge-pub">Insights</a>
       <a href="messages.html">Messages</a>
       <a href="calls.html">Appels</a>
       <a href="meeting-room.html">Salle de réunion</a>
@@ -637,6 +666,7 @@
 
       <a class="side-btn" href="competition.html">Voir côté candidat</a>
       <a class="side-btn" href="competition-admin.html">Voir côté admin</a>
+      <a class="side-btn" href="insights.html#challenge-pub">Voir Challenge Pub</a>
       <a class="side-btn" href="insights.html">Aller vers Insights</a>
       <a class="side-btn" href="messages.html">Messages</a>
       <a class="side-btn" href="profile.html">Mon compte</a>
@@ -657,7 +687,7 @@
 
         <div class="hub-card">
           <h4>Pages liées</h4>
-          <p>Cette page partage les données avec <strong>competition.html</strong>, <strong>competition-admin.html</strong> et les publications peuvent être relayées via <strong>Insights</strong>.</p>
+          <p>Cette page partage les données avec <strong>competition.html</strong>, <strong>competition-admin.html</strong> et la sous-section <strong>Challenge Pub</strong> dans <strong>insights.html</strong>.</p>
         </div>
       </div>
     </aside>
@@ -734,6 +764,84 @@
             <div class="notice" id="currentAnnouncementText">Aucune annonce pour le moment.</div>
             <div class="small-note">
               Ce bloc lit les paramètres définis depuis <strong>competition-admin.html</strong>.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Coordination des pages liées</h2>
+        <div class="coord-grid">
+          <div class="mini-data">
+            <div class="k">Candidat</div>
+            <div class="v">competition.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Admin</div>
+            <div class="v">competition-admin.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Jury</div>
+            <div class="v">competition-jury.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Sous-section liée</div>
+            <div class="v">insights.html → Challenge Pub</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>État Challenge Pub</h3>
+            <div class="grid-2">
+              <div class="mini-data">
+                <div class="k">Statut</div>
+                <div class="v" id="challengePubStatusText">Aucune publication</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Dernière mise à jour</div>
+                <div class="v" id="challengePubUpdateText">-</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Publié par</div>
+                <div class="v" id="challengePubByText">-</div>
+              </div>
+              <div class="mini-data">
+                <div class="k">Visibilité</div>
+                <div class="v" id="challengePubVisibilityText">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Accès rapide</h3>
+            <div class="btn-row">
+              <a class="btn secondary" href="competition.html">Ouvrir côté candidat</a>
+              <a class="btn secondary" href="competition-admin.html">Ouvrir côté admin</a>
+              <a class="btn secondary" href="insights.html#challenge-pub">Ouvrir Challenge Pub</a>
+              <a class="btn secondary" href="insights.html">Ouvrir Insights</a>
+            </div>
+            <div class="small-note">
+              Le jury peut consulter Challenge Pub, mais seule la page admin peut publier ou modifier son contenu.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Challenge Pub</h2>
+        <div class="grid-2">
+          <div class="challenge-pub-card">
+            <h3>Publication concours synchronisée</h3>
+            <div class="challenge-pub-preview" id="challengePubPreviewBox">Aucune publication pour le moment.</div>
+          </div>
+
+          <div class="challenge-pub-card">
+            <h3>Métadonnées Challenge Pub</h3>
+            <div class="notice" id="challengePubMetaBox">Aucune donnée publiée.</div>
+            <div class="btn-row">
+              <a class="btn secondary" href="insights.html#challenge-pub">Ouvrir dans Insights</a>
+              <a class="btn secondary" href="competition-admin.html">Ouvrir l’admin</a>
             </div>
           </div>
         </div>
@@ -824,12 +932,20 @@
     const heroChallengeTitle = document.getElementById("heroChallengeTitle");
     const heroEditionBadge = document.getElementById("heroEditionBadge");
 
+    const challengePubStatusText = document.getElementById("challengePubStatusText");
+    const challengePubUpdateText = document.getElementById("challengePubUpdateText");
+    const challengePubByText = document.getElementById("challengePubByText");
+    const challengePubVisibilityText = document.getElementById("challengePubVisibilityText");
+    const challengePubPreviewBox = document.getElementById("challengePubPreviewBox");
+    const challengePubMetaBox = document.getElementById("challengePubMetaBox");
+
     let currentUser = null;
     let currentProfile = {};
     let participantsMap = {};
     let juryReviewsMap = {};
     let competitionSettings = null;
     let juryAllowedMap = {};
+    let challengePubData = null;
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
@@ -873,6 +989,44 @@
       setOpenCloseTag(currentRegistrationStatusTag, regStatus);
       setOpenCloseTag(currentExamStatusTag, examStatus);
       currentAnnouncementText.textContent = announcement || "Aucune annonce pour le moment.";
+    }
+
+    function renderChallengePub(data = null) {
+      if (!data) {
+        challengePubPreviewBox.textContent = "Aucune publication pour le moment.";
+        challengePubMetaBox.textContent = "Aucune donnée publiée.";
+        challengePubStatusText.textContent = "Aucune publication";
+        challengePubUpdateText.textContent = "-";
+        challengePubByText.textContent = "-";
+        challengePubVisibilityText.textContent = "-";
+        return;
+      }
+
+      const title = sanitizeText(data.title || "Challenge Pub");
+      const badge = sanitizeText(data.badge || "Publication officielle");
+      const winner = sanitizeText(data.winnerName || "");
+      const score = sanitizeText(data.winnerScore || "");
+      const summary = sanitizeText(data.summary || "");
+      const content = sanitizeText(data.content || "");
+      const footer = sanitizeText(data.footer || "");
+      const visibility = sanitizeText(data.visibility || "visible");
+      const pinned = data.pinned ? "Oui" : "Non";
+
+      challengePubPreviewBox.textContent =
+`${title}
+${badge ? "[" + badge + "]" : ""}${winner ? "\nGagnant : " + winner : ""}${score ? "\nScore : " + score : ""}${summary ? "\n\n" + summary : ""}${content ? "\n\n" + content : ""}${footer ? "\n\n" + footer : ""}`;
+
+      challengePubMetaBox.textContent =
+`Publié le : ${formatDateTime(data.updatedAt || data.createdAt)}
+Publié par : ${sanitizeText(data.updatedByEmail || data.createdByEmail || CONFIG.adminEmail)}
+Visibilité : ${visibility}
+Mis en avant : ${pinned}
+Édition : ${sanitizeText(data.editionTitle || competitionSettings?.editionTitle || "Chem Challenge 2026")}`;
+
+      challengePubStatusText.textContent = visibility === "hidden" ? "Publication masquée" : "Publication active";
+      challengePubUpdateText.textContent = formatDateTime(data.updatedAt || data.createdAt);
+      challengePubByText.textContent = sanitizeText(data.updatedByEmail || data.createdByEmail || CONFIG.adminEmail);
+      challengePubVisibilityText.textContent = visibility === "hidden" ? "Masquée" : "Visible";
     }
 
     async function loadJuryProfile(uid) {
@@ -1201,6 +1355,11 @@ Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}
       onValue(ref(db, `competitions/${CONFIG.competitionId}/juryReviews`), (snap) => {
         juryReviewsMap = snap.exists() ? (snap.val() || {}) : {};
         renderCandidates();
+      });
+
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`), (snap) => {
+        challengePubData = snap.exists() ? (snap.val() || {}) : null;
+        renderChallengePub(challengePubData);
       });
     }
 
