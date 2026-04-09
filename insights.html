@@ -1526,7 +1526,7 @@ Cette zone est liée à :
     function goToSelfInsights() {
       setTimeout(() => {
         window.location.replace("./insights.html");
-      }, 400);
+      }, 0);
     }
 
     function resetInactivityTimer() {
@@ -1962,7 +1962,7 @@ Mis à jour : ${updated}
           showAuthMessage("Compte administrateur créé avec succès. Tu peux te connecter directement.", true);
           setTimeout(() => {
             window.location.replace("./login.html");
-          }, 1800);
+          }, 0);
         }
 
       } catch (error) {
