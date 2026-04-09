@@ -330,34 +330,43 @@
       position:fixed;
       inset:0;
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:center;
-      padding:30px 20px 22px;
+      padding:26px 20px 22px;
       z-index:60;
       background:linear-gradient(rgba(2,9,23,0.12), rgba(2,9,23,0.22));
+      overflow-y:auto;
+      overflow-x:hidden;
+      overscroll-behavior:contain;
     }
 
     .auth-card{
       width:100%;
       max-width:860px;
+      min-height:calc(100vh - 86px);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
       background:transparent;
       border:none;
       border-radius:0;
       box-shadow:none;
-      padding:0;
+      padding:36px 0 34px;
       text-align:center;
       color:#fff;
       position:relative;
       z-index:2;
+      margin:auto 0;
     }
 
     .auth-brand-wrap{
-      margin:0 auto 18px;
+      margin:0 auto 24px;
       display:flex;
       flex-direction:column;
       align-items:center;
-      gap:12px;
+      gap:14px;
       text-align:center;
+      transform:translateY(18px);
     }
 
     .auth-logo-line{
@@ -434,8 +443,9 @@
       width:100%;
       max-width:700px;
       margin:0 auto;
-      padding:12px 18px 8px;
+      padding:14px 18px 10px;
       position:relative;
+      flex:0 0 auto;
     }
 
     .auth-row{
@@ -1575,11 +1585,14 @@
 
       .auth-card{
         max-width:100%;
+        min-height:auto;
+        padding:26px 0 28px;
       }
 
       .auth-brand-wrap{
         gap:8px;
         margin-bottom:14px;
+        transform:none;
       }
 
       .chem-logo{
@@ -1637,9 +1650,13 @@
       }
 
       .auth-overlay{
-        padding:20px 12px 16px;
+        padding:14px 12px 16px;
         align-items:flex-start;
-        overflow:auto;
+      }
+
+      .auth-card{
+        min-height:auto;
+        padding:12px 0 22px;
       }
 
       .auth-logo-line{
@@ -2103,6 +2120,7 @@ Cette zone est liée à :
     const MAX_IMAGE_HEIGHT = 1400;
     const JPEG_QUALITY = 0.78;
     const COMPETITION_ID = "chem_challenge_2026";
+    const ONLINE_STALE_LIMIT = 75 * 1000;
 
     const publicTopbar = document.getElementById("publicTopbar");
     const privateTopbar = document.getElementById("privateTopbar");
@@ -2181,6 +2199,7 @@ Cette zone est liée à :
     let currentUserData = null;
     let activityTimeout = null;
     let activityEventsBound = false;
+    let listenersStarted = false;
     let usersMap = {};
     let postsMap = {};
     let likesMap = {};
@@ -2192,6 +2211,44 @@ Cette zone est liée à :
     let pendingPdf = null;
     let currentReportPostId = null;
     let challengePubData = null;
+    let renderPostsFrame = null;
+    let renderOnlineFrame = null;
+    let renderRecentFrame = null;
+    let prefetchBound = false;
+
+    function scheduleFrameRender(refHolderName, callback) {
+      if (window[refHolderName]) cancelAnimationFrame(window[refHolderName]);
+      window[refHolderName] = requestAnimationFrame(() => {
+        window[refHolderName] = null;
+        callback();
+      });
+    }
+
+    function prefetchPage(url) {
+      if (!url || document.querySelector(`link[data-prefetch="${url}"]`)) return;
+      const link = document.createElement("link");
+      link.rel = "prefetch";
+      link.href = url;
+      link.as = "document";
+      link.setAttribute("data-prefetch", url);
+      document.head.appendChild(link);
+    }
+
+    function bindSmartPrefetch() {
+      if (prefetchBound) return;
+      prefetchBound = true;
+      document.addEventListener("mouseover", (e) => {
+        const a = e.target.closest("a[href]");
+        if (!a) return;
+        const href = a.getAttribute("href") || "";
+        if (!href || href.startsWith("#") || href.startsWith("http")) return;
+        prefetchPage(href);
+      }, { passive:true });
+    }
+
+    function scrollAuthTop() {
+      if (authOverlay) authOverlay.scrollTo({ top: 0, behavior: "smooth" });
+    }
 
     function showAuthMessage(text, ok = false) {
       authMessage.textContent = text;
@@ -2208,6 +2265,16 @@ Cette zone est liée à :
       signupView.classList.toggle("hidden", name !== "signup");
       resetView.classList.toggle("hidden", name !== "reset");
       showAuthMessage("");
+
+      requestAnimationFrame(() => {
+        if (name === "signup" || name === "reset") {
+          if (authOverlay) authOverlay.style.alignItems = "flex-start";
+          scrollAuthTop();
+        } else {
+          if (authOverlay) authOverlay.style.alignItems = "flex-start";
+          scrollAuthTop();
+        }
+      });
     }
 
     function setUIConnected(isConnected) {
@@ -2427,15 +2494,27 @@ Cette zone est liée à :
       };
     }
 
+    function isActuallyOnline(userData = {}) {
+      const presence = userData.presence || {};
+      if (!presence.online) return false;
+      const lastSeen = Number(presence.lastSeen || 0);
+      if (!lastSeen) return false;
+      return (Date.now() - lastSeen) <= ONLINE_STALE_LIMIT;
+    }
+
     function visibleEmail(viewerUid, userData = {}) {
       const privacy = ensurePrivacy(userData);
-      if (viewerUid && viewerUid === userData.uid) return userData.email || "";
+      const viewerIsOwner = viewerUid && viewerUid === userData.uid;
+      const viewerIsAdmin = currentUser && isAdminEmail(currentUser.email || "");
+      if (viewerIsOwner || viewerIsAdmin) return userData.email || "";
       return privacy.hideEmail ? "Email masqué" : (userData.email || "");
     }
 
     function canSeePresence(viewerUid, userData = {}) {
       const privacy = ensurePrivacy(userData);
-      if (viewerUid && viewerUid === userData.uid) return true;
+      const viewerIsOwner = viewerUid && viewerUid === userData.uid;
+      const viewerIsAdmin = currentUser && isAdminEmail(currentUser.email || "");
+      if (viewerIsOwner || viewerIsAdmin) return true;
       return !privacy.hidePresence;
     }
 
@@ -2459,7 +2538,7 @@ Cette zone est liée à :
           const img = new Image();
           img.onload = () => {
             const { canvas, width, height } = drawResizedCanvas(img, MAX_IMAGE_WIDTH, MAX_IMAGE_HEIGHT);
-            let dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+            const dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
             resolve({
               type: "image",
               name: file.name || "image.jpg",
@@ -2544,8 +2623,10 @@ Cette zone est liée à :
       myAvatar.innerHTML = avatarMarkup(currentUserData, currentUser?.email || "");
       myName.textContent = currentUserData.displayName || "Utilisateur";
 
+      const reallyOnline = isActuallyOnline(currentUserData);
       const presence = currentUserData.presence || {};
-      if (presence.online) {
+
+      if (reallyOnline) {
         myPresenceBox.className = "pill online";
         myPresenceDot.className = "dot online";
         myPresenceText.textContent = "En ligne";
@@ -2745,37 +2826,29 @@ Mis à jour : ${updated}
         .map(([uid, val]) => ({ uid, ...(val || {}) }))
         .filter(user => user.uid !== currentUser?.uid)
         .filter(user => canSeePresence(currentUser?.uid, user))
-        .sort((a, b) => {
-          const onlineA = a.presence?.online ? 1 : 0;
-          const onlineB = b.presence?.online ? 1 : 0;
-          if (onlineA !== onlineB) return onlineB - onlineA;
-          return (a.displayName || "").localeCompare(b.displayName || "");
-        })
+        .filter(user => isActuallyOnline(user))
+        .sort((a, b) => (a.displayName || "").localeCompare(b.displayName || ""))
         .slice(0, 12);
 
       if (!items.length) {
-        onlineMembersList.innerHTML = `<div class="empty-card">Aucun membre visible pour le moment.</div>`;
+        onlineMembersList.innerHTML = `<div class="empty-card">Aucun membre réellement en ligne pour le moment.</div>`;
         return;
       }
 
-      onlineMembersList.innerHTML = items.map(user => {
-        const presence = user.presence || {};
-        const online = !!presence.online;
-        return `
-          <div class="side-item">
-            <div class="side-item-head">
-              <div class="side-item-title">${escapeHtml(user.displayName || "Sans nom")}</div>
-              <span class="pill ${online ? "online" : "offline"}">
-                <span class="dot ${online ? "online" : ""}"></span>
-                ${online ? "En ligne" : "Hors ligne"}
-              </span>
-            </div>
-            <div class="side-item-sub">
-              ${online ? "Disponible maintenant" : (presence.lastSeen ? `Dernière activité : ${escapeHtml(formatDate(presence.lastSeen))}` : "Pas d’activité récente")}
-            </div>
+      onlineMembersList.innerHTML = items.map(user => `
+        <div class="side-item">
+          <div class="side-item-head">
+            <div class="side-item-title">${escapeHtml(user.displayName || "Sans nom")}</div>
+            <span class="pill online">
+              <span class="dot online"></span>
+              En ligne
+            </span>
           </div>
-        `;
-      }).join("");
+          <div class="side-item-sub">
+            Actif maintenant
+          </div>
+        </div>
+      `).join("");
     }
 
     function getPostLikes(postId) {
@@ -2842,7 +2915,7 @@ Mis à jour : ${updated}
     }
 
     function renderPosts() {
-      const posts = Object.entries(postsMap || {})
+            const posts = Object.entries(postsMap || {})
         .map(([id, val]) => ({ id, ...(val || {}) }))
         .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
@@ -2927,6 +3000,30 @@ Mis à jour : ${updated}
       }).join("");
 
       bindPostActions();
+    }
+
+    function requestRenderPosts() {
+      if (renderPostsFrame) cancelAnimationFrame(renderPostsFrame);
+      renderPostsFrame = requestAnimationFrame(() => {
+        renderPostsFrame = null;
+        renderPosts();
+      });
+    }
+
+    function requestRenderOnlineMembers() {
+      if (renderOnlineFrame) cancelAnimationFrame(renderOnlineFrame);
+      renderOnlineFrame = requestAnimationFrame(() => {
+        renderOnlineFrame = null;
+        renderOnlineMembers();
+      });
+    }
+
+    function requestRenderRecentActivities() {
+      if (renderRecentFrame) cancelAnimationFrame(renderRecentFrame);
+      renderRecentFrame = requestAnimationFrame(() => {
+        renderRecentFrame = null;
+        renderRecentActivities();
+      });
     }
 
     function bindPostActions() {
@@ -3260,17 +3357,17 @@ Mis à jour : ${updated}
           currentUserData = { uid: currentUser.uid, ...usersMap[currentUser.uid] };
           updateMyHeader();
         }
-        renderOnlineMembers();
-        renderPosts();
-        renderRecentActivities();
+        requestRenderOnlineMembers();
+        requestRenderPosts();
+        requestRenderRecentActivities();
       });
     }
 
     function listenPosts() {
       onValue(ref(db, "posts"), (snap) => {
         postsMap = snap.val() || {};
-        renderPosts();
-        renderRecentActivities();
+        requestRenderPosts();
+        requestRenderRecentActivities();
         focusPostFromUrl();
       });
     }
@@ -3278,14 +3375,14 @@ Mis à jour : ${updated}
     function listenLikes() {
       onValue(ref(db, "likes"), (snap) => {
         likesMap = snap.val() || {};
-        renderPosts();
+        requestRenderPosts();
       });
     }
 
     function listenComments() {
       onValue(ref(db, "comments"), (snap) => {
         commentsMap = snap.val() || {};
-        renderPosts();
+        requestRenderPosts();
       });
     }
 
@@ -3294,6 +3391,16 @@ Mis à jour : ${updated}
         challengePubData = snap.exists() ? (snap.val() || {}) : null;
         renderChallengePub(challengePubData);
       });
+    }
+
+    function startAllRealtimeListeners() {
+      if (listenersStarted) return;
+      listenersStarted = true;
+      listenUsers();
+      listenPosts();
+      listenLikes();
+      listenComments();
+      listenChallengePub();
     }
 
     async function ensureAdminProfile(user) {
@@ -3431,13 +3538,22 @@ Mis à jour : ${updated}
       await forceOfflineAndSignOut();
     });
 
-    showResetBtn.addEventListener("click", () => showView("reset"));
+    showResetBtn.addEventListener("click", () => {
+      showView("reset");
+    });
+
     showSignupBtn.addEventListener("click", async () => {
       showView("signup");
       await verifyInviteToken();
     });
-    showLoginBtn.addEventListener("click", () => showView("login"));
-    backToLoginBtn.addEventListener("click", () => showView("login"));
+
+    showLoginBtn.addEventListener("click", () => {
+      showView("login");
+    });
+
+    backToLoginBtn.addEventListener("click", () => {
+      showView("login");
+    });
 
     loginBtn.addEventListener("click", loginToInsights);
     signupBtn.addEventListener("click", createAccountFromInvite);
@@ -3500,14 +3616,15 @@ Mis à jour : ${updated}
     });
 
     onAuthStateChanged(auth, async (user) => {
-            if (!user) {
+      if (!user) {
         currentUser = null;
         currentUserData = null;
         clearTimeout(activityTimeout);
         setUIConnected(false);
         showView("login");
         parseInviteToken();
-        listenChallengePub();
+        startAllRealtimeListeners();
+        bindSmartPrefetch();
         document.body.classList.remove("auth-checking");
         return;
       }
@@ -3527,13 +3644,10 @@ Mis à jour : ${updated}
         await loadCurrentUserData();
         setUIConnected(true);
         bindActivityEvents();
+        bindSmartPrefetch();
         resetInactivityTimer();
         await updatePresenceOnline();
-        listenUsers();
-        listenPosts();
-        listenLikes();
-        listenComments();
-        listenChallengePub();
+        startAllRealtimeListeners();
         parseInviteToken();
         document.body.classList.remove("auth-checking");
         return;
@@ -3545,7 +3659,8 @@ Mis à jour : ${updated}
         setUIConnected(false);
         showView("login");
         showAuthMessage("Vérifie d’abord ton adresse email avant de te connecter.");
-        listenChallengePub();
+        startAllRealtimeListeners();
+        bindSmartPrefetch();
         document.body.classList.remove("auth-checking");
         return;
       }
@@ -3561,7 +3676,8 @@ Mis à jour : ${updated}
         setUIConnected(false);
         showView("login");
         showAuthMessage("Compte introuvable dans la base de données.");
-        listenChallengePub();
+        startAllRealtimeListeners();
+        bindSmartPrefetch();
         document.body.classList.remove("auth-checking");
         return;
       }
@@ -3577,7 +3693,8 @@ Mis à jour : ${updated}
         showAuthMessage(status === "rejected"
           ? "Ton compte a été refusé par l’administrateur."
           : "Ton compte est encore en attente d’approbation.");
-        listenChallengePub();
+        startAllRealtimeListeners();
+        bindSmartPrefetch();
         document.body.classList.remove("auth-checking");
         return;
       }
@@ -3587,16 +3704,13 @@ Mis à jour : ${updated}
 
       setUIConnected(true);
       bindActivityEvents();
+      bindSmartPrefetch();
       resetInactivityTimer();
 
       await updatePresenceOnline();
       await loadCurrentUserData();
 
-      listenUsers();
-      listenPosts();
-      listenLikes();
-      listenComments();
-      listenChallengePub();
+      startAllRealtimeListeners();
 
       parseInviteToken();
       document.body.classList.remove("auth-checking");
