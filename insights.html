@@ -30,6 +30,10 @@
       color:var(--text);
     }
 
+    body.auth-checking{
+      visibility:hidden;
+    }
+
     .topbar{
       background:var(--nav);
       padding:18px 20px;
@@ -898,7 +902,6 @@
       font-family:inherit;
     }
 
-    /* ===== CHALLENGE PUB INSERTION ===== */
     .challenge-pub-card{
       padding:20px;
       margin-bottom:18px;
@@ -1072,6 +1075,10 @@
   </style>
 </head>
 <body>
+  <script>
+    document.body.classList.add("auth-checking");
+  </script>
+
   <header class="topbar hidden" id="publicTopbar">
     <nav>
       <a href="index.html">Home</a>
@@ -1266,7 +1273,6 @@
         </div>
       </div>
 
-      <!-- ===== CHALLENGE PUB INSERTION START ===== -->
       <div class="challenge-pub-card" id="challengePubSection">
         <div class="challenge-pub-head">
           <div>
@@ -1326,7 +1332,6 @@ Cette zone est liée à :
           </div>
         </div>
       </div>
-      <!-- ===== CHALLENGE PUB INSERTION END ===== -->
 
       <div class="post-grid" id="postGrid">
         <div class="empty-card">Chargement des publications...</div>
@@ -1469,7 +1474,6 @@ Cette zone est liée à :
     const submitReportBtn = document.getElementById("submitReportBtn");
     const reportText = document.getElementById("reportText");
 
-    /* ===== CHALLENGE PUB ELEMENTS ===== */
     const challengePubTopBadge = document.getElementById("challengePubTopBadge");
     const challengePubStatus = document.getElementById("challengePubStatus");
     const challengePubUpdatedAt = document.getElementById("challengePubUpdatedAt");
@@ -1481,6 +1485,7 @@ Cette zone est liée à :
     let currentUser = null;
     let currentUserData = null;
     let activityTimeout = null;
+    let activityEventsBound = false;
     let usersMap = {};
     let postsMap = {};
     let likesMap = {};
@@ -1527,20 +1532,80 @@ Cette zone est liée à :
       window.location.replace("./insights.html");
     }
 
+    async function forceOfflineAndSignOut() {
+      try { await updatePresenceOffline(); } catch (e) {}
+      try { await signOut(auth); } catch (e) {}
+      window.location.replace("./insights.html");
+    }
+
     function resetInactivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
       clearTimeout(activityTimeout);
       activityTimeout = setTimeout(async () => {
-        try { await signOut(auth); } catch (e) {}
-        window.location.replace("./insights.html");
+        await forceOfflineAndSignOut();
       }, INACTIVITY_LIMIT);
     }
 
     function bindActivityEvents() {
+      if (activityEventsBound) return;
+      activityEventsBound = true;
+
       ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
         window.addEventListener(evt, () => {
           if (auth.currentUser) resetInactivityTimer();
         }, { passive: true });
+      });
+
+      document.addEventListener("visibilitychange", async () => {
+        if (!auth.currentUser) return;
+        if (document.hidden) {
+          try {
+            await update(ref(db, "users/" + auth.currentUser.uid), {
+              presence: {
+                online: false,
+                lastSeen: Date.now()
+              },
+              updatedAt: Date.now()
+            });
+          } catch (e) {
+            console.error(e);
+          }
+        } else {
+          try {
+            await update(ref(db, "users/" + auth.currentUser.uid), {
+              presence: {
+                online: true,
+                lastSeen: Date.now()
+              },
+              updatedAt: Date.now()
+            });
+          } catch (e) {
+            console.error(e);
+          }
+          resetInactivityTimer();
+        }
+      });
+
+      window.addEventListener("beforeunload", () => {
+        if (!auth.currentUser) return;
+        update(ref(db, "users/" + auth.currentUser.uid), {
+          presence: {
+            online: false,
+            lastSeen: Date.now()
+          },
+          updatedAt: Date.now()
+        }).catch(() => {});
+      });
+
+      window.addEventListener("pagehide", () => {
+        if (!auth.currentUser) return;
+        update(ref(db, "users/" + auth.currentUser.uid), {
+          presence: {
+            online: false,
+            lastSeen: Date.now()
+          },
+          updatedAt: Date.now()
+        }).catch(() => {});
       });
     }
 
@@ -1855,7 +1920,8 @@ Publié par : ${data.updatedByEmail || data.createdByEmail || "Administration"}
 Mis à jour : ${updated}
 Édition : ${data.editionTitle || "Chem Challenge 2026"}`;
     }
-        async function createAccountFromInvite() {
+
+    async function createAccountFromInvite() {
       const firstName = signupFirstName.value.trim();
       const lastName = signupLastName.value.trim();
       const country = signupCountry.value.trim();
@@ -2667,9 +2733,7 @@ Mis à jour : ${updated}
     }
 
     logoutBtn.addEventListener("click", async () => {
-      try { await updatePresenceOffline(); } catch (e) {}
-      try { await signOut(auth); } catch (e) {}
-      window.location.replace("./insights.html");
+      await forceOfflineAndSignOut();
     });
 
     showResetBtn.addEventListener("click", () => showView("reset"));
@@ -2741,13 +2805,15 @@ Mis à jour : ${updated}
     });
 
     onAuthStateChanged(auth, async (user) => {
-      if (!user) {
+            if (!user) {
         currentUser = null;
         currentUserData = null;
+        clearTimeout(activityTimeout);
         setUIConnected(false);
         showView("login");
         parseInviteToken();
         listenChallengePub();
+        document.body.classList.remove("auth-checking");
         return;
       }
 
@@ -2774,15 +2840,18 @@ Mis à jour : ${updated}
         listenComments();
         listenChallengePub();
         parseInviteToken();
+        document.body.classList.remove("auth-checking");
         return;
       }
 
       if (!user.emailVerified) {
         try { await signOut(auth); } catch (e) {}
+        clearTimeout(activityTimeout);
         setUIConnected(false);
         showView("login");
         showAuthMessage("Vérifie d’abord ton adresse email avant de te connecter.");
         listenChallengePub();
+        document.body.classList.remove("auth-checking");
         return;
       }
 
@@ -2793,10 +2862,12 @@ Mis à jour : ${updated}
       const snap = await get(ref(db, "users/" + user.uid));
       if (!snap.exists()) {
         try { await signOut(auth); } catch (e) {}
+        clearTimeout(activityTimeout);
         setUIConnected(false);
         showView("login");
         showAuthMessage("Compte introuvable dans la base de données.");
         listenChallengePub();
+        document.body.classList.remove("auth-checking");
         return;
       }
 
@@ -2805,12 +2876,14 @@ Mis à jour : ${updated}
 
       if (status !== "approved") {
         try { await signOut(auth); } catch (e) {}
+        clearTimeout(activityTimeout);
         setUIConnected(false);
         showView("login");
         showAuthMessage(status === "rejected"
           ? "Ton compte a été refusé par l’administrateur."
           : "Ton compte est encore en attente d’approbation.");
         listenChallengePub();
+        document.body.classList.remove("auth-checking");
         return;
       }
 
@@ -2831,6 +2904,7 @@ Mis à jour : ${updated}
       listenChallengePub();
 
       parseInviteToken();
+      document.body.classList.remove("auth-checking");
     });
   </script>
 </body>
