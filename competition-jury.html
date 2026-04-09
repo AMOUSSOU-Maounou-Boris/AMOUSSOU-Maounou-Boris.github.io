@@ -744,6 +744,8 @@
       <a href="meeting-room.html">Salle de réunion</a>
       <a href="competition.html">Concours</a>
       <a href="competition-jury.html" class="active">Jury concours</a>
+      <a href="competition-rules.html">Règlement officiel</a>
+      <a href="verify-certificate.html">Vérifier un certificat</a>
       <a href="profile.html"><span class="nav-online-dot"></span>Mon compte</a>
     </div>
   </div>
@@ -765,6 +767,8 @@
       </div>
 
       <a class="side-btn" href="competition.html">Voir côté candidat</a>
+      <a class="side-btn" href="competition-rules.html">Règlement officiel</a>
+      <a class="side-btn" href="verify-certificate.html">Vérifier un certificat</a>
       <a class="side-btn" href="insights.html#challenge-pub">Voir Challenge Pub</a>
       <a class="side-btn" href="insights.html">Aller vers Insights</a>
       <a class="side-btn" href="messages.html">Messages</a>
@@ -787,6 +791,11 @@
         <div class="hub-card">
           <h4>Pages liées</h4>
           <p>Cette page partage les données avec <strong>competition.html</strong>, <strong>competition-admin.html</strong> et la sous-section <strong>Challenge Pub</strong> dans <strong>insights.html</strong>.</p>
+        </div>
+
+        <div class="hub-card">
+          <h4>Crédibilité concours</h4>
+          <p>Le jury peut aussi consulter le règlement officiel et la page de vérification des certificats déjà délivrés.</p>
         </div>
       </div>
     </aside>
@@ -828,6 +837,167 @@
           <div class="stat-box">
             <div class="label">Tests terminés</div>
             <div class="value" id="statCompleted">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section" style="padding-top:20px;">
+        <div style="
+          border:1px solid var(--line);
+          background:linear-gradient(135deg,#0c3f79 0%, #1557a6 55%, #2f8cff 100%);
+          color:#fff;
+          border-radius:24px;
+          padding:22px;
+          box-shadow:var(--shadow);
+          overflow:hidden;
+          position:relative;
+        ">
+          <div style="
+            position:absolute;
+            right:-55px;
+            top:-55px;
+            width:180px;
+            height:180px;
+            border-radius:50%;
+            background:rgba(255,255,255,.08);
+            pointer-events:none;
+          "></div>
+
+          <div style="display:flex; justify-content:space-between; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+            <div style="max-width:840px;">
+              <div style="
+                display:inline-flex;
+                align-items:center;
+                gap:8px;
+                padding:9px 14px;
+                border-radius:999px;
+                background:rgba(255,255,255,.14);
+                border:1px solid rgba(255,255,255,.18);
+                font-size:13px;
+                font-weight:900;
+                margin-bottom:12px;
+              ">
+                Chem Challenge • Jury officiel
+              </div>
+
+              <div style="font-size:31px; font-weight:900; line-height:1.15; margin-bottom:10px;">
+                Espace d’évaluation officielle du jury
+              </div>
+
+              <div style="font-size:15px; line-height:1.75; color:rgba(255,255,255,.94);">
+                Cet espace permet au jury de consulter les dossiers, les copies remontées,
+                les réponses rédigées, les appréciations précédentes, ainsi que les éléments
+                officiels du concours. Le règlement et la vérification des certificats
+                renforcent désormais la crédibilité globale de l’édition en cours.
+              </div>
+            </div>
+
+            <div style="min-width:220px; display:grid; gap:10px;">
+              <div style="
+                background:rgba(255,255,255,.10);
+                border:1px solid rgba(255,255,255,.18);
+                border-radius:18px;
+                padding:14px;
+              ">
+                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Référence</div>
+                <div style="font-size:16px; font-weight:900;">Règlement officiel</div>
+              </div>
+
+              <div style="
+                background:rgba(255,255,255,.10);
+                border:1px solid rgba(255,255,255,.18);
+                border-radius:18px;
+                padding:14px;
+              ">
+                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Contrôle public</div>
+                <div style="font-size:16px; font-weight:900;">Certificat vérifiable</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
+            <a href="competition-rules.html" style="
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+              min-height:46px;
+              padding:0 18px;
+              border-radius:14px;
+              background:#fff;
+              color:#0f4d92;
+              font-weight:900;
+              text-decoration:none;
+            ">Ouvrir le règlement officiel</a>
+
+            <a href="verify-certificate.html" style="
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+              min-height:46px;
+              padding:0 18px;
+              border-radius:14px;
+              background:rgba(255,255,255,.12);
+              border:1px solid rgba(255,255,255,.22);
+              color:#fff;
+              font-weight:900;
+              text-decoration:none;
+            ">Ouvrir la vérification certificat</a>
+          </div>
+        </div>
+
+        <div class="grid-4" style="margin-top:16px;">
+          <div class="mini-data">
+            <div class="k">Page règlement</div>
+            <div class="v">competition-rules.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Page vérification</div>
+            <div class="v">verify-certificate.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Résultats officiels</div>
+            <div class="v">Validés côté admin</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Certificats</div>
+            <div class="v">Délivrés par admin</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Repères officiels du concours</h2>
+
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Pages publiques de référence</h3>
+
+            <div class="notice">
+              Le jury peut à présent consulter les deux pages de crédibilité du concours :
+              le règlement officiel et la vérification publique des certificats.
+            </div>
+
+            <div class="btn-row">
+              <a class="btn secondary" href="competition-rules.html">Voir le règlement</a>
+              <a class="btn secondary" href="verify-certificate.html">Voir la vérification</a>
+            </div>
+
+            <div class="small-note">
+              Cela aide le jury à travailler dans un cadre plus clair, plus propre et plus officiel.
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Rôle du jury dans la crédibilité</h3>
+
+            <div class="notice">
+              Le jury contribue à la crédibilité du concours par la qualité des avis saisis,
+              l’examen des copies et la cohérence des évaluations transmises à l’administration.
+            </div>
+
+            <div class="small-note">
+              Les certificats visibles publiquement restent toutefois délivrés et validés par l’admin.
+            </div>
           </div>
         </div>
       </section>
@@ -944,11 +1114,13 @@
             <h3>Accès rapide</h3>
             <div class="btn-row">
               <a class="btn secondary" href="competition.html">Ouvrir côté candidat</a>
+              <a class="btn secondary" href="competition-rules.html">Ouvrir le règlement</a>
+              <a class="btn secondary" href="verify-certificate.html">Ouvrir la vérification</a>
               <a class="btn secondary" href="insights.html#challenge-pub">Ouvrir Challenge Pub</a>
               <a class="btn secondary" href="insights.html">Ouvrir Insights</a>
             </div>
             <div class="small-note">
-              Le jury peut consulter Challenge Pub, mais seule la page admin peut publier ou modifier son contenu.
+              Le jury peut consulter Challenge Pub, le règlement et la vérification, mais seule la page admin peut publier ou modifier le contenu officiel.
             </div>
           </div>
         </div>
@@ -1003,6 +1175,28 @@
 
         <div id="candidateList" class="panel-grid">
           <div class="notice">Chargement des dossiers candidats...</div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Repère final de validation</h2>
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Résultats et validation</h3>
+            <div class="notice">
+              Les évaluations du jury soutiennent la validation finale, mais les résultats officiellement publiés restent centralisés côté administration.
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Certificats vérifiables</h3>
+            <div class="notice">
+              Les certificats déjà délivrés peuvent être consultés et vérifiés publiquement via leur code sur la page <strong>verify-certificate.html</strong>.
+            </div>
+            <div class="btn-row">
+              <a class="btn secondary" href="verify-certificate.html">Ouvrir la vérification</a>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -1530,6 +1724,15 @@ Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}
               </div>
 
               <div class="detail-box">
+                <strong>Référence officielle</strong>
+                <span>
+Règlement : competition-rules.html
+Vérification certificat : verify-certificate.html
+Publication publique : insights.html → Challenge Pub
+                </span>
+              </div>
+
+              <div class="detail-box">
                 <strong>Correction jury détaillée</strong>
                 <span>
 Statut : ${sanitizeText(juryCorrection.correctionStatus || "pending")}
@@ -1584,6 +1787,8 @@ Mis à jour : ${formatDateTime(juryCorrection.updatedAt)}
 
               <div class="btn-row">
                 <button class="btn primary" data-save-review="${uid}">Enregistrer l’avis du jury</button>
+                <a class="btn secondary" href="competition-rules.html">Règlement</a>
+                <a class="btn secondary" href="verify-certificate.html">Vérifier certificat</a>
               </div>
             </div>
           </div>
