@@ -38,19 +38,19 @@
 
     body.login-page{
       background:
-        linear-gradient(rgba(5, 25, 58, 0.34), rgba(5, 25, 58, 0.34)),
-        url("/mnt/data/15499bae-f4a4-4c7c-8565-4fa1ad040c94.png") center center / cover no-repeat fixed;
+        linear-gradient(rgba(5,18,45,0.18), rgba(5,18,45,0.18)),
+        url("chem-excellence-login-bg.png") center center / cover no-repeat fixed;
       min-height:100vh;
     }
 
     .topbar{
-      background:rgba(8,46,91,0.92);
+      background:rgba(8,46,91,0.90);
       padding:18px 20px;
       position:sticky;
       top:0;
       z-index:20;
-      box-shadow:0 4px 16px rgba(0,0,0,0.12);
-      backdrop-filter:blur(8px);
+      box-shadow:0 4px 16px rgba(0,0,0,0.10);
+      backdrop-filter:blur(6px);
     }
 
     .topbar nav{
@@ -90,119 +90,85 @@
     .auth-overlay{
       position:fixed;
       inset:0;
-      background:rgba(6, 20, 45, 0.18);
+      background:rgba(7,20,46,0.10);
       display:flex;
       align-items:center;
       justify-content:center;
       padding:20px;
       z-index:60;
-      backdrop-filter:blur(2px);
+      backdrop-filter:none;
     }
 
     .auth-card{
       width:100%;
-      max-width:760px;
+      max-width:820px;
       background:transparent;
       border:none;
       border-radius:0;
       box-shadow:none;
-      padding:24px 18px 18px;
-      color:#fff;
+      padding:30px 20px 18px;
       text-align:center;
+      color:#fff;
     }
 
     .auth-logo{
-      width:130px;
-      height:130px;
-      margin:0 auto 14px;
+      width:640px;
+      max-width:96%;
+      height:150px;
+      margin:0 auto 18px;
+      background:url("chem-excellence-login-bg.png") center top / contain no-repeat;
+      border:none;
       border-radius:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:transparent;
-      color:#fff;
-      font-size:0;
-      font-weight:900;
       box-shadow:none;
-      background-image:url("/mnt/data/223e13c0-6105-478b-beeb-247ab2c2a6c7.png");
-      background-size:contain;
-      background-repeat:no-repeat;
-      background-position:center;
+      font-size:0;
+      color:transparent;
     }
 
     .chem-brand{
-      margin:0 auto 18px;
-      text-align:center;
-      max-width:760px;
-    }
-
-    .chem-brand-badge{
       display:none;
     }
 
-    .chem-brand-title{
-      margin:0;
-      font-size:58px;
-      font-weight:900;
-      color:#ffffff;
-      line-height:1.05;
-      text-shadow:0 4px 14px rgba(0,0,0,0.30);
-      letter-spacing:0.3px;
-    }
-
-    .chem-brand-sub{
-      margin:10px 0 0;
-      color:#ffffff;
-      font-size:17px;
-      line-height:1.6;
-      font-weight:700;
-      text-shadow:0 2px 10px rgba(0,0,0,0.28);
-    }
-
     .auth-title{
-      text-align:center;
-      margin:8px 0 8px;
-      color:#ffffff;
-      font-size:26px;
-      font-weight:800;
-      letter-spacing:0.3px;
-      text-shadow:0 2px 8px rgba(0,0,0,0.28);
+      display:none;
     }
 
     .auth-subtitle{
+      margin:0 auto 22px;
       text-align:center;
-      color:#f3f7ff;
-      line-height:1.7;
-      margin:0 0 22px;
-      font-size:16px;
+      color:#ffffff;
+      line-height:1.65;
+      font-size:19px;
       font-weight:600;
-      text-shadow:0 2px 8px rgba(0,0,0,0.22);
+      max-width:620px;
+      text-shadow:0 2px 12px rgba(0,0,0,0.28);
     }
 
     .auth-row{
+      width:100%;
+      max-width:620px;
+      margin:0 auto 16px;
       display:flex;
       align-items:center;
-      gap:14px;
-      border:1px solid rgba(255,255,255,0.28);
-      border-radius:14px;
+      gap:16px;
+      border:1px solid rgba(255,255,255,0.18);
+      border-radius:6px;
       padding:0 18px;
-      margin:0 auto 16px;
-      background:rgba(14, 44, 92, 0.54);
+      min-height:72px;
+      background:rgba(14,47,102,0.58);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.10),
-        0 6px 18px rgba(0,0,0,0.12);
-      max-width:600px;
-      min-height:66px;
-      backdrop-filter:blur(3px);
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 8px 20px rgba(0,0,0,0.10);
+      backdrop-filter:blur(2px);
     }
 
     .auth-icon{
-      width:24px;
-      height:24px;
-      flex:0 0 24px;
-      border-radius:6px;
-      background:rgba(255,255,255,0.90);
-      opacity:0.95;
+      width:28px;
+      height:28px;
+      flex:0 0 28px;
+      border-radius:0;
+      background:rgba(255,255,255,0.92);
+      position:relative;
+      clip-path:inset(0 round 4px);
     }
 
     .auth-row input{
@@ -210,7 +176,7 @@
       border:none;
       outline:none;
       padding:18px 0;
-      font-size:16px;
+      font-size:18px;
       background:transparent;
       font-family:inherit;
       color:#ffffff;
@@ -218,46 +184,51 @@
     }
 
     .auth-row input::placeholder{
-      color:#e7eefb;
-      font-weight:600;
+      color:#f5f8ff;
+      opacity:1;
+      font-weight:700;
     }
 
     .auth-submit,
     .auth-link-btn{
       width:100%;
-      max-width:500px;
       border:none;
-      border-radius:14px;
-      padding:16px 18px;
-      font-size:17px;
-      font-weight:900;
       cursor:pointer;
+      font-family:inherit;
     }
 
     .auth-submit{
-      background:linear-gradient(180deg, #2f7dff 0%, #0f4d92 100%);
-      color:#fff;
-      margin:14px auto 0;
       display:block;
-      box-shadow:0 10px 22px rgba(15,77,146,0.35);
+      max-width:500px;
+      margin:18px auto 10px;
+      border-radius:6px;
+      padding:17px 18px;
+      font-size:22px;
+      font-style:italic;
+      font-weight:900;
+      color:#ffffff;
+      background:linear-gradient(180deg, #3a8cff 0%, #1f63c9 48%, #114796 100%);
+      box-shadow:
+        0 10px 24px rgba(10,39,95,0.30),
+        inset 0 1px 0 rgba(255,255,255,0.22);
     }
 
     .auth-links{
-      margin-top:14px;
+      margin-top:8px;
       display:grid;
-      gap:12px;
+      gap:10px;
       justify-items:center;
     }
 
     .auth-links button{
       background:transparent;
-      color:#dce9ff;
-      font-weight:800;
-      border-radius:12px;
-      padding:8px 6px;
-      width:auto;
-      max-width:none;
+      color:#f3f7ff;
+      font-size:14px;
+      font-weight:700;
       text-decoration:underline;
+      padding:6px 8px;
+      border-radius:0;
+      width:auto;
     }
 
     .auth-message{
@@ -267,38 +238,39 @@
       font-size:14px;
       font-weight:700;
       line-height:1.5;
-      color:#ffd6d6;
+      color:#ffdada;
       white-space:pre-wrap;
       word-break:break-word;
-      text-shadow:0 2px 6px rgba(0,0,0,0.22);
+      text-shadow:0 2px 6px rgba(0,0,0,0.24);
     }
 
     .auth-message.ok{
-      color:#bff6cb;
+      color:#caffd7;
     }
 
     .invite-status-box{
-      border:1px solid rgba(255,255,255,0.22);
-      border-radius:16px;
-      background:rgba(18, 53, 106, 0.48);
-      color:#eff6ff;
+      width:100%;
+      max-width:620px;
+      margin:0 auto 14px;
+      border:1px solid rgba(255,255,255,0.18);
+      border-radius:8px;
+      background:rgba(14,47,102,0.52);
+      color:#ffffff;
       line-height:1.6;
       font-size:14px;
       padding:12px 14px;
-      margin:0 auto 14px;
-      max-width:600px;
-      backdrop-filter:blur(3px);
+      backdrop-filter:blur(2px);
     }
 
     .invite-status-box.ok{
-      background:rgba(12, 102, 52, 0.38);
-      border-color:rgba(183,235,201,0.45);
-      color:#eafff1;
+      background:rgba(16,108,55,0.36);
+      border-color:rgba(183,235,201,0.38);
+      color:#effff4;
     }
 
     .invite-status-box.bad{
-      background:rgba(148, 28, 28, 0.30);
-      border-color:rgba(241,193,193,0.45);
+      background:rgba(137,28,28,0.34);
+      border-color:rgba(241,193,193,0.35);
       color:#fff1f1;
     }
 
@@ -1153,28 +1125,28 @@
 
       .auth-card{
         max-width:100%;
-        padding:16px 10px 12px;
+        padding:18px 10px 14px;
       }
 
       .auth-logo{
-        width:100px;
-        height:100px;
-      }
-
-      .chem-brand-title{
-        font-size:36px;
-      }
-
-      .auth-title{
-        font-size:22px;
+        width:100%;
+        height:110px;
+        max-width:420px;
       }
 
       .auth-subtitle{
-        font-size:14px;
+        font-size:15px;
+        margin-bottom:18px;
       }
 
       .auth-row{
-        min-height:58px;
+        min-height:62px;
+        max-width:100%;
+      }
+
+      .auth-submit{
+        max-width:100%;
+        font-size:20px;
       }
     }
   </style>
@@ -1218,14 +1190,8 @@
     <div class="auth-card">
       <div class="auth-logo"></div>
 
-      <div class="chem-brand">
-        <h2 class="chem-brand-title">Chem Excellence Challenge</h2>
-        <p class="chem-brand-sub">Connectez-vous pour participer au <strong>Chem Excellence Challenge</strong></p>
-      </div>
-
       <div id="loginView">
-        <h2 class="auth-title">Connexion</h2>
-        <p class="auth-subtitle">Accède à Insights et à l’univers scientifique de Chem Excellence Challenge.</p>
+        <p class="auth-subtitle">Connectez-vous pour participer au <strong>Chem Excellence Challenge</strong></p>
 
         <div class="auth-row">
           <div class="auth-icon"></div>
@@ -1246,7 +1212,7 @@
       </div>
 
       <div id="signupView" class="hidden">
-        <h2 class="auth-title">Créer un compte</h2>
+        <h2 class="auth-title" style="display:block;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.28);margin-bottom:10px;">Créer un compte</h2>
         <p class="auth-subtitle">Création réservée aux personnes disposant d’un lien d’invitation valide, sauf administrateur.</p>
 
         <div class="invite-status-box" id="inviteStatusBox">
@@ -1291,7 +1257,7 @@
       </div>
 
       <div id="resetView" class="hidden">
-        <h2 class="auth-title">Réinitialiser</h2>
+        <h2 class="auth-title" style="display:block;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,0.28);margin-bottom:10px;">Réinitialiser</h2>
         <p class="auth-subtitle">Entre ton adresse email pour recevoir un lien de réinitialisation.</p>
 
         <div class="auth-row">
