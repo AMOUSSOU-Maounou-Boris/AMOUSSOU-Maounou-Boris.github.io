@@ -25,7 +25,7 @@
       --soft:#f7fbff;
       --shadow:0 16px 38px rgba(10,42,80,.10);
       --radius:18px;
-      --max:1100px;
+      --max:1150px;
     }
 
     body{
@@ -34,6 +34,8 @@
       background:linear-gradient(180deg,#eef6ff 0%,#f9fcff 100%);
       color:var(--text);
     }
+
+    a{ text-decoration:none; color:inherit; }
 
     .topbar{
       position:sticky;
@@ -52,14 +54,15 @@
       gap:10px 18px;
       align-items:center;
       justify-content:center;
+      font-weight:700;
     }
 
     .topbar a{
       color:#fff;
-      text-decoration:none;
       font-size:15px;
-      font-weight:700;
       opacity:.95;
+      position:relative;
+      padding-bottom:4px;
     }
 
     .topbar a:hover,
@@ -94,6 +97,17 @@
       background:rgba(255,255,255,.08);
     }
 
+    .hero-card::after{
+      content:"";
+      position:absolute;
+      right:-70px;
+      top:-70px;
+      width:200px;
+      height:200px;
+      border-radius:50%;
+      background:rgba(255,255,255,.07);
+    }
+
     .badge{
       display:inline-block;
       padding:8px 14px;
@@ -115,7 +129,7 @@
       margin:0;
       font-size:16px;
       line-height:1.7;
-      max-width:820px;
+      max-width:860px;
     }
 
     .wrap{
@@ -123,7 +137,7 @@
       margin:0 auto 40px;
       padding:0 18px;
       display:grid;
-      grid-template-columns:1fr .9fr;
+      grid-template-columns:1.15fr .85fr;
       gap:22px;
       align-items:start;
     }
@@ -161,7 +175,7 @@
 
     input{
       width:100%;
-      min-height:50px;
+      min-height:52px;
       padding:0 14px;
       border:1px solid #c8dbee;
       border-radius:12px;
@@ -169,11 +183,19 @@
       outline:none;
       transition:.2s ease;
       background:#fff;
+      color:var(--text);
     }
 
     input:focus{
       border-color:var(--blue);
       box-shadow:0 0 0 4px rgba(47,140,255,0.12);
+    }
+
+    .hint{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
     }
 
     .actions{
@@ -214,6 +236,12 @@
       background:#f6fbff;
     }
 
+    .btn:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+      transform:none !important;
+    }
+
     .result{
       margin-top:20px;
       display:none;
@@ -235,6 +263,11 @@
     .result.invalid{
       background:var(--red-soft);
       border:1px solid var(--red-line);
+    }
+
+    .result.loading{
+      background:#f5faff;
+      border:1px solid #d6e7fb;
     }
 
     .status{
@@ -269,6 +302,14 @@
       background:var(--red);
     }
 
+    .loading .status{
+      color:var(--blue-dark);
+    }
+
+    .loading .status-dot{
+      background:var(--blue);
+    }
+
     .result-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -277,7 +318,7 @@
     }
 
     .info{
-      background:rgba(255,255,255,0.75);
+      background:rgba(255,255,255,0.78);
       border:1px solid rgba(0,0,0,0.06);
       border-radius:12px;
       padding:12px;
@@ -298,6 +339,7 @@
       color:var(--text);
       font-size:15px;
       line-height:1.5;
+      word-break:break-word;
     }
 
     .note-box{
@@ -329,6 +371,20 @@
       padding-left:18px;
       line-height:1.8;
       color:var(--text);
+    }
+
+    .official-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 14px;
+      border-radius:999px;
+      background:#eef7ff;
+      border:1px solid #d4e6fa;
+      color:var(--blue-dark);
+      font-size:13px;
+      font-weight:800;
+      margin-bottom:10px;
     }
 
     .foot{
@@ -375,28 +431,33 @@
       <div class="badge">Service officiel</div>
       <h1>Vérification officielle d’un certificat</h1>
       <p>
-        Cette page permet de vérifier si un certificat Chem Challenge a bien été délivré et validé officiellement.
-        Entrez le code du certificat pour consulter son statut.
+        Cette page permet de vérifier si un certificat Chem Challenge a bien été délivré
+        et validé officiellement par l’administration. La vérification est maintenant
+        directement liée aux certificats réellement enregistrés dans le système du concours.
       </p>
     </div>
   </section>
 
   <main class="wrap">
     <section class="card">
+      <div class="official-pill">Base liée au système Chem Challenge</div>
       <h2 class="title">Rechercher un certificat</h2>
       <p class="muted">
-        Saisissez le numéro ou le code de vérification du certificat.  
-        Exemple : <strong>CHEM-2026-001</strong>
+        Saisissez le <strong>numéro de vérification</strong> du certificat.
+        Vous pouvez aussi essayer le <strong>code candidat</strong> s’il figure sur le document.
       </p>
 
       <div class="field">
-        <label for="certificateCode">Code du certificat</label>
+        <label for="certificateCode">Numéro ou code du certificat</label>
         <input
           type="text"
           id="certificateCode"
-          placeholder="Ex : CHEM-2026-001"
+          placeholder="Ex : CC-20260409-ABC123 ou CHEM-ABCDEFGH"
           autocomplete="off"
         />
+        <div class="hint">
+          Formats reconnus ici : numéro de vérification admin, code candidat, ou identifiant lié au certificat.
+        </div>
       </div>
 
       <div class="actions">
@@ -418,11 +479,15 @@
             <strong id="detailName">—</strong>
           </div>
           <div class="info">
-            <small>Code certificat</small>
+            <small>Numéro de vérification</small>
             <strong id="detailCode">—</strong>
           </div>
           <div class="info">
-            <small>Session</small>
+            <small>Code candidat</small>
+            <strong id="detailCandidateCode">—</strong>
+          </div>
+          <div class="info">
+            <small>Édition</small>
             <strong id="detailSession">—</strong>
           </div>
           <div class="info">
@@ -434,16 +499,28 @@
             <strong id="detailStatus">—</strong>
           </div>
           <div class="info">
+            <small>Institution</small>
+            <strong id="detailInstitution">—</strong>
+          </div>
+          <div class="info">
+            <small>Niveau / rôle</small>
+            <strong id="detailRole">—</strong>
+          </div>
+          <div class="info">
+            <small>Mention</small>
+            <strong id="detailMention">—</strong>
+          </div>
+          <div class="info">
             <small>Autorité</small>
-            <strong id="detailAuthority">Chem Challenge Administration</strong>
+            <strong id="detailAuthority">—</strong>
           </div>
         </div>
       </div>
 
       <div class="note-box">
-        <strong style="color:#0b57a4;">Note :</strong><br>
-        Pour l’instant, cette version fonctionne avec des codes d’exemple intégrés dans la page.
-        Ensuite, on pourra facilement la brancher à Firebase pour que la vérification soit totalement automatique.
+        <strong style="color:#0b57a4;">Information :</strong><br>
+        Cette page lit désormais les certificats réellement délivrés par l’admin dans le système du concours.
+        Tu n’as pas besoin de modifier `competition.html`, `competition-admin.html` ni `competition-jury.html`.
       </div>
     </section>
 
@@ -451,24 +528,35 @@
       <h2 class="title">À propos de la vérification</h2>
 
       <div class="side-box">
-        <strong>Ce que cette page apporte</strong>
-        Elle donne une vraie apparence institutionnelle et rassure les étudiants, le jury et les personnes externes.
+        <strong>Ce que cette page vérifie</strong>
+        Elle contrôle si le certificat saisi existe réellement parmi les certificats délivrés par l’administration du concours.
       </div>
 
       <div class="side-box">
-        <strong>Un certificat valide doit idéalement afficher</strong>
+        <strong>Un certificat valide affiche ici</strong>
         <ul class="mini-list">
-          <li>un identifiant unique,</li>
           <li>le nom du participant,</li>
-          <li>la date de validation,</li>
-          <li>un statut officiel,</li>
-          <li>une autorité de délivrance.</li>
+          <li>le numéro de vérification,</li>
+          <li>le code candidat,</li>
+          <li>la date de délivrance,</li>
+          <li>l’édition concernée,</li>
+          <li>l’autorité de délivrance.</li>
         </ul>
       </div>
 
       <div class="side-box">
-        <strong>Étape suivante possible</strong>
-        Après cette version, on pourra connecter cette page aux certificats réellement délivrés par l’admin.
+        <strong>Connexion avec ton système</strong>
+        Cette page est pensée pour fonctionner avec les certificats enregistrés par `competition-admin.html` et rester cohérente avec `competition.html`, `competition-jury.html` et `insights.html`.
+      </div>
+
+      <div class="side-box">
+        <strong>Rappel</strong>
+        Si aucun résultat n’apparaît, cela signifie généralement que :
+        <ul class="mini-list">
+          <li>le code saisi est incorrect,</li>
+          <li>le certificat n’a pas encore été délivré,</li>
+          <li>ou le document ne provient pas du système officiel.</li>
+        </ul>
       </div>
     </aside>
   </main>
@@ -477,34 +565,16 @@
     © Chem Challenge — Vérification officielle des certificats
   </div>
 
-  <script>
-    // Base d'exemple locale
-    // Plus tard, on remplacera ceci par Firebase.
-    const certificateDB = {
-      "CHEM-2026-001": {
-        valid: true,
-        name: "Jean Dupont",
-        code: "CHEM-2026-001",
-        session: "Session 2026",
-        date: "09/04/2026",
-        status: "Certificat valide"
-      },
-      "CHEM-2026-002": {
-        valid: true,
-        name: "Marie Kouassi",
-        code: "CHEM-2026-002",
-        session: "Session 2026",
-        date: "09/04/2026",
-        status: "Certificat valide"
-      },
-      "CHEM-2026-003": {
-        valid: true,
-        name: "Paul Mensah",
-        code: "CHEM-2026-003",
-        session: "Session 2026",
-        date: "09/04/2026",
-        status: "Certificat valide"
-      }
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      ref,
+      get
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const CONFIG = {
+      competitionId: "chem_challenge_2026",
+      adminEmail: "borisamoussou01@gmail.com"
     };
 
     const codeInput = document.getElementById("certificateCode");
@@ -517,62 +587,161 @@
 
     const detailName = document.getElementById("detailName");
     const detailCode = document.getElementById("detailCode");
+    const detailCandidateCode = document.getElementById("detailCandidateCode");
     const detailSession = document.getElementById("detailSession");
     const detailDate = document.getElementById("detailDate");
     const detailStatus = document.getElementById("detailStatus");
+    const detailInstitution = document.getElementById("detailInstitution");
+    const detailRole = document.getElementById("detailRole");
+    const detailMention = document.getElementById("detailMention");
     const detailAuthority = document.getElementById("detailAuthority");
 
-    function showInvalid(message){
+    function sanitizeText(value = "") {
+      return String(value).replace(/[<>"']/g, "").trim();
+    }
+
+    function normalizeCode(value = "") {
+      return String(value)
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "");
+    }
+
+    function formatDate(ts) {
+      if (!ts) return "—";
+      try {
+        return new Date(ts).toLocaleDateString("fr-FR", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        });
+      } catch (e) {
+        return "—";
+      }
+    }
+
+    function showLoading(message = "Vérification en cours...") {
+      resultBox.className = "result show loading";
+      statusText.textContent = "Recherche en cours";
+      resultMessage.textContent = message;
+      detailsGrid.style.display = "none";
+    }
+
+    function showInvalid(message) {
       resultBox.className = "result show invalid";
       statusText.textContent = "Certificat introuvable";
       resultMessage.innerHTML = message;
       detailsGrid.style.display = "none";
     }
 
-    function showValid(data){
+    function showValid(data) {
       resultBox.className = "result show valid";
       statusText.textContent = "Certificat valide";
       resultMessage.innerHTML = "Le certificat recherché a été trouvé dans le système officiel de vérification.";
       detailsGrid.style.display = "grid";
 
-      detailName.textContent = data.name || "—";
-      detailCode.textContent = data.code || "—";
-      detailSession.textContent = data.session || "—";
-      detailDate.textContent = data.date || "—";
-      detailStatus.textContent = data.status || "Certificat valide";
-      detailAuthority.textContent = "Chem Challenge Administration";
+      detailName.textContent = sanitizeText(data.fullName || "—");
+      detailCode.textContent = sanitizeText(data.verificationNumber || "—");
+      detailCandidateCode.textContent = sanitizeText(data.candidateCode || "—");
+      detailSession.textContent = sanitizeText(data.editionTitle || data.competitionTitle || "Chem Challenge");
+      detailDate.textContent = formatDate(data.issuedAt);
+      detailStatus.textContent = "Certificat valide et délivré";
+      detailInstitution.textContent = sanitizeText(data.institution || "—");
+      detailRole.textContent = sanitizeText(data.roleLabel || "—");
+      detailMention.textContent = sanitizeText(data.mentionLabel || "Participation");
+      detailAuthority.textContent = sanitizeText(data.issuedByEmail || CONFIG.adminEmail);
     }
 
-    function verifyCertificate(){
-      const raw = codeInput.value.trim();
-      const code = raw.toUpperCase();
+    function matchCertificate(inputCode, cert, uid) {
+      const target = normalizeCode(inputCode);
+      if (!target) return false;
 
-      if(!code){
-        showInvalid("Veuillez entrer un code de certificat avant de lancer la vérification.");
+      const verificationNumber = normalizeCode(cert?.verificationNumber || "");
+      const candidateCode = normalizeCode(cert?.candidateCode || "");
+      const certificateUid = normalizeCode(uid || "");
+      const fullName = normalizeCode(cert?.fullName || "");
+
+      return (
+        target === verificationNumber ||
+        target === candidateCode ||
+        target === certificateUid ||
+        target === fullName
+      );
+    }
+
+    async function verifyCertificate() {
+      const raw = codeInput.value.trim();
+      const code = normalizeCode(raw);
+
+      if (!code) {
+        showInvalid("Veuillez entrer un numéro ou un code de certificat avant de lancer la vérification.");
         return;
       }
 
-      const record = certificateDB[code];
+      showLoading();
 
-      if(record && record.valid){
-        showValid(record);
-      } else {
-        showInvalid("Aucun certificat valide n’a été trouvé pour ce code. Vérifiez l’identifiant saisi ou contactez l’administration du concours.");
+      try {
+        const certsRef = ref(db, `competitions/${CONFIG.competitionId}/certificates`);
+        const snap = await get(certsRef);
+
+        if (!snap.exists()) {
+          showInvalid("Aucun certificat n’est actuellement enregistré dans le système officiel.");
+          return;
+        }
+
+        const certs = snap.val() || {};
+        let found = null;
+        let foundUid = null;
+
+        Object.entries(certs).some(([uid, cert]) => {
+          if (matchCertificate(code, cert, uid)) {
+            found = cert || {};
+            foundUid = uid;
+            return true;
+          }
+          return false;
+        });
+
+        if (!found) {
+          showInvalid("Aucun certificat valide n’a été trouvé pour ce code. Vérifiez l’identifiant saisi ou contactez l’administration du concours.");
+          return;
+        }
+
+        showValid({
+          ...found,
+          uid: foundUid
+        });
+
+      } catch (error) {
+        console.error("Erreur de vérification certificat :", error);
+        showInvalid("Une erreur s’est produite pendant la vérification. Réessayez dans un instant.");
       }
     }
 
-    function resetForm(){
+    function resetForm() {
       codeInput.value = "";
       resultBox.className = "result";
+      statusText.textContent = "Statut";
       resultMessage.textContent = "";
       detailsGrid.style.display = "none";
+
+      detailName.textContent = "—";
+      detailCode.textContent = "—";
+      detailCandidateCode.textContent = "—";
+      detailSession.textContent = "—";
+      detailDate.textContent = "—";
+      detailStatus.textContent = "—";
+      detailInstitution.textContent = "—";
+      detailRole.textContent = "—";
+      detailMention.textContent = "—";
+      detailAuthority.textContent = "—";
     }
 
     verifyBtn.addEventListener("click", verifyCertificate);
     resetBtn.addEventListener("click", resetForm);
 
-    codeInput.addEventListener("keydown", function(e){
-      if(e.key === "Enter"){
+    codeInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
         verifyCertificate();
       }
     });
