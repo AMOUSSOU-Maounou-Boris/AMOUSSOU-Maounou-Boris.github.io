@@ -811,6 +811,8 @@
       <a href="competition.html">Concours</a>
       <a href="competition-admin.html" class="active">Admin concours</a>
       <a href="competition-jury.html">Jury concours</a>
+      <a href="competition-rules.html">Règlement officiel</a>
+      <a href="verify-certificate.html">Vérifier un certificat</a>
       <a href="profile.html"><span class="nav-online-dot"></span>Mon compte</a>
     </div>
   </div>
@@ -833,6 +835,8 @@
 
       <a class="side-btn" href="competition.html">Voir côté candidat</a>
       <a class="side-btn" href="competition-jury.html">Voir côté jury</a>
+      <a class="side-btn" href="competition-rules.html">Règlement officiel</a>
+      <a class="side-btn" href="verify-certificate.html">Vérifier un certificat</a>
       <a class="side-btn" href="insights.html#challenge-pub">Voir Challenge Pub</a>
       <a class="side-btn" href="insights.html">Aller vers Insights</a>
       <a class="side-btn" href="messages.html">Messages</a>
@@ -855,6 +859,11 @@
         <div class="hub-card">
           <h4>Pages liées</h4>
           <p>Les données sont partagées avec <strong>competition.html</strong>, <strong>competition-jury.html</strong> et la sous-section <strong>Challenge Pub</strong> de <strong>insights.html</strong>.</p>
+        </div>
+
+        <div class="hub-card">
+          <h4>Crédibilité publique</h4>
+          <p>Le règlement officiel et la vérification des certificats renforcent maintenant la visibilité institutionnelle du concours.</p>
         </div>
       </div>
     </aside>
@@ -897,6 +906,169 @@
           <div class="stat-box">
             <div class="label">Certificats délivrés</div>
             <div class="value" id="statIssued">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section" style="padding-top:20px;">
+        <div style="
+          border:1px solid var(--line);
+          background:linear-gradient(135deg,#0c3f79 0%, #1557a6 55%, #2f8cff 100%);
+          color:#fff;
+          border-radius:24px;
+          padding:22px;
+          box-shadow:var(--shadow);
+          overflow:hidden;
+          position:relative;
+        ">
+          <div style="
+            position:absolute;
+            right:-55px;
+            top:-55px;
+            width:180px;
+            height:180px;
+            border-radius:50%;
+            background:rgba(255,255,255,.08);
+            pointer-events:none;
+          "></div>
+
+          <div style="display:flex; justify-content:space-between; gap:18px; align-items:flex-start; flex-wrap:wrap;">
+            <div style="max-width:840px;">
+              <div style="
+                display:inline-flex;
+                align-items:center;
+                gap:8px;
+                padding:9px 14px;
+                border-radius:999px;
+                background:rgba(255,255,255,.14);
+                border:1px solid rgba(255,255,255,.18);
+                font-size:13px;
+                font-weight:900;
+                margin-bottom:12px;
+              ">
+                Chem Challenge • Administration officielle
+              </div>
+
+              <div style="font-size:31px; font-weight:900; line-height:1.15; margin-bottom:10px;">
+                Centre de pilotage officiel du concours
+              </div>
+
+              <div style="font-size:15px; line-height:1.75; color:rgba(255,255,255,.94);">
+                Cette interface centrale contrôle les inscriptions, le jury, la session en direct,
+                Challenge Pub, les résultats validés et la délivrance des certificats officiels.
+                Les pages règlement officiel et vérification du certificat renforcent maintenant
+                la crédibilité publique du concours sans casser le système déjà en place.
+              </div>
+            </div>
+
+            <div style="min-width:220px; display:grid; gap:10px;">
+              <div style="
+                background:rgba(255,255,255,.10);
+                border:1px solid rgba(255,255,255,.18);
+                border-radius:18px;
+                padding:14px;
+              ">
+                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Règlement</div>
+                <div style="font-size:16px; font-weight:900;">Page officielle active</div>
+              </div>
+
+              <div style="
+                background:rgba(255,255,255,.10);
+                border:1px solid rgba(255,255,255,.18);
+                border-radius:18px;
+                padding:14px;
+              ">
+                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Certificat</div>
+                <div style="font-size:16px; font-weight:900;">Vérification par code</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
+            <a href="competition-rules.html" style="
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+              min-height:46px;
+              padding:0 18px;
+              border-radius:14px;
+              background:#fff;
+              color:#0f4d92;
+              font-weight:900;
+              text-decoration:none;
+            ">Ouvrir le règlement officiel</a>
+
+            <a href="verify-certificate.html" style="
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+              min-height:46px;
+              padding:0 18px;
+              border-radius:14px;
+              background:rgba(255,255,255,.12);
+              border:1px solid rgba(255,255,255,.22);
+              color:#fff;
+              font-weight:900;
+              text-decoration:none;
+            ">Ouvrir la vérification certificat</a>
+          </div>
+        </div>
+
+        <div class="grid-4" style="margin-top:16px;">
+          <div class="mini-data">
+            <div class="k">Page règlement</div>
+            <div class="v">competition-rules.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Page vérification</div>
+            <div class="v">verify-certificate.html</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Résultats validés</div>
+            <div class="v">Admin + Challenge Pub</div>
+          </div>
+          <div class="mini-data">
+            <div class="k">Certificat officiel</div>
+            <div class="v">Délivré par l’admin</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Repères officiels du concours</h2>
+
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Pages publiques de crédibilité</h3>
+
+            <div class="notice">
+              Le concours dispose maintenant de deux pages officielles supplémentaires :
+              le règlement public et la vérification des certificats.
+            </div>
+
+            <div class="btn-row">
+              <a class="btn secondary" href="competition-rules.html">Voir le règlement</a>
+              <a class="btn secondary" href="verify-certificate.html">Voir la vérification</a>
+            </div>
+
+            <div class="small-note">
+              Ces liens permettent à l’admin de contrôler rapidement ce que voient les candidats
+              et les visiteurs externes.
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Résultats et certificats validés</h3>
+
+            <div class="notice">
+              Les résultats officiels sont ceux validés par l’administration puis relayés dans Challenge Pub.
+              Les certificats délivrés peuvent ensuite être contrôlés via leur numéro officiel de vérification.
+            </div>
+
+            <div class="small-note">
+              Cela donne une visibilité plus crédible, plus institutionnelle et plus propre au concours,
+              sans changement lourd dans ton architecture actuelle.
+            </div>
           </div>
         </div>
       </section>
@@ -1071,6 +1243,8 @@
             <div class="btn-row">
               <a class="btn secondary" href="competition.html">Ouvrir côté candidat</a>
               <a class="btn secondary" href="competition-jury.html">Ouvrir côté jury</a>
+              <a class="btn secondary" href="competition-rules.html">Ouvrir le règlement</a>
+              <a class="btn secondary" href="verify-certificate.html">Ouvrir la vérification</a>
               <a class="btn secondary" href="insights.html#challenge-pub">Ouvrir Challenge Pub</a>
               <a class="btn secondary" href="insights.html">Ouvrir Insights</a>
             </div>
@@ -1319,6 +1493,30 @@
 
         <div id="candidateList" class="panel-grid">
           <div class="notice">Chargement des candidatures...</div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Repères finaux de validation</h2>
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Résultats validés</h3>
+            <div class="notice">
+              Les résultats officiellement assumés par le concours sont ceux validés ici par l’administration
+              puis relayés dans la publication Challenge Pub et, si besoin, dans Insights.
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Certificats vérifiables</h3>
+            <div class="notice">
+              Chaque certificat délivré par l’admin peut être contrôlé par son code officiel
+              sur la page <strong>verify-certificate.html</strong>.
+            </div>
+            <div class="btn-row">
+              <a class="btn secondary" href="verify-certificate.html">Ouvrir la page de vérification</a>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -1851,6 +2049,23 @@ Mis en avant : ${pinned}
         issuedByEmail: currentUser.email,
         verificationNumber,
         updatedAt: Date.now()
+      });
+
+      await set(ref(db, `certificates/${verificationNumber}`), {
+        uid,
+        candidateUid: uid,
+        candidateName: certPayload.fullName,
+        certificateCode: verificationNumber,
+        session: certPayload.editionTitle || "Chem Challenge 2026",
+        validationDate: new Date().toISOString().slice(0, 10),
+        status: "valid",
+        valid: true,
+        issuedBy: "Chem Challenge Administration",
+        issuedByEmail: currentUser.email,
+        score: certPayload.score != null && certPayload.totalQuestions != null ? `${certPayload.score}/${certPayload.totalQuestions}` : "",
+        title: certPayload.competitionTitle || "Chem Challenge",
+        createdAt: Date.now(),
+        competitionId: CONFIG.competitionId
       });
 
       await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
@@ -2584,6 +2799,7 @@ Demande : ${req ? "Oui" : "Non"}
 Mention demandée : ${sanitizeText(req?.mentionWanted || "-")}
 Numéro de vérification : ${sanitizeText(cert?.verificationNumber || "-")}
 Délivré le : ${formatDate(cert?.issuedAt)}
+Page publique : verify-certificate.html
                 </span>
               </div>
 
@@ -2636,9 +2852,10 @@ Mis à jour : ${formatDateTime(adminCorrection.updatedAt)}
                 <div class="btn-row">
                   <button class="btn gold" data-action="issueCert" data-uid="${uid}">Délivrer le certificat</button>
                   <button class="btn orange" data-action="rejectCert" data-uid="${uid}">Refuser la demande</button>
+                  <a class="btn secondary" href="verify-certificate.html">Page de vérification</a>
                 </div>
                 <div class="notice" style="margin-top:12px;">
-                  Le certificat délivré ici sera visible automatiquement côté candidat.
+                  Le certificat délivré ici sera visible automatiquement côté candidat et vérifiable publiquement par code.
                 </div>
               </div>
             </div>
