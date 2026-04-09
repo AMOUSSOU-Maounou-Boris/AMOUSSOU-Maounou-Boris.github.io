@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -655,7 +655,7 @@
 
         <div class="video-card">
           <h4 id="remoteVideoLabel">Participant</h4>
-          <video id="remoteVideo" autoplay playsinline muted></video>
+          <video id="remoteVideo" autoplay playsinline></video>
           <div class="audio-only-box" id="remoteAudioBox" style="display:none;">Flux audio distant</div>
         </div>
       </div>
@@ -872,7 +872,7 @@
         </div>
         <div class="video-card">
           <h4 id="remoteVideoLabel">${escapeHtml(remoteName)}</h4>
-          <video id="remoteVideo" autoplay playsinline muted style="${isVideo ? "" : "display:none;"}"></video>
+          <video id="remoteVideo" autoplay playsinline style="${isVideo ? "" : "display:none;"}"></video>
           <div class="audio-only-box" id="remoteAudioBox" style="${isVideo ? "display:none;" : ""}">Flux audio distant</div>
         </div>
       `;
@@ -1103,6 +1103,21 @@
               }
             : false
         });
+
+        const audioTracks = currentLocalStream.getAudioTracks();
+        audioTracks.forEach(track => {
+          track.enabled = true;
+          try { track.contentHint = "speech"; } catch (_) {}
+        });
+
+        const videoTracks = currentLocalStream.getVideoTracks();
+        videoTracks.forEach(track => {
+          track.enabled = true;
+        });
+
+        muted = false;
+        cameraEnabled = mode === "video";
+
         return true;
       } catch (error) {
         console.error(error);
@@ -1253,9 +1268,21 @@
 
       if (remoteVideoEl) {
         remoteVideoEl.srcObject = currentRemoteStream;
+        remoteVideoEl.muted = false;
+        remoteVideoEl.volume = 1;
       }
       if (remoteVideoLabelEl) {
         remoteVideoLabelEl.textContent = selectedContact?.displayName || currentIncomingCall?.fromName || "Participant";
+      }
+
+      try {
+        peerConnection.addTransceiver("audio", { direction: "sendrecv" });
+      } catch (_) {}
+
+      if (currentCallMode === "video") {
+        try {
+          peerConnection.addTransceiver("video", { direction: "sendrecv" });
+        } catch (_) {}
       }
 
       peerConnection.ontrack = (event) => {
@@ -1266,6 +1293,7 @@
           if (remoteVideoEl) {
             remoteVideoEl.srcObject = stream;
             remoteVideoEl.muted = false;
+            remoteVideoEl.volume = 1;
             remoteVideoEl.onloadedmetadata = () => {
               remoteVideoEl.play().catch(() => {});
             };
@@ -1275,6 +1303,7 @@
           if (remoteVideoEl) {
             remoteVideoEl.srcObject = currentRemoteStream;
             remoteVideoEl.muted = false;
+            remoteVideoEl.volume = 1;
             remoteVideoEl.onloadedmetadata = () => {
               remoteVideoEl.play().catch(() => {});
             };
@@ -1282,7 +1311,7 @@
         }
 
         callModalStatus.textContent = "Flux distant reçu.";
-        appendCallLog("Flux audio/vidéo distant reçu.");
+        appendCallLog(`Flux distant reçu : ${event.track?.kind || "media"}.`);
       };
 
       peerConnection.onicecandidate = async (event) => {
@@ -1317,6 +1346,7 @@
           appendCallLog("Connexion WebRTC établie.");
           if (remoteVideoEl) {
             remoteVideoEl.muted = false;
+            remoteVideoEl.volume = 1;
             remoteVideoEl.play().catch(() => {});
           }
         }
@@ -1339,7 +1369,13 @@
         appendCallLog(`État ICE : ${iceState}`);
       };
 
-      currentLocalStream.getTracks().forEach(track => {
+      currentLocalStream.getAudioTracks().forEach(track => {
+        track.enabled = true;
+        peerConnection.addTrack(track, currentLocalStream);
+      });
+
+      currentLocalStream.getVideoTracks().forEach(track => {
+        track.enabled = true;
         peerConnection.addTrack(track, currentLocalStream);
       });
 
@@ -1384,6 +1420,7 @@
 
       if (currentLocalStream && localVideoEl) {
         localVideoEl.srcObject = currentLocalStream;
+        localVideoEl.muted = true;
         localVideoEl.onloadedmetadata = () => {
           localVideoEl.play().catch(() => {});
         };
@@ -1392,6 +1429,7 @@
       if (currentRemoteStream && remoteVideoEl) {
         remoteVideoEl.srcObject = currentRemoteStream;
         remoteVideoEl.muted = false;
+        remoteVideoEl.volume = 1;
         remoteVideoEl.onloadedmetadata = () => {
           remoteVideoEl.play().catch(() => {});
         };
@@ -1568,8 +1606,7 @@ Heure : ${formatDate(Date.now())}`;
         closeModal(incomingCallModal);
 
         await createPeerConnection(incoming.fromUid);
-
-        const offer = offerSnap.val();
+                const offer = offerSnap.val();
         await peerConnection.setRemoteDescription(new RTCSessionDescription({
           type: offer.type,
           sdp: offer.sdp
