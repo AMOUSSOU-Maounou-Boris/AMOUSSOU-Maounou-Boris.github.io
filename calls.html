@@ -655,7 +655,8 @@
 
         <div class="video-card">
           <h4 id="remoteVideoLabel">Participant</h4>
-          <video id="remoteVideo" autoplay playsinline muted></video>
+          <video id="remoteVideo" autoplay playsinline></video>
+          <audio id="remoteAudio" autoplay playsinline></audio>
           <div class="audio-only-box" id="remoteAudioBox" style="display:none;">Flux audio distant</div>
         </div>
       </div>
@@ -764,6 +765,7 @@
 
     let localVideoEl = null;
     let remoteVideoEl = null;
+    let remoteAudioEl = null;
     let localAudioBoxEl = null;
     let remoteAudioBoxEl = null;
     let remoteVideoLabelEl = null;
@@ -872,7 +874,8 @@
         </div>
         <div class="video-card">
           <h4 id="remoteVideoLabel">${escapeHtml(remoteName)}</h4>
-          <video id="remoteVideo" autoplay playsinline muted style="${isVideo ? "" : "display:none;"}"></video>
+          <video id="remoteVideo" autoplay playsinline style="${isVideo ? "" : "display:none;"}"></video>
+          <audio id="remoteAudio" autoplay playsinline></audio>
           <div class="audio-only-box" id="remoteAudioBox" style="${isVideo ? "display:none;" : ""}">Flux audio distant</div>
         </div>
       `;
@@ -881,6 +884,7 @@
     function attachModalMediaRefs() {
       localVideoEl = document.getElementById("localVideo");
       remoteVideoEl = document.getElementById("remoteVideo");
+      remoteAudioEl = document.getElementById("remoteAudio");
       localAudioBoxEl = document.getElementById("localAudioBox");
       remoteAudioBoxEl = document.getElementById("remoteAudioBox");
       remoteVideoLabelEl = document.getElementById("remoteVideoLabel");
@@ -1150,6 +1154,7 @@
 
       if (localVideoEl) localVideoEl.srcObject = null;
       if (remoteVideoEl) remoteVideoEl.srcObject = null;
+      if (remoteAudioEl) remoteAudioEl.srcObject = null;
     }
 
     function cleanupRealtimeListeners() {
@@ -1270,6 +1275,13 @@
         remoteVideoEl.srcObject = currentRemoteStream;
         remoteVideoEl.muted = true;
       }
+
+      if (remoteAudioEl) {
+        remoteAudioEl.srcObject = currentRemoteStream;
+        remoteAudioEl.muted = false;
+        remoteAudioEl.volume = 1;
+      }
+
       if (remoteVideoLabelEl) {
         remoteVideoLabelEl.textContent = selectedContact?.displayName || currentIncomingCall?.fromName || "Participant";
       }
@@ -1279,26 +1291,27 @@
 
         if (stream) {
           currentRemoteStream = stream;
-          if (remoteVideoEl) {
-            remoteVideoEl.srcObject = stream;
-            remoteVideoEl.muted = true;
-            remoteVideoEl.onloadedmetadata = () => {
-              remoteVideoEl.play().catch(() => {});
-            };
-          }
         } else if (event.track) {
           currentRemoteStream.addTrack(event.track);
-          if (remoteVideoEl) {
-            remoteVideoEl.srcObject = currentRemoteStream;
-            remoteVideoEl.muted = true;
-            remoteVideoEl.onloadedmetadata = () => {
-              remoteVideoEl.play().catch(() => {});
-            };
-          }
+        }
+
+        if (remoteVideoEl) {
+          remoteVideoEl.srcObject = currentRemoteStream;
+          remoteVideoEl.muted = true;
+          remoteVideoEl.onloadedmetadata = () => {
+            remoteVideoEl.play().catch(() => {});
+          };
+        }
+
+        if (remoteAudioEl) {
+          remoteAudioEl.srcObject = currentRemoteStream;
+          remoteAudioEl.muted = false;
+          remoteAudioEl.volume = 1;
+          remoteAudioEl.play().catch(() => {});
         }
 
         callModalStatus.textContent = "Flux distant reçu.";
-        appendCallLog("Flux audio/vidéo distant reçu.");
+        appendCallLog(`Flux distant reçu : ${event.track?.kind || "media"}.`);
       };
 
       peerConnection.onicecandidate = async (event) => {
@@ -1331,9 +1344,12 @@
           callModalStatus.textContent = "Connexion établie ✅";
           setStatus("Appel en cours.");
           appendCallLog("Connexion WebRTC établie.");
+
           if (remoteVideoEl) {
-            remoteVideoEl.muted = true;
             remoteVideoEl.play().catch(() => {});
+          }
+          if (remoteAudioEl) {
+            remoteAudioEl.play().catch(() => {});
           }
         }
         if (state === "failed") {
@@ -1355,12 +1371,7 @@
         appendCallLog(`État ICE : ${iceState}`);
       };
 
-      currentLocalStream.getAudioTracks().forEach(track => {
-        track.enabled = true;
-        peerConnection.addTrack(track, currentLocalStream);
-      });
-
-      currentLocalStream.getVideoTracks().forEach(track => {
+      currentLocalStream.getTracks().forEach(track => {
         track.enabled = true;
         peerConnection.addTrack(track, currentLocalStream);
       });
@@ -1417,6 +1428,13 @@
         remoteVideoEl.onloadedmetadata = () => {
           remoteVideoEl.play().catch(() => {});
         };
+      }
+
+      if (currentRemoteStream && remoteAudioEl) {
+        remoteAudioEl.srcObject = currentRemoteStream;
+        remoteAudioEl.muted = false;
+        remoteAudioEl.volume = 1;
+        remoteAudioEl.play().catch(() => {});
       }
 
       muteBtn.textContent = "Couper micro";
@@ -1590,7 +1608,8 @@ Heure : ${formatDate(Date.now())}`;
         closeModal(incomingCallModal);
 
         await createPeerConnection(incoming.fromUid);
-                const offer = offerSnap.val();
+
+        const offer = offerSnap.val();
         await peerConnection.setRemoteDescription(new RTCSessionDescription({
           type: offer.type,
           sdp: offer.sdp
