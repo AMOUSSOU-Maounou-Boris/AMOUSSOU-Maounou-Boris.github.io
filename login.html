@@ -169,9 +169,7 @@
 
     function goToInsights() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
-      setTimeout(() => {
-        window.location.replace("./insights.html");
-      }, 600);
+      window.location.replace("./insights.html");
     }
 
     async function ensureAdminProfile(user) {
