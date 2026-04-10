@@ -34,18 +34,31 @@
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
       min-height:100%;
-      background:var(--bg);
       color:var(--text);
       overflow-x:hidden;
+    }
+
+    html{
+      background:
+        radial-gradient(circle at 12% 70%, rgba(255,190,120,0.95) 0%, rgba(255,190,120,0.18) 10%, rgba(255,190,120,0.00) 20%),
+        radial-gradient(circle at 78% 72%, rgba(255,196,120,0.55) 0%, rgba(255,196,120,0.13) 10%, rgba(255,196,120,0.00) 24%),
+        radial-gradient(circle at 84% 18%, rgba(118,225,255,0.32) 0%, rgba(118,225,255,0.07) 11%, rgba(118,225,255,0) 24%),
+        radial-gradient(circle at 18% 18%, rgba(127,211,255,0.28) 0%, rgba(127,211,255,0.08) 10%, rgba(127,211,255,0) 24%),
+        linear-gradient(118deg, #041126 0%, #0a2659 34%, #133d84 58%, #0a285d 75%, #031228 100%);
+      background-attachment:fixed;
     }
 
     body{
       min-height:100vh;
       position:relative;
+      background:transparent;
+      opacity:1;
+      transition:opacity .14s ease;
     }
 
     body.auth-checking{
-      visibility:hidden;
+      opacity:0;
+      pointer-events:none;
     }
 
     body.login-page{
@@ -1526,6 +1539,54 @@
       white-space:pre-wrap;
     }
 
+    .support-form{
+      display:grid;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .support-input,
+    .support-textarea{
+      width:100%;
+      border:1px solid #d4dfed;
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:15px;
+      outline:none;
+      font-family:inherit;
+      background:#fcfdff;
+      color:#0b2340;
+    }
+
+    .support-textarea{
+      min-height:130px;
+      resize:vertical;
+    }
+
+    .support-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      margin-top:4px;
+    }
+
+    .support-note{
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+      margin-top:2px;
+    }
+
+    .support-feedback{
+      margin-top:8px;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.5;
+      color:#0f4d92;
+      white-space:pre-wrap;
+    }
+
     @keyframes starPulse{
       0%,100%{ opacity:.88; transform:scale(1); }
       50%{ opacity:1; transform:scale(1.012); }
@@ -1699,10 +1760,7 @@
     }
   </style>
 </head>
-<body class="login-page">
-  <script>
-    document.body.classList.add("auth-checking");
-  </script>
+<body class="login-page auth-checking">
 
   <div class="chem-scene" aria-hidden="true">
     <div class="chem-particles"></div>
@@ -1842,7 +1900,7 @@
 
           <div class="auth-links">
             <button id="showSignupBtn" class="auth-link-btn" type="button">Pas encore inscrit ? <span style="font-style:italic;">Créer un compte</span></button>
-            <button class="auth-link-btn" type="button">Besoin d'aide ? <span style="font-style:italic;">Support</span></button>
+            <button id="openSupportBtn" class="auth-link-btn" type="button">Besoin d'aide ? <span style="font-style:italic;">Support</span></button>
           </div>
         </div>
 
@@ -1888,6 +1946,7 @@
 
           <div class="auth-links">
             <button id="showLoginBtn" class="auth-link-btn" type="button">Déjà un compte ? Se connecter</button>
+            <button id="openSupportBtnSignup" class="auth-link-btn" type="button">Besoin d'aide ? <span style="font-style:italic;">Support</span></button>
           </div>
         </div>
 
@@ -1904,6 +1963,7 @@
 
           <div class="auth-links" style="justify-content:center;">
             <button id="backToLoginBtn" class="auth-link-btn" type="button">Retour à la connexion</button>
+            <button id="openSupportBtnReset" class="auth-link-btn" type="button">Besoin d'aide ? <span style="font-style:italic;">Support</span></button>
           </div>
         </div>
 
@@ -1932,6 +1992,7 @@
           <a class="secondary-btn" href="profile.html">Mon compte</a>
           <a class="secondary-btn" href="messages.html">Messages</a>
           <a class="secondary-btn" href="calls.html">Appels</a>
+          <button class="secondary-btn" id="openSupportBtnPrivate" type="button">Besoin d'aide / Support</button>
           <button class="danger-btn" id="logoutBtn" type="button">Déconnexion</button>
         </div>
       </div>
@@ -2088,6 +2149,32 @@ Cette zone est liée à :
     </div>
   </div>
 
+  <div class="modal" id="supportModal">
+    <div class="modal-content">
+      <button class="modal-close" type="button" id="closeSupportModal">×</button>
+      <h3>Besoin d'aide / Support</h3>
+      <p class="modal-note">Remplis ces champs. Ton message sera préparé automatiquement pour l’adresse de support.</p>
+
+      <div class="support-form">
+        <input class="support-input" id="supportName" type="text" placeholder="Nom complet" />
+        <input class="support-input" id="supportEmail" type="email" placeholder="Adresse e-mail" />
+        <input class="support-input" id="supportSubject" type="text" placeholder="Sujet" />
+        <textarea class="support-textarea" id="supportMessage" placeholder="Décris ton problème, ta question ou la difficulté rencontrée..."></textarea>
+      </div>
+
+      <div class="support-note">
+        Adresse de support : maounou-boris.amoussou@cnrs.fr
+      </div>
+
+      <div class="support-feedback" id="supportFeedback"></div>
+
+      <div class="support-actions">
+        <button class="ghost-btn" id="cancelSupportBtn" type="button">Annuler</button>
+        <button class="primary-btn" id="sendSupportBtn" type="button">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import {
@@ -2176,8 +2263,7 @@ Cette zone est liée à :
     const attachmentPreview = document.getElementById("attachmentPreview");
     const postInfoText = document.getElementById("postInfoText");
     const publishBtn = document.getElementById("publishBtn");
-
-    const postGrid = document.getElementById("postGrid");
+        const postGrid = document.getElementById("postGrid");
     const onlineMembersList = document.getElementById("onlineMembersList");
     const recentActivityList = document.getElementById("recentActivityList");
 
@@ -2186,6 +2272,21 @@ Cette zone est liée à :
     const cancelReportBtn = document.getElementById("cancelReportBtn");
     const submitReportBtn = document.getElementById("submitReportBtn");
     const reportText = document.getElementById("reportText");
+
+    const supportModal = document.getElementById("supportModal");
+    const closeSupportModal = document.getElementById("closeSupportModal");
+    const cancelSupportBtn = document.getElementById("cancelSupportBtn");
+    const sendSupportBtn = document.getElementById("sendSupportBtn");
+    const supportName = document.getElementById("supportName");
+    const supportEmail = document.getElementById("supportEmail");
+    const supportSubject = document.getElementById("supportSubject");
+    const supportMessage = document.getElementById("supportMessage");
+    const supportFeedback = document.getElementById("supportFeedback");
+
+    const openSupportBtn = document.getElementById("openSupportBtn");
+    const openSupportBtnSignup = document.getElementById("openSupportBtnSignup");
+    const openSupportBtnReset = document.getElementById("openSupportBtnReset");
+    const openSupportBtnPrivate = document.getElementById("openSupportBtnPrivate");
 
     const challengePubTopBadge = document.getElementById("challengePubTopBadge");
     const challengePubStatus = document.getElementById("challengePubStatus");
@@ -2267,13 +2368,8 @@ Cette zone est liée à :
       showAuthMessage("");
 
       requestAnimationFrame(() => {
-        if (name === "signup" || name === "reset") {
-          if (authOverlay) authOverlay.style.alignItems = "flex-start";
-          scrollAuthTop();
-        } else {
-          if (authOverlay) authOverlay.style.alignItems = "flex-start";
-          scrollAuthTop();
-        }
+        if (authOverlay) authOverlay.style.alignItems = "flex-start";
+        scrollAuthTop();
       });
     }
 
@@ -2423,6 +2519,57 @@ Cette zone est liée à :
 
     function closeModal(modal) {
       modal.classList.remove("show");
+    }
+
+    function prefillSupportForm() {
+      const fullName =
+        (currentUserData && currentUserData.displayName) ||
+        (currentUser && currentUser.displayName) ||
+        "";
+
+      const emailValue =
+        (currentUserData && currentUserData.email) ||
+        (currentUser && currentUser.email) ||
+        (loginEmail && loginEmail.value ? loginEmail.value.trim() : "") ||
+        (signupEmail && signupEmail.value ? signupEmail.value.trim() : "") ||
+        (resetEmail && resetEmail.value ? resetEmail.value.trim() : "") ||
+        "";
+
+      supportName.value = fullName;
+      supportEmail.value = emailValue;
+      supportSubject.value = supportSubject.value || "Demande d'aide - Insights";
+      supportFeedback.textContent = "";
+    }
+
+    function openSupportModalBox() {
+      prefillSupportForm();
+      openModal(supportModal);
+    }
+
+    function sendSupportRequest() {
+      const name = supportName.value.trim();
+      const email = supportEmail.value.trim();
+      const subject = supportSubject.value.trim();
+      const message = supportMessage.value.trim();
+
+      if (!name || !email || !subject || !message) {
+        supportFeedback.textContent = "Merci de remplir tous les champs du support.";
+        return;
+      }
+
+      const fullSubject = `[Insights Support] ${subject}`;
+      const body =
+`Nom : ${name}
+Email : ${email}
+Page : insights.html
+Date : ${new Date().toLocaleString("fr-FR")}
+
+Message :
+${message}`;
+
+      const mailto = `mailto:maounou-boris.amoussou@cnrs.fr?subject=${encodeURIComponent(fullSubject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailto;
+      supportFeedback.textContent = "Le message est prêt à être envoyé depuis votre messagerie.";
     }
 
     function parseInviteToken() {
@@ -2915,7 +3062,7 @@ Mis à jour : ${updated}
     }
 
     function renderPosts() {
-            const posts = Object.entries(postsMap || {})
+      const posts = Object.entries(postsMap || {})
         .map(([id, val]) => ({ id, ...(val || {}) }))
         .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
@@ -3613,6 +3760,19 @@ Mis à jour : ${updated}
 
     reportModal.addEventListener("click", (e) => {
       if (e.target === reportModal) closeModal(reportModal);
+    });
+
+    if (openSupportBtn) openSupportBtn.addEventListener("click", openSupportModalBox);
+    if (openSupportBtnSignup) openSupportBtnSignup.addEventListener("click", openSupportModalBox);
+    if (openSupportBtnReset) openSupportBtnReset.addEventListener("click", openSupportModalBox);
+    if (openSupportBtnPrivate) openSupportBtnPrivate.addEventListener("click", openSupportModalBox);
+
+    if (closeSupportModal) closeSupportModal.addEventListener("click", () => closeModal(supportModal));
+    if (cancelSupportBtn) cancelSupportBtn.addEventListener("click", () => closeModal(supportModal));
+    if (sendSupportBtn) sendSupportBtn.addEventListener("click", sendSupportRequest);
+
+    supportModal.addEventListener("click", (e) => {
+      if (e.target === supportModal) closeModal(supportModal);
     });
 
     onAuthStateChanged(auth, async (user) => {
