@@ -213,6 +213,7 @@
       display:flex;
       flex-direction:column;
       gap:18px;
+      min-width:0;
     }
 
     .hero{
@@ -1023,6 +1024,80 @@
 
     .hidden{ display:none !important; }
 
+    /* ===== Mode épreuve automatique plein écran de page ===== */
+    body.exam-live-mode{
+      background:#f5f9ff;
+    }
+
+    body.exam-live-mode #competitionTopbar{
+      display:none !important;
+    }
+
+    body.exam-live-mode #competitionSidebar,
+    body.exam-live-mode #competitionRightbar{
+      display:none !important;
+    }
+
+    body.exam-live-mode #competitionPage{
+      max-width:100%;
+      margin:0;
+      padding:0;
+      display:block;
+    }
+
+    body.exam-live-mode #competitionMain{
+      width:100%;
+      max-width:100%;
+      margin:0;
+      padding:0;
+      gap:0;
+    }
+
+    body.exam-live-mode #competitionMain > section:not(#examSection){
+      display:none !important;
+    }
+
+    body.exam-live-mode #examSection{
+      display:block !important;
+      width:100%;
+      min-height:100vh;
+      margin:0;
+      border:none;
+      border-radius:0;
+      box-shadow:none;
+      background:linear-gradient(180deg,#f7fbff 0%, #eef5ff 100%);
+      padding:28px 24px 34px;
+    }
+
+    body.exam-live-mode #examSection .exam-top{
+      position:sticky;
+      top:0;
+      z-index:15;
+      background:rgba(247,251,255,.95);
+      backdrop-filter:blur(8px);
+      padding-bottom:14px;
+      margin-bottom:18px;
+    }
+
+    body.exam-live-mode #examSection .question-card{
+      max-width:1100px;
+      margin:0 auto;
+      background:#fff;
+      box-shadow:0 14px 34px rgba(7,31,66,0.08);
+      border-radius:24px;
+      padding:26px;
+    }
+
+    body.exam-live-mode #examSection .progress{
+      max-width:1100px;
+      margin:0 auto 18px;
+    }
+
+    body.exam-live-mode #examSection .result-box{
+      max-width:1100px;
+      margin:18px auto 0;
+    }
+
     @media (max-width:1200px){
       .page{
         grid-template-columns:1fr;
@@ -1047,7 +1122,7 @@
   </style>
 </head>
 <body>
-  <div class="topbar">
+  <div class="topbar" id="competitionTopbar">
     <div class="topbar-inner">
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
@@ -1065,8 +1140,8 @@
     </div>
   </div>
 
-  <div class="page">
-    <aside class="card sidebar">
+  <div class="page" id="competitionPage">
+    <aside class="card sidebar" id="competitionSidebar">
       <div class="profile-box">
         <img id="userAvatar" class="avatar hidden" alt="Profil">
         <div id="avatarFallback" class="avatar-placeholder">CC</div>
@@ -1108,7 +1183,7 @@
       </div>
     </aside>
 
-    <main class="main">
+    <main class="main" id="competitionMain">
       <section class="card hero">
         <div class="hero-top">
           <div>
@@ -1345,7 +1420,7 @@
         </div>
       </section>
 
-      <section class="card section">
+      <section class="card section" id="liveStatusSection">
         <h2>État temps réel de la compétition</h2>
 
         <div class="live-shell">
@@ -1745,7 +1820,8 @@
           <div class="hint" id="certificateText">Après le test, tu peux envoyer une demande.</div>
         </div>
       </section>
-            <section class="card section">
+
+      <section class="card section">
         <h2>Certificat</h2>
         <p>
           Le certificat apparaîtra ici après délivrance par l’administrateur.
@@ -1823,7 +1899,7 @@
       </section>
     </main>
 
-    <aside class="card rightbar">
+    <aside class="card rightbar" id="competitionRightbar">
       <h3 class="right-title">Informations concours</h3>
 
       <div class="mini-box">
@@ -1993,6 +2069,12 @@
       "Explique en quelques lignes pourquoi le pH d’une solution neutre vaut environ 7 à 25 °C."
     ];
 
+    const competitionTopbar = document.getElementById("competitionTopbar");
+    const competitionPage = document.getElementById("competitionPage");
+    const competitionSidebar = document.getElementById("competitionSidebar");
+    const competitionMain = document.getElementById("competitionMain");
+    const competitionRightbar = document.getElementById("competitionRightbar");
+
     const userNameEl = document.getElementById("userName");
     const userEmailEl = document.getElementById("userEmail");
     const userAvatar = document.getElementById("userAvatar");
@@ -2113,6 +2195,13 @@
     let examStarted = false;
     let examFinished = false;
     let examSubmissionSaved = false;
+    let autoStartedSessionKey = "";
+
+    let usersMap = {};
+    let postsMap = {};
+    let likesMap = {};
+    let commentsMap = {};
+    let challengePubData = null;
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
@@ -2169,6 +2258,16 @@
         clearInterval(liveCountdownTimer);
         liveCountdownTimer = null;
       }
+    }
+
+    function setExamFullscreenMode(enabled) {
+      document.body.classList.toggle("exam-live-mode", !!enabled);
+      if (enabled) window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function syncCompetitionDisplayMode() {
+      const shouldFocusExam = examStarted && !examFinished;
+      setExamFullscreenMode(shouldFocusExam);
     }
 
     function applySettingsToUI(settings = null) {
@@ -2304,7 +2403,10 @@
     }
 
     function updateLiveExamAvailabilityUI() {
-      if (!currentRegistration) return;
+      if (!currentRegistration) {
+        startExamBtn.disabled = true;
+        return;
+      }
 
       if (currentRegistration.status === "approved" && !currentRegistration.hasPlayed && !currentRegistration.examCompleted) {
         if (!canStartExamNow()) {
@@ -2312,7 +2414,30 @@
           return;
         }
         startExamBtn.disabled = !isLiveCompetitionStarted();
+        return;
       }
+
+      startExamBtn.disabled = true;
+    }
+
+    async function maybeAutoEnterExamMode() {
+      syncCompetitionDisplayMode();
+
+      if (!currentUser || !currentRegistration) return;
+      if (examStarted || examFinished) return;
+      if (!canStartExamNow()) return;
+      if (!isLiveCompetitionStarted()) return;
+      if (currentRegistration.status !== "approved") return;
+      if (currentRegistration.hasPlayed || currentRegistration.examCompleted) return;
+      if (currentRegistration.examStarted && !currentRegistration.examCompleted) return;
+
+      const sessionKey = String(liveControlState?.startedAt || "");
+      if (!sessionKey) return;
+      if (autoStartedSessionKey === sessionKey) return;
+
+      autoStartedSessionKey = sessionKey;
+      await requestFullscreenMode();
+      await startExam({ silent: true, auto: true });
     }
 
     function renderLiveControl(liveData = null) {
@@ -2348,6 +2473,7 @@
         paint();
         liveCountdownTimer = setInterval(paint, 1000);
         updateLiveExamAvailabilityUI();
+        maybeAutoEnterExamMode();
         return;
       }
 
@@ -2365,6 +2491,7 @@
         }
 
         updateLiveExamAvailabilityUI();
+        syncCompetitionDisplayMode();
         return;
       }
 
@@ -2375,6 +2502,7 @@
       liveStatusText.textContent = "Quand l’admin lance la compétition, l’état et le chrono apparaissent automatiquement ici sans recharger la page.";
       liveMetaText.textContent = "Aucune session active.";
       updateLiveExamAvailabilityUI();
+      syncCompetitionDisplayMode();
     }
 
     async function loadUserProfile(uid) {
@@ -2499,6 +2627,7 @@
           : "Les inscriptions sont actuellement fermées par l’administrateur."
         );
         startExamBtn.disabled = true;
+        syncCompetitionDisplayMode();
         return;
       }
 
@@ -2571,6 +2700,9 @@
         setRegistrationStatus("none", "Aucune inscription enregistrée.");
         startExamBtn.disabled = true;
       }
+
+      maybeAutoEnterExamMode();
+      syncCompetitionDisplayMode();
     }
 
     function renderQuestion() {
@@ -2586,6 +2718,7 @@
       writtenAnswerShell.classList.add("hidden");
       selectedAnswerIndex = null;
       nextQuestionBtn.disabled = true;
+      writtenAnswerInput.removeEventListener("input", handleWrittenInput);
 
       if (q.type === "written") {
         questionTypePill.textContent = "Question rédigée";
@@ -2697,6 +2830,25 @@
         }
       });
 
+      currentRegistration = {
+        ...(currentRegistration || {}),
+        examStarted: true,
+        examCompleted: true,
+        hasPlayed: true,
+        score,
+        totalQuestions: total,
+        percent,
+        submittedAt: Date.now(),
+        examMeta: {
+          startedAt,
+          updatedAt: Date.now(),
+          currentQuestionIndex: total,
+          warnings,
+          timeLeft: 0,
+          inProgress: false
+        }
+      };
+
       await set(ref(db, `competitions/${CONFIG.competitionId}/leaderboard/${currentUser.uid}`), {
         uid: currentUser.uid,
         displayName: sanitizeText(currentRegistration?.displayName || currentRegistration?.fullName || currentUser.displayName || "Participant"),
@@ -2728,8 +2880,10 @@
       liveStatusText.textContent = "La compétition est terminée.";
       startExamBtn.disabled = true;
 
+      syncCompetitionDisplayMode();
       await loadRegistrationStatus();
       await loadCertificateStatus();
+      syncCompetitionDisplayMode();
     }
 
     async function handleNextQuestion() {
@@ -2798,26 +2952,28 @@
       }, 1000);
     }
 
-    async function startExam() {
+    async function startExam(options = {}) {
+      const silent = !!options.silent;
+
       if (!currentUser || !currentRegistration) return;
 
       if (!canStartExamNow()) {
-        alert("L’épreuve est actuellement fermée par l’administrateur.");
+        if (!silent) alert("L’épreuve est actuellement fermée par l’administrateur.");
         return;
       }
 
       if (!isLiveCompetitionStarted()) {
-        alert("La compétition n’a pas encore été lancée par l’administrateur.");
+        if (!silent) alert("La compétition n’a pas encore été lancée par l’administrateur.");
         return;
       }
 
       if (currentRegistration.status !== "approved") {
-        alert("Ton inscription n’est pas encore approuvée.");
+        if (!silent) alert("Ton inscription n’est pas encore approuvée.");
         return;
       }
 
       if (currentRegistration.hasPlayed || currentRegistration.examCompleted) {
-        alert("Tu as déjà utilisé ta tentative pour cette édition.");
+        if (!silent) alert("Tu as déjà utilisé ta tentative pour cette édition.");
         return;
       }
 
@@ -2854,8 +3010,25 @@
         }
       });
 
+      currentRegistration = {
+        ...(currentRegistration || {}),
+        examStarted: true,
+        examCompleted: false,
+        hasPlayed: false,
+        startedAt,
+        examMeta: {
+          startedAt,
+          updatedAt: Date.now(),
+          currentQuestionIndex: 0,
+          warnings: 0,
+          timeLeft,
+          inProgress: true
+        }
+      };
+
       updateWarningUI();
       examSection.style.display = "block";
+      syncCompetitionDisplayMode();
       examSection.scrollIntoView({ behavior: "smooth", block: "start" });
 
       renderQuestion();
@@ -3111,6 +3284,7 @@
         const data = snap.exists() ? (snap.val() || {}) : null;
         renderLiveControl(data);
         await loadRegistrationStatus();
+        syncCompetitionDisplayMode();
       });
     }
 
@@ -3127,7 +3301,7 @@
 
     startExamBtn.addEventListener("click", async () => {
       await requestFullscreenMode();
-      await startExam();
+      await startExam({ silent: false, auto: false });
     });
 
     nextQuestionBtn.addEventListener("click", handleNextQuestion);
@@ -3153,6 +3327,7 @@
       await loadRegistrationStatus();
       await loadCertificateStatus();
       loadLeaderboard();
+      syncCompetitionDisplayMode();
     });
   </script>
 </body>
