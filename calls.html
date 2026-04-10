@@ -1209,6 +1209,11 @@
       iceServers: [
         {
           urls: [
+            "stun:stun.relay.metered.ca:80"
+          ]
+        },
+        {
+          urls: [
             "turn:standard.relay.metered.ca:80",
             "turn:standard.relay.metered.ca:80?transport=udp",
             "turn:standard.relay.metered.ca:80?transport=tcp",
@@ -1218,17 +1223,12 @@
           ],
           username: "5ff54ce1d293fa306e56fe05",
           credential: "xzI7qJDBCvqPJt7e"
-        },
-        {
-          urls: [
-            "stun:stun.relay.metered.ca:80"
-          ]
         }
       ],
       iceTransportPolicy: "all",
-      bundlePolicy: "balanced",
+      bundlePolicy: "max-bundle",
       rtcpMuxPolicy: "require",
-      iceCandidatePoolSize: 4
+      iceCandidatePoolSize: 2
     };
 
     function resetActivityTimer() {
@@ -1327,6 +1327,26 @@
       localAudioBoxEl = document.getElementById("localAudioBox");
       remoteAudioBoxEl = document.getElementById("remoteAudioBox");
       remoteVideoLabelEl = document.getElementById("remoteVideoLabel");
+    }
+
+    async function safePlayMedia(el) {
+      if (!el) return;
+      try {
+        el.autoplay = true;
+        el.playsInline = true;
+        await el.play();
+      } catch (_) {}
+    }
+
+    function forceRemoteAudioPlayback() {
+      if (!remoteVideoEl) return;
+      remoteVideoEl.muted = false;
+      remoteVideoEl.defaultMuted = false;
+      remoteVideoEl.volume = 1;
+      safePlayMedia(remoteVideoEl);
+      setTimeout(() => safePlayMedia(remoteVideoEl), 250);
+      setTimeout(() => safePlayMedia(remoteVideoEl), 900);
+      setTimeout(() => safePlayMedia(remoteVideoEl), 1800);
     }
 
     function formatPresence(userData = {}) {
@@ -1711,7 +1731,10 @@
 
       if (remoteVideoEl) {
         remoteVideoEl.srcObject = currentRemoteStream;
+        remoteVideoEl.autoplay = true;
+        remoteVideoEl.playsInline = true;
         remoteVideoEl.muted = false;
+        remoteVideoEl.defaultMuted = false;
         remoteVideoEl.volume = 1;
       }
 
@@ -1719,7 +1742,7 @@
         remoteVideoLabelEl.textContent = selectedContact?.displayName || currentIncomingCall?.fromName || "Participant";
       }
 
-      peerConnection.ontrack = (event) => {
+      peerConnection.ontrack = async (event) => {
         const inboundStream = event.streams && event.streams[0] ? event.streams[0] : null;
 
         if (inboundStream) {
@@ -1734,11 +1757,14 @@
           remoteVideoEl.autoplay = true;
           remoteVideoEl.playsInline = true;
           remoteVideoEl.muted = false;
+          remoteVideoEl.defaultMuted = false;
           remoteVideoEl.volume = 1;
 
           remoteVideoEl.onloadedmetadata = () => {
-            remoteVideoEl.play().catch(() => {});
+            forceRemoteAudioPlayback();
           };
+
+          forceRemoteAudioPlayback();
         }
 
         callModalStatus.textContent = "Flux distant reçu.";
@@ -1778,8 +1804,9 @@
 
           if (remoteVideoEl) {
             remoteVideoEl.muted = false;
+            remoteVideoEl.defaultMuted = false;
             remoteVideoEl.volume = 1;
-            remoteVideoEl.play().catch(() => {});
+            forceRemoteAudioPlayback();
           }
         }
         if (state === "failed") {
@@ -1849,19 +1876,22 @@
       if (currentLocalStream && localVideoEl) {
         localVideoEl.srcObject = currentLocalStream;
         localVideoEl.muted = true;
+        localVideoEl.defaultMuted = true;
         localVideoEl.volume = 0;
         localVideoEl.onloadedmetadata = () => {
-          localVideoEl.play().catch(() => {});
+          safePlayMedia(localVideoEl);
         };
       }
 
       if (currentRemoteStream && remoteVideoEl) {
         remoteVideoEl.srcObject = currentRemoteStream;
         remoteVideoEl.muted = false;
+        remoteVideoEl.defaultMuted = false;
         remoteVideoEl.volume = 1;
         remoteVideoEl.onloadedmetadata = () => {
-          remoteVideoEl.play().catch(() => {});
+          forceRemoteAudioPlayback();
         };
+        forceRemoteAudioPlayback();
       }
 
       muteBtn.textContent = "Couper micro";
@@ -1945,6 +1975,7 @@ Heure : ${formatDate(Date.now())}`;
             await flushPendingRemoteCandidates();
             callModalStatus.textContent = "Connexion à l’appel...";
             appendCallLog("Réponse distante reçue.");
+            forceRemoteAudioPlayback();
           } catch (e) {
             console.error(e);
             appendCallLog("Erreur définition réponse distante.");
@@ -2058,6 +2089,7 @@ Heure : ${formatDate(Date.now())}`;
 Expéditeur : ${incoming.fromName || ""}
 Heure : ${formatDate(Date.now())}`;
 
+        forceRemoteAudioPlayback();
         setStatus("Appel accepté.");
         currentIncomingCall = null;
       } catch (error) {
@@ -2212,7 +2244,7 @@ Heure : ${formatDate(Date.now())}`;
         if (e.target === modal) closeModal(modal);
       });
     });
-    onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "insights.html";
         return;
@@ -2234,12 +2266,45 @@ Heure : ${formatDate(Date.now())}`;
       loadContacts();
       listenForCalls();
       setupSelectedContactUI();
+
+      if (preselectedCallUid) {
+        const trySelect = () => {
+          const found = allContacts.find(x => x.uid === preselectedCallUid) || null;
+          if (found) {
+            selectedContact = found;
+            renderContacts();
+            setupSelectedContactUI();
+            return true;
+          }
+          return false;
+        };
+
+        if (!trySelect()) {
+          setTimeout(() => { trySelect(); }, 600);
+        }
+      }
     });
 
-    window.addEventListener("beforeunload", () => {
+    window.addEventListener("beforeunload", async () => {
       try {
         if (currentLocalStream) currentLocalStream.getTracks().forEach(track => track.stop());
       } catch (_) {}
+
+      try {
+        if (currentCallId) {
+          await safeSetCallStatus(currentCallId, {
+            status: "ended",
+            endedBy: currentUser?.uid || "",
+            endedAt: Date.now()
+          });
+        }
+      } catch (_) {}
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && remoteVideoEl) {
+        forceRemoteAudioPlayback();
+      }
     });
   </script>
 </body>
