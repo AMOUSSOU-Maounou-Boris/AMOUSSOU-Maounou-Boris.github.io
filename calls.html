@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Appels | Boris Research Hub</title>
   <style>
-    *{ box-sizing:border-box; }
+    *{box-sizing:border-box}
 
     :root{
       --bg:#eaf5ff;
@@ -18,38 +18,33 @@
       --green:#18c34a;
       --red:#df4b4b;
       --orange:#f7a600;
-      --shadow:0 14px 34px rgba(7,31,66,0.10);
+      --shadow:0 14px 34px rgba(7,31,66,.10);
       --line:#d9e5f2;
       --soft:#f4f8fc;
-      --gold:#d1a028;
-      --chem-deep:#061631;
-      --chem-mid:#0c2f69;
-      --chem-light:#49c8ff;
-      --chem-ice:#dff7ff;
     }
 
-    html, body{
+    html,body{
       margin:0;
-      font-family:Arial, Helvetica, sans-serif;
       min-height:100%;
+      font-family:Arial,Helvetica,sans-serif;
       color:var(--text);
       overflow-x:hidden;
     }
 
     html{
       background:
-        radial-gradient(circle at 12% 70%, rgba(255,190,120,0.95) 0%, rgba(255,190,120,0.18) 10%, rgba(255,190,120,0.00) 20%),
-        radial-gradient(circle at 78% 72%, rgba(255,196,120,0.55) 0%, rgba(255,196,120,0.13) 10%, rgba(255,196,120,0.00) 24%),
-        radial-gradient(circle at 84% 18%, rgba(118,225,255,0.32) 0%, rgba(118,225,255,0.07) 11%, rgba(118,225,255,0) 24%),
-        radial-gradient(circle at 18% 18%, rgba(127,211,255,0.28) 0%, rgba(127,211,255,0.08) 10%, rgba(127,211,255,0) 24%),
-        linear-gradient(118deg, #041126 0%, #0a2659 34%, #133d84 58%, #0a285d 75%, #031228 100%);
+        radial-gradient(circle at 12% 70%, rgba(255,190,120,.95) 0%, rgba(255,190,120,.18) 10%, rgba(255,190,120,0) 20%),
+        radial-gradient(circle at 78% 72%, rgba(255,196,120,.55) 0%, rgba(255,196,120,.13) 10%, rgba(255,196,120,0) 24%),
+        radial-gradient(circle at 84% 18%, rgba(118,225,255,.32) 0%, rgba(118,225,255,.07) 11%, rgba(118,225,255,0) 24%),
+        radial-gradient(circle at 18% 18%, rgba(127,211,255,.28) 0%, rgba(127,211,255,.08) 10%, rgba(127,211,255,0) 24%),
+        linear-gradient(118deg,#041126 0%,#0a2659 34%,#133d84 58%,#0a285d 75%,#031228 100%);
       background-attachment:fixed;
     }
 
     body{
-      min-height:100vh;
-      position:relative;
       background:transparent;
+      position:relative;
+      min-height:100vh;
     }
 
     body::before{
@@ -58,14 +53,14 @@
       inset:0;
       pointer-events:none;
       background:
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.10), rgba(255,255,255,0) 36%),
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.12) 0 1px, transparent 2px),
-        radial-gradient(circle at 65% 22%, rgba(255,255,255,0.10) 0 1.5px, transparent 2.5px),
-        radial-gradient(circle at 84% 62%, rgba(255,255,255,0.12) 0 1.6px, transparent 2.6px),
-        radial-gradient(circle at 36% 78%, rgba(255,255,255,0.10) 0 1.4px, transparent 2.4px),
-        radial-gradient(circle at 11% 58%, rgba(255,255,255,0.16) 0 2px, transparent 3px),
-        radial-gradient(circle at 70% 82%, rgba(255,255,255,0.11) 0 2px, transparent 3px);
-      background-size:100% 100%, 260px 260px, 330px 330px, 380px 380px, 290px 290px, 420px 420px, 520px 520px;
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.10), rgba(255,255,255,0) 36%),
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.12) 0 1px, transparent 2px),
+        radial-gradient(circle at 65% 22%, rgba(255,255,255,.10) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 84% 62%, rgba(255,255,255,.12) 0 1.6px, transparent 2.6px),
+        radial-gradient(circle at 36% 78%, rgba(255,255,255,.10) 0 1.4px, transparent 2.4px),
+        radial-gradient(circle at 11% 58%, rgba(255,255,255,.16) 0 2px, transparent 3px),
+        radial-gradient(circle at 70% 82%, rgba(255,255,255,.11) 0 2px, transparent 3px);
+      background-size:100% 100%,260px 260px,330px 330px,380px 380px,290px 290px,420px 420px,520px 520px;
       animation:starPulse 9s linear infinite;
       opacity:.92;
       z-index:0;
@@ -77,8 +72,8 @@
       inset:0;
       pointer-events:none;
       background:
-        radial-gradient(circle at 50% 50%, rgba(120,215,255,0.16), rgba(120,215,255,0) 55%),
-        linear-gradient(90deg, rgba(124,219,255,0) 0%, rgba(124,219,255,0.10) 48%, rgba(124,219,255,0.24) 50%, rgba(124,219,255,0.10) 52%, rgba(124,219,255,0) 100%);
+        radial-gradient(circle at 50% 50%, rgba(120,215,255,.16), rgba(120,215,255,0) 55%),
+        linear-gradient(90deg, rgba(124,219,255,0) 0%, rgba(124,219,255,.10) 48%, rgba(124,219,255,.24) 50%, rgba(124,219,255,.10) 52%, rgba(124,219,255,0) 100%);
       mix-blend-mode:screen;
       animation:auroraSweep 14s ease-in-out infinite;
       z-index:0;
@@ -92,9 +87,7 @@
       z-index:1;
     }
 
-    .chem-particles,
-    .chem-particles::before,
-    .chem-particles::after{
+    .chem-particles,.chem-particles::before,.chem-particles::after{
       position:absolute;
       inset:0;
       content:"";
@@ -109,7 +102,7 @@
         radial-gradient(circle, rgba(255,255,255,.95) 0 2px, transparent 2.8px),
         radial-gradient(circle, rgba(181,233,255,.72) 0 1.4px, transparent 2.2px),
         radial-gradient(circle, rgba(255,255,255,.48) 0 3px, transparent 4px);
-      background-size:180px 180px, 120px 120px, 260px 260px;
+      background-size:180px 180px,120px 120px,260px 260px;
       animation:particleDrift 24s linear infinite;
     }
 
@@ -117,7 +110,7 @@
       background-image:
         radial-gradient(circle, rgba(255,255,255,.70) 0 1.6px, transparent 2.2px),
         radial-gradient(circle, rgba(160,224,255,.45) 0 3px, transparent 3.8px);
-      background-size:220px 220px, 300px 300px;
+      background-size:220px 220px,300px 300px;
       animation:particleDriftReverse 30s linear infinite;
     }
 
@@ -125,7 +118,7 @@
       background-image:
         radial-gradient(circle, rgba(255,255,255,.30) 0 5px, transparent 6.5px),
         radial-gradient(circle, rgba(255,255,255,.55) 0 1.2px, transparent 2px);
-      background-size:340px 340px, 110px 110px;
+      background-size:340px 340px,110px 110px;
       animation:particlePulse 10s ease-in-out infinite;
     }
 
@@ -139,10 +132,8 @@
       min-height:260px;
       border-radius:50%;
       background:
-        radial-gradient(circle at 24% 28%, rgba(255,255,255,0.82) 0%, rgba(163,225,255,0.88) 10%, rgba(42,116,191,0.82) 30%, rgba(8,31,77,0.85) 62%, rgba(3,12,31,0.96) 100%);
-      box-shadow:
-        0 0 90px rgba(82,193,255,0.25),
-        0 0 180px rgba(91,194,255,0.15);
+        radial-gradient(circle at 24% 28%, rgba(255,255,255,.82) 0%, rgba(163,225,255,.88) 10%, rgba(42,116,191,.82) 30%, rgba(8,31,77,.85) 62%, rgba(3,12,31,.96) 100%);
+      box-shadow:0 0 90px rgba(82,193,255,.25),0 0 180px rgba(91,194,255,.15);
       filter:saturate(1.12);
       opacity:.96;
       animation:planetFloat 9s ease-in-out infinite;
@@ -153,9 +144,9 @@
       position:absolute;
       inset:16% -14%;
       border-radius:50%;
-      border:8px solid rgba(109,208,255,0.18);
+      border:8px solid rgba(109,208,255,.18);
       transform:rotate(-20deg);
-      box-shadow:0 0 18px rgba(140,225,255,0.18), inset 0 0 20px rgba(140,225,255,0.08);
+      box-shadow:0 0 18px rgba(140,225,255,.18), inset 0 0 20px rgba(140,225,255,.08);
     }
 
     .chem-orbit::after{
@@ -163,7 +154,7 @@
       position:absolute;
       inset:21% -5%;
       border-radius:50%;
-      border:4px solid rgba(148,229,255,0.22);
+      border:4px solid rgba(148,229,255,.22);
       transform:rotate(-20deg);
     }
 
@@ -175,12 +166,11 @@
       min-width:170px;
       height:110vh;
       opacity:.55;
-      filter:drop-shadow(0 0 16px rgba(165,230,255,0.18));
+      filter:drop-shadow(0 0 16px rgba(165,230,255,.18));
       animation:dnaGlow 8s ease-in-out infinite;
     }
 
-    .chem-dna::before,
-    .chem-dna::after{
+    .chem-dna::before,.chem-dna::after{
       content:"";
       position:absolute;
       top:0;
@@ -227,12 +217,11 @@
       mix-blend-mode:screen;
     }
 
-    .chem-network,
-    .chem-network-right{
+    .chem-network,.chem-network-right{
       position:absolute;
       pointer-events:none;
       opacity:.48;
-      filter:drop-shadow(0 0 10px rgba(118,224,255,0.15));
+      filter:drop-shadow(0 0 10px rgba(118,224,255,.15));
     }
 
     .chem-network{
@@ -252,8 +241,7 @@
       opacity:.58;
     }
 
-    .chem-network svg,
-    .chem-network-right svg{
+    .chem-network svg,.chem-network-right svg{
       width:100%;
       height:100%;
     }
@@ -269,17 +257,17 @@
       animation:floatLabel 7s ease-in-out infinite;
     }
 
-    .chem-label.h2o{ left:25vw; top:26vh; font-size:2rem; }
-    .chem-label.nh2{ left:24vw; top:40vh; font-size:2.2rem; animation-delay:-2s; }
-    .chem-label.ch3{ right:24vw; bottom:20vh; font-size:2.3rem; animation-delay:-4s; }
+    .chem-label.h2o{left:25vw;top:26vh;font-size:2rem}
+    .chem-label.nh2{left:24vw;top:40vh;font-size:2.2rem;animation-delay:-2s}
+    .chem-label.ch3{right:24vw;bottom:20vh;font-size:2.3rem;animation-delay:-4s}
 
     .topbar{
-      background:rgba(8,46,91,0.90);
+      background:rgba(8,46,91,.90);
       padding:18px 20px;
       position:sticky;
       top:0;
       z-index:40;
-      box-shadow:0 4px 16px rgba(0,0,0,0.10);
+      box-shadow:0 4px 16px rgba(0,0,0,.10);
       backdrop-filter:blur(6px);
     }
 
@@ -303,7 +291,7 @@
       gap:8px;
     }
 
-    .topbar a.active{ border-bottom-color:#fff; }
+    .topbar a.active{border-bottom-color:#fff}
 
     .nav-online-dot{
       width:10px;
@@ -311,7 +299,7 @@
       border-radius:50%;
       background:var(--green);
       display:inline-block;
-      box-shadow:0 0 8px rgba(24,195,74,0.7);
+      box-shadow:0 0 8px rgba(24,195,74,.7);
     }
 
     .page{
@@ -332,12 +320,10 @@
       min-width:0;
     }
 
-    .main{ min-width:0; }
+    .main{min-width:0}
 
-    .sidebar-card,
-    .hero,
-    .stage{
-      background:rgba(255,255,255,0.98);
+    .sidebar-card,.hero,.stage{
+      background:rgba(255,255,255,.98);
       border-radius:28px;
       box-shadow:var(--shadow);
       border:1px solid #e4edf7;
@@ -345,9 +331,7 @@
       overflow:hidden;
     }
 
-    .sidebar-card::before,
-    .hero::before,
-    .stage::before{
+    .sidebar-card::before,.hero::before,.stage::before{
       content:"";
       position:absolute;
       top:-44px;
@@ -355,11 +339,13 @@
       width:160px;
       height:160px;
       border-radius:50%;
-      background:radial-gradient(circle, rgba(255,199,103,0.18), rgba(255,199,103,0) 72%);
+      background:radial-gradient(circle, rgba(255,199,103,.18), rgba(255,199,103,0) 72%);
       pointer-events:none;
     }
 
-    .sidebar-card{ padding:20px; }
+    .sidebar-card{padding:20px}
+    .hero{padding:20px 22px;margin-bottom:18px;display:flex;gap:16px;align-items:flex-start}
+    .stage{padding:22px;min-height:540px;display:flex;flex-direction:column;gap:16px}
 
     .sidebar-top{
       display:flex;
@@ -382,20 +368,11 @@
       font-weight:800;
       overflow:hidden;
       flex:0 0 auto;
-      box-shadow:0 10px 22px rgba(15,77,146,0.20);
+      box-shadow:0 10px 22px rgba(15,77,146,.20);
     }
 
-    .avatar.large{
-      width:70px;
-      height:70px;
-      font-size:26px;
-    }
-
-    .avatar.small{
-      width:46px;
-      height:46px;
-      font-size:16px;
-    }
+    .avatar.large{width:70px;height:70px;font-size:26px}
+    .avatar.small{width:46px;height:46px;font-size:16px}
 
     .avatar img{
       width:100%;
@@ -403,13 +380,7 @@
       object-fit:cover;
     }
 
-    .logout-btn,
-    .call-btn,
-    .option-btn,
-    .main-btn,
-    .secondary-btn,
-    .danger-btn,
-    .mini-btn{
+    .logout-btn,.call-btn,.option-btn,.main-btn,.secondary-btn,.danger-btn,.mini-btn{
       border:none;
       border-radius:16px;
       padding:13px 16px;
@@ -424,19 +395,15 @@
       font-family:inherit;
     }
 
-    .logout-btn,
-    .option-btn,
-    .secondary-btn,
-    .mini-btn{
+    .logout-btn,.option-btn,.secondary-btn,.mini-btn{
       background:#eef4fb;
       color:var(--text);
     }
 
-    .call-btn,
-    .main-btn{
+    .call-btn,.main-btn{
       background:var(--blue-dark);
       color:#fff;
-      box-shadow:0 10px 20px rgba(15,77,146,0.18);
+      box-shadow:0 10px 20px rgba(15,77,146,.18);
     }
 
     .danger-btn{
@@ -467,7 +434,7 @@
 
     .search-input:focus{
       border-color:#7fb5ff;
-      box-shadow:0 0 0 3px rgba(47,140,255,0.13);
+      box-shadow:0 0 0 3px rgba(47,140,255,.13);
     }
 
     .tabs{
@@ -517,20 +484,15 @@
       gap:12px;
     }
 
-    .contact-card:hover{
-      transform:translateY(-1px);
-    }
+    .contact-card:hover{transform:translateY(-1px)}
 
     .contact-card.active{
       border-color:#9fc8ff;
-      box-shadow:0 0 0 3px rgba(47,140,255,0.10);
+      box-shadow:0 0 0 3px rgba(47,140,255,.10);
       background:#f7fbff;
     }
 
-    .contact-main{
-      flex:1;
-      min-width:0;
-    }
+    .contact-main{flex:1;min-width:0}
 
     .contact-title{
       font-weight:800;
@@ -567,7 +529,7 @@
 
     .dot.online{
       background:var(--green);
-      box-shadow:0 0 8px rgba(24,195,74,0.45);
+      box-shadow:0 0 8px rgba(24,195,74,.45);
     }
 
     .mini-btn{
@@ -583,14 +545,6 @@
       padding:8px 2px;
       position:relative;
       z-index:1;
-    }
-
-    .hero{
-      padding:20px 22px;
-      margin-bottom:18px;
-      display:flex;
-      gap:16px;
-      align-items:flex-start;
     }
 
     .hero-main{
@@ -629,14 +583,6 @@
       min-width:110px;
     }
 
-    .stage{
-      padding:22px;
-      min-height:540px;
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-    }
-
     .stage-status{
       min-height:24px;
       font-size:14px;
@@ -649,7 +595,7 @@
     .stage-body{
       flex:1;
       border-radius:24px;
-      background:linear-gradient(180deg, #0d376d 0%, #032750 100%);
+      background:linear-gradient(180deg,#0d376d 0%,#032750 100%);
       color:#fff;
       padding:24px;
       position:relative;
@@ -657,7 +603,7 @@
       display:flex;
       flex-direction:column;
       justify-content:center;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
     }
 
     .stage-body::before{
@@ -666,7 +612,7 @@
       width:240px;
       height:240px;
       border-radius:50%;
-      background:rgba(255,255,255,0.06);
+      background:rgba(255,255,255,.06);
       top:-80px;
       right:-80px;
     }
@@ -684,7 +630,7 @@
     .modal{
       position:fixed;
       inset:0;
-      background:rgba(8,35,64,0.45);
+      background:rgba(8,35,64,.45);
       display:none;
       align-items:center;
       justify-content:center;
@@ -692,14 +638,14 @@
       z-index:90;
     }
 
-    .modal.show{ display:flex; }
+    .modal.show{display:flex}
 
     .modal-content{
       width:100%;
       max-width:470px;
       background:#fff;
       border-radius:24px;
-      box-shadow:0 20px 50px rgba(0,0,0,0.22);
+      box-shadow:0 20px 50px rgba(0,0,0,.22);
       padding:22px;
       position:relative;
     }
@@ -709,11 +655,11 @@
       max-height:92vh;
       overflow:auto;
       background:
-        radial-gradient(circle at 12% 70%, rgba(255,190,120,0.35) 0%, rgba(255,190,120,0.10) 12%, rgba(255,190,120,0.00) 22%),
-        radial-gradient(circle at 78% 72%, rgba(255,196,120,0.28) 0%, rgba(255,196,120,0.06) 12%, rgba(255,196,120,0.00) 26%),
-        linear-gradient(118deg, #041126 0%, #0a2659 34%, #133d84 58%, #0a285d 75%, #031228 100%);
+        radial-gradient(circle at 12% 70%, rgba(255,190,120,.35) 0%, rgba(255,190,120,.10) 12%, rgba(255,190,120,0) 22%),
+        radial-gradient(circle at 78% 72%, rgba(255,196,120,.28) 0%, rgba(255,196,120,.06) 12%, rgba(255,196,120,0) 26%),
+        linear-gradient(118deg,#041126 0%,#0a2659 34%,#133d84 58%,#0a285d 75%,#031228 100%);
       color:#fff;
-      border:1px solid rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,.10);
     }
 
     .modal-close{
@@ -734,10 +680,7 @@
       color:#082e5b;
     }
 
-    .call-large h3,
-    .call-large .call-title{
-      color:#fff;
-    }
+    .call-large h3,.call-large .call-title{color:#fff}
 
     .modal-note{
       margin:0 0 14px;
@@ -745,7 +688,7 @@
       color:var(--muted);
     }
 
-    .call-large .modal-note{ color:#d7e4ff; }
+    .call-large .modal-note{color:#d7e4ff}
 
     .modal-actions{
       display:flex;
@@ -777,20 +720,20 @@
 
     .call-videos{
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
       gap:14px;
       margin-top:12px;
       align-items:start;
     }
 
     .video-card{
-      background:rgba(15,45,88,0.72);
-      border:1px solid rgba(255,255,255,0.10);
+      background:rgba(15,45,88,.72);
+      border:1px solid rgba(255,255,255,.10);
       border-radius:20px;
       padding:10px;
       min-height:250px;
       min-width:0;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
     }
 
     .video-card h4{
@@ -804,7 +747,7 @@
       display:block;
       border-radius:16px;
       background:#000;
-      height:min(48vh, 360px);
+      height:min(48vh,360px);
       object-fit:cover;
     }
 
@@ -832,7 +775,7 @@
     .small-log{
       margin-top:16px;
       border-radius:16px;
-      background:rgba(255,255,255,0.08);
+      background:rgba(255,255,255,.08);
       padding:14px;
       color:#d7e4ff;
       line-height:1.65;
@@ -843,94 +786,72 @@
       overflow:auto;
     }
 
+    .sr-only-audio{
+      position:absolute;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+      opacity:.001;
+      pointer-events:none;
+    }
+
     @keyframes starPulse{
-      0%,100%{ opacity:.88; transform:scale(1); }
-      50%{ opacity:1; transform:scale(1.012); }
+      0%,100%{opacity:.88;transform:scale(1)}
+      50%{opacity:1;transform:scale(1.012)}
     }
 
     @keyframes auroraSweep{
-      0%,100%{ transform:translateX(-8%) scaleX(1); opacity:.68; }
-      50%{ transform:translateX(8%) scaleX(1.06); opacity:.92; }
+      0%,100%{transform:translateX(-8%) scaleX(1);opacity:.68}
+      50%{transform:translateX(8%) scaleX(1.06);opacity:.92}
     }
 
     @keyframes particleDrift{
-      from{ transform:translateY(0) translateX(0); }
-      to{ transform:translateY(-30px) translateX(24px); }
+      from{transform:translateY(0) translateX(0)}
+      to{transform:translateY(-30px) translateX(24px)}
     }
 
     @keyframes particleDriftReverse{
-      from{ transform:translateY(0) translateX(0); }
-      to{ transform:translateY(20px) translateX(-20px); }
+      from{transform:translateY(0) translateX(0)}
+      to{transform:translateY(20px) translateX(-20px)}
     }
 
     @keyframes particlePulse{
-      0%,100%{ opacity:.38; }
-      50%{ opacity:.72; }
+      0%,100%{opacity:.38}
+      50%{opacity:.72}
     }
 
     @keyframes planetFloat{
-      0%,100%{ transform:translateY(0px); }
-      50%{ transform:translateY(-10px); }
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-10px)}
     }
 
     @keyframes dnaGlow{
-      0%,100%{ opacity:.50; transform:translateX(0); }
-      50%{ opacity:.68; transform:translateX(-6px); }
+      0%,100%{opacity:.50;transform:translateX(0)}
+      50%{opacity:.68;transform:translateX(-6px)}
     }
 
     @keyframes floatLabel{
-      0%,100%{ transform:translateY(0); opacity:.28; }
-      50%{ transform:translateY(-8px); opacity:.42; }
+      0%,100%{transform:translateY(0);opacity:.28}
+      50%{transform:translateY(-8px);opacity:.42}
     }
 
     @media (max-width:980px){
-      .page{ grid-template-columns:1fr; }
-      .sidebar{ position:static; }
-      .hero-main{
-        flex-direction:column;
-        align-items:flex-start;
-      }
+      .page{grid-template-columns:1fr}
+      .sidebar{position:static}
+      .hero-main{flex-direction:column;align-items:flex-start}
     }
 
     @media (max-width:680px){
-      .topbar{
-        padding:14px 10px;
-      }
-
-      .topbar nav{
-        gap:10px;
-      }
-
-      .topbar a{
-        font-size:14px;
-      }
-
-      .page{
-        padding:0 12px 24px;
-      }
-
-      .sidebar-card,
-      .hero,
-      .stage{
-        border-radius:22px;
-        padding:18px;
-      }
-
-      .chem-orbit{
-        width:54vw;
-        height:54vw;
-        left:-16vw;
-        bottom:9vh;
-      }
-
-      .chem-dna{
-        width:28vw;
-        min-width:120px;
-      }
-
-      .chem-label.h2o{ left:20vw; top:23vh; font-size:1.6rem; }
-      .chem-label.nh2{ left:17vw; top:41vh; font-size:1.8rem; }
-      .chem-label.ch3{ right:18vw; bottom:19vh; font-size:1.8rem; }
+      .topbar{padding:14px 10px}
+      .topbar nav{gap:10px}
+      .topbar a{font-size:14px}
+      .page{padding:0 12px 24px}
+      .sidebar-card,.hero,.stage{border-radius:22px;padding:18px}
+      .chem-orbit{width:54vw;height:54vw;left:-16vw;bottom:9vh}
+      .chem-dna{width:28vw;min-width:120px}
+      .chem-label.h2o{left:20vw;top:23vh;font-size:1.6rem}
+      .chem-label.nh2{left:17vw;top:41vh;font-size:1.8rem}
+      .chem-label.ch3{right:18vw;bottom:19vh;font-size:1.8rem}
     }
   </style>
 </head>
@@ -1005,7 +926,6 @@
         </div>
 
         <button class="logout-btn" id="logoutBtn" type="button">Déconnexion</button>
-
         <input type="text" id="contactSearch" class="search-input" placeholder="Rechercher un contact...">
 
         <div class="tabs">
@@ -1097,6 +1017,8 @@
         </div>
       </div>
 
+      <audio id="remoteAudio" class="sr-only-audio" autoplay playsinline></audio>
+
       <div class="call-controls">
         <button class="secondary-btn" id="muteBtn" type="button">Couper micro</button>
         <button class="secondary-btn" id="cameraBtn" type="button">Couper caméra</button>
@@ -1109,20 +1031,8 @@
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import {
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      ref,
-      get,
-      set,
-      update,
-      onValue,
-      remove,
-      push,
-      onDisconnect
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, get, set, update, onValue, remove, push, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const LAST_ACTIVITY_KEY = "insights_last_activity";
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
@@ -1169,6 +1079,7 @@
     const cameraBtn = document.getElementById("cameraBtn");
     const hangupBtn = document.getElementById("hangupBtn");
     const callLogBox = document.getElementById("callLogBox");
+    const remoteAudioEl = document.getElementById("remoteAudio");
 
     let currentUser = null;
     let myProfile = null;
@@ -1209,11 +1120,6 @@
       iceServers: [
         {
           urls: [
-            "stun:stun.relay.metered.ca:80"
-          ]
-        },
-        {
-          urls: [
             "turn:standard.relay.metered.ca:80",
             "turn:standard.relay.metered.ca:80?transport=udp",
             "turn:standard.relay.metered.ca:80?transport=tcp",
@@ -1223,12 +1129,13 @@
           ],
           username: "5ff54ce1d293fa306e56fe05",
           credential: "xzI7qJDBCvqPJt7e"
-        }
+        },
+        { urls: ["stun:stun.relay.metered.ca:80"] }
       ],
       iceTransportPolicy: "all",
-      bundlePolicy: "max-bundle",
+      bundlePolicy: "balanced",
       rtcpMuxPolicy: "require",
-      iceCandidatePoolSize: 2
+      iceCandidatePoolSize: 4
     };
 
     function resetActivityTimer() {
@@ -1241,10 +1148,10 @@
     }
 
     function bindActivityEvents() {
-      ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
+      ["click","mousemove","keydown","scroll","touchstart"].forEach(evt => {
         window.addEventListener(evt, () => {
           if (auth.currentUser) resetActivityTimer();
-        }, { passive: true });
+        }, { passive:true });
       });
     }
 
@@ -1264,12 +1171,12 @@
     function formatDate(ts) {
       if (!ts) return "";
       return new Date(ts).toLocaleString("fr-FR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit"
       });
     }
 
@@ -1285,24 +1192,13 @@
 
     function setAvatar(el, photoURL, name, email) {
       if (!el) return;
-      if (photoURL) {
-        el.innerHTML = `<img src="${photoURL}" alt="avatar">`;
-      } else {
-        el.textContent = initials(name, email);
-      }
+      if (photoURL) el.innerHTML = `<img src="${photoURL}" alt="avatar">`;
+      else el.textContent = initials(name, email);
     }
 
-    function openModal(modal) {
-      modal.classList.add("show");
-    }
-
-    function closeModal(modal) {
-      modal.classList.remove("show");
-    }
-
-    function getConversationKey(uid1, uid2) {
-      return [uid1, uid2].sort().join("_");
-    }
+    function openModal(modal) { modal.classList.add("show"); }
+    function closeModal(modal) { modal.classList.remove("show"); }
+    function getConversationKey(uid1, uid2) { return [uid1, uid2].sort().join("_"); }
 
     function buildCallMarkup(mode, remoteName = "Participant") {
       const isVideo = mode === "video";
@@ -1312,7 +1208,6 @@
           <video id="localVideo" autoplay muted playsinline ${isVideo ? "" : 'style="display:none;"'}></video>
           <div class="audio-only-box" id="localAudioBox" ${isVideo ? 'style="display:none;"' : ""}>Appel audio local</div>
         </div>
-
         <div class="video-card">
           <h4 id="remoteVideoLabel">${escapeHtml(remoteName)}</h4>
           <video id="remoteVideo" autoplay playsinline ${isVideo ? "" : 'style="display:none;"'}></video>
@@ -1329,35 +1224,13 @@
       remoteVideoLabelEl = document.getElementById("remoteVideoLabel");
     }
 
-    async function safePlayMedia(el) {
-      if (!el) return;
-      try {
-        el.autoplay = true;
-        el.playsInline = true;
-        await el.play();
-      } catch (_) {}
-    }
-
-    function forceRemoteAudioPlayback() {
-      if (!remoteVideoEl) return;
-      remoteVideoEl.muted = false;
-      remoteVideoEl.defaultMuted = false;
-      remoteVideoEl.volume = 1;
-      safePlayMedia(remoteVideoEl);
-      setTimeout(() => safePlayMedia(remoteVideoEl), 250);
-      setTimeout(() => safePlayMedia(remoteVideoEl), 900);
-      setTimeout(() => safePlayMedia(remoteVideoEl), 1800);
-    }
-
     function formatPresence(userData = {}) {
       const presence = userData.presence || {};
       const privacy = userData.privacy || {};
       if (privacy.hidePresence && currentUser && userData.uid !== currentUser.uid) {
         return { online:false, text:"Visibilité masquée" };
       }
-      if (presence.online) {
-        return { online:true, text:"En ligne" };
-      }
+      if (presence.online) return { online:true, text:"En ligne" };
       return {
         online:false,
         text: presence.lastSeen ? `Dernière activité : ${formatDate(presence.lastSeen)}` : "Hors ligne"
@@ -1374,11 +1247,7 @@
         videoCallBtn.style.display = "none";
         optionsBtn.style.display = "none";
         setStatus("", false);
-        stageBody.innerHTML = `
-          <div class="empty-state">
-            Choisis un contact accepté pour lancer un appel audio ou vidéo.
-          </div>
-        `;
+        stageBody.innerHTML = `<div class="empty-state">Choisis un contact accepté pour lancer un appel audio ou vidéo.</div>`;
         return;
       }
 
@@ -1394,7 +1263,6 @@
 
     function renderContactStage() {
       if (!selectedContact) return;
-
       const presence = formatPresence(selectedContact);
       stageStatus.style.color = presence.online ? "#15803d" : "#6b7d93";
       stageStatus.textContent = presence.online
@@ -1416,7 +1284,6 @@
         email: currentUser.email || "",
         photoURL: ""
       };
-
       setAvatar(myAvatar, myProfile.photoURL, myProfile.displayName, myProfile.email);
       myName.textContent = myProfile.displayName || "Utilisateur";
     }
@@ -1428,14 +1295,8 @@
       onValue(connectedRef, async (snap) => {
         if (snap.val() === true) {
           try {
-            await onDisconnect(presenceRef).set({
-              online:false,
-              lastSeen:Date.now()
-            });
-            await set(presenceRef, {
-              online:true,
-              lastSeen:Date.now()
-            });
+            await onDisconnect(presenceRef).set({ online:false, lastSeen:Date.now() });
+            await set(presenceRef, { online:true, lastSeen:Date.now() });
           } catch (e) {
             console.error(e);
           }
@@ -1452,21 +1313,14 @@
         .map(uid => usersCache[uid] ? { uid, ...(usersCache[uid] || {}) } : null)
         .filter(Boolean)
         .filter(user => {
-          const isBlockedByMe = !!(allBlocks[currentUser.uid] && allBlocks[currentUser.uid][user.uid]);
+          const blockedByMe = !!(allBlocks[currentUser.uid] && allBlocks[currentUser.uid][user.uid]);
           const blockedMe = !!(allBlocks[user.uid] && allBlocks[user.uid][currentUser.uid]);
-          return !isBlockedByMe && !blockedMe;
+          return !blockedByMe && !blockedMe;
         })
-        .sort((a, b) => {
-          const nameA = (a.displayName || a.email || "").toLowerCase();
-          const nameB = (b.displayName || b.email || "").toLowerCase();
-          return nameA.localeCompare(nameB);
-        });
+        .sort((a,b) => ((a.displayName || a.email || "").toLowerCase()).localeCompare((b.displayName || b.email || "").toLowerCase()));
 
-      if (selectedContact) {
-        selectedContact = allContacts.find(x => x.uid === selectedContact.uid) || null;
-      } else if (preselectedCallUid) {
-        selectedContact = allContacts.find(x => x.uid === preselectedCallUid) || null;
-      }
+      if (selectedContact) selectedContact = allContacts.find(x => x.uid === selectedContact.uid) || null;
+      else if (preselectedCallUid) selectedContact = allContacts.find(x => x.uid === preselectedCallUid) || null;
 
       renderContacts();
       setupSelectedContactUI();
@@ -1500,10 +1354,7 @@
       }
 
       if (searchText) {
-        items = items.filter(item => {
-          const hay = `${item.displayName || ""} ${item.email || ""}`.toLowerCase();
-          return hay.includes(searchText);
-        });
+        items = items.filter(item => `${item.displayName || ""} ${item.email || ""}`.toLowerCase().includes(searchText));
       }
 
       if (!items.length) {
@@ -1514,7 +1365,6 @@
       contactsList.innerHTML = items.map(item => {
         const presence = formatPresence(item);
         const isActive = selectedContact && selectedContact.uid === item.uid;
-
         return `
           <div class="contact-card ${isActive ? "active" : ""}" data-uid="${item.uid}">
             <div class="avatar small">${item.photoURL ? `<img src="${item.photoURL}" alt="avatar">` : escapeHtml(initials(item.displayName, item.email))}</div>
@@ -1561,28 +1411,21 @@
             channelCount:1
           },
           video: mode === "video"
-            ? {
-                width:{ ideal:1280 },
-                height:{ ideal:720 },
-                frameRate:{ ideal:24, max:30 }
-              }
+            ? { width:{ideal:1280}, height:{ideal:720}, frameRate:{ideal:24,max:30} }
             : false
         });
 
-        const audioTracks = currentLocalStream.getAudioTracks();
-        audioTracks.forEach(track => {
+        currentLocalStream.getAudioTracks().forEach(track => {
           track.enabled = true;
           try { track.contentHint = "speech"; } catch (_) {}
         });
 
-        const videoTracks = currentLocalStream.getVideoTracks();
-        videoTracks.forEach(track => {
+        currentLocalStream.getVideoTracks().forEach(track => {
           track.enabled = true;
         });
 
         muted = false;
         cameraEnabled = mode === "video";
-
         return true;
       } catch (error) {
         console.error(error);
@@ -1616,21 +1459,13 @@
 
       if (localVideoEl) localVideoEl.srcObject = null;
       if (remoteVideoEl) remoteVideoEl.srcObject = null;
+      if (remoteAudioEl) remoteAudioEl.srcObject = null;
     }
 
     function cleanupRealtimeListeners() {
-      if (unsubscribeCandidates) {
-        unsubscribeCandidates();
-        unsubscribeCandidates = null;
-      }
-      if (unsubscribeAnswer) {
-        unsubscribeAnswer();
-        unsubscribeAnswer = null;
-      }
-      if (unsubscribeSession) {
-        unsubscribeSession();
-        unsubscribeSession = null;
-      }
+      if (unsubscribeCandidates) { unsubscribeCandidates(); unsubscribeCandidates = null; }
+      if (unsubscribeAnswer) { unsubscribeAnswer(); unsubscribeAnswer = null; }
+      if (unsubscribeSession) { unsubscribeSession(); unsubscribeSession = null; }
       processedRemoteCandidateIds = new Set();
       pendingRemoteCandidates = [];
     }
@@ -1648,10 +1483,7 @@
       try {
         const snap = await get(ref(db, `calls/${callId}`));
         if (!snap.exists()) return;
-        await update(ref(db, `calls/${callId}`), {
-          ...payload,
-          updatedAt:Date.now()
-        });
+        await update(ref(db, `calls/${callId}`), { ...payload, updatedAt:Date.now() });
       } catch (e) {
         console.error(e);
       }
@@ -1691,23 +1523,16 @@
       else setupSelectedContactUI();
 
       if (closingCallId) {
-        setTimeout(async () => {
-          await destroyCallArtifacts(closingCallId);
-        }, CALL_CLEANUP_DELAY);
+        setTimeout(async () => { await destroyCallArtifacts(closingCallId); }, CALL_CLEANUP_DELAY);
       }
 
-      setTimeout(() => {
-        callEnding = false;
-      }, 400);
+      setTimeout(() => { callEnding = false; }, 400);
     }
 
     async function flushPendingRemoteCandidates() {
-      if (!peerConnection || !peerConnection.remoteDescription) return;
-      if (!pendingRemoteCandidates.length) return;
-
+      if (!peerConnection || !peerConnection.remoteDescription || !pendingRemoteCandidates.length) return;
       const queue = [...pendingRemoteCandidates];
       pendingRemoteCandidates = [];
-
       for (const cand of queue) {
         try {
           await peerConnection.addIceCandidate(new RTCIceCandidate({
@@ -1723,20 +1548,29 @@
       }
     }
 
+    async function forceRemoteAudioPlayback() {
+      try {
+        if (remoteAudioEl && remoteAudioEl.srcObject) {
+          remoteAudioEl.muted = false;
+          remoteAudioEl.volume = 1;
+          await remoteAudioEl.play().catch(() => {});
+        }
+      } catch (_) {}
+
+      try {
+        if (remoteVideoEl && remoteVideoEl.srcObject) {
+          remoteVideoEl.muted = false;
+          remoteVideoEl.volume = 1;
+          await remoteVideoEl.play().catch(() => {});
+        }
+      } catch (_) {}
+    }
+
     async function createPeerConnection(remoteUid) {
       peerConnection = new RTCPeerConnection(rtcConfig);
       currentRemoteStream = new MediaStream();
       processedRemoteCandidateIds = new Set();
       pendingRemoteCandidates = [];
-
-      if (remoteVideoEl) {
-        remoteVideoEl.srcObject = currentRemoteStream;
-        remoteVideoEl.autoplay = true;
-        remoteVideoEl.playsInline = true;
-        remoteVideoEl.muted = false;
-        remoteVideoEl.defaultMuted = false;
-        remoteVideoEl.volume = 1;
-      }
 
       if (remoteVideoLabelEl) {
         remoteVideoLabelEl.textContent = selectedContact?.displayName || currentIncomingCall?.fromName || "Participant";
@@ -1748,8 +1582,8 @@
         if (inboundStream) {
           currentRemoteStream = inboundStream;
         } else if (event.track) {
-          const hasTrack = currentRemoteStream.getTracks().some(t => t.id === event.track.id);
-          if (!hasTrack) currentRemoteStream.addTrack(event.track);
+          const already = currentRemoteStream.getTracks().some(t => t.id === event.track.id);
+          if (!already) currentRemoteStream.addTrack(event.track);
         }
 
         if (remoteVideoEl) {
@@ -1757,23 +1591,23 @@
           remoteVideoEl.autoplay = true;
           remoteVideoEl.playsInline = true;
           remoteVideoEl.muted = false;
-          remoteVideoEl.defaultMuted = false;
           remoteVideoEl.volume = 1;
-
-          remoteVideoEl.onloadedmetadata = () => {
-            forceRemoteAudioPlayback();
-          };
-
-          forceRemoteAudioPlayback();
         }
 
+        if (remoteAudioEl) {
+          remoteAudioEl.srcObject = currentRemoteStream;
+          remoteAudioEl.autoplay = true;
+          remoteAudioEl.muted = false;
+          remoteAudioEl.volume = 1;
+        }
+
+        await forceRemoteAudioPlayback();
         callModalStatus.textContent = "Flux distant reçu.";
         appendCallLog(`Flux distant reçu : ${event.track?.kind || "media"}.`);
       };
 
       peerConnection.onicecandidate = async (event) => {
         if (!event.candidate || !currentCallId || !currentUser) return;
-
         const c = event.candidate;
         if (!c.candidate) return;
 
@@ -1791,23 +1625,15 @@
         }
       };
 
-      peerConnection.onconnectionstatechange = () => {
+      peerConnection.onconnectionstatechange = async () => {
         const state = peerConnection?.connectionState || "";
 
-        if (state === "connecting") {
-          callModalStatus.textContent = "Connexion en cours...";
-        }
+        if (state === "connecting") callModalStatus.textContent = "Connexion en cours...";
         if (state === "connected") {
           callModalStatus.textContent = "Connexion établie ✅";
           setStatus("Appel en cours.");
           appendCallLog("Connexion WebRTC établie.");
-
-          if (remoteVideoEl) {
-            remoteVideoEl.muted = false;
-            remoteVideoEl.defaultMuted = false;
-            remoteVideoEl.volume = 1;
-            forceRemoteAudioPlayback();
-          }
+          await forceRemoteAudioPlayback();
         }
         if (state === "failed") {
           callModalStatus.textContent = "Connexion échouée";
@@ -1835,11 +1661,9 @@
 
       unsubscribeCandidates = onValue(ref(db, `callCandidates/${currentCallId}/${remoteUid}`), async (snap) => {
         const candidates = snap.val() || {};
-
         for (const [id, cand] of Object.entries(candidates)) {
           if (processedRemoteCandidateIds.has(id)) continue;
-          if (!cand || !cand.candidate) continue;
-          if (!peerConnection) continue;
+          if (!cand || !cand.candidate || !peerConnection) continue;
 
           processedRemoteCandidateIds.add(id);
 
@@ -1876,22 +1700,19 @@
       if (currentLocalStream && localVideoEl) {
         localVideoEl.srcObject = currentLocalStream;
         localVideoEl.muted = true;
-        localVideoEl.defaultMuted = true;
         localVideoEl.volume = 0;
-        localVideoEl.onloadedmetadata = () => {
-          safePlayMedia(localVideoEl);
-        };
+        localVideoEl.onloadedmetadata = () => { localVideoEl.play().catch(() => {}); };
       }
 
       if (currentRemoteStream && remoteVideoEl) {
         remoteVideoEl.srcObject = currentRemoteStream;
         remoteVideoEl.muted = false;
-        remoteVideoEl.defaultMuted = false;
         remoteVideoEl.volume = 1;
-        remoteVideoEl.onloadedmetadata = () => {
-          forceRemoteAudioPlayback();
-        };
-        forceRemoteAudioPlayback();
+        remoteVideoEl.onloadedmetadata = () => { remoteVideoEl.play().catch(() => {}); };
+      }
+
+      if (currentRemoteStream && remoteAudioEl) {
+        remoteAudioEl.srcObject = currentRemoteStream;
       }
 
       muteBtn.textContent = "Couper micro";
@@ -1919,17 +1740,18 @@
       }
 
       await destroyCallArtifacts(currentCallId).catch(() => {});
-
       renderCallUI(mode, selectedContact.displayName || "Participant");
       openModal(callModal);
 
-      callModalStatus.textContent = `Tentative d’appel avec ${selectedContact.displayName || "le contact"}...`;
-      callLogBox.textContent = `Préparation de l’appel...
+      try {
+        await forceRemoteAudioPlayback();
+
+        callModalStatus.textContent = `Tentative d’appel avec ${selectedContact.displayName || "le contact"}...`;
+        callLogBox.textContent = `Préparation de l’appel...
 Type : ${mode === "video" ? "Vidéo" : "Audio"}
 Contact : ${selectedContact.displayName || ""}
 Heure : ${formatDate(Date.now())}`;
 
-      try {
         await set(ref(db, `calls/${currentCallId}`), {
           callId: currentCallId,
           fromUid: currentUser.uid,
@@ -1964,8 +1786,7 @@ Heure : ${formatDate(Date.now())}`;
 
         unsubscribeAnswer = onValue(ref(db, `callAnswers/${currentCallId}`), async (snap) => {
           const ans = snap.val();
-          if (!ans || !peerConnection) return;
-          if (peerConnection.currentRemoteDescription) return;
+          if (!ans || !peerConnection || peerConnection.currentRemoteDescription) return;
 
           try {
             await peerConnection.setRemoteDescription(new RTCSessionDescription({
@@ -1973,9 +1794,9 @@ Heure : ${formatDate(Date.now())}`;
               sdp: ans.sdp
             }));
             await flushPendingRemoteCandidates();
+            await forceRemoteAudioPlayback();
             callModalStatus.textContent = "Connexion à l’appel...";
             appendCallLog("Réponse distante reçue.");
-            forceRemoteAudioPlayback();
           } catch (e) {
             console.error(e);
             appendCallLog("Erreur définition réponse distante.");
@@ -2041,6 +1862,7 @@ Heure : ${formatDate(Date.now())}`;
         renderCallUI(incoming.mode, incoming.fromName || "Participant");
         openModal(callModal);
         closeModal(incomingCallModal);
+        await forceRemoteAudioPlayback();
 
         await createPeerConnection(incoming.fromUid);
 
@@ -2089,7 +1911,6 @@ Heure : ${formatDate(Date.now())}`;
 Expéditeur : ${incoming.fromName || ""}
 Heure : ${formatDate(Date.now())}`;
 
-        forceRemoteAudioPlayback();
         setStatus("Appel accepté.");
         currentIncomingCall = null;
       } catch (error) {
@@ -2163,9 +1984,7 @@ Heure : ${formatDate(Date.now())}`;
           uid: selectedContact.uid,
           blockedAt: Date.now()
         });
-        if (currentCallId) {
-          await endCurrentCall(true, "ended");
-        }
+        if (currentCallId) await endCurrentCall(true, "ended");
       }
 
       closeModal(optionsModal);
@@ -2222,9 +2041,7 @@ Heure : ${formatDate(Date.now())}`;
     muteBtn.addEventListener("click", () => {
       if (!currentLocalStream) return;
       muted = !muted;
-      currentLocalStream.getAudioTracks().forEach(track => {
-        track.enabled = !muted;
-      });
+      currentLocalStream.getAudioTracks().forEach(track => { track.enabled = !muted; });
       muteBtn.textContent = muted ? "Rétablir micro" : "Couper micro";
       appendCallLog(muted ? "Micro coupé." : "Micro réactivé.");
     });
@@ -2232,9 +2049,7 @@ Heure : ${formatDate(Date.now())}`;
     cameraBtn.addEventListener("click", () => {
       if (!currentLocalStream || currentCallMode !== "video") return;
       cameraEnabled = !cameraEnabled;
-      currentLocalStream.getVideoTracks().forEach(track => {
-        track.enabled = cameraEnabled;
-      });
+      currentLocalStream.getVideoTracks().forEach(track => { track.enabled = cameraEnabled; });
       cameraBtn.textContent = cameraEnabled ? "Couper caméra" : "Rétablir caméra";
       appendCallLog(cameraEnabled ? "Caméra réactivée." : "Caméra coupée.");
     });
@@ -2244,7 +2059,8 @@ Heure : ${formatDate(Date.now())}`;
         if (e.target === modal) closeModal(modal);
       });
     });
-        onAuthStateChanged(auth, async (user) => {
+
+    onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "insights.html";
         return;
@@ -2278,7 +2094,6 @@ Heure : ${formatDate(Date.now())}`;
           }
           return false;
         };
-
         if (!trySelect()) {
           setTimeout(() => { trySelect(); }, 600);
         }
@@ -2302,7 +2117,7 @@ Heure : ${formatDate(Date.now())}`;
     });
 
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden && remoteVideoEl) {
+      if (!document.hidden) {
         forceRemoteAudioPlayback();
       }
     });
