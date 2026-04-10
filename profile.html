@@ -367,6 +367,17 @@
       font-size:14px;
     }
 
+    .visitor-banner{
+      border:1px solid #dce8f5;
+      background:linear-gradient(180deg,#f8fbff 0%,#eef5fc 100%);
+      border-radius:18px;
+      padding:14px 16px;
+      color:#38506d;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.6;
+    }
+
     .field-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -438,6 +449,7 @@
 
     .toggle-copy{
       min-width:0;
+      flex:1 1 260px;
     }
 
     .toggle-copy strong{
@@ -451,6 +463,54 @@
       color:var(--muted);
       line-height:1.55;
       font-size:13px;
+    }
+
+    .toggle-control{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+      min-width:150px;
+      justify-content:flex-end;
+    }
+
+    .toggle-light-btn{
+      border:none;
+      background:#eef4fb;
+      border-radius:999px;
+      padding:8px 12px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      font-weight:800;
+      color:#0b2340;
+      font-size:13px;
+      white-space:nowrap;
+    }
+
+    .toggle-light-btn .state-dot{
+      width:11px;
+      height:11px;
+      border-radius:50%;
+      display:inline-block;
+      background:#a6b7c9;
+      box-shadow:0 0 0 2px rgba(0,0,0,0.04);
+    }
+
+    .toggle-light-btn.on .state-dot{
+      background:var(--green);
+      box-shadow:0 0 8px rgba(24,195,74,0.45);
+    }
+
+    .toggle-light-btn.off .state-dot{
+      background:var(--red);
+      box-shadow:0 0 8px rgba(223,75,75,0.35);
+    }
+
+    .toggle-light-btn .state-label{
+      min-width:64px;
+      text-align:left;
     }
 
     .profile-msg,
@@ -861,6 +921,10 @@
         flex-direction:column;
         align-items:flex-start;
       }
+      .toggle-control{
+        width:100%;
+        justify-content:flex-start;
+      }
     }
 
     @media (max-width: 680px){
@@ -955,6 +1019,10 @@
           </div>
         </div>
 
+        <div class="visitor-banner hidden" id="visitorBanner">
+          Tu consultes ce profil en mode visiteur. Les modifications du compte restent réservées uniquement à son propriétaire connecté.
+        </div>
+
         <div class="editor-block" id="editorBlock">
           <h2 class="section-title">Modifier mon profil</h2>
           <p class="section-note">Tous les champs utiles au compte sont regroupés ici pour éviter de retourner modifier ailleurs.</p>
@@ -1024,7 +1092,12 @@
                   <strong>Email visible</strong>
                   <span>Choisis si les autres membres peuvent voir ton adresse email.</span>
                 </div>
-                <button class="secondary-btn" id="toggleHideEmailBtn" type="button">Basculer</button>
+                <div class="toggle-control">
+                  <button class="toggle-light-btn off" id="toggleHideEmailBtn" type="button">
+                    <span class="state-dot"></span>
+                    <span class="state-label">Désactivé</span>
+                  </button>
+                </div>
               </div>
 
               <div class="toggle-item">
@@ -1032,7 +1105,12 @@
                   <strong>Bio visible</strong>
                   <span>Choisis si ta bio est visible par les autres utilisateurs.</span>
                 </div>
-                <button class="secondary-btn" id="toggleHideBioBtn" type="button">Basculer</button>
+                <div class="toggle-control">
+                  <button class="toggle-light-btn off" id="toggleHideBioBtn" type="button">
+                    <span class="state-dot"></span>
+                    <span class="state-label">Désactivé</span>
+                  </button>
+                </div>
               </div>
 
               <div class="toggle-item">
@@ -1040,7 +1118,12 @@
                   <strong>Présence visible</strong>
                   <span>Afficher ou masquer ton statut en ligne / hors ligne.</span>
                 </div>
-                <button class="secondary-btn" id="toggleHidePresenceBtn" type="button">Basculer</button>
+                <div class="toggle-control">
+                  <button class="toggle-light-btn off" id="toggleHidePresenceBtn" type="button">
+                    <span class="state-dot"></span>
+                    <span class="state-label">Désactivé</span>
+                  </button>
+                </div>
               </div>
 
               <div class="toggle-item">
@@ -1278,6 +1361,7 @@
 
     const messageBtn = document.getElementById("messageBtn");
     const logoutBtn = document.getElementById("logoutBtn");
+    const visitorBanner = document.getElementById("visitorBanner");
 
     const editorBlock = document.getElementById("editorBlock");
     const dangerZone = document.getElementById("dangerZone");
@@ -1561,16 +1645,6 @@
       else bigAvatar.textContent = initials(name, email);
     }
 
-    function showMsg(node, text, ok = false) {
-      node.textContent = text;
-      node.className = ok ? `${node.id.includes("Msg") ? node.className.split(" ")[0] : ""} msg-ok` : `${node.id.includes("Msg") ? node.className.split(" ")[0] : ""} msg-err`;
-    }
-
-    function setSimpleMsg(node, text, ok = false) {
-      node.textContent = text;
-      node.className = ok ? node.className.replace("msg-err","").trim() + " msg-ok" : node.className.replace("msg-ok","").trim() + " msg-err";
-    }
-
     function userAccountStatusText(userData = {}) {
       const status = userData.accountStatus || "pending_admin_approval";
       if (status === "approved") return "Actif";
@@ -1583,6 +1657,38 @@
       if (rule === "admin") return "Messages : admin";
       if (rule === "none") return "Messages : fermés";
       return "Messages : ouverts";
+    }
+
+    function setToggleVisual(button, isOn) {
+      button.classList.remove("on", "off");
+      button.classList.add(isOn ? "on" : "off");
+      const label = button.querySelector(".state-label");
+      if (label) label.textContent = isOn ? "Activé" : "Désactivé";
+    }
+
+    function refreshPrivacyToggles() {
+      const privacy = userPrivacy(viewedUser || {});
+      setToggleVisual(toggleHideEmailBtn, !privacy.hideEmail);
+      setToggleVisual(toggleHideBioBtn, !privacy.hideBio);
+      setToggleVisual(toggleHidePresenceBtn, !privacy.hidePresence);
+    }
+
+    function setVisitorMode(isVisitor) {
+      visitorBanner.classList.toggle("hidden", !isVisitor);
+      editorBlock.classList.toggle("hidden", isVisitor);
+      dangerZone.classList.toggle("hidden", isVisitor);
+      changeAvatarBtn.classList.toggle("hidden", isVisitor);
+
+      toggleHideEmailBtn.disabled = isVisitor;
+      toggleHideBioBtn.disabled = isVisitor;
+      toggleHidePresenceBtn.disabled = isVisitor;
+      allowMessagesSelect.disabled = isVisitor;
+      saveProfileBtn.disabled = isVisitor;
+      changePasswordBtn.disabled = isVisitor;
+      resendVerificationBtn.disabled = isVisitor;
+      refreshVerificationBtn.disabled = isVisitor;
+      deleteAccountBtn.disabled = isVisitor;
+      avatarInput.disabled = isVisitor;
     }
 
     function updateEmailVerifiedUI() {
@@ -1869,10 +1975,9 @@ ${message}`;
       const privacy = userPrivacy(viewedUser);
       allowMessagesSelect.value = privacy.allowMessages || "all";
       messageRulePill.textContent = messageRuleText(privacy.allowMessages || "all");
+      refreshPrivacyToggles();
 
-      editorBlock.classList.toggle("hidden", !isMine);
-      dangerZone.classList.toggle("hidden", !isMine);
-      changeAvatarBtn.classList.toggle("hidden", !isMine);
+      setVisitorMode(!isMine);
 
       if (isMine) {
         messageBtn.classList.add("hidden");
@@ -1911,6 +2016,7 @@ ${message}`;
         profileEmail.textContent = "";
         profileInstitutionLine.textContent = "";
         bioText.textContent = "Ce profil n'existe pas.";
+        visitorBanner.classList.add("hidden");
         editorBlock.classList.add("hidden");
         dangerZone.classList.add("hidden");
         changeAvatarBtn.classList.add("hidden");
@@ -1954,7 +2060,7 @@ ${message}`;
     }
 
     async function deleteSinglePost(postId) {
-      if (!currentUser || !postId) return;
+      if (!currentUser || !postId || !isViewingOwnProfile()) return;
       const ok = confirm("Supprimer cette publication ?");
       if (!ok) return;
 
@@ -2072,7 +2178,7 @@ ${message}`;
     }
 
     async function saveProfile() {
-      if (!currentUser || currentUser.uid !== viewedUid) return;
+      if (!currentUser || currentUser.uid !== viewedUid || !isViewingOwnProfile()) return;
 
       const newName = nameInput.value.trim();
       const newBio = bioInput.value.trim();
@@ -2180,7 +2286,7 @@ ${message}`;
     }
 
     async function refreshVerificationState() {
-      if (!currentUser) return;
+      if (!currentUser || !isViewingOwnProfile()) return;
       try {
         await reload(currentUser);
         updateEmailVerifiedUI();
@@ -2257,10 +2363,13 @@ ${message}`;
       }
     }
 
-    changeAvatarBtn.addEventListener("click", () => avatarInput.click());
+    changeAvatarBtn.addEventListener("click", () => {
+      if (!isViewingOwnProfile()) return;
+      avatarInput.click();
+    });
 
     avatarInput.addEventListener("change", async () => {
-      if (!currentUser || currentUser.uid !== viewedUid) return;
+      if (!currentUser || currentUser.uid !== viewedUid || !isViewingOwnProfile()) return;
 
       const file = avatarInput.files[0];
       if (!file) return;
@@ -2354,6 +2463,7 @@ ${message}`;
     });
 
     deleteAccountBtn.addEventListener("click", () => {
+      if (!isViewingOwnProfile()) return;
       deletePasswordInput.value = "";
       deleteModalMsg.textContent = "";
       openModal(deleteAccountModal);
@@ -2410,7 +2520,6 @@ ${message}`;
       bindRealtimeData();
 
       updateEmailVerifiedUI();
-
       document.body.classList.remove("auth-checking");
     });
   </script>
