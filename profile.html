@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profil</title>
+  <title>Mon compte | Boris Research Hub</title>
   <style>
     * { box-sizing: border-box; }
+
     :root{
       --bg:#eaf5ff;
       --card:#ffffff;
@@ -17,23 +18,88 @@
       --green:#18c34a;
       --red:#df4b4b;
       --orange:#e67e22;
-      --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
+      --gold:#d1a028;
       --line:#d9e5f2;
+      --soft:#f4f8fc;
+      --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
+      --chem-deep:#061631;
+      --chem-mid:#0c2f69;
+      --chem-light:#49c8ff;
     }
-    body{
+
+    html, body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
-      background:var(--bg);
+      min-height:100%;
       color:var(--text);
+      overflow-x:hidden;
     }
+
+    html{
+      background:
+        radial-gradient(circle at 12% 70%, rgba(255,190,120,0.95) 0%, rgba(255,190,120,0.18) 10%, rgba(255,190,120,0.00) 20%),
+        radial-gradient(circle at 78% 72%, rgba(255,196,120,0.55) 0%, rgba(255,196,120,0.13) 10%, rgba(255,196,120,0.00) 24%),
+        radial-gradient(circle at 84% 18%, rgba(118,225,255,0.32) 0%, rgba(118,225,255,0.07) 11%, rgba(118,225,255,0) 24%),
+        radial-gradient(circle at 18% 18%, rgba(127,211,255,0.28) 0%, rgba(127,211,255,0.08) 10%, rgba(127,211,255,0) 24%),
+        linear-gradient(118deg, #041126 0%, #0a2659 34%, #133d84 58%, #0a285d 75%, #031228 100%);
+      background-attachment:fixed;
+    }
+
+    body{
+      min-height:100vh;
+      position:relative;
+      background:transparent;
+      opacity:1;
+      transition:opacity .16s ease;
+    }
+
+    body.auth-checking{
+      opacity:0;
+      pointer-events:none;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.10), rgba(255,255,255,0) 36%),
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.12) 0 1px, transparent 2px),
+        radial-gradient(circle at 65% 22%, rgba(255,255,255,0.10) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 84% 62%, rgba(255,255,255,0.12) 0 1.6px, transparent 2.6px),
+        radial-gradient(circle at 36% 78%, rgba(255,255,255,0.10) 0 1.4px, transparent 2.4px),
+        radial-gradient(circle at 11% 58%, rgba(255,255,255,0.16) 0 2px, transparent 3px),
+        radial-gradient(circle at 70% 82%, rgba(255,255,255,0.11) 0 2px, transparent 3px);
+      background-size:100% 100%, 260px 260px, 330px 330px, 380px 380px, 290px 290px, 420px 420px, 520px 520px;
+      animation:starPulse 9s linear infinite;
+      opacity:.88;
+      z-index:0;
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(120,215,255,0.15), rgba(120,215,255,0) 55%),
+        linear-gradient(90deg, rgba(124,219,255,0) 0%, rgba(124,219,255,0.08) 48%, rgba(124,219,255,0.2) 50%, rgba(124,219,255,0.08) 52%, rgba(124,219,255,0) 100%);
+      mix-blend-mode:screen;
+      animation:auroraSweep 14s ease-in-out infinite;
+      z-index:0;
+    }
+
     .topbar{
-      background:var(--nav);
+      background:rgba(8,46,91,0.92);
       padding:18px 20px;
       position:sticky;
       top:0;
-      z-index:20;
-      box-shadow:0 4px 16px rgba(0,0,0,0.08);
+      z-index:30;
+      box-shadow:0 4px 16px rgba(0,0,0,0.10);
+      backdrop-filter:blur(6px);
     }
+
     .topbar nav{
       display:flex;
       gap:18px;
@@ -41,6 +107,7 @@
       align-items:center;
       flex-wrap:wrap;
     }
+
     .topbar a{
       color:#fff;
       text-decoration:none;
@@ -52,49 +119,59 @@
       align-items:center;
       gap:8px;
     }
+
     .topbar a.active{
       border-bottom-color:#fff;
     }
+
     .nav-online-dot{
       width:10px;
       height:10px;
       border-radius:50%;
       background:var(--green);
       display:inline-block;
-      box-shadow:0 0 0 2px rgba(255,255,255,0.18);
+      box-shadow:0 0 8px rgba(24,195,74,0.7);
     }
 
-    .profile-page{
-      max-width:1450px;
-      margin:26px auto;
-      padding:0 18px 40px;
+    .hidden{ display:none !important; }
+
+    .page-shell{
+      position:relative;
+      z-index:5;
+      max-width:1500px;
+      margin:24px auto;
+      padding:0 18px 42px;
       display:grid;
-      gap:24px;
+      gap:22px;
     }
 
-    .profile-card{
+    .profile-hero{
       display:grid;
-      grid-template-columns:300px 1fr;
+      grid-template-columns:330px 1fr;
       gap:24px;
-      background:var(--card);
+      background:rgba(255,255,255,0.98);
+      border:1px solid rgba(228,237,247,0.95);
       border-radius:30px;
       box-shadow:var(--shadow);
       padding:26px;
     }
 
-    .profile-left{
-      background:linear-gradient(180deg, #0d376d 0%, #032750 100%);
+    .left-pane{
+      background:
+        radial-gradient(circle at 20% 20%, rgba(132,210,255,.18), rgba(132,210,255,0) 26%),
+        radial-gradient(circle at 82% 76%, rgba(255,199,103,.18), rgba(255,199,103,0) 24%),
+        linear-gradient(180deg, #0d376d 0%, #032750 100%);
       border-radius:28px;
       padding:24px;
       color:#fff;
       display:flex;
       flex-direction:column;
       align-items:center;
-      justify-content:flex-start;
       position:relative;
       overflow:hidden;
     }
-    .profile-left::before{
+
+    .left-pane::before{
       content:"";
       position:absolute;
       width:180px;
@@ -104,9 +181,10 @@
       right:-60px;
       top:-60px;
     }
+
     .big-avatar{
-      width:150px;
-      height:150px;
+      width:156px;
+      height:156px;
       border-radius:50%;
       background:#184684;
       display:flex;
@@ -118,41 +196,115 @@
       overflow:hidden;
       border:4px solid rgba(255,255,255,0.18);
       position:relative;
-      margin-bottom:18px;
       z-index:1;
+      margin-bottom:16px;
+      box-shadow:0 10px 26px rgba(0,0,0,0.18);
     }
+
     .big-avatar img{
       width:100%;
       height:100%;
       object-fit:cover;
     }
 
-    .hidden{
-      display:none !important;
+    .avatar-actions{
+      width:100%;
+      display:grid;
+      gap:10px;
+      position:relative;
+      z-index:1;
+      margin-top:6px;
     }
 
-    .profile-right{
+    .avatar-note{
+      margin-top:12px;
+      text-align:center;
+      color:rgba(255,255,255,0.92);
+      line-height:1.55;
+      font-size:13px;
+      position:relative;
+      z-index:1;
+    }
+
+    .mini-stats{
+      margin-top:18px;
+      width:100%;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+
+    .mini-stat{
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:18px;
+      padding:12px 10px;
+      text-align:center;
+      backdrop-filter:blur(6px);
+    }
+
+    .mini-stat .k{
+      font-size:12px;
+      opacity:.88;
+      margin-bottom:5px;
+    }
+
+    .mini-stat .v{
+      font-size:18px;
+      font-weight:900;
+    }
+
+    .preview-image-box{
+      margin-top:14px;
+      width:100%;
+      position:relative;
+      z-index:1;
+    }
+
+    .preview-image-box img{
+      width:100%;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,0.14);
+      display:block;
+    }
+
+    .preview-meta{
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(255,255,255,0.94);
+      font-weight:700;
+      line-height:1.45;
+    }
+
+    .right-pane{
       min-width:0;
+      display:grid;
+      gap:18px;
     }
 
-    .profile-top{
+    .hero-top{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
       gap:18px;
       flex-wrap:wrap;
-      margin-bottom:20px;
     }
-    .profile-top h1{
+
+    .hero-top h1{
       margin:0 0 8px;
       font-size:38px;
-      line-height:1.12;
+      line-height:1.1;
+      color:#082e5b;
     }
-    .profile-top p{
+
+    .hero-top p{
       margin:0 0 8px;
       color:var(--muted);
       line-height:1.6;
-      font-size:16px;
+      font-size:15px;
+      word-break:break-word;
     }
 
     .status-line{
@@ -160,10 +312,12 @@
       align-items:center;
       gap:10px;
       font-size:14px;
-      font-weight:700;
+      font-weight:800;
       color:#14854b;
       margin-top:8px;
+      flex-wrap:wrap;
     }
+
     .status-dot{
       width:12px;
       height:12px;
@@ -172,20 +326,153 @@
       display:inline-block;
       flex:0 0 12px;
     }
+
     .status-dot.online{
       background:var(--green);
     }
 
-    .profile-actions{
+    .action-wrap{
       display:flex;
       gap:12px;
       flex-wrap:wrap;
     }
 
+    .grid-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .card,
+    .editor-block,
+    .posts-section,
+    .admin-section{
+      background:#fff;
+      border:1px solid #e4edf7;
+      border-radius:24px;
+      padding:20px;
+      box-shadow:0 8px 18px rgba(8,33,64,0.05);
+    }
+
+    .section-title{
+      margin:0 0 10px;
+      font-size:24px;
+      color:#082e5b;
+    }
+
+    .section-note{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .field-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:12px;
+    }
+
+    .field-full{
+      grid-column:1 / -1;
+    }
+
+    label{
+      display:block;
+      font-weight:800;
+      margin-bottom:8px;
+      font-size:14px;
+      color:#082e5b;
+    }
+
+    input, textarea, select{
+      width:100%;
+      border:1px solid #d3ddea;
+      border-radius:16px;
+      padding:13px 14px;
+      font-size:15px;
+      outline:none;
+      font-family:inherit;
+      background:#fcfdff;
+      color:#0b2340;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus{
+      border-color:#7fb5ff;
+      box-shadow:0 0 0 3px rgba(47,140,255,0.13);
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:120px;
+    }
+
+    .profile-actions-grid{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .privacy-list,
+    .security-list,
+    .quick-list{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .toggle-item{
+      border:1px solid #e2ebf5;
+      background:#fbfdff;
+      border-radius:18px;
+      padding:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .toggle-copy{
+      min-width:0;
+    }
+
+    .toggle-copy strong{
+      display:block;
+      color:#082e5b;
+      margin-bottom:5px;
+      font-size:15px;
+    }
+
+    .toggle-copy span{
+      color:var(--muted);
+      line-height:1.55;
+      font-size:13px;
+    }
+
+    .profile-msg,
+    .security-msg,
+    .invite-msg,
+    .approval-msg{
+      margin-top:12px;
+      min-height:22px;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.5;
+      white-space:pre-wrap;
+    }
+
+    .msg-ok{ color:#15803d; }
+    .msg-err{ color:#b42318; }
+
     .primary-btn,
     .secondary-btn,
     .danger-btn,
-    .warn-btn{
+    .warn-btn,
+    .ghost-btn{
       border:none;
       border-radius:16px;
       padding:13px 18px;
@@ -197,103 +484,47 @@
       justify-content:center;
       gap:8px;
       font-size:14px;
-    }
-    .primary-btn{
-      background:var(--blue-dark);
-      color:#fff;
-    }
-    .secondary-btn{
-      background:#eef4fb;
-      color:var(--text);
-    }
-    .danger-btn{
-      background:var(--red);
-      color:#fff;
-    }
-    .warn-btn{
-      background:var(--orange);
-      color:#fff;
-    }
-
-    .editor-block,
-    .bio-block,
-    .posts-section,
-    .admin-section,
-    .admin-subcard{
-      background:#fff;
-      border:1px solid #e4edf7;
-      border-radius:24px;
-      padding:20px;
-      box-shadow:0 8px 18px rgba(8, 33, 64, 0.05);
-    }
-    .editor-block{
-      margin-bottom:18px;
-    }
-    .editor-block label,
-    .admin-subcard label{
-      display:block;
-      font-weight:800;
-      margin-bottom:8px;
-      margin-top:12px;
-      font-size:14px;
-    }
-    .editor-block label:first-child,
-    .admin-subcard label:first-child{
-      margin-top:0;
-    }
-    .editor-block input,
-    .editor-block textarea,
-    .admin-subcard input,
-    .admin-subcard select,
-    .admin-subcard textarea{
-      width:100%;
-      border:1px solid #d3ddea;
-      border-radius:16px;
-      padding:13px 14px;
-      font-size:15px;
-      outline:none;
       font-family:inherit;
-      background:#fcfdff;
-    }
-    .editor-block input:focus,
-    .editor-block textarea:focus,
-    .admin-subcard input:focus,
-    .admin-subcard select:focus,
-    .admin-subcard textarea:focus{
-      border-color:#7fb5ff;
-      box-shadow:0 0 0 3px rgba(47, 140, 255, 0.13);
     }
 
-    .info-text{
-      margin-top:12px;
-      font-weight:700;
-      font-size:14px;
-      line-height:1.5;
+    .primary-btn{ background:var(--blue-dark); color:#fff; }
+    .secondary-btn{ background:#eef4fb; color:var(--text); }
+    .danger-btn{ background:var(--red); color:#fff; }
+    .warn-btn{ background:var(--orange); color:#fff; }
+    .ghost-btn{ background:#fff; color:#0b2340; border:1px solid #d7e3f1; }
+
+    .danger-zone{
+      border:1px solid rgba(223,75,75,0.22);
+      background:linear-gradient(180deg, #fff8f8 0%, #fff 100%);
     }
 
-    .bio-block h3{
-      margin:0 0 10px;
-      font-size:22px;
-    }
-    .bio-block p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.7;
-      white-space:pre-wrap;
-      word-break:break-word;
+    .danger-zone .section-title{
+      color:#b42318;
     }
 
-    .section-head{
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .pill.pending{ background:#fff3e8; color:#b45309; }
+    .pill.approved{ background:#ecfdf3; color:#166534; }
+    .pill.rejected{ background:#fff1f2; color:#b42318; }
+    .pill.info{ background:#eef4fb; color:#38506d; }
+
+    .posts-head{
       display:flex;
       justify-content:space-between;
-      align-items:center;
-      gap:16px;
-      margin-bottom:14px;
+      gap:14px;
+      align-items:flex-start;
       flex-wrap:wrap;
-    }
-    .section-head h2{
-      margin:0;
-      font-size:28px;
+      margin-bottom:14px;
     }
 
     .posts-grid{
@@ -305,34 +536,46 @@
       background:#fff;
       border-radius:22px;
       border:1px solid #e3ebf5;
-      box-shadow:0 8px 18px rgba(8, 33, 64, 0.05);
+      box-shadow:0 8px 18px rgba(8,33,64,0.05);
       overflow:hidden;
-      cursor:pointer;
       transition:.18s ease;
     }
+
     .post-preview:hover{
       transform:translateY(-2px);
     }
+
     .post-preview-img{
       width:100%;
       max-height:420px;
       object-fit:cover;
       display:block;
       border-bottom:1px solid #e6eef8;
+      background:#fff;
     }
+
     .post-preview-body{
       padding:16px 18px 18px;
     }
+
     .post-preview-body p{
       margin:0 0 10px;
-      line-height:1.6;
+      line-height:1.65;
       white-space:pre-wrap;
       word-break:break-word;
-      font-size:16px;
+      font-size:15px;
     }
+
     .post-preview-body small{
       color:var(--muted);
       font-weight:700;
+    }
+
+    .post-inline-actions{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
     .pdf-card{
@@ -347,12 +590,14 @@
       gap:14px;
       flex-wrap:wrap;
     }
+
     .pdf-info{
       display:flex;
       align-items:center;
       gap:12px;
       min-width:0;
     }
+
     .pdf-icon{
       width:44px;
       height:44px;
@@ -365,15 +610,18 @@
       font-weight:800;
       flex:0 0 44px;
     }
+
     .pdf-title{
       font-weight:800;
       word-break:break-word;
     }
+
     .pdf-sub{
       color:var(--muted);
       font-size:13px;
       margin-top:3px;
     }
+
     .pdf-open{
       text-decoration:none;
       background:var(--blue-dark);
@@ -391,50 +639,14 @@
       padding:18px;
       font-weight:700;
       color:var(--muted);
-      box-shadow:var(--shadow);
-    }
-
-    .avatar-note{
-      margin-top:12px;
-      text-align:center;
-      color:rgba(255,255,255,0.9);
-      line-height:1.5;
-      font-size:13px;
-      position:relative;
-      z-index:1;
-    }
-
-    .preview-image-box{
-      margin-top:14px;
-      width:100%;
-      position:relative;
-      z-index:1;
-    }
-    .preview-image-box img{
-      width:100%;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,0.14);
-      display:block;
-    }
-    .preview-meta{
-      margin-top:10px;
-      font-size:12px;
-      color:rgba(255,255,255,0.92);
-      font-weight:700;
-      line-height:1.45;
-    }
-
-    .session-note{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.5;
+      border:1px dashed #dce8f3;
     }
 
     .admin-section{
       display:grid;
       gap:18px;
     }
+
     .admin-head{
       display:flex;
       justify-content:space-between;
@@ -442,35 +654,39 @@
       gap:14px;
       flex-wrap:wrap;
     }
+
     .admin-head h2{
       margin:0;
       font-size:28px;
+      color:#082e5b;
     }
+
     .admin-head p{
       margin:8px 0 0;
       color:var(--muted);
       line-height:1.6;
     }
+
     .admin-grid{
       display:grid;
       grid-template-columns:1.1fr 1fr;
       gap:18px;
     }
+
+    .admin-subcard{
+      background:#fff;
+      border:1px solid #e4edf7;
+      border-radius:24px;
+      padding:20px;
+      box-shadow:0 8px 18px rgba(8,33,64,0.05);
+    }
+
     .admin-row{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       margin-top:14px;
     }
-    .admin-msg{
-      min-height:22px;
-      margin-top:12px;
-      font-size:14px;
-      font-weight:700;
-      line-height:1.5;
-    }
-    .admin-msg.ok{ color:#15803d; }
-    .admin-msg.err{ color:#b42318; }
 
     .invite-result{
       margin-top:14px;
@@ -479,10 +695,13 @@
       border-radius:16px;
       padding:14px;
     }
+
     .invite-result-title{
       font-weight:800;
       margin-bottom:8px;
+      color:#082e5b;
     }
+
     .invite-link-box{
       width:100%;
       border:1px solid #d3ddea;
@@ -499,6 +718,7 @@
       gap:12px;
       margin-top:8px;
     }
+
     .approval-card{
       border:1px solid #e1ebf7;
       border-radius:18px;
@@ -507,77 +727,154 @@
       display:grid;
       gap:12px;
     }
+
     .approval-top{
       display:flex;
       justify-content:space-between;
       gap:14px;
       flex-wrap:wrap;
     }
+
     .approval-name{
       font-weight:800;
       font-size:17px;
       color:#082e5b;
     }
+
     .approval-email{
       color:var(--muted);
       margin-top:4px;
       word-break:break-word;
     }
+
     .approval-meta{
       font-size:13px;
       color:var(--muted);
       line-height:1.6;
     }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:7px 12px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:800;
-      white-space:nowrap;
-    }
-    .pill.pending{
-      background:#fff3e8;
-      color:#b45309;
-    }
-    .pill.approved{
-      background:#ecfdf3;
-      color:#166534;
-    }
-    .pill.rejected{
-      background:#fff1f2;
-      color:#b42318;
-    }
+
     .approval-actions{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
     }
+
     .approval-empty{
       color:var(--muted);
       font-weight:700;
       padding:12px 0 4px;
     }
 
-    @media (max-width: 1100px){
-      .admin-grid{
-        grid-template-columns:1fr;
-      }
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(8,35,64,0.48);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:90;
     }
-    @media (max-width: 980px){
-      .profile-card{
+
+    .modal.show{ display:flex; }
+
+    .modal-content{
+      width:100%;
+      max-width:520px;
+      background:#fff;
+      border-radius:24px;
+      box-shadow:0 20px 50px rgba(0,0,0,0.22);
+      padding:22px;
+      position:relative;
+    }
+
+    .modal-close{
+      position:absolute;
+      top:12px;
+      right:14px;
+      border:none;
+      background:transparent;
+      font-size:28px;
+      cursor:pointer;
+      color:#0b2340;
+      line-height:1;
+    }
+
+    .modal h3{
+      margin:0 0 10px;
+      font-size:24px;
+      color:#082e5b;
+    }
+
+    .modal-note{
+      color:var(--muted);
+      line-height:1.6;
+      margin:0 0 16px;
+      font-size:14px;
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      margin-top:14px;
+    }
+
+    .support-form{
+      display:grid;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .support-feedback{
+      margin-top:8px;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.5;
+      color:#0f4d92;
+      white-space:pre-wrap;
+      min-height:20px;
+    }
+
+    @keyframes starPulse{
+      0%,100%{ opacity:.88; transform:scale(1); }
+      50%{ opacity:1; transform:scale(1.012); }
+    }
+
+    @keyframes auroraSweep{
+      0%,100%{ transform:translateX(-8%) scaleX(1); opacity:.68; }
+      50%{ transform:translateX(8%) scaleX(1.06); opacity:.92; }
+    }
+
+    @media (max-width: 1180px){
+      .profile-hero{ grid-template-columns:1fr; }
+      .admin-grid{ grid-template-columns:1fr; }
+    }
+
+    @media (max-width: 900px){
+      .grid-2,
+      .field-grid{
         grid-template-columns:1fr;
       }
-      .profile-top{
+      .hero-top{
         flex-direction:column;
         align-items:flex-start;
       }
     }
+
+    @media (max-width: 680px){
+      .topbar{ padding:14px 10px; }
+      .topbar nav{ gap:10px; }
+      .topbar a{ font-size:14px; }
+      .page-shell{ padding:0 12px 30px; }
+      .profile-hero{ padding:14px; border-radius:22px; }
+      .left-pane{ border-radius:22px; }
+      .hero-top h1{ font-size:30px; }
+    }
   </style>
 </head>
-<body>
+<body class="auth-checking">
   <header class="topbar">
     <nav>
       <a href="index.html">Home</a>
@@ -587,55 +884,231 @@
       <a href="contact.html">Contact</a>
       <a href="insights.html">Insights</a>
       <a href="messages.html">Messages</a>
-      <a href="profile.html" class="active"><span class="nav-online-dot"></span> Mon compte</a>
+      <a href="calls.html">Appels</a>
+      <a href="meeting-room.html" id="meetingNavLink" class="hidden">Salle de réunion</a>
       <a href="competition.html">Concours</a>
+      <a href="competition-rules.html">Règlement officiel</a>
+      <a href="verify-certificats.html">Vérifier un certificat</a>
+      <a href="profile.html" class="active"><span class="nav-online-dot" id="navOnlineDot"></span> Mon compte</a>
     </nav>
   </header>
 
-  <main class="profile-page">
-    <section class="profile-card">
-      <div class="profile-left">
+  <main class="page-shell">
+    <section class="profile-hero">
+      <aside class="left-pane">
         <div class="big-avatar" id="bigAvatar">MB</div>
+
         <input type="file" id="avatarInput" accept="image/*" class="hidden" />
-        <button class="secondary-btn" id="changeAvatarBtn" type="button">Changer la photo</button>
+
+        <div class="avatar-actions">
+          <button class="secondary-btn" id="changeAvatarBtn" type="button">Changer la photo</button>
+          <button class="secondary-btn" id="copyProfileLinkBtn" type="button">Copier mon lien</button>
+          <button class="secondary-btn" id="openSupportBtn" type="button">Besoin d'aide / Support</button>
+        </div>
+
         <div class="avatar-note">
           Photo de profil légère et compressée automatiquement.
         </div>
-        <div class="preview-image-box hidden" id="avatarPreviewMount"></div>
-      </div>
 
-      <div class="profile-right">
-        <div class="profile-top">
+        <div class="mini-stats">
+          <div class="mini-stat">
+            <div class="k">Publications</div>
+            <div class="v" id="postCountStat">0</div>
+          </div>
+          <div class="mini-stat">
+            <div class="k">Commentaires</div>
+            <div class="v" id="commentCountStat">0</div>
+          </div>
+          <div class="mini-stat">
+            <div class="k">Likes reçus</div>
+            <div class="v" id="likesReceivedStat">0</div>
+          </div>
+          <div class="mini-stat">
+            <div class="k">Compte</div>
+            <div class="v" id="accountStatusStat">-</div>
+          </div>
+        </div>
+
+        <div class="preview-image-box hidden" id="avatarPreviewMount"></div>
+      </aside>
+
+      <section class="right-pane">
+        <div class="hero-top">
           <div>
             <h1 id="profileName">Chargement...</h1>
             <p id="profileEmail">...</p>
+            <p id="profileInstitutionLine"></p>
             <div class="status-line">
               <span class="status-dot" id="statusDot"></span>
               <span id="statusText">Chargement...</span>
+              <span class="pill info" id="messageRulePill">Messages : -</span>
             </div>
-            <div class="session-note">Les publications de ce profil sont cliquables et ouvrent directement Insights.</div>
+            <p class="section-note" style="margin-top:10px;">
+              Les publications de ce profil sont cliquables et ouvrent directement Insights.
+            </p>
           </div>
-          <div class="profile-actions">
+
+          <div class="action-wrap">
             <a class="secondary-btn" id="messageBtn" href="messages.html">Message</a>
+            <a class="secondary-btn" id="openInsightsBtn" href="insights.html">Ouvrir Insights</a>
+            <button class="secondary-btn" id="logoutBtn" type="button">Déconnexion</button>
           </div>
         </div>
 
         <div class="editor-block" id="editorBlock">
-          <label for="nameInput">Nom affiché</label>
-          <input type="text" id="nameInput" placeholder="Ton nom" />
+          <h2 class="section-title">Modifier mon profil</h2>
+          <p class="section-note">Tous les champs utiles au compte sont regroupés ici pour éviter de retourner modifier ailleurs.</p>
 
-          <label for="bioInput">Bio</label>
-          <textarea id="bioInput" rows="5" placeholder="Présente-toi en quelques lignes..."></textarea>
+          <div class="field-grid">
+            <div>
+              <label for="nameInput">Nom affiché</label>
+              <input type="text" id="nameInput" placeholder="Ton nom affiché" />
+            </div>
 
-          <button class="primary-btn" id="saveProfileBtn" type="button">Enregistrer le profil</button>
-          <div class="info-text" id="profileMsg"></div>
+            <div>
+              <label for="countryInput">Pays</label>
+              <input type="text" id="countryInput" placeholder="Pays" />
+            </div>
+
+            <div>
+              <label for="firstNameInput">Prénom</label>
+              <input type="text" id="firstNameInput" placeholder="Prénom" />
+            </div>
+
+            <div>
+              <label for="lastNameInput">Nom</label>
+              <input type="text" id="lastNameInput" placeholder="Nom" />
+            </div>
+
+            <div>
+              <label for="institutionInput">Institution / Université</label>
+              <input type="text" id="institutionInput" placeholder="Université, laboratoire, entreprise..." />
+            </div>
+
+            <div>
+              <label for="specialtyInput">Spécialité / Domaine</label>
+              <input type="text" id="specialtyInput" placeholder="Chimie, environnement, matériaux..." />
+            </div>
+
+            <div>
+              <label for="websiteInput">Site web / LinkedIn / ORCID</label>
+              <input type="text" id="websiteInput" placeholder="Lien web optionnel" />
+            </div>
+
+            <div>
+              <label for="phoneInput">Téléphone (optionnel)</label>
+              <input type="text" id="phoneInput" placeholder="Numéro optionnel" />
+            </div>
+
+            <div class="field-full">
+              <label for="bioInput">Bio</label>
+              <textarea id="bioInput" rows="5" placeholder="Présente-toi en quelques lignes..."></textarea>
+            </div>
+          </div>
+
+          <div class="profile-actions-grid">
+            <button class="primary-btn" id="saveProfileBtn" type="button">Enregistrer le profil</button>
+          </div>
+
+          <div class="profile-msg" id="profileMsg"></div>
         </div>
 
-        <div class="bio-block">
-          <h3>À propos</h3>
-          <p id="bioText">Aucune bio pour le moment.</p>
+        <div class="grid-2">
+          <div class="card">
+            <h2 class="section-title">Confidentialité</h2>
+            <p class="section-note">Ces réglages utilisent la même logique que celle d’Insights.</p>
+
+            <div class="privacy-list">
+              <div class="toggle-item">
+                <div class="toggle-copy">
+                  <strong>Email visible</strong>
+                  <span>Choisis si les autres membres peuvent voir ton adresse email.</span>
+                </div>
+                <button class="secondary-btn" id="toggleHideEmailBtn" type="button">Basculer</button>
+              </div>
+
+              <div class="toggle-item">
+                <div class="toggle-copy">
+                  <strong>Bio visible</strong>
+                  <span>Choisis si ta bio est visible par les autres utilisateurs.</span>
+                </div>
+                <button class="secondary-btn" id="toggleHideBioBtn" type="button">Basculer</button>
+              </div>
+
+              <div class="toggle-item">
+                <div class="toggle-copy">
+                  <strong>Présence visible</strong>
+                  <span>Afficher ou masquer ton statut en ligne / hors ligne.</span>
+                </div>
+                <button class="secondary-btn" id="toggleHidePresenceBtn" type="button">Basculer</button>
+              </div>
+
+              <div class="toggle-item">
+                <div class="toggle-copy">
+                  <strong>Qui peut t’écrire</strong>
+                  <span>Définis qui peut te contacter directement.</span>
+                </div>
+                <select id="allowMessagesSelect" style="max-width:220px;">
+                  <option value="all">Tout le monde</option>
+                  <option value="contacts">Seulement contacts</option>
+                  <option value="admin">Seulement admin</option>
+                  <option value="none">Personne</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="profile-msg" id="privacyMsg"></div>
+          </div>
+
+          <div class="card">
+            <h2 class="section-title">Compte & sécurité</h2>
+            <p class="section-note">Gère ton mot de passe, ta vérification email et ta session.</p>
+
+            <div class="security-list">
+              <div>
+                <label for="newPasswordInput">Nouveau mot de passe</label>
+                <input type="password" id="newPasswordInput" placeholder="Au moins 6 caractères" />
+              </div>
+
+              <div class="action-wrap">
+                <button class="primary-btn" id="changePasswordBtn" type="button">Changer le mot de passe</button>
+                <button class="secondary-btn" id="resendVerificationBtn" type="button">Renvoyer vérification email</button>
+              </div>
+
+              <div class="toggle-item">
+                <div class="toggle-copy">
+                  <strong>Email vérifié</strong>
+                  <span id="emailVerifiedText">Chargement...</span>
+                </div>
+                <button class="secondary-btn" id="refreshVerificationBtn" type="button">Actualiser</button>
+              </div>
+            </div>
+
+            <div class="security-msg" id="securityMsg"></div>
+          </div>
         </div>
-      </div>
+
+        <div class="card">
+          <h2 class="section-title">À propos</h2>
+          <p class="section-note" id="aboutMetaText">Informations du profil</p>
+          <div style="margin-top:12px; line-height:1.8; color:#41566f; white-space:pre-wrap; word-break:break-word;" id="bioText">
+            Aucune bio pour le moment.
+          </div>
+        </div>
+
+        <div class="card danger-zone" id="dangerZone">
+          <h2 class="section-title">Zone sensible</h2>
+          <p class="section-note">
+            Ces actions sont importantes. La suppression du compte est irréversible.
+          </p>
+
+          <div class="action-wrap" style="margin-top:14px;">
+            <button class="danger-btn" id="deleteAccountBtn" type="button">Supprimer mon compte</button>
+          </div>
+
+          <div class="security-msg" id="dangerMsg"></div>
+        </div>
+      </section>
     </section>
 
     <section class="admin-section hidden" id="adminSection">
@@ -651,7 +1124,7 @@
 
       <div class="admin-grid">
         <div class="admin-subcard">
-          <h3 style="margin:0 0 14px;">Créer un lien d’invitation</h3>
+          <h3 style="margin:0 0 14px; color:#082e5b;">Créer un lien d’invitation</h3>
 
           <label for="inviteEmailInput">Adresse e-mail invitée</label>
           <input type="email" id="inviteEmailInput" placeholder="Ex : membre@gmail.com">
@@ -676,61 +1149,176 @@
             <div class="invite-link-box" id="inviteLinkText"></div>
           </div>
 
-          <div class="admin-msg" id="inviteAdminMsg"></div>
+          <div class="invite-msg" id="inviteAdminMsg"></div>
         </div>
 
         <div class="admin-subcard">
-          <h3 style="margin:0 0 14px;">Demandes en attente</h3>
+          <h3 style="margin:0 0 14px; color:#082e5b;">Demandes en attente</h3>
           <div class="admin-list" id="approvalsList">
             <div class="approval-empty">Chargement...</div>
           </div>
-          <div class="admin-msg" id="approvalAdminMsg"></div>
+          <div class="approval-msg" id="approvalAdminMsg"></div>
         </div>
       </div>
     </section>
 
     <section class="posts-section">
-      <div class="section-head">
-        <h2>Publications</h2>
+      <div class="posts-head">
+        <div>
+          <h2 class="section-title" style="margin-bottom:6px;">Publications</h2>
+          <p class="section-note">Tu peux ouvrir une publication dans Insights ou la supprimer si c’est la tienne.</p>
+        </div>
+
+        <div class="action-wrap">
+          <select id="postsFilterSelect" style="max-width:220px;">
+            <option value="all">Toutes</option>
+            <option value="images">Avec images</option>
+            <option value="pdf">Avec PDF</option>
+            <option value="text">Texte uniquement</option>
+          </select>
+        </div>
       </div>
+
       <div id="userPosts" class="posts-grid"></div>
     </section>
   </main>
+
+  <div class="modal" id="supportModal">
+    <div class="modal-content">
+      <button class="modal-close" type="button" id="closeSupportModal">×</button>
+      <h3>Besoin d'aide / Support</h3>
+      <p class="modal-note">Remplis ces champs. Ton message sera préparé automatiquement pour l’adresse de support.</p>
+
+      <div class="support-form">
+        <input id="supportName" type="text" placeholder="Nom complet" />
+        <input id="supportEmail" type="email" placeholder="Adresse e-mail" />
+        <input id="supportSubject" type="text" placeholder="Sujet" />
+        <textarea id="supportMessage" placeholder="Décris ton problème, ta question ou la difficulté rencontrée..."></textarea>
+      </div>
+
+      <div class="support-feedback" id="supportFeedback"></div>
+
+      <div class="modal-actions">
+        <button class="ghost-btn" id="cancelSupportBtn" type="button">Annuler</button>
+        <button class="primary-btn" id="sendSupportBtn" type="button">Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="deleteAccountModal">
+    <div class="modal-content">
+      <button class="modal-close" type="button" id="closeDeleteModal">×</button>
+      <h3>Supprimer mon compte</h3>
+      <p class="modal-note">
+        Cette action est irréversible. Ton compte Firebase sera supprimé ainsi que tes données principales du site.
+      </p>
+
+      <label for="deletePasswordInput">Confirme avec ton mot de passe</label>
+      <input type="password" id="deletePasswordInput" placeholder="Mot de passe actuel" />
+
+      <div class="security-msg" id="deleteModalMsg"></div>
+
+      <div class="modal-actions">
+        <button class="ghost-btn" id="cancelDeleteBtn" type="button">Annuler</button>
+        <button class="danger-btn" id="confirmDeleteBtn" type="button">Supprimer définitivement</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import {
       onAuthStateChanged,
       signOut,
-      updateProfile
+      updateProfile,
+      updatePassword,
+      sendEmailVerification,
+      reload,
+      deleteUser,
+      EmailAuthProvider,
+      reauthenticateWithCredential
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
     import {
       ref,
       get,
       update,
       onValue,
-      set
+      set,
+      remove
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+    const INACTIVITY_LIMIT = 15 * 60 * 1000;
+    const LAST_ACTIVITY_KEY = "insights_last_activity";
+    const MAX_INPUT_FILE_SIZE = 10 * 1024 * 1024;
+    const MAX_WIDTH = 900;
+    const MAX_HEIGHT = 900;
+    const JPEG_QUALITY = 0.72;
+    const ONLINE_STALE_LIMIT = 75 * 1000;
+
+    const params = new URLSearchParams(window.location.search);
+    const requestedUid = params.get("uid");
+
+    const meetingNavLink = document.getElementById("meetingNavLink");
+    const navOnlineDot = document.getElementById("navOnlineDot");
 
     const bigAvatar = document.getElementById("bigAvatar");
     const changeAvatarBtn = document.getElementById("changeAvatarBtn");
     const avatarInput = document.getElementById("avatarInput");
     const avatarPreviewMount = document.getElementById("avatarPreviewMount");
+    const copyProfileLinkBtn = document.getElementById("copyProfileLinkBtn");
 
     const profileName = document.getElementById("profileName");
     const profileEmail = document.getElementById("profileEmail");
+    const profileInstitutionLine = document.getElementById("profileInstitutionLine");
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
+    const messageRulePill = document.getElementById("messageRulePill");
+
+    const messageBtn = document.getElementById("messageBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const editorBlock = document.getElementById("editorBlock");
+    const dangerZone = document.getElementById("dangerZone");
+
     const nameInput = document.getElementById("nameInput");
+    const firstNameInput = document.getElementById("firstNameInput");
+    const lastNameInput = document.getElementById("lastNameInput");
+    const countryInput = document.getElementById("countryInput");
+    const institutionInput = document.getElementById("institutionInput");
+    const specialtyInput = document.getElementById("specialtyInput");
+    const websiteInput = document.getElementById("websiteInput");
+    const phoneInput = document.getElementById("phoneInput");
     const bioInput = document.getElementById("bioInput");
     const saveProfileBtn = document.getElementById("saveProfileBtn");
     const profileMsg = document.getElementById("profileMsg");
+
     const bioText = document.getElementById("bioText");
-    const editorBlock = document.getElementById("editorBlock");
+    const aboutMetaText = document.getElementById("aboutMetaText");
+
+    const toggleHideEmailBtn = document.getElementById("toggleHideEmailBtn");
+    const toggleHideBioBtn = document.getElementById("toggleHideBioBtn");
+    const toggleHidePresenceBtn = document.getElementById("toggleHidePresenceBtn");
+    const allowMessagesSelect = document.getElementById("allowMessagesSelect");
+    const privacyMsg = document.getElementById("privacyMsg");
+
+    const newPasswordInput = document.getElementById("newPasswordInput");
+    const changePasswordBtn = document.getElementById("changePasswordBtn");
+    const resendVerificationBtn = document.getElementById("resendVerificationBtn");
+    const refreshVerificationBtn = document.getElementById("refreshVerificationBtn");
+    const emailVerifiedText = document.getElementById("emailVerifiedText");
+    const securityMsg = document.getElementById("securityMsg");
+    const deleteAccountBtn = document.getElementById("deleteAccountBtn");
+    const dangerMsg = document.getElementById("dangerMsg");
+
+    const postCountStat = document.getElementById("postCountStat");
+    const commentCountStat = document.getElementById("commentCountStat");
+    const likesReceivedStat = document.getElementById("likesReceivedStat");
+    const accountStatusStat = document.getElementById("accountStatusStat");
+
+    const postsFilterSelect = document.getElementById("postsFilterSelect");
     const userPosts = document.getElementById("userPosts");
-    const messageBtn = document.getElementById("messageBtn");
 
     const adminSection = document.getElementById("adminSection");
     const inviteEmailInput = document.getElementById("inviteEmailInput");
@@ -743,22 +1331,34 @@
     const approvalsList = document.getElementById("approvalsList");
     const approvalAdminMsg = document.getElementById("approvalAdminMsg");
 
-    const params = new URLSearchParams(window.location.search);
-    const requestedUid = params.get("uid");
+    const supportModal = document.getElementById("supportModal");
+    const openSupportBtn = document.getElementById("openSupportBtn");
+    const closeSupportModal = document.getElementById("closeSupportModal");
+    const cancelSupportBtn = document.getElementById("cancelSupportBtn");
+    const sendSupportBtn = document.getElementById("sendSupportBtn");
+    const supportName = document.getElementById("supportName");
+    const supportEmail = document.getElementById("supportEmail");
+    const supportSubject = document.getElementById("supportSubject");
+    const supportMessage = document.getElementById("supportMessage");
+    const supportFeedback = document.getElementById("supportFeedback");
+
+    const deleteAccountModal = document.getElementById("deleteAccountModal");
+    const closeDeleteModal = document.getElementById("closeDeleteModal");
+    const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+    const deletePasswordInput = document.getElementById("deletePasswordInput");
+    const deleteModalMsg = document.getElementById("deleteModalMsg");
 
     let currentUser = null;
     let viewedUid = null;
     let viewedUser = null;
     let activityTimeout = null;
+    let approvalsBound = false;
     let lastInviteLink = "";
-    let approvalsUnsubscribeBound = false;
 
-    const INACTIVITY_LIMIT = 15 * 60 * 1000;
-    const LAST_ACTIVITY_KEY = "insights_last_activity";
-    const MAX_INPUT_FILE_SIZE = 10 * 1024 * 1024;
-    const MAX_WIDTH = 900;
-    const MAX_HEIGHT = 900;
-    const JPEG_QUALITY = 0.72;
+    let postsMap = {};
+    let commentsMap = {};
+    let likesMap = {};
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
@@ -770,12 +1370,15 @@
     }
 
     function bindActivityEvents() {
-      ["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
+      ["click","mousemove","keydown","scroll","touchstart"].forEach(evt => {
         window.addEventListener(evt, () => {
           if (auth.currentUser) resetActivityTimer();
-        }, { passive: true });
+        }, { passive:true });
       });
     }
+
+    function openModal(modal){ modal.classList.add("show"); }
+    function closeModal(modal){ modal.classList.remove("show"); }
 
     function initials(name = "", email = "") {
       const s = (name || email || "U").trim();
@@ -793,11 +1396,11 @@
     function formatDate(ts) {
       if (!ts) return "";
       return new Date(ts).toLocaleString("fr-FR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit"
       });
     }
 
@@ -814,49 +1417,53 @@
       return Math.floor((base64.length * 3) / 4) - padding;
     }
 
-    function showAvatar(photoURL, name, email) {
-      if (photoURL) bigAvatar.innerHTML = `<img src="${photoURL}" alt="avatar">`;
-      else bigAvatar.textContent = initials(name, email);
+    function isAdminUser(user) {
+      return !!user && !!user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
     }
 
-    function showMsg(text, ok = false) {
-      profileMsg.textContent = text;
-      profileMsg.style.color = ok ? "#12824b" : "#c0392b";
+    function isViewingOwnProfile() {
+      return !!currentUser && !!viewedUid && currentUser.uid === viewedUid;
     }
 
-    function showInviteMsg(text, ok = false) {
-      inviteAdminMsg.textContent = text;
-      inviteAdminMsg.className = ok ? "admin-msg ok" : "admin-msg err";
-    }
-
-    function showApprovalMsg(text, ok = false) {
-      approvalAdminMsg.textContent = text;
-      approvalAdminMsg.className = ok ? "admin-msg ok" : "admin-msg err";
+    function isRealAdminContext() {
+      return isAdminUser(currentUser) && isViewingOwnProfile();
     }
 
     function userPrivacy(userData = {}) {
       return userData.privacy || {
         hidePresence: false,
         hideEmail: true,
-        hideBio: false
+        hideBio: false,
+        allowMessages: "all"
       };
     }
 
     function canSeeEmail(userData = {}) {
       if (!userData?.uid) return false;
       if (currentUser && userData.uid === currentUser.uid) return true;
+      if (isAdminUser(currentUser)) return true;
       return !userPrivacy(userData).hideEmail;
     }
 
     function canSeeBio(userData = {}) {
       if (!userData?.uid) return false;
       if (currentUser && userData.uid === currentUser.uid) return true;
+      if (isAdminUser(currentUser)) return true;
       return !userPrivacy(userData).hideBio;
+    }
+
+    function isActuallyOnline(userData = {}) {
+      const presence = userData.presence || {};
+      if (!presence.online) return false;
+      const lastSeen = Number(presence.lastSeen || 0);
+      if (!lastSeen) return false;
+      return (Date.now() - lastSeen) <= ONLINE_STALE_LIMIT;
     }
 
     function canSeePresence(userData = {}) {
       if (!userData?.uid) return false;
       if (currentUser && userData.uid === currentUser.uid) return true;
+      if (isAdminUser(currentUser)) return true;
       return !userPrivacy(userData).hidePresence;
     }
 
@@ -866,6 +1473,14 @@
 
     function visibleBio(userData = {}) {
       return canSeeBio(userData) ? (userData.bio || "Aucune bio pour le moment.") : "Bio masquée";
+    }
+
+    function visibleInstitutionLine(userData = {}) {
+      const parts = [];
+      if (userData.institution) parts.push(userData.institution);
+      if (userData.specialty) parts.push(userData.specialty);
+      if (userData.country) parts.push(userData.country);
+      return parts.join(" • ");
     }
 
     function normalizePostImages(post = {}) {
@@ -907,7 +1522,7 @@
       canvas.height = newHeight;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, newWidth, newHeight);
-      return { canvas, width: newWidth, height: newHeight };
+      return { canvas, width:newWidth, height:newHeight };
     }
 
     function canvasToDataURL(canvas, type, quality) {
@@ -941,27 +1556,72 @@
       };
     }
 
-    function isAdminUser(user) {
-      return !!user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    function showAvatar(photoURL, name, email) {
+      if (photoURL) bigAvatar.innerHTML = `<img src="${photoURL}" alt="avatar">`;
+      else bigAvatar.textContent = initials(name, email);
     }
 
-    function isViewingOwnProfile() {
-      return !!currentUser && !!viewedUid && currentUser.uid === viewedUid;
+    function showMsg(node, text, ok = false) {
+      node.textContent = text;
+      node.className = ok ? `${node.id.includes("Msg") ? node.className.split(" ")[0] : ""} msg-ok` : `${node.id.includes("Msg") ? node.className.split(" ")[0] : ""} msg-err`;
     }
 
-    function isRealAdminContext() {
-      return isAdminUser(currentUser) && isViewingOwnProfile();
+    function setSimpleMsg(node, text, ok = false) {
+      node.textContent = text;
+      node.className = ok ? node.className.replace("msg-err","").trim() + " msg-ok" : node.className.replace("msg-ok","").trim() + " msg-err";
     }
 
-    function randomToken(length = 28) {
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
-      let out = "";
-      const arr = new Uint32Array(length);
-      window.crypto.getRandomValues(arr);
-      for (let i = 0; i < length; i++) {
-        out += chars[arr[i] % chars.length];
+    function userAccountStatusText(userData = {}) {
+      const status = userData.accountStatus || "pending_admin_approval";
+      if (status === "approved") return "Actif";
+      if (status === "rejected") return "Refusé";
+      return "En attente";
+    }
+
+    function messageRuleText(rule = "all") {
+      if (rule === "contacts") return "Messages : contacts";
+      if (rule === "admin") return "Messages : admin";
+      if (rule === "none") return "Messages : fermés";
+      return "Messages : ouverts";
+    }
+
+    function updateEmailVerifiedUI() {
+      emailVerifiedText.textContent = currentUser?.emailVerified
+        ? "Adresse vérifiée"
+        : "Adresse non vérifiée";
+    }
+
+    function prefillSupportForm() {
+      supportName.value = viewedUser?.displayName || currentUser?.displayName || "";
+      supportEmail.value = viewedUser?.email || currentUser?.email || "";
+      supportSubject.value = supportSubject.value || "Demande d'aide - Profil";
+      supportFeedback.textContent = "";
+    }
+
+    function sendSupportRequest() {
+      const name = supportName.value.trim();
+      const email = supportEmail.value.trim();
+      const subject = supportSubject.value.trim();
+      const message = supportMessage.value.trim();
+
+      if (!name || !email || !subject || !message) {
+        supportFeedback.textContent = "Merci de remplir tous les champs du support.";
+        return;
       }
-      return out;
+
+      const fullSubject = `[Profile Support] ${subject}`;
+      const body =
+`Nom : ${name}
+Email : ${email}
+Page : profile.html
+Date : ${new Date().toLocaleString("fr-FR")}
+
+Message :
+${message}`;
+
+      const mailto = `mailto:maounou-boris.amoussou@cnrs.fr?subject=${encodeURIComponent(fullSubject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailto;
+      supportFeedback.textContent = "Le message est prêt à être envoyé depuis votre messagerie.";
     }
 
     function renderInviteResult(link) {
@@ -977,6 +1637,15 @@
       inviteLinkText.textContent = link;
     }
 
+    function randomToken(length = 28) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+      let out = "";
+      const arr = new Uint32Array(length);
+      window.crypto.getRandomValues(arr);
+      for (let i = 0; i < length; i++) out += chars[arr[i] % chars.length];
+      return out;
+    }
+
     async function createSignupInvite() {
       if (!isRealAdminContext()) return;
 
@@ -984,18 +1653,21 @@
       const hours = Number(inviteHoursInput.value || "24");
 
       if (!mail) {
-        showInviteMsg("Entre l’adresse e-mail de la personne à inviter.");
+        inviteAdminMsg.textContent = "Entre l’adresse e-mail de la personne à inviter.";
+        inviteAdminMsg.className = "invite-msg msg-err";
         return;
       }
 
       const basicMailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!basicMailPattern.test(mail)) {
-        showInviteMsg("Adresse e-mail invalide.");
+        inviteAdminMsg.textContent = "Adresse e-mail invalide.";
+        inviteAdminMsg.className = "invite-msg msg-err";
         return;
       }
 
       createInviteBtn.disabled = true;
-      showInviteMsg("Création du lien en cours...", true);
+      inviteAdminMsg.textContent = "Création du lien en cours...";
+      inviteAdminMsg.className = "invite-msg msg-ok";
 
       try {
         const token = randomToken(32);
@@ -1013,10 +1685,12 @@
         });
 
         renderInviteResult(signupUrl);
-        showInviteMsg(`Lien créé avec succès. Expiration : ${formatDate(expiresAt)}.`, true);
+        inviteAdminMsg.textContent = `Lien créé avec succès. Expiration : ${formatDate(expiresAt)}.`;
+        inviteAdminMsg.className = "invite-msg msg-ok";
       } catch (error) {
         console.error(error);
-        showInviteMsg("Impossible de créer le lien d’invitation.");
+        inviteAdminMsg.textContent = "Impossible de créer le lien d’invitation.";
+        inviteAdminMsg.className = "invite-msg msg-err";
       } finally {
         createInviteBtn.disabled = false;
       }
@@ -1040,10 +1714,12 @@
           approvedAt: Date.now()
         });
 
-        showApprovalMsg("Compte approuvé avec succès.", true);
+        approvalAdminMsg.textContent = "Compte approuvé avec succès.";
+        approvalAdminMsg.className = "approval-msg msg-ok";
       } catch (error) {
         console.error(error);
-        showApprovalMsg("Impossible d’approuver ce compte.");
+        approvalAdminMsg.textContent = "Impossible d’approuver ce compte.";
+        approvalAdminMsg.className = "approval-msg msg-err";
       }
     }
 
@@ -1064,10 +1740,12 @@
           rejectedBy: ADMIN_EMAIL
         });
 
-        showApprovalMsg("Compte refusé.", true);
+        approvalAdminMsg.textContent = "Compte refusé.";
+        approvalAdminMsg.className = "approval-msg msg-ok";
       } catch (error) {
         console.error(error);
-        showApprovalMsg("Impossible de refuser ce compte.");
+        approvalAdminMsg.textContent = "Impossible de refuser ce compte.";
+        approvalAdminMsg.className = "approval-msg msg-err";
       }
     }
 
@@ -1077,8 +1755,8 @@
         .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
       const pendingFirst = entries.filter(item => (item.status || "pending_admin_approval") === "pending_admin_approval");
-      const approvedThenRejected = entries.filter(item => (item.status || "") !== "pending_admin_approval");
-      const all = [...pendingFirst, ...approvedThenRejected].slice(0, 40);
+      const others = entries.filter(item => (item.status || "") !== "pending_admin_approval");
+      const all = [...pendingFirst, ...others].slice(0, 40);
 
       if (!all.length) {
         approvalsList.innerHTML = `<div class="approval-empty">Aucune demande pour le moment.</div>`;
@@ -1118,25 +1796,19 @@
       }).join("");
 
       document.querySelectorAll("[data-approve-uid]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          await approveAccount(btn.dataset.approveUid);
-        });
+        btn.addEventListener("click", async () => approveAccount(btn.dataset.approveUid));
       });
 
       document.querySelectorAll("[data-reject-uid]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          await rejectAccount(btn.dataset.rejectUid);
-        });
+        btn.addEventListener("click", async () => rejectAccount(btn.dataset.rejectUid));
       });
     }
 
     function bindAdminRealtime() {
-      if (!isRealAdminContext() || approvalsUnsubscribeBound) return;
-      approvalsUnsubscribeBound = true;
-
+      if (!isRealAdminContext() || approvalsBound) return;
+      approvalsBound = true;
       onValue(ref(db, "accountApprovals"), (snap) => {
-        const data = snap.val() || {};
-        renderApprovals(data);
+        renderApprovals(snap.val() || {});
       });
     }
 
@@ -1149,69 +1821,109 @@
       }
     }
 
-    async function loadUserProfile(uid) {
-      const snap = await get(ref(db, "users/" + uid));
-      if (!snap.exists()) {
-        profileName.textContent = "Profil introuvable";
-        profileEmail.textContent = "";
-        bioText.textContent = "Ce profil n'existe pas.";
-        editorBlock.style.display = "none";
-        changeAvatarBtn.style.display = "none";
-        adminSection.classList.add("hidden");
-        return;
-      }
+    function updateMeetingNav() {
+      if (isAdminUser(currentUser)) meetingNavLink.classList.remove("hidden");
+      else meetingNavLink.classList.add("hidden");
+    }
 
-      viewedUser = { uid, ...snap.val() };
-      const isMine = currentUser && currentUser.uid === uid;
+    async function ensureAdminRoleIfNeeded() {
+      if (!isAdminUser(currentUser)) return;
+      try {
+        const meSnap = await get(ref(db, "users/" + currentUser.uid));
+        if (meSnap.exists()) {
+          const meData = meSnap.val() || {};
+          if ((meData.role || "") !== "admin") {
+            await update(ref(db, "users/" + currentUser.uid), {
+              role: "admin",
+              updatedAt: Date.now()
+            });
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateProfileView(userData = {}) {
+      viewedUser = { uid:viewedUid, ...(userData || {}) };
+      const isMine = isViewingOwnProfile();
 
       profileName.textContent = viewedUser.displayName || "Sans nom";
       profileEmail.textContent = visibleEmail(viewedUser);
+      profileInstitutionLine.textContent = visibleInstitutionLine(viewedUser);
+      aboutMetaText.textContent = `Statut du compte : ${userAccountStatusText(viewedUser)}${viewedUser.website ? " • Lien : " + viewedUser.website : ""}`;
       bioText.textContent = visibleBio(viewedUser);
+
       showAvatar(viewedUser.photoURL, viewedUser.displayName, viewedUser.email);
 
-      editorBlock.style.display = isMine ? "block" : "none";
-      changeAvatarBtn.style.display = isMine ? "inline-flex" : "none";
-
       nameInput.value = viewedUser.displayName || "";
+      firstNameInput.value = viewedUser.firstName || "";
+      lastNameInput.value = viewedUser.lastName || "";
+      countryInput.value = viewedUser.country || "";
+      institutionInput.value = viewedUser.institution || "";
+      specialtyInput.value = viewedUser.specialty || "";
+      websiteInput.value = viewedUser.website || "";
+      phoneInput.value = viewedUser.phone || "";
       bioInput.value = viewedUser.bio || "";
 
+      const privacy = userPrivacy(viewedUser);
+      allowMessagesSelect.value = privacy.allowMessages || "all";
+      messageRulePill.textContent = messageRuleText(privacy.allowMessages || "all");
+
+      editorBlock.classList.toggle("hidden", !isMine);
+      dangerZone.classList.toggle("hidden", !isMine);
+      changeAvatarBtn.classList.toggle("hidden", !isMine);
+
       if (isMine) {
-        messageBtn.style.display = "none";
+        messageBtn.classList.add("hidden");
       } else {
-        messageBtn.style.display = "inline-flex";
-        messageBtn.href = `messages.html?user=${encodeURIComponent(uid)}`;
+        messageBtn.classList.remove("hidden");
+        messageBtn.href = `messages.html?user=${encodeURIComponent(viewedUid)}`;
+      }
+
+      accountStatusStat.textContent = userAccountStatusText(viewedUser);
+
+      const presence = viewedUser.presence || {};
+      if (!canSeePresence(viewedUser)) {
+        statusDot.classList.remove("online");
+        statusText.textContent = "Visibilité masquée";
+        statusText.style.color = "#6b7d93";
+        navOnlineDot.style.background = "#a6b7c9";
+      } else if (isActuallyOnline(viewedUser)) {
+        statusDot.classList.add("online");
+        statusText.textContent = "En ligne";
+        statusText.style.color = "#14854b";
+        navOnlineDot.style.background = "var(--green)";
+      } else {
+        statusDot.classList.remove("online");
+        statusText.textContent = presence.lastSeen ? "Dernière activité : " + formatDate(presence.lastSeen) : "Hors ligne";
+        statusText.style.color = "#6b7d93";
+        navOnlineDot.style.background = "#a6b7c9";
       }
 
       updateAdminVisibility();
     }
 
+    async function loadUserProfile(uid) {
+      const snap = await get(ref(db, "users/" + uid));
+      if (!snap.exists()) {
+        profileName.textContent = "Profil introuvable";
+        profileEmail.textContent = "";
+        profileInstitutionLine.textContent = "";
+        bioText.textContent = "Ce profil n'existe pas.";
+        editorBlock.classList.add("hidden");
+        dangerZone.classList.add("hidden");
+        changeAvatarBtn.classList.add("hidden");
+        adminSection.classList.add("hidden");
+        return;
+      }
+      updateProfileView(snap.val() || {});
+    }
+
     function listenPresence(uid) {
       onValue(ref(db, "users/" + uid), (snap) => {
-        const userData = snap.val() || {};
-        viewedUser = { uid, ...userData };
-
-        profileName.textContent = viewedUser.displayName || "Sans nom";
-        profileEmail.textContent = visibleEmail(viewedUser);
-        bioText.textContent = visibleBio(viewedUser);
-        showAvatar(viewedUser.photoURL, viewedUser.displayName, viewedUser.email);
-
-        const data = viewedUser.presence || {};
-        if (!canSeePresence(viewedUser)) {
-          statusDot.classList.remove("online");
-          statusText.textContent = "Visibilité masquée";
-          statusText.style.color = "#6b7d93";
-          return;
-        }
-
-        if (data.online) {
-          statusDot.classList.add("online");
-          statusText.textContent = "En ligne";
-          statusText.style.color = "#14854b";
-        } else {
-          statusDot.classList.remove("online");
-          statusText.textContent = data.lastSeen ? "Dernière activité : " + formatDate(data.lastSeen) : "Hors ligne";
-          statusText.style.color = "#6b7d93";
-        }
+        if (!snap.exists()) return;
+        updateProfileView(snap.val() || {});
       });
     }
 
@@ -1241,45 +1953,133 @@
       return "";
     }
 
-    function loadUserPosts(uid) {
-      onValue(ref(db, "posts"), (snap) => {
-        const data = snap.val() || {};
-        const posts = Object.entries(data)
-          .map(([id, val]) => ({ id, ...val }))
-          .filter(post => post.authorId === uid)
-          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    async function deleteSinglePost(postId) {
+      if (!currentUser || !postId) return;
+      const ok = confirm("Supprimer cette publication ?");
+      if (!ok) return;
 
-        if (!posts.length) {
-          userPosts.innerHTML = `<div class="empty-card">Aucune publication pour le moment.</div>`;
-          return;
-        }
+      try {
+        const snap = await get(ref(db, `posts/${postId}`));
+        if (!snap.exists()) return;
+        const post = snap.val() || {};
+        if (post.authorId !== currentUser.uid) return;
 
-        userPosts.innerHTML = posts.map(post => `
-          <article class="post-preview" data-post-id="${post.id}">
-            ${renderPostAttachment(post)}
-            <div class="post-preview-body">
-              <p>${escapeHtml(post.text || "")}</p>
-              <small>${escapeHtml(formatDate(post.createdAt))}</small>
+        await remove(ref(db, `posts/${postId}`));
+        await remove(ref(db, `likes/${postId}`));
+        await remove(ref(db, `comments/${postId}`));
+      } catch (error) {
+        console.error(error);
+        dangerMsg.textContent = "Impossible de supprimer cette publication.";
+        dangerMsg.className = "security-msg msg-err";
+      }
+    }
+
+    function applyPostsFilter(posts) {
+      const filter = postsFilterSelect.value;
+      if (filter === "images") {
+        return posts.filter(post => normalizePostImages(post).length > 0);
+      }
+      if (filter === "pdf") {
+        return posts.filter(post => !!normalizePostPdf(post));
+      }
+      if (filter === "text") {
+        return posts.filter(post => normalizePostImages(post).length === 0 && !normalizePostPdf(post));
+      }
+      return posts;
+    }
+
+    function renderPostsForProfile() {
+      const allPosts = Object.entries(postsMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}) }))
+        .filter(post => post.authorId === viewedUid)
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      const posts = applyPostsFilter(allPosts);
+      const commentEntries = Object.entries(commentsMap || {});
+      const likeEntries = Object.entries(likesMap || {});
+
+      const commentCount = commentEntries.reduce((sum, [postId, comments]) => {
+        const post = postsMap[postId];
+        if (!post || post.authorId !== viewedUid) return sum;
+        return sum + Object.keys(comments || {}).length;
+      }, 0);
+
+      const likesReceived = likeEntries.reduce((sum, [postId, likes]) => {
+        const post = postsMap[postId];
+        if (!post || post.authorId !== viewedUid) return sum;
+        return sum + Object.keys(likes || {}).length;
+      }, 0);
+
+      postCountStat.textContent = String(allPosts.length);
+      commentCountStat.textContent = String(commentCount);
+      likesReceivedStat.textContent = String(likesReceived);
+
+      if (!posts.length) {
+        userPosts.innerHTML = `<div class="empty-card">Aucune publication pour le moment.</div>`;
+        return;
+      }
+
+      userPosts.innerHTML = posts.map(post => `
+        <article class="post-preview" data-post-id="${post.id}">
+          ${renderPostAttachment(post)}
+          <div class="post-preview-body">
+            <p>${escapeHtml(post.text || "")}</p>
+            <small>${escapeHtml(formatDate(post.createdAt))}</small>
+            <div class="post-inline-actions">
+              <button class="secondary-btn" type="button" data-open-post="${post.id}">Ouvrir dans Insights</button>
+              ${isViewingOwnProfile() ? `<button class="danger-btn" type="button" data-delete-post="${post.id}">Supprimer</button>` : ""}
             </div>
-          </article>
-        `).join("");
+          </div>
+        </article>
+      `).join("");
 
-        document.querySelectorAll("[data-post-id]").forEach(card => {
-          card.addEventListener("click", () => {
-            window.location.href = `insights.html?postId=${encodeURIComponent(card.dataset.postId)}`;
-          });
+      document.querySelectorAll("[data-open-post]").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          window.location.href = `insights.html?postId=${encodeURIComponent(btn.dataset.openPost)}`;
+        });
+      });
+
+      document.querySelectorAll("[data-delete-post]").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          await deleteSinglePost(btn.dataset.deletePost);
+        });
+      });
+
+      document.querySelectorAll("[data-post-id]").forEach(card => {
+        card.addEventListener("click", () => {
+          window.location.href = `insights.html?postId=${encodeURIComponent(card.dataset.postId)}`;
         });
       });
     }
 
-    saveProfileBtn.addEventListener("click", async () => {
+    function bindRealtimeData() {
+      onValue(ref(db, "posts"), (snap) => {
+        postsMap = snap.val() || {};
+        renderPostsForProfile();
+      });
+
+      onValue(ref(db, "comments"), (snap) => {
+        commentsMap = snap.val() || {};
+        renderPostsForProfile();
+      });
+
+      onValue(ref(db, "likes"), (snap) => {
+        likesMap = snap.val() || {};
+        renderPostsForProfile();
+      });
+    }
+
+    async function saveProfile() {
       if (!currentUser || currentUser.uid !== viewedUid) return;
 
       const newName = nameInput.value.trim();
       const newBio = bioInput.value.trim();
 
       if (!newName) {
-        showMsg("Le nom affiché est obligatoire.");
+        profileMsg.textContent = "Le nom affiché est obligatoire.";
+        profileMsg.className = "profile-msg msg-err";
         return;
       }
 
@@ -1287,18 +2087,175 @@
         await updateProfile(currentUser, { displayName: newName });
         await update(ref(db, "users/" + currentUser.uid), {
           displayName: newName,
+          firstName: firstNameInput.value.trim(),
+          lastName: lastNameInput.value.trim(),
+          country: countryInput.value.trim(),
+          institution: institutionInput.value.trim(),
+          specialty: specialtyInput.value.trim(),
+          website: websiteInput.value.trim(),
+          phone: phoneInput.value.trim(),
           bio: newBio,
           updatedAt: Date.now()
         });
 
-        profileName.textContent = newName;
-        bioText.textContent = newBio || "Aucune bio pour le moment.";
-        showMsg("Profil mis à jour avec succès.", true);
+        profileMsg.textContent = "Profil mis à jour avec succès.";
+        profileMsg.className = "profile-msg msg-ok";
       } catch (error) {
         console.error(error);
-        showMsg("Erreur de mise à jour.");
+        profileMsg.textContent = "Erreur de mise à jour du profil.";
+        profileMsg.className = "profile-msg msg-err";
       }
-    });
+    }
+
+    async function setPrivacyField(field) {
+      if (!currentUser || !isViewingOwnProfile()) return;
+      const privacy = userPrivacy(viewedUser);
+      const nextValue = !privacy[field];
+
+      try {
+        await update(ref(db, `users/${currentUser.uid}/privacy`), {
+          ...privacy,
+          [field]: nextValue
+        });
+        privacyMsg.textContent = "Paramètre de confidentialité mis à jour.";
+        privacyMsg.className = "profile-msg msg-ok";
+      } catch (error) {
+        console.error(error);
+        privacyMsg.textContent = "Impossible de mettre à jour ce paramètre.";
+        privacyMsg.className = "profile-msg msg-err";
+      }
+    }
+
+    async function setAllowMessagesRule() {
+      if (!currentUser || !isViewingOwnProfile()) return;
+      const privacy = userPrivacy(viewedUser);
+
+      try {
+        await update(ref(db, `users/${currentUser.uid}/privacy`), {
+          ...privacy,
+          allowMessages: allowMessagesSelect.value
+        });
+        privacyMsg.textContent = "Règle de messagerie mise à jour.";
+        privacyMsg.className = "profile-msg msg-ok";
+      } catch (error) {
+        console.error(error);
+        privacyMsg.textContent = "Impossible de mettre à jour la règle de messagerie.";
+        privacyMsg.className = "profile-msg msg-err";
+      }
+    }
+
+    async function changePasswordNow() {
+      if (!currentUser || !isViewingOwnProfile()) return;
+      const newPassword = newPasswordInput.value;
+
+      if (!newPassword || newPassword.length < 6) {
+        securityMsg.textContent = "Le nouveau mot de passe doit contenir au moins 6 caractères.";
+        securityMsg.className = "security-msg msg-err";
+        return;
+      }
+
+      try {
+        await updatePassword(currentUser, newPassword);
+        newPasswordInput.value = "";
+        securityMsg.textContent = "Mot de passe mis à jour avec succès.";
+        securityMsg.className = "security-msg msg-ok";
+      } catch (error) {
+        console.error(error);
+        securityMsg.textContent = "Impossible de changer le mot de passe. Reconnecte-toi puis réessaie.";
+        securityMsg.className = "security-msg msg-err";
+      }
+    }
+
+    async function resendVerificationNow() {
+      if (!currentUser || !isViewingOwnProfile()) return;
+      try {
+        await sendEmailVerification(currentUser);
+        securityMsg.textContent = "Email de vérification renvoyé.";
+        securityMsg.className = "security-msg msg-ok";
+      } catch (error) {
+        console.error(error);
+        securityMsg.textContent = "Impossible de renvoyer le mail de vérification.";
+        securityMsg.className = "security-msg msg-err";
+      }
+    }
+
+    async function refreshVerificationState() {
+      if (!currentUser) return;
+      try {
+        await reload(currentUser);
+        updateEmailVerifiedUI();
+        securityMsg.textContent = currentUser.emailVerified ? "Adresse email vérifiée." : "Adresse email toujours non vérifiée.";
+        securityMsg.className = "security-msg msg-ok";
+      } catch (error) {
+        console.error(error);
+        securityMsg.textContent = "Impossible d’actualiser l’état de vérification.";
+        securityMsg.className = "security-msg msg-err";
+      }
+    }
+
+    async function deleteAllUserData(uid) {
+      const postsSnap = await get(ref(db, "posts"));
+      const commentsSnap = await get(ref(db, "comments"));
+      const likesSnap = await get(ref(db, "likes"));
+
+      const postsData = postsSnap.val() || {};
+      const commentsData = commentsSnap.val() || {};
+      const likesData = likesSnap.val() || {};
+
+      for (const [postId, post] of Object.entries(postsData)) {
+        if ((post || {}).authorId === uid) {
+          await remove(ref(db, `posts/${postId}`));
+          await remove(ref(db, `comments/${postId}`));
+          await remove(ref(db, `likes/${postId}`));
+        }
+      }
+
+      for (const [postId, comments] of Object.entries(commentsData)) {
+        for (const [commentId, comment] of Object.entries(comments || {})) {
+          if ((comment || {}).authorId === uid) {
+            await remove(ref(db, `comments/${postId}/${commentId}`));
+          }
+        }
+      }
+
+      for (const [postId, likes] of Object.entries(likesData)) {
+        if (likes && likes[uid]) {
+          await remove(ref(db, `likes/${postId}/${uid}`));
+        }
+      }
+
+      await remove(ref(db, `users/${uid}`));
+      await remove(ref(db, `accountApprovals/${uid}`));
+    }
+
+    async function deleteOwnAccount() {
+      if (!currentUser || !isViewingOwnProfile()) return;
+      const password = deletePasswordInput.value;
+
+      if (!password) {
+        deleteModalMsg.textContent = "Entre ton mot de passe pour confirmer.";
+        deleteModalMsg.className = "security-msg msg-err";
+        return;
+      }
+
+      confirmDeleteBtn.disabled = true;
+      deleteModalMsg.textContent = "Suppression du compte en cours...";
+      deleteModalMsg.className = "security-msg msg-ok";
+
+      try {
+        const credential = EmailAuthProvider.credential(currentUser.email, password);
+        await reauthenticateWithCredential(currentUser, credential);
+        await deleteAllUserData(currentUser.uid);
+        await deleteUser(currentUser);
+        window.location.replace("insights.html");
+      } catch (error) {
+        console.error(error);
+        deleteModalMsg.textContent = "Impossible de supprimer le compte. Vérifie le mot de passe ou reconnecte-toi.";
+        deleteModalMsg.className = "security-msg msg-err";
+      } finally {
+        confirmDeleteBtn.disabled = false;
+      }
+    }
 
     changeAvatarBtn.addEventListener("click", () => avatarInput.click());
 
@@ -1309,19 +2266,22 @@
       if (!file) return;
 
       if (!file.type.startsWith("image/")) {
-        showMsg("Choisis uniquement une image.");
+        profileMsg.textContent = "Choisis uniquement une image.";
+        profileMsg.className = "profile-msg msg-err";
         avatarInput.value = "";
         return;
       }
 
       if (file.size > MAX_INPUT_FILE_SIZE) {
-        showMsg("Image trop lourde. Maximum 10 Mo.");
+        profileMsg.textContent = "Image trop lourde. Maximum 10 Mo.";
+        profileMsg.className = "profile-msg msg-err";
         avatarInput.value = "";
         return;
       }
 
       try {
-        showMsg("Compression de la photo en cours...", true);
+        profileMsg.textContent = "Compression de la photo en cours...";
+        profileMsg.className = "profile-msg msg-ok";
 
         const result = await compressImageFile(file);
 
@@ -1341,13 +2301,70 @@
         });
 
         showAvatar(result.dataUrl, nameInput.value, currentUser.email);
-        showMsg("Photo de profil mise à jour.", true);
+        profileMsg.textContent = "Photo de profil mise à jour.";
+        profileMsg.className = "profile-msg msg-ok";
       } catch (error) {
         console.error(error);
-        showMsg("Erreur lors de la mise à jour de la photo.");
+        profileMsg.textContent = "Erreur lors de la mise à jour de la photo.";
+        profileMsg.className = "profile-msg msg-err";
       } finally {
         avatarInput.value = "";
       }
+    });
+
+    copyProfileLinkBtn.addEventListener("click", async () => {
+      const link = `${window.location.origin}${window.location.pathname}?uid=${encodeURIComponent(viewedUid || "")}`;
+      try {
+        await navigator.clipboard.writeText(link);
+        profileMsg.textContent = "Lien du profil copié.";
+        profileMsg.className = "profile-msg msg-ok";
+      } catch (error) {
+        console.error(error);
+        profileMsg.textContent = "Impossible de copier automatiquement le lien.";
+        profileMsg.className = "profile-msg msg-err";
+      }
+    });
+
+    openSupportBtn.addEventListener("click", () => {
+      prefillSupportForm();
+      openModal(supportModal);
+    });
+
+    closeSupportModal.addEventListener("click", () => closeModal(supportModal));
+    cancelSupportBtn.addEventListener("click", () => closeModal(supportModal));
+    sendSupportBtn.addEventListener("click", sendSupportRequest);
+    supportModal.addEventListener("click", (e) => {
+      if (e.target === supportModal) closeModal(supportModal);
+    });
+
+    saveProfileBtn.addEventListener("click", saveProfile);
+
+    toggleHideEmailBtn.addEventListener("click", () => setPrivacyField("hideEmail"));
+    toggleHideBioBtn.addEventListener("click", () => setPrivacyField("hideBio"));
+    toggleHidePresenceBtn.addEventListener("click", () => setPrivacyField("hidePresence"));
+    allowMessagesSelect.addEventListener("change", setAllowMessagesRule);
+
+    changePasswordBtn.addEventListener("click", changePasswordNow);
+    resendVerificationBtn.addEventListener("click", resendVerificationNow);
+    refreshVerificationBtn.addEventListener("click", refreshVerificationState);
+
+    logoutBtn.addEventListener("click", async () => {
+      try { await signOut(auth); } catch (e) {}
+      window.location.replace("insights.html");
+    });
+
+    deleteAccountBtn.addEventListener("click", () => {
+      deletePasswordInput.value = "";
+      deleteModalMsg.textContent = "";
+      openModal(deleteAccountModal);
+    });
+
+    closeDeleteModal.addEventListener("click", () => closeModal(deleteAccountModal));
+    cancelDeleteBtn.addEventListener("click", () => closeModal(deleteAccountModal));
+    confirmDeleteBtn.addEventListener("click", deleteOwnAccount);
+
+    deleteAccountModal.addEventListener("click", (e) => {
+      if (e.target === deleteAccountModal) closeModal(deleteAccountModal);
     });
 
     createInviteBtn.addEventListener("click", createSignupInvite);
@@ -1356,23 +2373,27 @@
       if (!lastInviteLink) return;
       try {
         await navigator.clipboard.writeText(lastInviteLink);
-        showInviteMsg("Lien copié dans le presse-papiers.", true);
+        inviteAdminMsg.textContent = "Lien copié dans le presse-papiers.";
+        inviteAdminMsg.className = "invite-msg msg-ok";
       } catch (error) {
         console.error(error);
-        showInviteMsg("Impossible de copier automatiquement. Copie le lien manuellement.");
+        inviteAdminMsg.textContent = "Impossible de copier automatiquement. Copie le lien manuellement.";
+        inviteAdminMsg.className = "invite-msg msg-err";
       }
     });
 
+    postsFilterSelect.addEventListener("change", renderPostsForProfile);
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        window.location.href = "insights.html";
+        window.location.replace("insights.html");
         return;
       }
 
       const lastActivity = Number(localStorage.getItem(LAST_ACTIVITY_KEY) || "0");
       if (lastActivity && Date.now() - lastActivity > INACTIVITY_LIMIT) {
         try { await signOut(auth); } catch (e) {}
-        window.location.href = "insights.html";
+        window.location.replace("insights.html");
         return;
       }
 
@@ -1381,29 +2402,16 @@
 
       bindActivityEvents();
       resetActivityTimer();
+      updateMeetingNav();
 
+      await ensureAdminRoleIfNeeded();
       await loadUserProfile(viewedUid);
       listenPresence(viewedUid);
-      loadUserPosts(viewedUid);
+      bindRealtimeData();
 
-      if (isAdminUser(currentUser)) {
-        try {
-          const meSnap = await get(ref(db, "users/" + currentUser.uid));
-          if (meSnap.exists()) {
-            const meData = meSnap.val() || {};
-            if ((meData.role || "") !== "admin") {
-              await update(ref(db, "users/" + currentUser.uid), {
-                role: "admin",
-                updatedAt: Date.now()
-              });
-            }
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      updateEmailVerifiedUI();
 
-      updateAdminVisibility();
+      document.body.classList.remove("auth-checking");
     });
   </script>
 </body>
