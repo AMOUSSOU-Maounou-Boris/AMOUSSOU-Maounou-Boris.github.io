@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -207,6 +207,7 @@
       color:var(--muted);
       line-height:1.45;
       font-size:14px;
+      white-space:pre-wrap;
     }
 
     .main{
@@ -336,6 +337,12 @@
     .grid-4{
       display:grid;
       grid-template-columns:repeat(4,1fr);
+      gap:12px;
+    }
+
+    .grid-5{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
       gap:12px;
     }
 
@@ -472,6 +479,7 @@
       font-weight:800;
       line-height:1.45;
       word-break:break-word;
+      white-space:pre-wrap;
     }
 
     .status-tag{
@@ -493,7 +501,8 @@
     .tag-open{ background:#eaf9ee; color:#0b7f34; }
     .tag-close{ background:#ffe9e9; color:#b62727; }
     .tag-live{ background:#edf4ff; color:#0f4d92; }
-    .tag-finished{ background:#ffe9e9; color:#b62727; }
+    .tag-finished{ background:#ffe9e9; color:#b11818; }
+    .tag-locked{ background:#fff1f1; color:#ad2222; }
 
     .detail-grid{
       display:grid;
@@ -552,6 +561,7 @@
       color:var(--muted);
       line-height:1.6;
       font-size:14px;
+      white-space:pre-wrap;
     }
 
     .small-note{
@@ -559,6 +569,7 @@
       font-size:13px;
       line-height:1.55;
       margin-top:8px;
+      white-space:pre-wrap;
     }
 
     .jury-list{
@@ -748,34 +759,38 @@
       outline:none;
     }
 
-    .security-grid{
+    .monitor-grid{
       display:grid;
       grid-template-columns:repeat(4,1fr);
       gap:12px;
-      margin-top:14px;
     }
 
-    .security-card{
+    .monitor-card{
       border:1px solid var(--line);
-      border-radius:18px;
+      border-radius:16px;
       background:#fff;
       padding:14px;
     }
 
-    .security-card .k{
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:6px;
-      text-transform:uppercase;
-      font-weight:700;
+    .monitor-card h4{
+      margin:0 0 8px;
+      font-size:15px;
+      color:var(--nav);
     }
 
-    .security-card .v{
-      color:var(--nav);
-      font-size:14px;
-      font-weight:800;
-      line-height:1.5;
-      word-break:break-word;
+    .monitor-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      white-space:pre-wrap;
+    }
+
+    .bulk-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      margin-top:16px;
     }
 
     .hidden{ display:none !important; }
@@ -798,14 +813,15 @@
       }
       .detail-grid,
       .grid-2,
-      .action-grid{
+      .action-grid,
+      .bulk-actions{
         grid-template-columns:1fr;
       }
       .grid-3{
         grid-template-columns:1fr;
       }
       .coord-grid,
-      .security-grid{
+      .monitor-grid{
         grid-template-columns:1fr 1fr;
       }
     }
@@ -815,8 +831,9 @@
       .toolbar,
       .candidate-meta,
       .grid-4,
+      .grid-5,
       .coord-grid,
-      .security-grid{
+      .monitor-grid{
         grid-template-columns:1fr;
       }
       .hero h1{
@@ -880,7 +897,7 @@
 
         <div class="hub-card">
           <h4>Contrôle total</h4>
-          <p>Cette page centralise les inscriptions, jury, paramètres du challenge, résultats, certificats, publication concours et liaison avec Insights.</p>
+          <p>Cette page centralise les inscriptions, jury, paramètres du challenge, sécurité stricte, résultats, certificats, publication concours et liaison avec Insights.</p>
         </div>
 
         <div class="hub-card">
@@ -894,8 +911,8 @@
         </div>
 
         <div class="hub-card">
-          <h4>Crédibilité publique</h4>
-          <p>Le règlement officiel et la vérification des certificats renforcent maintenant la visibilité institutionnelle du concours.</p>
+          <h4>Sécurité session</h4>
+          <p>Code de session unique, verrou appareil + mail, limitation de reprise, surveillance des avertissements, masquage des scores avant publication officielle.</p>
         </div>
       </div>
     </aside>
@@ -908,7 +925,7 @@
             <p>
               Depuis cet espace, l’administrateur peut modifier le nom du challenge, l’édition,
               ouvrir ou fermer les inscriptions, autoriser les jurys par email, suivre en direct les candidats pendant le test,
-              publier les résultats, délivrer les certificats et superviser l’ensemble du challenge.
+              publier les résultats, délivrer les certificats, verrouiller les accès candidats et superviser l’ensemble du challenge.
             </p>
           </div>
           <div class="hero-badge" id="heroEditionBadge">Édition active</div>
@@ -987,7 +1004,7 @@
 
               <div style="font-size:15px; line-height:1.75; color:rgba(255,255,255,.94);">
                 Cette interface centrale contrôle les inscriptions, le jury, la session en direct,
-                Challenge Pub, les résultats validés et la délivrance des certificats officiels.
+                la sécurité d’accès candidat, Challenge Pub, les résultats validés et la délivrance des certificats officiels.
                 Les pages règlement officiel et vérification du certificat renforcent maintenant
                 la crédibilité publique du concours sans casser le système déjà en place.
               </div>
@@ -1010,8 +1027,8 @@
                 border-radius:18px;
                 padding:14px;
               ">
-                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Certificat</div>
-                <div style="font-size:16px; font-weight:900;">Vérification par code</div>
+                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Sécurité</div>
+                <div style="font-size:16px; font-weight:900;">Session verrouillée</div>
               </div>
             </div>
           </div>
@@ -1057,85 +1074,11 @@
           </div>
           <div class="mini-data">
             <div class="k">Résultats validés</div>
-            <div class="v">Admin + Challenge Pub</div>
+            <div class="v">Admin + Challenge Pub + Insights</div>
           </div>
           <div class="mini-data">
             <div class="k">Certificat officiel</div>
             <div class="v">Délivré par l’admin</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card section">
-        <h2>Sécurité ultra stricte du concours</h2>
-
-        <div class="grid-2">
-          <div class="card" style="padding:18px; box-shadow:none;">
-            <h3>Codes et verrouillage candidat</h3>
-
-            <div class="grid-2">
-              <div>
-                <label for="sessionCodeInput">Code secret de session</label>
-                <input id="sessionCodeInput" type="text" placeholder="Code de vérification unique pour l’épreuve" />
-              </div>
-              <div>
-                <label for="cooldownMonthsInput">Blocage même mail / appareil</label>
-                <input id="cooldownMonthsInput" type="number" min="1" max="12" value="3" />
-              </div>
-            </div>
-
-            <div class="grid-2" style="margin-top:12px;">
-              <div>
-                <label for="deviceLockModeInput">Verrouillage appareil</label>
-                <select id="deviceLockModeInput">
-                  <option value="strict">Strict</option>
-                  <option value="medium">Moyen</option>
-                </select>
-              </div>
-              <div>
-                <label for="candidateGateModeInput">Mode d’accès pendant session</label>
-                <select id="candidateGateModeInput">
-                  <option value="strict">Accès interdit hors candidats vérifiés</option>
-                  <option value="soft">Message d’avertissement</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="btn-row">
-              <button class="btn primary" id="saveSecuritySettingsBtn">Enregistrer la sécurité</button>
-              <button class="btn secondary" id="generateSessionCodeBtn">Générer un code</button>
-            </div>
-
-            <div class="small-note">
-              Le candidat ne pourra accéder à l’épreuve qu’avec son email, son appareil enregistré et le code de session actif.
-            </div>
-          </div>
-
-          <div class="card" style="padding:18px; box-shadow:none;">
-            <h3>État actuel de la sécurité</h3>
-
-            <div class="security-grid">
-              <div class="security-card">
-                <div class="k">Code session</div>
-                <div class="v" id="securitySessionCodeText">-</div>
-              </div>
-              <div class="security-card">
-                <div class="k">Blocage</div>
-                <div class="v" id="securityCooldownText">-</div>
-              </div>
-              <div class="security-card">
-                <div class="k">Appareil</div>
-                <div class="v" id="securityDeviceModeText">-</div>
-              </div>
-              <div class="security-card">
-                <div class="k">Accès page concours</div>
-                <div class="v" id="securityGateModeText">-</div>
-              </div>
-            </div>
-
-            <div class="notice" style="margin-top:14px;">
-              Pendant une session active, les personnes non candidates vérifiées doivent tomber sur une page d’interdiction d’accès côté <strong>competition.html</strong>.
-            </div>
           </div>
         </div>
       </section>
@@ -1167,9 +1110,10 @@
 
           <div class="notice" style="margin-top:14px;">
             • durée synchronisée : <strong>50 min 00 s</strong><br>
-            • seuls les candidats vérifiés peuvent entrer pendant la session<br>
-            • page bloquée aux non-candidats sur competition.html pendant le live<br>
-            • fin automatique + copies remontées vers admin et jury
+            • statut rouge quand la compétition est lancée<br>
+            • chrono vert pendant le décompte<br>
+            • à la fin : <strong>Terminée, votre candidature est envoyée</strong><br>
+            • les copies remontent automatiquement ici et côté jury pour correction
           </div>
         </div>
       </section>
@@ -1227,7 +1171,7 @@
             </div>
 
             <div class="small-note">
-              Ces paramètres sont lus par <strong>competition.html</strong>, <strong>competition-jury.html</strong> et <strong>insights.html → Challenge Pub</strong>.
+              Ces paramètres sont lus par <strong>competition.html</strong>, <strong>competition-jury.html</strong> et la sous-section <strong>Challenge Pub</strong> dans <strong>insights.html</strong>.
             </div>
           </div>
 
@@ -1261,44 +1205,128 @@
       </section>
 
       <section class="card section">
-        <h2>Correction groupée et contrôle humain</h2>
+        <h2>Sécurité ultra stricte de session</h2>
 
         <div class="grid-2">
           <div class="card" style="padding:18px; box-shadow:none;">
-            <h3>Traitement massif des copies</h3>
+            <h3>Verrouillage candidat</h3>
 
-            <div class="btn-row">
-              <button class="btn primary" id="autoCorrectQcmBtn">Corriger automatiquement tous les QCM</button>
-              <button class="btn orange" id="prepareManualReviewBtn">Préparer les réponses écrites à revoir</button>
-              <button class="btn gold" id="rebuildFinalScoresBtn">Recalculer tous les scores finaux</button>
+            <div class="grid-2">
+              <div>
+                <label for="sessionCodeInput">Code unique de session</label>
+                <input id="sessionCodeInput" type="text" placeholder="Ex. CHEM-2026-ALPHA" />
+              </div>
+              <div>
+                <label for="cooldownMonthsInput">Blocage reprise (mois)</label>
+                <input id="cooldownMonthsInput" type="number" min="1" max="12" value="3" />
+              </div>
             </div>
 
-            <div class="notice" style="margin-top:14px;">
-              Les scores publics ne doivent pas être visibles aux candidats tant que le bouton
-              <strong>Afficher les résultats</strong> n’a pas été utilisé après contrôle humain.
+            <div class="grid-3" style="margin-top:12px;">
+              <div>
+                <label for="deviceLockModeInput">Verrou appareil</label>
+                <select id="deviceLockModeInput">
+                  <option value="strict">Strict</option>
+                  <option value="medium">Moyen</option>
+                  <option value="soft">Souple</option>
+                </select>
+              </div>
+              <div>
+                <label for="candidateGateModeInput">Filtre accès competition.html</label>
+                <select id="candidateGateModeInput">
+                  <option value="strict">Strict</option>
+                  <option value="warning">Avertissement</option>
+                  <option value="off">Désactivé</option>
+                </select>
+              </div>
+              <div>
+                <label for="maxWarningsInput">Avertissements max</label>
+                <input id="maxWarningsInput" type="number" min="1" max="10" value="3" />
+              </div>
+            </div>
+
+            <div class="grid-2" style="margin-top:12px;">
+              <div>
+                <label for="forbiddenTitleInput">Titre page interdite</label>
+                <input id="forbiddenTitleInput" type="text" placeholder="Compétition en cours, accès interdits..." />
+              </div>
+              <div>
+                <label for="forbiddenMessageInput">Message page interdite</label>
+                <input id="forbiddenMessageInput" type="text" placeholder="Seuls les candidats autorisés peuvent continuer." />
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn primary" id="saveSecurityBtn">Enregistrer la sécurité</button>
+              <button class="btn orange" id="rotateSessionCodeBtn">Régénérer le code</button>
+            </div>
+
+            <div class="small-note">
+              Le candidat ne pourra entrer dans <strong>competition.html</strong> pendant la session que s’il est approuvé, connecté avec le bon mail, sur le bon appareil, et avec le bon code de session.
             </div>
           </div>
 
           <div class="card" style="padding:18px; box-shadow:none;">
-            <h3>État de correction</h3>
+            <h3>État sécurité actif</h3>
 
-            <div class="security-grid">
-              <div class="security-card">
-                <div class="k">QCM corrigés</div>
-                <div class="v" id="massQcmStatusText">-</div>
+            <div class="grid-2">
+              <div class="mini-data">
+                <div class="k">Code session</div>
+                <div class="v" id="securityCurrentCode">-</div>
               </div>
-              <div class="security-card">
-                <div class="k">Copies écrites</div>
-                <div class="v" id="massWrittenStatusText">-</div>
+              <div class="mini-data">
+                <div class="k">Blocage reprise</div>
+                <div class="v" id="securityCooldownView">-</div>
               </div>
-              <div class="security-card">
-                <div class="k">Scores finaux</div>
-                <div class="v" id="massFinalScoreStatusText">-</div>
+              <div class="mini-data">
+                <div class="k">Mode appareil</div>
+                <div class="v" id="securityDeviceModeView">-</div>
               </div>
-              <div class="security-card">
-                <div class="k">Publication publique</div>
-                <div class="v" id="massPublishStatusText">-</div>
+              <div class="mini-data">
+                <div class="k">Filtre d’accès</div>
+                <div class="v" id="securityGateModeView">-</div>
               </div>
+            </div>
+
+            <div style="margin-top:12px;">
+              <label>Message d’interdiction actif</label>
+              <div class="notice" id="securityForbiddenPreview">Aucun message enregistré.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Surveillance des accès candidats</h3>
+            <div class="monitor-grid">
+              <div class="monitor-card">
+                <h4>Accès vérifiés</h4>
+                <p id="monitorVerifiedCount">0</p>
+              </div>
+              <div class="monitor-card">
+                <h4>Appareils verrouillés</h4>
+                <p id="monitorLockedDevicesCount">0</p>
+              </div>
+              <div class="monitor-card">
+                <h4>Alertes sécurité</h4>
+                <p id="monitorSecurityEventsCount">0</p>
+              </div>
+              <div class="monitor-card">
+                <h4>Connexions bloquées</h4>
+                <p id="monitorBlockedCount">0</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Actions rapides sécurité</h3>
+            <div class="btn-row">
+              <button class="btn secondary" id="refreshSecurityMonitorBtn">Actualiser la surveillance</button>
+              <button class="btn red" id="forceLockAllCandidatesBtn">Forcer verrouillage session</button>
+              <button class="btn orange" id="clearCandidateAccessBtn">Réinitialiser accès vérifiés</button>
+            </div>
+            <div class="small-note">
+              Ces actions sont utiles si tu changes le code de session, si tu redémarres une épreuve ou si tu suspectes une fraude.
             </div>
           </div>
         </div>
@@ -1359,7 +1387,7 @@
               <a class="btn secondary" href="insights.html">Ouvrir Insights</a>
             </div>
             <div class="small-note">
-              Toute publication Challenge Pub faite ici sera relue automatiquement sur les autres pages liées.
+              Toute publication Challenge Pub faite ici est relue automatiquement sur les autres pages liées.
             </div>
           </div>
         </div>
@@ -1385,6 +1413,10 @@
             <div class="btn-row">
               <button class="btn primary" id="addAnnouncementBtn">Publier l’annonce</button>
               <button class="btn secondary" id="clearAnnouncementDraftBtn">Effacer</button>
+            </div>
+
+            <div class="small-note">
+              Chaque annonce aura toujours les boutons <strong>Masquer / Démasquer</strong> et <strong>Supprimer</strong>.
             </div>
           </div>
 
@@ -1424,6 +1456,10 @@
               <button class="btn green" id="addJuryBtn">Autoriser cet email</button>
               <button class="btn secondary" id="clearJuryFieldsBtn">Effacer</button>
             </div>
+
+            <div class="small-note">
+              Le jury n’est pas libre. C’est ici que l’admin décide qui peut accéder à <strong>competition-jury.html</strong>.
+            </div>
           </div>
 
           <div class="card" style="padding:18px; box-shadow:none;">
@@ -1460,24 +1496,30 @@
 
             <div style="margin-top:12px;">
               <label for="resultPostContentInput">Texte de publication</label>
-              <textarea id="resultPostContentInput" placeholder="Texte à publier dans Insights avec classement, félicitations, résumé..."></textarea>
+              <textarea id="resultPostContentInput" placeholder="Texte à publier dans Insights avec coupe, félicitations, classement ou résumé..."></textarea>
             </div>
 
             <div class="btn-row">
               <button class="btn gold" id="publishResultsBtn">Publier vers Insights</button>
               <button class="btn secondary" id="clearResultPublishBtn">Effacer</button>
-              <button class="btn orange" id="showResultsPublicBtn">Afficher les résultats aux candidats</button>
             </div>
 
             <div class="small-note">
-              Tant que l’administrateur n’a pas appuyé sur <strong>Afficher les résultats</strong>, les candidats ne doivent pas voir leur score final public.
+              Cette publication est enregistrée dans la base et relue côté Insights. Les scores candidats restent masqués tant que l’admin n’active pas l’affichage officiel.
             </div>
           </div>
 
           <div class="card" style="padding:18px; box-shadow:none;">
             <h3>Aperçu rapide</h3>
-            <div class="notice" id="resultPreviewBox">
-              🏆 Aucun aperçu pour le moment.
+            <div class="notice" id="resultPreviewBox">🏆 Aucun aperçu pour le moment.</div>
+
+            <div class="btn-row">
+              <button class="btn green" id="showResultsBoardBtn">Afficher les résultats</button>
+              <button class="btn red" id="hideResultsBoardBtn">Masquer les résultats</button>
+            </div>
+
+            <div class="small-note" id="resultsBoardStatusText">
+              Les résultats publics sont actuellement masqués.
             </div>
           </div>
         </div>
@@ -1549,12 +1591,46 @@
               <button class="btn secondary" id="loadChallengePubBtn">Recharger la publication</button>
               <button class="btn secondary" id="clearChallengePubBtn">Effacer le brouillon</button>
             </div>
+
+            <div class="small-note">
+              Cette publication est le point central du concours. Elle est relue par <strong>competition.html</strong> et affichée dans <strong>insights.html</strong> sous la sous-section <strong>Challenge Pub</strong>.
+            </div>
           </div>
 
           <div class="pub-card">
             <h3>Aperçu Challenge Pub</h3>
             <div class="pub-preview" id="challengePubPreviewBox">Aucune publication pour le moment.</div>
             <div class="small-note" id="challengePubMetaBox" style="margin-top:10px;">Aucune donnée publiée.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
+        <h2>Correction automatique et traitement en masse</h2>
+
+        <div class="bulk-actions">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Correction automatique globale</h3>
+            <div class="notice">
+              Cette action corrige en série toutes les questions QCM déjà remises, calcule les scores automatiques,
+              met à jour le classement interne et laisse les réponses rédigées en attente de vérification humaine.
+            </div>
+            <div class="btn-row">
+              <button class="btn primary" id="autoCorrectAllBtn">Corriger automatiquement tous les QCM</button>
+              <button class="btn secondary" id="rebuildLeaderboardBtn">Recalculer le classement interne</button>
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Aide à la correction jury/admin</h3>
+            <div class="notice">
+              Les réponses rédigées restent sous contrôle humain. Le système peut toutefois préparer un statut,
+              une note automatique partielle, et marquer les copies nécessitant une relecture approfondie.
+            </div>
+            <div class="btn-row">
+              <button class="btn green" id="prepareManualReviewBtn">Préparer la relecture manuelle</button>
+              <button class="btn orange" id="markAllPendingReviewBtn">Marquer toutes les copies à revoir</button>
+            </div>
           </div>
         </div>
       </section>
@@ -1579,16 +1655,15 @@
         </div>
 
         <div class="notice">
-          Ici, l’admin voit les candidats, leur progression, les copies, les réponses rédigées,
-          l’appareil utilisé, l’état de verrouillage et les éléments utiles au contrôle de fraude.
+          Ici, l’admin voit aussi les candidats qui ont commencé le test, leur progression, le temps restant, les avertissements enregistrés, les appareils vérifiés, les verrous de session et les copies remontées automatiquement, y compris les réponses rédigées.
         </div>
       </section>
 
       <section class="card section">
         <h2>Dossiers candidats et suivi en direct</h2>
         <p>
-          Chaque bloc ci-dessous regroupe le dossier du candidat, son état pendant le test, l’avis du jury, les demandes de certificat,
-          les réponses remises, les données de sécurité et les actions administratives.
+          Chaque bloc ci-dessous regroupe le dossier du candidat, son état pendant le test, la sécurité de sa session, l’avis du jury,
+          les demandes de certificat, les réponses remises et les actions administratives.
         </p>
 
         <div id="candidateList" class="panel-grid">
@@ -1642,7 +1717,9 @@
     const CONFIG = {
       competitionId: "chem_challenge_2026",
       adminEmail: "borisamoussou01@gmail.com",
-      liveDurationSeconds: 50 * 60
+      liveDurationSeconds: 50 * 60,
+      defaultCooldownMonths: 3,
+      defaultMaxWarnings: 3
     };
 
     const userNameEl = document.getElementById("userName");
@@ -1684,26 +1761,6 @@
     const finishCompetitionBtn = document.getElementById("finishCompetitionBtn");
     const resetCompetitionBtn = document.getElementById("resetCompetitionBtn");
 
-    const sessionCodeInput = document.getElementById("sessionCodeInput");
-    const cooldownMonthsInput = document.getElementById("cooldownMonthsInput");
-    const deviceLockModeInput = document.getElementById("deviceLockModeInput");
-    const candidateGateModeInput = document.getElementById("candidateGateModeInput");
-    const saveSecuritySettingsBtn = document.getElementById("saveSecuritySettingsBtn");
-    const generateSessionCodeBtn = document.getElementById("generateSessionCodeBtn");
-
-    const securitySessionCodeText = document.getElementById("securitySessionCodeText");
-    const securityCooldownText = document.getElementById("securityCooldownText");
-    const securityDeviceModeText = document.getElementById("securityDeviceModeText");
-    const securityGateModeText = document.getElementById("securityGateModeText");
-
-    const autoCorrectQcmBtn = document.getElementById("autoCorrectQcmBtn");
-    const prepareManualReviewBtn = document.getElementById("prepareManualReviewBtn");
-    const rebuildFinalScoresBtn = document.getElementById("rebuildFinalScoresBtn");
-    const massQcmStatusText = document.getElementById("massQcmStatusText");
-    const massWrittenStatusText = document.getElementById("massWrittenStatusText");
-    const massFinalScoreStatusText = document.getElementById("massFinalScoreStatusText");
-    const massPublishStatusText = document.getElementById("massPublishStatusText");
-
     const announcementTitleInput = document.getElementById("announcementTitleInput");
     const announcementContentInput = document.getElementById("announcementContentInput");
     const addAnnouncementBtn = document.getElementById("addAnnouncementBtn");
@@ -1728,8 +1785,10 @@
     const resultPostContentInput = document.getElementById("resultPostContentInput");
     const publishResultsBtn = document.getElementById("publishResultsBtn");
     const clearResultPublishBtn = document.getElementById("clearResultPublishBtn");
-    const showResultsPublicBtn = document.getElementById("showResultsPublicBtn");
     const resultPreviewBox = document.getElementById("resultPreviewBox");
+    const showResultsBoardBtn = document.getElementById("showResultsBoardBtn");
+    const hideResultsBoardBtn = document.getElementById("hideResultsBoardBtn");
+    const resultsBoardStatusText = document.getElementById("resultsBoardStatusText");
 
     const challengePubTitleInput = document.getElementById("challengePubTitleInput");
     const challengePubVisibilityInput = document.getElementById("challengePubVisibilityInput");
@@ -1747,6 +1806,33 @@
     const challengePubPreviewBox = document.getElementById("challengePubPreviewBox");
     const challengePubMetaBox = document.getElementById("challengePubMetaBox");
 
+    const sessionCodeInput = document.getElementById("sessionCodeInput");
+    const cooldownMonthsInput = document.getElementById("cooldownMonthsInput");
+    const deviceLockModeInput = document.getElementById("deviceLockModeInput");
+    const candidateGateModeInput = document.getElementById("candidateGateModeInput");
+    const maxWarningsInput = document.getElementById("maxWarningsInput");
+    const forbiddenTitleInput = document.getElementById("forbiddenTitleInput");
+    const forbiddenMessageInput = document.getElementById("forbiddenMessageInput");
+    const saveSecurityBtn = document.getElementById("saveSecurityBtn");
+    const rotateSessionCodeBtn = document.getElementById("rotateSessionCodeBtn");
+    const securityCurrentCode = document.getElementById("securityCurrentCode");
+    const securityCooldownView = document.getElementById("securityCooldownView");
+    const securityDeviceModeView = document.getElementById("securityDeviceModeView");
+    const securityGateModeView = document.getElementById("securityGateModeView");
+    const securityForbiddenPreview = document.getElementById("securityForbiddenPreview");
+    const monitorVerifiedCount = document.getElementById("monitorVerifiedCount");
+    const monitorLockedDevicesCount = document.getElementById("monitorLockedDevicesCount");
+    const monitorSecurityEventsCount = document.getElementById("monitorSecurityEventsCount");
+    const monitorBlockedCount = document.getElementById("monitorBlockedCount");
+    const refreshSecurityMonitorBtn = document.getElementById("refreshSecurityMonitorBtn");
+    const forceLockAllCandidatesBtn = document.getElementById("forceLockAllCandidatesBtn");
+    const clearCandidateAccessBtn = document.getElementById("clearCandidateAccessBtn");
+
+    const autoCorrectAllBtn = document.getElementById("autoCorrectAllBtn");
+    const rebuildLeaderboardBtn = document.getElementById("rebuildLeaderboardBtn");
+    const prepareManualReviewBtn = document.getElementById("prepareManualReviewBtn");
+    const markAllPendingReviewBtn = document.getElementById("markAllPendingReviewBtn");
+
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");
     const certificateFilter = document.getElementById("certificateFilter");
@@ -1755,7 +1841,7 @@
 
     let currentUser = null;
     let currentProfile = {};
-    let registrationsMap = {};
+    let participantsMap = {};
     let certificateRequestsMap = {};
     let certificatesMap = {};
     let juryReviewsMap = {};
@@ -1763,12 +1849,27 @@
     let competitionSettings = null;
     let challengePubData = null;
     let announcementsMap = {};
+    let examSubmissionsMap = {};
     let manualCorrectionsMap = {};
     let liveControlState = null;
     let liveCountdownTimer = null;
+    let candidateAccessMap = {};
+    let deviceLocksMap = {};
+    let securityEventsMap = {};
+    let securitySettings = null;
+    let resultsPublication = null;
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
+    }
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
     function formatDate(ts) {
@@ -1796,6 +1897,16 @@
       return email.toLowerCase().replace(/\./g, ",");
     }
 
+    function randomSessionCode() {
+      return "CHEM-" + Math.random().toString(36).slice(2, 6).toUpperCase() + "-" + Date.now().toString().slice(-4);
+    }
+
+    function addMonths(timestamp, months = 3) {
+      const d = new Date(timestamp || Date.now());
+      d.setMonth(d.getMonth() + Number(months || 3));
+      return d.getTime();
+    }
+
     function makeVerificationNumber(uid) {
       const clean = uid.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase();
       const d = new Date();
@@ -1803,10 +1914,6 @@
       const m = String(d.getMonth() + 1).padStart(2, "0");
       const dd = String(d.getDate()).padStart(2, "0");
       return `CC-${y}${m}${dd}-${clean}`;
-    }
-
-    function generateSessionCode() {
-      return "CHEM-" + Math.random().toString(36).slice(2, 6).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
     }
 
     function getStatusTagClass(status) {
@@ -1818,6 +1925,7 @@
       if (status === "closed") return "tag-close";
       if (status === "live") return "tag-live";
       if (status === "finished") return "tag-finished";
+      if (status === "locked") return "tag-locked";
       return "tag-none";
     }
 
@@ -1831,6 +1939,11 @@
         clearInterval(liveCountdownTimer);
         liveCountdownTimer = null;
       }
+    }
+
+    function clearField(el) {
+      if (!el) return;
+      el.value = "";
     }
 
     function applySettingsToUI(settings = null) {
@@ -1861,19 +1974,37 @@
     function applySecurityToUI(settings = null) {
       const s = settings || {};
       const code = sanitizeText(s.sessionCode || "");
-      const cooldown = Number(s.rejoinCooldownMonths || 3);
+      const cooldownMonths = Number(s.rejoinCooldownMonths || CONFIG.defaultCooldownMonths);
       const deviceMode = sanitizeText(s.deviceLockMode || "strict");
       const gateMode = sanitizeText(s.candidateGateMode || "strict");
+      const maxWarnings = Number(s.maxWarnings || CONFIG.defaultMaxWarnings);
+      const forbiddenTitle = sanitizeText(s.forbiddenTitle || "Compétition en cours, accès interdits à toute personne non candidats");
+      const forbiddenMessage = sanitizeText(s.forbiddenMessage || "Seuls les candidats avec code unique valide, mail autorisé et appareil reconnu peuvent continuer.");
 
       sessionCodeInput.value = code;
-      cooldownMonthsInput.value = cooldown;
+      cooldownMonthsInput.value = cooldownMonths;
       deviceLockModeInput.value = deviceMode;
       candidateGateModeInput.value = gateMode;
+      maxWarningsInput.value = maxWarnings;
+      forbiddenTitleInput.value = forbiddenTitle;
+      forbiddenMessageInput.value = forbiddenMessage;
 
-      securitySessionCodeText.textContent = code || "-";
-      securityCooldownText.textContent = `${cooldown} mois`;
-      securityDeviceModeText.textContent = deviceMode === "strict" ? "Strict" : "Moyen";
-      securityGateModeText.textContent = gateMode === "strict" ? "Blocage fort" : "Avertissement";
+      securityCurrentCode.textContent = code || "Non défini";
+      securityCooldownView.textContent = `${cooldownMonths} mois`;
+      securityDeviceModeView.textContent = deviceMode;
+      securityGateModeView.textContent = gateMode;
+      securityForbiddenPreview.textContent = `${forbiddenTitle}\n${forbiddenMessage}`;
+    }
+
+    function renderResultsPublicationState() {
+      const visible = !!resultsPublication?.showResults;
+      resultsBoardStatusText.textContent = visible
+        ? `Les résultats publics sont affichés depuis le ${formatDateTime(resultsPublication.updatedAt)}.`
+        : "Les résultats publics sont actuellement masqués.";
+
+      if (competitionSettings) {
+        resultVisibilityInput.value = visible ? "visible" : "hidden";
+      }
     }
 
     function renderChallengePubPreview(data = null) {
@@ -1924,11 +2055,6 @@ Mis en avant : ${pinned}
       syncVisibility.textContent = visibility === "hidden" ? "Masquée" : "Visible";
     }
 
-    function clearField(el) {
-      if (!el) return;
-      el.value = "";
-    }
-
     async function loadAdminProfile(uid) {
       const snap = await get(ref(db, `users/${uid}`));
       if (!snap.exists()) return;
@@ -1949,14 +2075,207 @@ Mis en avant : ${pinned}
         avatarFallback.classList.add("hidden");
       }
     }
-        async function saveCompetitionSettings() {
-      if (!currentUser || (currentUser.email || "").toLowerCase() !== CONFIG.adminEmail.toLowerCase()) {
+
+    function updatePreview() {
+      const winner = sanitizeText(winnerNameInput.value);
+      const score = sanitizeText(winnerScoreInput.value);
+      const text = sanitizeText(resultPostContentInput.value);
+
+      resultPreviewBox.textContent = `🏆 ${winner || "Nom du gagnant"}${score ? " — " + score : ""}${text ? "\n\n" + text : ""}`;
+    }
+
+    function computeSecurityMonitors() {
+      const verifiedCount = Object.values(candidateAccessMap || {}).filter(v => v && v.verified).length;
+      const lockedCount = Object.values(deviceLocksMap || {}).filter(v => v && (v.sessionState === "active" || v.sessionState === "cooldown")).length;
+      const securityEventsCount = Object.values(securityEventsMap || {}).reduce((acc, val) => acc + (val ? Object.keys(val).length : 0), 0);
+      const blockedCount = Object.values(participantsMap || {}).filter(v => Number(v?.cooldownUntil || 0) > Date.now()).length;
+
+      monitorVerifiedCount.textContent = String(verifiedCount);
+      monitorLockedDevicesCount.textContent = String(lockedCount);
+      monitorSecurityEventsCount.textContent = String(securityEventsCount);
+      monitorBlockedCount.textContent = String(blockedCount);
+    }
+
+    function renderLiveControl(liveData = null) {
+      stopLiveCountdownTimer();
+
+      const state = liveData || {};
+      const status = sanitizeText(state.status || "idle");
+
+      if (status === "live") {
+        liveStatusBadge.className = "live-badge live";
+        liveStatusBadge.textContent = sanitizeText(state.message || "La compétition est lancée");
+        liveStatusText.textContent = "La compétition est actuellement en cours sur les trois pages. Le chrono descend automatiquement en temps réel.";
+        liveMetaText.textContent = `Lancée par : ${sanitizeText(state.launchedByEmail || CONFIG.adminEmail)} · Début : ${formatDateTime(state.startedAt)} · Fin prévue : ${formatDateTime(state.endsAt)}`;
+
+        const paint = () => {
+          const left = Math.max(0, Math.floor(((state.endsAt || 0) - Date.now()) / 1000));
+          liveCountdownText.textContent = formatClock(left);
+          liveCountdownText.classList.remove("finished");
+        };
+
+        paint();
+        liveCountdownTimer = setInterval(paint, 1000);
+        return;
+      }
+
+      if (status === "finished") {
+        liveStatusBadge.className = "live-badge finished";
+        liveStatusBadge.textContent = sanitizeText(state.finishedMessage || "Terminée, votre candidature est envoyée");
+        liveCountdownText.textContent = "00:00";
+        liveCountdownText.classList.add("finished");
+        liveStatusText.textContent = "La session est terminée. Les copies doivent déjà être remontées automatiquement pour correction côté admin et jury.";
+        liveMetaText.textContent = `Terminé le : ${formatDateTime(state.finishedAt || state.endsAt)} · Dernière mise à jour : ${formatDateTime(state.updatedAt)}`;
+        return;
+      }
+
+      liveStatusBadge.className = "live-badge idle";
+      liveStatusBadge.textContent = "Compétition non lancée";
+      liveCountdownText.textContent = "50:00";
+      liveCountdownText.classList.remove("finished");
+      liveStatusText.textContent = "Quand l’admin clique sur “Lancer la compétition”, le statut et le chrono apparaissent automatiquement sur les trois pages, sans rechargement.";
+      liveMetaText.textContent = "Aucune session active.";
+    }
+
+    function computeStats(filteredIds = null) {
+      const ids = filteredIds || Object.keys(participantsMap);
+      let total = 0;
+      let pending = 0;
+      let approved = 0;
+      let inProgress = 0;
+      let completed = 0;
+      let issued = 0;
+
+      ids.forEach((uid) => {
+        const p = participantsMap[uid];
+        if (!p) return;
+        total++;
+        if (p.status === "pending") pending++;
+        if (p.status === "approved") approved++;
+        if (p.examMeta?.inProgress || (p.examStarted && !p.examCompleted)) inProgress++;
+        if (p.examCompleted) completed++;
+        if (certificatesMap[uid]) issued++;
+      });
+
+      statTotal.textContent = total;
+      statPending.textContent = pending;
+      statApproved.textContent = approved;
+      statInProgress.textContent = inProgress;
+      statCompleted.textContent = completed;
+      statIssued.textContent = issued;
+    }
+
+    function getFilteredCandidateIds() {
+      const search = sanitizeText(searchInput.value).toLowerCase();
+      const status = statusFilter.value;
+      const certFilter = certificateFilter.value;
+
+      return Object.keys(participantsMap).filter((uid) => {
+        const p = participantsMap[uid] || {};
+        const req = certificateRequestsMap[uid] || null;
+        const cert = certificatesMap[uid] || null;
+
+        const haystack = [
+          p.fullName, p.displayName, p.email, p.country, p.city,
+          p.institution, p.category, p.schoolLevel, p.candidateCode
+        ].join(" ").toLowerCase();
+
+        const matchSearch = !search || haystack.includes(search);
+        const matchStatus = status === "all" || p.status === status;
+
+        let matchCert = true;
+        if (certFilter === "requested") matchCert = !!req && !cert;
+        else if (certFilter === "issued") matchCert = !!cert;
+        else if (certFilter === "none") matchCert = !req && !cert;
+
+        return matchSearch && matchStatus && matchCert;
+      });
+    }
+
+    function renderSubmissionAnswers(submission) {
+      const answers = Array.isArray(submission?.answers) ? submission.answers : [];
+      if (!answers.length) {
+        return `<div class="notice" style="margin-top:10px;">Aucune copie détaillée enregistrée pour le moment.</div>`;
+      }
+
+      return `
+        <div class="sub-answer-list">
+          ${answers.map((ans, idx) => `
+            <div class="sub-answer">
+              <strong>Question ${idx + 1}${ans?.type ? " · " + escapeHtml(ans.type) : ""}</strong>
+              <div>
+Question : ${escapeHtml(ans?.questionText || "-")}
+Réponse envoyée : ${escapeHtml(ans?.answerLabel || ans?.answerText || ans?.typedAnswer || ans?.selectedOption || "-")}
+Bonne réponse : ${escapeHtml(ans?.correctLabel || ans?.correctText || "-")}
+Statut : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === false ? "Incorrect" : "À corriger"}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderJuryList() {
+      const entries = Object.entries(juryAllowedMap || {});
+      if (!entries.length) {
+        juryList.innerHTML = `<div class="notice">Aucun email jury autorisé pour le moment.</div>`;
+        return;
+      }
+
+      juryList.innerHTML = entries.map(([key, item]) => {
+        const email = sanitizeText(item.email || "");
+        const fullName = sanitizeText(item.fullName || "Membre du jury");
+        const role = sanitizeText(item.role || "-");
+        return `
+          <div class="jury-item">
+            <div>
+              <div style="font-weight:900; color:var(--nav); margin-bottom:6px;">${escapeHtml(fullName)}</div>
+              <div style="color:var(--muted); font-size:14px; line-height:1.55;">
+                ${escapeHtml(email)}<br>
+                Rôle : ${escapeHtml(role)}<br>
+                Autorisé le : ${escapeHtml(formatDateTime(item.authorizedAt))}
+              </div>
+              <div class="click-links">
+                <a class="text-link" href="profile.html?email=${encodeURIComponent(email)}">Voir le compte</a>
+                <a class="text-link" href="messages.html?email=${encodeURIComponent(email)}">Envoyer un message</a>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn red" data-remove-jury="${key}" data-jury-email="${email}">Retirer</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-remove-jury]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const key = btn.getAttribute("data-remove-jury");
+          const email = btn.getAttribute("data-jury-email") || "";
+          await removeJuryEmail(key, email);
+        });
+      });
+    }
+        async function removeJuryEmail(key, email) {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
         alert("Action réservée à l’administrateur principal.");
         return;
       }
 
-      const existingSecuritySnap = await get(ref(db, `competitions/${CONFIG.competitionId}/securitySettings`));
-      const existingSecurity = existingSecuritySnap.exists() ? (existingSecuritySnap.val() || {}) : {};
+      await remove(ref(db, `competitions/${CONFIG.competitionId}/juryAllowedEmails/${key}`));
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "jury_email_removed",
+        juryEmail: email || "",
+        adminEmail: currentUser.email,
+        at: Date.now()
+      });
+    }
+
+    async function saveCompetitionSettings() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
 
       const payload = {
         challengeTitle: sanitizeText(challengeTitleInput.value) || "Chem Challenge",
@@ -1964,21 +2283,9 @@ Mis en avant : ${pinned}
         registrationStatus: sanitizeText(registrationStatusInput.value) || "open",
         examStatus: sanitizeText(examStatusInput.value) || "open",
         resultVisibility: sanitizeText(resultVisibilityInput.value) || "hidden",
-        announcement: challengeAnnouncementInput.value.trim(),
+        announcement: sanitizeText(challengeAnnouncementInput.value),
         updatedAt: Date.now(),
-        updatedByEmail: currentUser.email,
-        linkedPages: {
-          candidate: "competition.html",
-          jury: "competition-jury.html",
-          admin: "competition-admin.html",
-          insights: "insights.html#challenge-pub"
-        },
-        securitySnapshot: {
-          sessionCode: sanitizeText(existingSecurity.sessionCode || ""),
-          rejoinCooldownMonths: Number(existingSecurity.rejoinCooldownMonths || 3),
-          deviceLockMode: sanitizeText(existingSecurity.deviceLockMode || "strict"),
-          candidateGateMode: sanitizeText(existingSecurity.candidateGateMode || "strict")
-        }
+        updatedByEmail: currentUser.email
       };
 
       await set(ref(db, `competitions/${CONFIG.competitionId}/settings`), payload);
@@ -1989,57 +2296,100 @@ Mis en avant : ${pinned}
         at: Date.now()
       });
 
-      alert("Paramètres du concours enregistrés avec succès.");
+      alert("Paramètres du challenge enregistrés avec succès.");
     }
 
     async function saveSecuritySettings() {
-      if (!currentUser || (currentUser.email || "").toLowerCase() !== CONFIG.adminEmail.toLowerCase()) {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
         alert("Action réservée à l’administrateur principal.");
         return;
       }
 
-      const code = sanitizeText(sessionCodeInput.value) || generateSessionCode();
-      const cooldown = Math.max(1, Math.min(12, Number(cooldownMonthsInput.value || 3)));
-      const deviceMode = sanitizeText(deviceLockModeInput.value || "strict");
-      const gateMode = sanitizeText(candidateGateModeInput.value || "strict");
+      const currentCode = sanitizeText(sessionCodeInput.value) || randomSessionCode();
 
       const payload = {
-        sessionCode: code,
-        rejoinCooldownMonths: cooldown,
-        deviceLockMode: deviceMode,
-        candidateGateMode: gateMode,
-        lockCertificateIdentity: true,
-        lockCandidateIdentityFromExam: true,
-        allowResultPublicAfterAdminActionOnly: true,
-        resultBoardAutoOpenWhenVisible: true,
+        sessionCode: currentCode,
+        rejoinCooldownMonths: Math.max(1, Number(cooldownMonthsInput.value || CONFIG.defaultCooldownMonths)),
+        deviceLockMode: sanitizeText(deviceLockModeInput.value || "strict"),
+        candidateGateMode: sanitizeText(candidateGateModeInput.value || "strict"),
+        maxWarnings: Math.max(1, Number(maxWarningsInput.value || CONFIG.defaultMaxWarnings)),
+        forbiddenTitle: sanitizeText(forbiddenTitleInput.value || "Compétition en cours, accès interdits à toute personne non candidats"),
+        forbiddenMessage: sanitizeText(forbiddenMessageInput.value || "Seuls les candidats avec code unique valide, mail autorisé et appareil reconnu peuvent continuer."),
         updatedAt: Date.now(),
         updatedByEmail: currentUser.email
       };
 
-      await set(ref(db, `competitions/${CONFIG.competitionId}/securitySettings`), payload);
-
-      try {
-        await update(ref(db, `competitions/${CONFIG.competitionId}/settings`), {
-          securitySnapshot: {
-            sessionCode: code,
-            rejoinCooldownMonths: cooldown,
-            deviceLockMode: deviceMode,
-            candidateGateMode: gateMode
-          },
-          updatedAt: Date.now(),
-          updatedByEmail: currentUser.email
-        });
-      } catch (e) {
-        console.error(e);
-      }
+      await set(ref(db, `competitions/${CONFIG.competitionId}/security`), payload);
 
       await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
         type: "security_settings_updated",
         adminEmail: currentUser.email,
+        sessionCode: payload.sessionCode,
         at: Date.now()
       });
 
       alert("Paramètres de sécurité enregistrés.");
+    }
+
+    async function rotateSessionCode() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      sessionCodeInput.value = randomSessionCode();
+      await saveSecuritySettings();
+    }
+
+    async function forceLockAllCandidates() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const updates = {};
+      const now = Date.now();
+      const sessionState = sanitizeText(liveControlState?.status || "idle");
+
+      Object.keys(participantsMap || {}).forEach(uid => {
+        updates[`competitions/${CONFIG.competitionId}/deviceLocks/${uid}`] = {
+          uid,
+          lockedAt: now,
+          lockedByEmail: currentUser.email,
+          sessionState,
+          forceLocked: true,
+          updatedAt: now
+        };
+      });
+
+      if (Object.keys(updates).length) {
+        await update(ref(db), updates);
+      }
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "all_candidates_force_locked",
+        adminEmail: currentUser.email,
+        at: now
+      });
+
+      alert("Verrouillage de session appliqué à tous les candidats.");
+    }
+
+    async function clearCandidateAccess() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      await remove(ref(db, `competitions/${CONFIG.competitionId}/candidateAccess`));
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "candidate_access_cleared",
+        adminEmail: currentUser.email,
+        at: Date.now()
+      });
+
+      alert("Accès vérifiés réinitialisés.");
     }
 
     async function addJuryEmail() {
@@ -2081,70 +2431,13 @@ Mis en avant : ${pinned}
       juryRoleInput.value = "";
     }
 
-    async function removeJuryEmail(key, email) {
-      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
-        alert("Action réservée à l’administrateur principal.");
-        return;
-      }
-
-      await remove(ref(db, `competitions/${CONFIG.competitionId}/juryAllowedEmails/${key}`));
-
-      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
-        type: "jury_email_removed",
-        juryEmail: email || "",
-        adminEmail: currentUser.email,
-        at: Date.now()
-      });
-    }
-
-    function renderJuryList() {
-      const entries = Object.entries(juryAllowedMap || {});
-      if (!entries.length) {
-        juryList.innerHTML = `<div class="notice">Aucun email jury autorisé pour le moment.</div>`;
-        return;
-      }
-
-      juryList.innerHTML = entries.map(([key, item]) => {
-        const email = sanitizeText(item.email || "");
-        const fullName = sanitizeText(item.fullName || "Membre du jury");
-        const role = sanitizeText(item.role || "-");
-        return `
-          <div class="jury-item">
-            <div>
-              <div style="font-weight:900; color:var(--nav); margin-bottom:6px;">${fullName}</div>
-              <div style="color:var(--muted); font-size:14px; line-height:1.55;">
-                ${email}<br>
-                Rôle : ${role}<br>
-                Autorisé le : ${formatDateTime(item.authorizedAt)}
-              </div>
-              <div class="click-links">
-                <a class="text-link" href="profile.html?email=${encodeURIComponent(email)}">Voir le compte</a>
-                <a class="text-link" href="messages.html?email=${encodeURIComponent(email)}">Envoyer un message</a>
-              </div>
-            </div>
-            <div class="btn-row">
-              <button class="btn red" data-remove-jury="${key}" data-jury-email="${email}">Retirer</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-      document.querySelectorAll("[data-remove-jury]").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          const key = btn.getAttribute("data-remove-jury");
-          const email = btn.getAttribute("data-jury-email") || "";
-          await removeJuryEmail(key, email);
-        });
-      });
-    }
-
     async function approveCandidate(uid) {
       if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
         alert("Action réservée à l’administrateur principal.");
         return;
       }
 
-      const participant = registrationsMap[uid];
+      const participant = participantsMap[uid];
       if (!participant) return;
 
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${uid}`), {
@@ -2169,7 +2462,7 @@ Mis en avant : ${pinned}
         return;
       }
 
-      const participant = registrationsMap[uid];
+      const participant = participantsMap[uid];
       if (!participant) return;
 
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${uid}`), {
@@ -2194,7 +2487,7 @@ Mis en avant : ${pinned}
         return;
       }
 
-      const participant = registrationsMap[uid];
+      const participant = participantsMap[uid];
       if (!participant) return;
 
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${uid}`), {
@@ -2219,7 +2512,7 @@ Mis en avant : ${pinned}
         return;
       }
 
-      const participant = registrationsMap[uid];
+      const participant = participantsMap[uid];
       if (!participant) {
         alert("Participant introuvable.");
         return;
@@ -2233,37 +2526,29 @@ Mis en avant : ${pinned}
       const requestData = certificateRequestsMap[uid] || {};
       const verificationNumber = makeVerificationNumber(uid);
       const settings = competitionSettings || {};
-
-      const lockedIdentity = {
-        fullName: sanitizeText(participant.fullName || requestData.fullName || "Participant"),
-        institution: sanitizeText(participant.institution || requestData.institution || ""),
-        roleLabel: sanitizeText(participant.schoolLevel || requestData.roleLabel || ""),
-        photoURL: sanitizeText(participant.photoURL || ""),
-        email: sanitizeText(participant.email || ""),
-        candidateCode: sanitizeText(participant.candidateCode || "")
-      };
+      const finalFullName = sanitizeText(participant.fullName || requestData.fullName || "Participant");
+      const finalInstitution = sanitizeText(participant.institution || requestData.institution || "");
+      const finalRole = sanitizeText(participant.schoolLevel || requestData.roleLabel || "");
+      const finalPhoto = sanitizeText(participant.photoURL || "");
 
       const certPayload = {
         uid,
-        email: lockedIdentity.email,
-        fullName: lockedIdentity.fullName,
-        mentionLabel: sanitizeText(requestData.mentionWanted || "Participation"),
-        institution: lockedIdentity.institution,
-        roleLabel: lockedIdentity.roleLabel,
-        messageToAdmin: sanitizeText(requestData.messageToAdmin || ""),
-        score: participant.finalScore ?? participant.score ?? null,
-        totalQuestions: participant.finalTotalQuestions ?? participant.totalQuestions ?? null,
-        finalRank: participant.finalRank ?? null,
-        candidateCode: lockedIdentity.candidateCode,
-        photoURL: lockedIdentity.photoURL,
+        email: participant.email || "",
+        fullName: finalFullName,
+        mentionLabel: requestData.mentionWanted || "Participation",
+        institution: finalInstitution,
+        roleLabel: finalRole,
+        messageToAdmin: requestData.messageToAdmin || "",
+        score: participant.score ?? null,
+        totalQuestions: participant.totalQuestions ?? null,
+        candidateCode: participant.candidateCode || "",
+        photoURL: finalPhoto,
         verificationNumber,
         issuedAt: Date.now(),
         issuedByEmail: currentUser.email,
         competitionId: CONFIG.competitionId,
         competitionTitle: settings.challengeTitle || "Chem Challenge",
-        editionTitle: settings.editionTitle || "Chem Challenge 2026",
-        identityLocked: true,
-        printPdfAllowed: true
+        editionTitle: settings.editionTitle || "Chem Challenge 2026"
       };
 
       await set(ref(db, `competitions/${CONFIG.competitionId}/certificates/${uid}`), certPayload);
@@ -2273,8 +2558,7 @@ Mis en avant : ${pinned}
         issuedAt: Date.now(),
         issuedByEmail: currentUser.email,
         verificationNumber,
-        updatedAt: Date.now(),
-        identityLocked: true
+        updatedAt: Date.now()
       });
 
       await set(ref(db, `certificates/${verificationNumber}`), {
@@ -2289,7 +2573,6 @@ Mis en avant : ${pinned}
         issuedBy: "Chem Challenge Administration",
         issuedByEmail: currentUser.email,
         score: certPayload.score != null && certPayload.totalQuestions != null ? `${certPayload.score}/${certPayload.totalQuestions}` : "",
-        rank: certPayload.finalRank != null ? String(certPayload.finalRank) : "",
         title: certPayload.competitionTitle || "Chem Challenge",
         createdAt: Date.now(),
         competitionId: CONFIG.competitionId
@@ -2303,8 +2586,6 @@ Mis en avant : ${pinned}
         adminEmail: currentUser.email,
         at: Date.now()
       });
-
-      alert("Certificat délivré avec identité verrouillée sur les vraies données du candidat.");
     }
 
     async function rejectCertificate(uid) {
@@ -2343,7 +2624,7 @@ Mis en avant : ${pinned}
       const winnerName = sanitizeText(winnerNameInput.value);
       const winnerScore = sanitizeText(winnerScoreInput.value);
       const postTitle = sanitizeText(resultPostTitleInput.value) || `Résultats officiels du ${sanitizeText(settings.editionTitle || "Chem Challenge")}`;
-      const postContent = resultPostContentInput.value.trim();
+      const postContent = sanitizeText(resultPostContentInput.value);
 
       if (!winnerName && !postContent) {
         alert("Ajoute au moins un gagnant ou un texte de publication.");
@@ -2352,8 +2633,7 @@ Mis en avant : ${pinned}
 
       const finalContent = `🏆 ${winnerName ? "Meilleur gagnant : " + winnerName : ""}
 ${winnerScore ? "\nScore : " + winnerScore : ""}
-${postContent ? "\n\n" + postContent : ""}
-`.trim();
+${postContent ? "\n\n" + postContent : ""}`.trim();
 
       const payload = {
         source: "competition_admin",
@@ -2407,6 +2687,33 @@ ${postContent ? "\n\n" + postContent : ""}
       alert("Résultats publiés dans Insights + Challenge Pub.");
     }
 
+    async function setResultsBoardVisibility(showResults) {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      await set(ref(db, `competitions/${CONFIG.competitionId}/resultsPublication`), {
+        showResults: !!showResults,
+        updatedAt: Date.now(),
+        updatedByEmail: currentUser.email
+      });
+
+      await update(ref(db, `competitions/${CONFIG.competitionId}/settings`), {
+        resultVisibility: showResults ? "visible" : "hidden",
+        updatedAt: Date.now(),
+        updatedByEmail: currentUser.email
+      });
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: showResults ? "results_board_shown" : "results_board_hidden",
+        adminEmail: currentUser.email,
+        at: Date.now()
+      });
+
+      alert(showResults ? "Les résultats publics sont maintenant affichés." : "Les résultats publics sont maintenant masqués.");
+    }
+
     async function saveChallengePub() {
       if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
         alert("Action réservée à l’administrateur principal.");
@@ -2419,8 +2726,8 @@ ${postContent ? "\n\n" + postContent : ""}
       const badge = sanitizeText(challengePubBadgeInput.value) || "Publication officielle";
       const winnerName = sanitizeText(challengePubWinnerInput.value);
       const winnerScore = sanitizeText(challengePubScoreInput.value);
-      const summary = challengePubSummaryInput.value.trim();
-      const content = challengePubContentInput.value.trim();
+      const summary = sanitizeText(challengePubSummaryInput.value);
+      const content = sanitizeText(challengePubContentInput.value);
       const footer = sanitizeText(challengePubFooterInput.value) || "Publication validée par l’administration.";
       const pinned = challengePubPinInput.value === "yes";
 
@@ -2511,14 +2818,6 @@ ${postContent ? "\n\n" + postContent : ""}
       alert("Challenge Pub a été masqué.");
     }
 
-    function updatePreview() {
-      const winner = sanitizeText(winnerNameInput.value);
-      const scoreValue = sanitizeText(winnerScoreInput.value);
-      const text = resultPostContentInput.value.trim();
-
-      resultPreviewBox.textContent = `🏆 ${winner || "Nom du gagnant"}${scoreValue ? " — " + scoreValue : ""}${text ? "\n\n" + text : ""}`;
-    }
-
     async function addAnnouncement() {
       if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
         alert("Action réservée à l’administrateur principal.");
@@ -2526,7 +2825,7 @@ ${postContent ? "\n\n" + postContent : ""}
       }
 
       const title = sanitizeText(announcementTitleInput.value);
-      const content = announcementContentInput.value.trim();
+      const content = sanitizeText(announcementContentInput.value);
 
       if (!title && !content) {
         alert("Ajoute au moins un titre ou un contenu.");
@@ -2583,10 +2882,10 @@ ${postContent ? "\n\n" + postContent : ""}
           <div class="announcement-card">
             <div class="announcement-head">
               <div>
-                <div class="announcement-title">${sanitizeText(item.title || "Annonce")}</div>
+                <div class="announcement-title">${escapeHtml(sanitizeText(item.title || "Annonce"))}</div>
                 <div class="announcement-meta">
-                  Créée le : ${formatDateTime(item.createdAt)}<br>
-                  Par : ${sanitizeText(item.createdByEmail || CONFIG.adminEmail)}
+                  Créée le : ${escapeHtml(formatDateTime(item.createdAt))}<br>
+                  Par : ${escapeHtml(sanitizeText(item.createdByEmail || CONFIG.adminEmail))}
                 </div>
               </div>
 
@@ -2597,7 +2896,7 @@ ${postContent ? "\n\n" + postContent : ""}
               </div>
             </div>
 
-            <div class="announcement-content">${sanitizeText(item.content || "") || "Aucun contenu."}</div>
+            <div class="announcement-content">${escapeHtml(sanitizeText(item.content || "") || "Aucun contenu.")}</div>
           </div>
         `;
       }).join("");
@@ -2624,11 +2923,15 @@ ${postContent ? "\n\n" + postContent : ""}
         return;
       }
 
-      const securitySnap = await get(ref(db, `competitions/${CONFIG.competitionId}/securitySettings`));
-      const security = securitySnap.exists() ? (securitySnap.val() || {}) : {};
-
       const now = Date.now();
       const endsAt = now + (CONFIG.liveDurationSeconds * 1000);
+      const code = sanitizeText(sessionCodeInput.value) || randomSessionCode();
+
+      await update(ref(db, `competitions/${CONFIG.competitionId}/security`), {
+        sessionCode: code,
+        updatedAt: now,
+        updatedByEmail: currentUser.email
+      });
 
       await set(ref(db, `competitions/${CONFIG.competitionId}/liveControl`), {
         status: "live",
@@ -2639,9 +2942,7 @@ ${postContent ? "\n\n" + postContent : ""}
         message: "La compétition est lancée",
         finishedMessage: "Terminée, votre candidature est envoyée",
         launchedByEmail: currentUser.email,
-        updatedAt: now,
-        sessionCode: sanitizeText(security.sessionCode || ""),
-        candidateGateMode: sanitizeText(security.candidateGateMode || "strict")
+        updatedAt: now
       });
 
       await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
@@ -2649,6 +2950,7 @@ ${postContent ? "\n\n" + postContent : ""}
         adminEmail: currentUser.email,
         startedAt: now,
         endsAt,
+        sessionCode: code,
         at: now
       });
     }
@@ -2670,9 +2972,22 @@ ${postContent ? "\n\n" + postContent : ""}
         updatedAt: now
       });
 
+      const cooldownMonths = Number(securitySettings?.rejoinCooldownMonths || CONFIG.defaultCooldownMonths);
+      const cooldownUntil = addMonths(now, cooldownMonths);
+
+      const updates = {};
+      Object.keys(participantsMap || {}).forEach(uid => {
+        updates[`competitions/${CONFIG.competitionId}/participants/${uid}/cooldownUntil`] = cooldownUntil;
+        updates[`competitions/${CONFIG.competitionId}/participants/${uid}/updatedAt`] = now;
+      });
+      if (Object.keys(updates).length) {
+        await update(ref(db), updates);
+      }
+
       await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
         type: "competition_live_finished_manually",
         adminEmail: currentUser.email,
+        cooldownUntil,
         at: now
       });
     }
@@ -2716,128 +3031,164 @@ ${postContent ? "\n\n" + postContent : ""}
       });
     }
 
-    function renderLiveControl(liveData = null) {
-      stopLiveCountdownTimer();
+    async function autoCorrectAllQCM() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
 
-      const state = liveData || {};
-      const status = sanitizeText(state.status || "idle");
+      const updates = {};
+      const leaderboardUpdates = {};
+      let corrected = 0;
 
-      if (status === "live") {
-        liveStatusBadge.className = "live-badge live";
-        liveStatusBadge.textContent = sanitizeText(state.message || "La compétition est lancée");
-        liveStatusText.textContent = "La compétition est actuellement en cours sur les trois pages. Le chrono descend automatiquement en temps réel.";
-        liveMetaText.textContent = `Lancée par : ${sanitizeText(state.launchedByEmail || CONFIG.adminEmail)} · Début : ${formatDateTime(state.startedAt)} · Fin prévue : ${formatDateTime(state.endsAt)}`;
+      Object.entries(examSubmissionsMap || {}).forEach(([uid, sub]) => {
+        const answers = Array.isArray(sub?.answers) ? sub.answers : [];
+        if (!answers.length) return;
 
-        const paint = () => {
-          const left = Math.max(0, Math.floor(((state.endsAt || 0) - Date.now()) / 1000));
-          liveCountdownText.textContent = formatClock(left);
-          liveCountdownText.classList.remove("finished");
-          if (left <= 0) {
-            liveCountdownText.textContent = "00:00";
-            autoFinishIfExpired(state);
-          }
+        let qcmScore = 0;
+        let totalQuestions = answers.length;
+
+        answers.forEach(ans => {
+          if (ans?.type === "qcm" && ans?.isCorrect === true) qcmScore++;
+        });
+
+        updates[`competitions/${CONFIG.competitionId}/participants/${uid}/score`] = qcmScore;
+        updates[`competitions/${CONFIG.competitionId}/participants/${uid}/totalQuestions`] = totalQuestions;
+        updates[`competitions/${CONFIG.competitionId}/participants/${uid}/percent`] = totalQuestions ? Math.round((qcmScore / totalQuestions) * 100) : 0;
+        updates[`competitions/${CONFIG.competitionId}/participants/${uid}/updatedAt`] = Date.now();
+
+        leaderboardUpdates[`competitions/${CONFIG.competitionId}/leaderboard/${uid}`] = {
+          uid,
+          displayName: sanitizeText(sub?.displayName || participantsMap?.[uid]?.displayName || participantsMap?.[uid]?.fullName || "Participant"),
+          candidateCode: sanitizeText(sub?.candidateCode || participantsMap?.[uid]?.candidateCode || ""),
+          score: qcmScore,
+          totalQuestions,
+          percent: totalQuestions ? Math.round((qcmScore / totalQuestions) * 100) : 0,
+          submittedAt: sub?.submittedAt || Date.now()
         };
 
-        paint();
-        liveCountdownTimer = setInterval(paint, 1000);
+        corrected++;
+      });
+
+      const finalUpdates = { ...updates, ...leaderboardUpdates };
+      if (Object.keys(finalUpdates).length) {
+        await update(ref(db), finalUpdates);
+      }
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "all_qcm_auto_corrected",
+        adminEmail: currentUser.email,
+        correctedCount: corrected,
+        at: Date.now()
+      });
+
+      alert(`Correction automatique terminée pour ${corrected} copie(s).`);
+    }
+
+    async function rebuildLeaderboard() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
         return;
       }
 
-      if (status === "finished") {
-        liveStatusBadge.className = "live-badge finished";
-        liveStatusBadge.textContent = sanitizeText(state.finishedMessage || "Terminée, votre candidature est envoyée");
-        liveCountdownText.textContent = "00:00";
-        liveCountdownText.classList.add("finished");
-        liveStatusText.textContent = "La session est terminée. Les copies doivent déjà être remontées automatiquement pour correction côté admin et jury.";
-        liveMetaText.textContent = `Terminé le : ${formatDateTime(state.finishedAt || state.endsAt)} · Dernière mise à jour : ${formatDateTime(state.updatedAt)}`;
+      const updates = {};
+      let count = 0;
+
+      Object.entries(participantsMap || {}).forEach(([uid, p]) => {
+        if (!p || p.score == null || p.totalQuestions == null) return;
+        updates[`competitions/${CONFIG.competitionId}/leaderboard/${uid}`] = {
+          uid,
+          displayName: sanitizeText(p.displayName || p.fullName || "Participant"),
+          candidateCode: sanitizeText(p.candidateCode || ""),
+          score: p.score,
+          totalQuestions: p.totalQuestions,
+          percent: p.percent != null ? p.percent : (p.totalQuestions ? Math.round((p.score / p.totalQuestions) * 100) : 0),
+          submittedAt: p.submittedAt || Date.now()
+        };
+        count++;
+      });
+
+      if (Object.keys(updates).length) {
+        await update(ref(db), updates);
+      }
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "leaderboard_rebuilt",
+        adminEmail: currentUser.email,
+        count,
+        at: Date.now()
+      });
+
+      alert(`Classement recalculé pour ${count} candidat(s).`);
+    }
+
+    async function prepareManualReview() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
         return;
       }
 
-      liveStatusBadge.className = "live-badge idle";
-      liveStatusBadge.textContent = "Compétition non lancée";
-      liveCountdownText.textContent = "50:00";
-      liveCountdownText.classList.remove("finished");
-      liveStatusText.textContent = "Quand l’admin clique sur “Lancer la compétition”, le statut et le chrono apparaissent automatiquement sur les trois pages, sans rechargement.";
-      liveMetaText.textContent = "Aucune session active.";
-    }
+      const updates = {};
+      let count = 0;
 
-    function computeStats(filteredIds = null) {
-      const ids = filteredIds || Object.keys(registrationsMap);
-      let total = 0;
-      let pending = 0;
-      let approved = 0;
-      let inProgress = 0;
-      let completed = 0;
-      let issued = 0;
-
-      ids.forEach((uid) => {
-        const p = registrationsMap[uid];
-        if (!p) return;
-        total++;
-        if (p.status === "pending") pending++;
-        if (p.status === "approved") approved++;
-        if (p.examMeta?.inProgress || (p.examStarted && !p.examCompleted)) inProgress++;
-        if (p.examCompleted) completed++;
-        if (certificatesMap[uid]) issued++;
+      Object.entries(examSubmissionsMap || {}).forEach(([uid, sub]) => {
+        const writtenCount = Number(sub?.writtenCount || 0);
+        updates[`competitions/${CONFIG.competitionId}/manualCorrections/${uid}/admin`] = {
+          correctedByUid: currentUser.uid,
+          correctedByEmail: currentUser.email,
+          correctedByName: currentProfile.fullName || currentProfile.name || currentUser.displayName || "Admin",
+          manualScore: manualCorrectionsMap?.[uid]?.admin?.manualScore ?? null,
+          correctionStatus: writtenCount > 0 ? "needs_revision" : "reviewed",
+          notes: writtenCount > 0 ? "Réponses rédigées détectées : relecture humaine conseillée." : "Aucune réponse rédigée détectée.",
+          updatedAt: Date.now()
+        };
+        count++;
       });
 
-      statTotal.textContent = total;
-      statPending.textContent = pending;
-      statApproved.textContent = approved;
-      statInProgress.textContent = inProgress;
-      statCompleted.textContent = completed;
-      statIssued.textContent = issued;
-    }
-
-    function getFilteredCandidateIds() {
-      const search = sanitizeText(searchInput.value).toLowerCase();
-      const status = statusFilter.value;
-      const certFilter = certificateFilter.value;
-
-      return Object.keys(registrationsMap).filter((uid) => {
-        const p = registrationsMap[uid] || {};
-        const req = certificateRequestsMap[uid] || null;
-        const cert = certificatesMap[uid] || null;
-
-        const haystack = [
-          p.fullName, p.displayName, p.email, p.country, p.city,
-          p.institution, p.category, p.schoolLevel, p.candidateCode,
-          p.deviceLabel, p.deviceFingerprint, p.lastKnownIpHash
-        ].join(" ").toLowerCase();
-
-        const matchSearch = !search || haystack.includes(search);
-        const matchStatus = status === "all" || p.status === status;
-
-        let matchCert = true;
-        if (certFilter === "requested") matchCert = !!req && !cert;
-        else if (certFilter === "issued") matchCert = !!cert;
-        else if (certFilter === "none") matchCert = !req && !cert;
-
-        return matchSearch && matchStatus && matchCert;
-      });
-    }
-
-    function renderSubmissionAnswers(submission) {
-      const answers = Array.isArray(submission?.answers) ? submission.answers : [];
-      if (!answers.length) {
-        return `<div class="notice" style="margin-top:10px;">Aucune copie détaillée enregistrée pour le moment.</div>`;
+      if (Object.keys(updates).length) {
+        await update(ref(db), updates);
       }
 
-      return `
-        <div class="sub-answer-list">
-          ${answers.map((ans, idx) => `
-            <div class="sub-answer">
-              <strong>Question ${idx + 1}${ans?.type ? " · " + sanitizeText(ans.type) : ""}</strong>
-              <div>
-Question : ${sanitizeText(ans?.questionText || "-")}
-Réponse envoyée : ${sanitizeText(ans?.answerLabel || ans?.answerText || ans?.typedAnswer || ans?.selectedOption || "-")}
-Bonne réponse : ${sanitizeText(ans?.correctLabel || ans?.correctText || "-")}
-Statut : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === false ? "Incorrect" : "À corriger"}
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      `;
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "manual_review_prepared",
+        adminEmail: currentUser.email,
+        count,
+        at: Date.now()
+      });
+
+      alert(`Préparation de relecture effectuée pour ${count} copie(s).`);
+    }
+
+    async function markAllPendingReview() {
+      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
+        alert("Action réservée à l’administrateur principal.");
+        return;
+      }
+
+      const updates = {};
+      let count = 0;
+
+      Object.keys(examSubmissionsMap || {}).forEach(uid => {
+        updates[`competitions/${CONFIG.competitionId}/manualCorrections/${uid}/admin/correctionStatus`] = "needs_revision";
+        updates[`competitions/${CONFIG.competitionId}/manualCorrections/${uid}/admin/correctedByUid`] = currentUser.uid;
+        updates[`competitions/${CONFIG.competitionId}/manualCorrections/${uid}/admin/correctedByEmail`] = currentUser.email;
+        updates[`competitions/${CONFIG.competitionId}/manualCorrections/${uid}/admin/correctedByName`] = currentProfile.fullName || currentProfile.name || currentUser.displayName || "Admin";
+        updates[`competitions/${CONFIG.competitionId}/manualCorrections/${uid}/admin/updatedAt`] = Date.now();
+        count++;
+      });
+
+      if (Object.keys(updates).length) {
+        await update(ref(db), updates);
+      }
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "all_marked_pending_review",
+        adminEmail: currentUser.email,
+        count,
+        at: Date.now()
+      });
+
+      alert(`Toutes les copies ont été marquées à revoir (${count}).`);
     }
 
     async function saveAdminCorrection(uid) {
@@ -2854,7 +3205,7 @@ Statut : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === false ? "Inc
 
       const manualScoreRaw = sanitizeText(scoreEl.value);
       const correctionStatus = sanitizeText(statusEl.value || "pending");
-      const notes = notesEl.value.trim();
+      const notes = sanitizeText(notesEl.value);
 
       const manualScore = manualScoreRaw === "" ? null : Number(manualScoreRaw);
       if (manualScoreRaw !== "" && Number.isNaN(manualScore)) {
@@ -2883,189 +3234,15 @@ Statut : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === false ? "Inc
       alert("Correction admin enregistrée.");
     }
 
-    async function autoCorrectAllQcm() {
-      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
-        alert("Action réservée à l’administrateur principal.");
-        return;
-      }
-
-      const submissionsSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/examSubmissions`));
-      if (!submissionsSnap.exists()) {
-        alert("Aucune copie disponible.");
-        return;
-      }
-
-      const submissions = submissionsSnap.val() || {};
-      let count = 0;
-
-      for (const [uid, submission] of Object.entries(submissions)) {
-        const answers = Array.isArray(submission.answers) ? submission.answers : [];
-        let qcmScore = 0;
-        let qcmTotal = 0;
-        let writtenCount = 0;
-
-        answers.forEach((ans) => {
-          if (ans?.type === "qcm") {
-            qcmTotal += 1;
-            if (ans?.isCorrect === true) qcmScore += 1;
-          }
-          if (ans?.type === "written") writtenCount += 1;
-        });
-
-        await update(ref(db, `competitions/${CONFIG.competitionId}/manualCorrections/${uid}/system`), {
-          qcmAutoScore: qcmScore,
-          qcmCount: qcmTotal,
-          writtenCount,
-          autoCorrectedAt: Date.now(),
-          autoCorrectedBy: currentUser.email
-        });
-
-        count++;
-      }
-
-      massQcmStatusText.textContent = `${count} copie(s) QCM traitée(s)`;
-    }
-
-    async function prepareManualReview() {
-      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
-        alert("Action réservée à l’administrateur principal.");
-        return;
-      }
-
-      const submissionsSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/examSubmissions`));
-      if (!submissionsSnap.exists()) {
-        alert("Aucune copie disponible.");
-        return;
-      }
-
-      const submissions = submissionsSnap.val() || {};
-      let count = 0;
-
-      for (const [uid, submission] of Object.entries(submissions)) {
-        const answers = Array.isArray(submission.answers) ? submission.answers : [];
-        const writtenAnswers = answers.filter(a => a?.type === "written");
-        await update(ref(db, `competitions/${CONFIG.competitionId}/manualCorrections/${uid}/reviewQueue`), {
-          needsManualReview: writtenAnswers.length > 0,
-          writtenCount: writtenAnswers.length,
-          preparedAt: Date.now(),
-          preparedBy: currentUser.email
-        });
-        count++;
-      }
-
-      massWrittenStatusText.textContent = `${count} copie(s) préparée(s)`;
-    }
-
-    async function rebuildFinalScores() {
-      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
-        alert("Action réservée à l’administrateur principal.");
-        return;
-      }
-
-      const participantsSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/participants`));
-      const correctionsSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/manualCorrections`));
-      const submissionsSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/examSubmissions`));
-
-      const participants = participantsSnap.exists() ? (participantsSnap.val() || {}) : {};
-      const corrections = correctionsSnap.exists() ? (correctionsSnap.val() || {}) : {};
-      const submissions = submissionsSnap.exists() ? (submissionsSnap.val() || {}) : {};
-
-      const ranking = [];
-
-      for (const [uid, participant] of Object.entries(participants)) {
-        const corr = corrections[uid] || {};
-        const sys = corr.system || {};
-        const admin = corr.admin || {};
-        const jury = corr.jury || {};
-        const submission = submissions[uid] || {};
-
-        const answers = Array.isArray(submission.answers) ? submission.answers : [];
-        const qcmTotal = Number(sys.qcmCount || answers.filter(a => a?.type === "qcm").length || 0);
-        const writtenTotal = Number(sys.writtenCount || answers.filter(a => a?.type === "written").length || 0);
-        const qcmAutoScore = Number(sys.qcmAutoScore || 0);
-
-        const adminManual = admin.manualScore != null ? Number(admin.manualScore) : null;
-        const juryManual = jury.manualScore != null ? Number(jury.manualScore) : null;
-
-        let writtenScore = 0;
-        if (adminManual != null && juryManual != null) writtenScore = (adminManual + juryManual) / 2;
-        else if (adminManual != null) writtenScore = adminManual;
-        else if (juryManual != null) writtenScore = juryManual;
-
-        const finalScore = Number((qcmAutoScore + writtenScore).toFixed(2));
-        const finalTotalQuestions = qcmTotal + writtenTotal;
-        const finalPercent = finalTotalQuestions > 0 ? Number(((finalScore / finalTotalQuestions) * 100).toFixed(2)) : 0;
-
-        await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${uid}`), {
-          finalScore,
-          finalTotalQuestions,
-          finalPercent,
-          finalScoreUpdatedAt: Date.now(),
-          finalScoreUpdatedBy: currentUser.email
-        });
-
-        ranking.push({
-          uid,
-          displayName: sanitizeText(participant.displayName || participant.fullName || "Participant"),
-          candidateCode: sanitizeText(participant.candidateCode || ""),
-          finalScore,
-          finalTotalQuestions,
-          finalPercent
-        });
-      }
-
-      ranking.sort((a, b) => {
-        if ((b.finalPercent || 0) !== (a.finalPercent || 0)) return (b.finalPercent || 0) - (a.finalPercent || 0);
-        return (b.finalScore || 0) - (a.finalScore || 0);
-      });
-
-      for (let i = 0; i < ranking.length; i++) {
-        const row = ranking[i];
-        await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${row.uid}`), {
-          finalRank: i + 1
-        });
-
-        await set(ref(db, `competitions/${CONFIG.competitionId}/leaderboard/${row.uid}`), {
-          uid: row.uid,
-          displayName: row.displayName,
-          candidateCode: row.candidateCode,
-          score: row.finalScore,
-          totalQuestions: row.finalTotalQuestions,
-          percent: row.finalPercent,
-          rank: i + 1,
-          submittedAt: Date.now()
-        });
-      }
-
-      massFinalScoreStatusText.textContent = `${ranking.length} score(s) recalculé(s)`;
-    }
-
-    async function showResultsPublicly() {
-      if (!currentUser || currentUser.email !== CONFIG.adminEmail) {
-        alert("Action réservée à l’administrateur principal.");
-        return;
-      }
-
-      await update(ref(db, `competitions/${CONFIG.competitionId}/settings`), {
-        resultVisibility: "visible",
-        publicResultBoardEnabled: true,
-        updatedAt: Date.now(),
-        updatedByEmail: currentUser.email
-      });
-
-      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
-        type: "results_made_public",
-        adminEmail: currentUser.email,
-        at: Date.now()
-      });
-
-      massPublishStatusText.textContent = "Résultats visibles";
-      alert("Les résultats sont maintenant visibles aux candidats.");
+    function renderAnnouncementsQuickState() {
+      renderResultsPublicationState();
+      computeSecurityMonitors();
     }
 
     function renderCandidates() {
       const ids = getFilteredCandidateIds();
       computeStats(ids);
+      renderAnnouncementsQuickState();
 
       if (!ids.length) {
         candidateList.innerHTML = `<div class="notice">Aucun dossier ne correspond au filtre actuel.</div>`;
@@ -3073,24 +3250,25 @@ Statut : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === false ? "Inc
       }
 
       ids.sort((a, b) => {
-        const pa = registrationsMap[a] || {};
-        const pb = registrationsMap[b] || {};
+        const pa = participantsMap[a] || {};
+        const pb = participantsMap[b] || {};
         return (pb.createdAt || 0) - (pa.createdAt || 0);
       });
 
       candidateList.innerHTML = ids.map((uid) => {
-        const p = registrationsMap[uid] || {};
+        const p = participantsMap[uid] || {};
         const req = certificateRequestsMap[uid] || null;
         const cert = certificatesMap[uid] || null;
         const jury = juryReviewsMap[uid] || {};
         const examMeta = p.examMeta || {};
-        const submission = (manualCorrectionsMap?.submissions?.[uid]) || null;
+        const submission = examSubmissionsMap[uid] || null;
         const adminCorrection = manualCorrectionsMap?.[uid]?.admin || {};
-        const systemCorrection = manualCorrectionsMap?.[uid]?.system || {};
-        const deviceLabel = sanitizeText(p.deviceLabel || p.examDeviceLabel || "-");
-        const deviceFingerprint = sanitizeText(p.deviceFingerprint || p.examDeviceFingerprint || "-");
-        const ipHash = sanitizeText(p.lastKnownIpHash || p.examIpHash || "-");
-        const nextEligibleAt = p.nextEligibleAt ? formatDateTime(p.nextEligibleAt) : "-";
+        const access = candidateAccessMap?.[uid] || {};
+        const deviceLock = deviceLocksMap?.[uid] || {};
+        const securityEvents = securityEventsMap?.[uid] ? Object.values(securityEventsMap[uid]) : [];
+        const lastSecurityEvent = securityEvents.length
+          ? securityEvents.sort((a,b)=>(b?.createdAt||0)-(a?.createdAt||0))[0]
+          : null;
 
         const registrationStatusClass = getStatusTagClass(p.status || "none");
         const registrationStatusText =
@@ -3110,31 +3288,34 @@ Statut : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === false ? "Inc
           liveStatus === "live" ? "Test en cours" :
           liveStatus === "completed" ? "Test terminé" : "Pas encore lancé";
 
-        const safeName = sanitizeText(p.fullName || "Participant");
-        const safeEmail = sanitizeText(p.email || "");
-        const safeUid = sanitizeText(uid);
+        const submissionSummary = submission
+          ? `Copie reçue le : ${formatDateTime(submission.submittedAt || p.submittedAt)}
+Mode : ${sanitizeText(submission.mode || "mixte")}
+Questions envoyées : ${submission.answerCount != null ? submission.answerCount : (Array.isArray(submission.answers) ? submission.answers.length : "-")}
+Score automatique : ${submission.autoScore != null ? submission.autoScore : (p.score != null ? p.score : "-")}/${submission.totalQuestions != null ? submission.totalQuestions : (p.totalQuestions || "-")}
+Réponses rédigées : ${submission.writtenCount != null ? submission.writtenCount : "0"}`
+          : "Aucune copie détaillée enregistrée pour le moment.";
 
-        const submissionSummary = `
-Copie détectée : ${p.examCompleted ? "Oui" : "Non"}
-Score automatique QCM : ${systemCorrection.qcmAutoScore != null ? systemCorrection.qcmAutoScore : "-"}
-Questions QCM : ${systemCorrection.qcmCount != null ? systemCorrection.qcmCount : "-"}
-Réponses écrites : ${systemCorrection.writtenCount != null ? systemCorrection.writtenCount : "-"}
-Score final : ${p.finalScore != null ? p.finalScore : (p.score != null ? p.score : "-")}/${p.finalTotalQuestions != null ? p.finalTotalQuestions : (p.totalQuestions || "-")}
-Classement final : ${p.finalRank != null ? p.finalRank : "-"}
-        `.trim();
+        const lockedDeviceText =
+          deviceLock?.deviceFingerprint ? "Oui" : "Non";
+
+        const cooldownText =
+          Number(p.cooldownUntil || 0) > Date.now()
+            ? `Bloqué jusqu’au : ${formatDateTime(p.cooldownUntil)}`
+            : "Aucun blocage actif";
 
         return `
           <div class="candidate-card">
             <div class="candidate-top">
               <div>
-                <div class="candidate-name">${safeName}</div>
+                <div class="candidate-name">${escapeHtml(sanitizeText(p.fullName || "Participant"))}</div>
                 <div class="candidate-id">
-                  ${safeEmail} · ${sanitizeText(p.candidateCode || "-")}
+                  ${escapeHtml(sanitizeText(p.email || ""))} · ${escapeHtml(sanitizeText(p.candidateCode || "-"))}
                 </div>
 
                 <div class="click-links">
-                  <a class="text-link" href="profile.html?uid=${encodeURIComponent(safeUid)}">Voir le compte</a>
-                  <a class="text-link" href="messages.html?uid=${encodeURIComponent(safeUid)}">Envoyer un message</a>
+                  <a class="text-link" href="profile.html?uid=${encodeURIComponent(uid)}">Voir le compte</a>
+                  <a class="text-link" href="messages.html?uid=${encodeURIComponent(uid)}">Envoyer un message</a>
                 </div>
               </div>
 
@@ -3148,19 +3329,19 @@ Classement final : ${p.finalRank != null ? p.finalRank : "-"}
             <div class="candidate-meta">
               <div class="mini-data">
                 <div class="k">Pays / Ville</div>
-                <div class="v">${sanitizeText(p.country || "-")} / ${sanitizeText(p.city || "-")}</div>
+                <div class="v">${escapeHtml(sanitizeText(p.country || "-"))} / ${escapeHtml(sanitizeText(p.city || "-"))}</div>
               </div>
               <div class="mini-data">
                 <div class="k">Niveau</div>
-                <div class="v">${sanitizeText(p.schoolLevel || "-")}</div>
+                <div class="v">${escapeHtml(sanitizeText(p.schoolLevel || "-"))}</div>
               </div>
               <div class="mini-data">
                 <div class="k">Catégorie</div>
-                <div class="v">${sanitizeText(p.category || "-")}</div>
+                <div class="v">${escapeHtml(sanitizeText(p.category || "-"))}</div>
               </div>
               <div class="mini-data">
-                <div class="k">Résultat final</div>
-                <div class="v">${p.finalScore != null ? `${p.finalScore}/${p.finalTotalQuestions || "-"}` : "Non calculé"}</div>
+                <div class="k">Résultat</div>
+                <div class="v">${p.score != null ? `${p.score}/${p.totalQuestions || "-"}` : "Masqué / Non disponible"}</div>
               </div>
               <div class="mini-data">
                 <div class="k">Progression test</div>
@@ -3171,38 +3352,58 @@ Classement final : ${p.finalRank != null ? p.finalRank : "-"}
             <div class="detail-grid">
               <div class="detail-box">
                 <strong>Établissement / département</strong>
-                <span>${sanitizeText(p.institution || "-")} ${p.department ? "· " + sanitizeText(p.department) : ""}</span>
+                <span>${escapeHtml(sanitizeText(p.institution || "-"))} ${p.department ? "· " + escapeHtml(sanitizeText(p.department)) : ""}</span>
               </div>
 
               <div class="detail-box">
                 <strong>Suivi en direct du test</strong>
                 <span>
-État : ${liveText}
-Temps restant : ${examMeta.timeLeft != null ? examMeta.timeLeft + " s" : "-"}
-Avertissements : ${examMeta.warnings != null ? examMeta.warnings : "-"}
-Dernière mise à jour : ${formatDateTime(examMeta.updatedAt || p.updatedAt)}
+État : ${escapeHtml(liveText)}
+Temps restant : ${examMeta.timeLeft != null ? escapeHtml(String(examMeta.timeLeft)) + " s" : "-"}
+Avertissements : ${examMeta.warnings != null ? escapeHtml(String(examMeta.warnings)) : "-"}
+Dernière mise à jour : ${escapeHtml(formatDateTime(examMeta.updatedAt || p.updatedAt))}
+                </span>
+              </div>
+
+              <div class="detail-box">
+                <strong>Sécurité de session</strong>
+                <span>
+Code vérifié : ${access?.verified ? "Oui" : "Non"}
+Dernière vérification : ${formatDateTime(access?.verifiedAt)}
+Appareil verrouillé : ${lockedDeviceText}
+Empreinte présente : ${deviceLock?.deviceFingerprint ? "Oui" : "Non"}
+Reprise session : ${cooldownText}
+                </span>
+              </div>
+
+              <div class="detail-box">
+                <strong>Dernière alerte sécurité</strong>
+                <span>
+Dernier événement : ${lastSecurityEvent ? sanitizeText(lastSecurityEvent.type || "-") : "-"}
+Détail : ${lastSecurityEvent ? sanitizeText(lastSecurityEvent.message || "-") : "-"}
+Date : ${lastSecurityEvent ? formatDateTime(lastSecurityEvent.createdAt) : "-"}
                 </span>
               </div>
 
               <div class="detail-box">
                 <strong>Motivation</strong>
-                <span>${sanitizeText(p.motivation || "-")}</span>
+                <span>${escapeHtml(sanitizeText(p.motivation || "-"))}</span>
               </div>
 
               <div class="detail-box">
                 <strong>Attentes / expérience</strong>
-                <span>${sanitizeText(p.expectations || "-")}
+                <span>${escapeHtml(sanitizeText(p.expectations || "-"))}
 
-${sanitizeText(p.experience || "-")}</span>
+${escapeHtml(sanitizeText(p.experience || "-"))}</span>
               </div>
 
               <div class="detail-box">
                 <strong>Avis du jury</strong>
                 <span>
-Recommandation : ${sanitizeText(jury.recommendation || p.juryRecommendation || "-")}
-Score jury : ${jury.score != null ? jury.score : (p.juryScore != null ? p.juryScore : "-")}
-Commentaires : ${sanitizeText(jury.notes || p.juryNotes || "-")}
-Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}
+Recommandation : ${escapeHtml(sanitizeText(jury.recommendation || p.juryRecommendation || "-"))}
+Score jury : ${jury.score != null ? escapeHtml(String(jury.score)) : (p.juryScore != null ? escapeHtml(String(p.juryScore)) : "-")}
+Commentaires : ${escapeHtml(sanitizeText(jury.notes || p.juryNotes || "-"))}
+Mis à jour : ${escapeHtml(formatDateTime(jury.updatedAt || p.juryReviewedAt))}
                 </span>
               </div>
 
@@ -3210,25 +3411,29 @@ Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}
                 <strong>Certificat / vérification</strong>
                 <span>
 Demande : ${req ? "Oui" : "Non"}
-Mention demandée : ${sanitizeText(req?.mentionWanted || "-")}
-Numéro de vérification : ${sanitizeText(cert?.verificationNumber || "-")}
-Délivré le : ${formatDate(cert?.issuedAt)}
-Identité verrouillée : ${cert?.identityLocked ? "Oui" : "Non"}
+Mention demandée : ${escapeHtml(sanitizeText(req?.mentionWanted || "-"))}
+Numéro de vérification : ${escapeHtml(sanitizeText(cert?.verificationNumber || "-"))}
+Délivré le : ${escapeHtml(formatDate(cert?.issuedAt))}
+Page publique : verify-certificate.html
                 </span>
               </div>
 
               <div class="detail-box">
-                <strong>Copie et score final</strong>
-                <span>${submissionSummary}</span>
+                <strong>Copie remise automatiquement</strong>
+                <span>${escapeHtml(submissionSummary)}</span>
+                <details class="copy-details">
+                  <summary>Voir la copie et les réponses</summary>
+                  ${renderSubmissionAnswers(submission)}
+                </details>
               </div>
 
               <div class="detail-box">
-                <strong>Sécurité appareil / accès</strong>
+                <strong>Correction admin</strong>
                 <span>
-Appareil : ${deviceLabel}
-Empreinte : ${deviceFingerprint}
-IP hash : ${ipHash}
-Nouvel accès possible après : ${nextEligibleAt}
+Statut : ${escapeHtml(sanitizeText(adminCorrection.correctionStatus || "pending"))}
+Note manuelle : ${adminCorrection.manualScore != null ? escapeHtml(String(adminCorrection.manualScore)) : "-"}
+Commentaires : ${escapeHtml(sanitizeText(adminCorrection.notes || "-"))}
+Mis à jour : ${escapeHtml(formatDateTime(adminCorrection.updatedAt))}
                 </span>
               </div>
             </div>
@@ -3242,15 +3447,15 @@ Nouvel accès possible après : ${nextEligibleAt}
                   <button class="btn secondary" data-action="reset" data-uid="${uid}">Remettre en attente</button>
                 </div>
                 <div class="notice" style="margin-top:12px;">
-                  Dernière décision admin : ${sanitizeText(p.adminApprovedBy || "-")} · ${formatDateTime(p.adminDecisionAt)}
+                  Dernière décision admin : ${escapeHtml(sanitizeText(p.adminApprovedBy || "-"))} · ${escapeHtml(formatDateTime(p.adminDecisionAt))}
                 </div>
               </div>
 
               <div class="action-box">
                 <h4>Communication rapide</h4>
                 <div class="btn-row">
-                  <a class="btn secondary" href="profile.html?uid=${encodeURIComponent(safeUid)}">Ouvrir son compte</a>
-                  <a class="btn primary" href="messages.html?uid=${encodeURIComponent(safeUid)}">Lui écrire</a>
+                  <a class="btn secondary" href="profile.html?uid=${encodeURIComponent(uid)}">Ouvrir son compte</a>
+                  <a class="btn primary" href="messages.html?uid=${encodeURIComponent(uid)}">Lui écrire</a>
                 </div>
                 <div class="notice" style="margin-top:12px;">
                   Utilise ces liens pour tomber sur le compte ou engager une communication directe.
@@ -3265,7 +3470,7 @@ Nouvel accès possible après : ${nextEligibleAt}
                   <a class="btn secondary" href="verify-certificate.html">Page de vérification</a>
                 </div>
                 <div class="notice" style="margin-top:12px;">
-                  Le certificat délivré ici sera visible côté candidat et vérifiable publiquement par code.
+                  Le certificat délivré ici est visible automatiquement côté candidat et vérifiable publiquement par code.
                 </div>
               </div>
             </div>
@@ -3276,7 +3481,7 @@ Nouvel accès possible après : ${nextEligibleAt}
               <div class="grid-3">
                 <div>
                   <label for="adminCorrectionScore-${uid}">Note manuelle</label>
-                  <input id="adminCorrectionScore-${uid}" type="number" min="0" step="0.5" value="${adminCorrection.manualScore != null ? adminCorrection.manualScore : ""}" placeholder="Ex. 17.5" />
+                  <input id="adminCorrectionScore-${uid}" type="number" min="0" step="0.5" value="${adminCorrection.manualScore != null ? escapeHtml(String(adminCorrection.manualScore)) : ""}" placeholder="Ex. 17.5" />
                 </div>
 
                 <div>
@@ -3296,7 +3501,7 @@ Nouvel accès possible après : ${nextEligibleAt}
 
               <div style="margin-top:12px;">
                 <label for="adminCorrectionNotes-${uid}">Commentaires admin</label>
-                <textarea id="adminCorrectionNotes-${uid}" placeholder="Ajoute ici les remarques de correction, y compris pour les réponses écrites.">${sanitizeText(adminCorrection.notes || "")}</textarea>
+                <textarea id="adminCorrectionNotes-${uid}" placeholder="Ajoute ici les remarques de correction, y compris pour les réponses écrites.">${escapeHtml(sanitizeText(adminCorrection.notes || ""))}</textarea>
               </div>
             </div>
           </div>
@@ -3344,27 +3549,34 @@ Nouvel accès possible après : ${nextEligibleAt}
           resultVisibility: "hidden",
           announcement: ""
         });
-
-        massPublishStatusText.textContent = (competitionSettings?.resultVisibility || "hidden") === "visible" ? "Résultats visibles" : "Résultats masqués";
       });
 
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/securitySettings`), (snap) => {
-        const securityData = snap.exists() ? (snap.val() || {}) : {
-          sessionCode: "",
-          rejoinCooldownMonths: 3,
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/security`), (snap) => {
+        securitySettings = snap.exists() ? (snap.val() || {}) : null;
+        applySecurityToUI(securitySettings || {
+          sessionCode: randomSessionCode(),
+          rejoinCooldownMonths: CONFIG.defaultCooldownMonths,
           deviceLockMode: "strict",
-          candidateGateMode: "strict"
-        };
-        applySecurityToUI(securityData);
+          candidateGateMode: "strict",
+          maxWarnings: CONFIG.defaultMaxWarnings,
+          forbiddenTitle: "Compétition en cours, accès interdits à toute personne non candidats",
+          forbiddenMessage: "Seuls les candidats avec code unique valide, mail autorisé et appareil reconnu peuvent continuer."
+        });
+      });
+
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/resultsPublication`), (snap) => {
+        resultsPublication = snap.exists() ? (snap.val() || {}) : null;
+        renderResultsPublicationState();
       });
 
       onValue(ref(db, `competitions/${CONFIG.competitionId}/liveControl`), (snap) => {
         liveControlState = snap.exists() ? (snap.val() || {}) : null;
         renderLiveControl(liveControlState);
+        autoFinishIfExpired(liveControlState);
       });
 
       onValue(ref(db, `competitions/${CONFIG.competitionId}/participants`), (snap) => {
-        registrationsMap = snap.exists() ? (snap.val() || {}) : {};
+        participantsMap = snap.exists() ? (snap.val() || {}) : {};
         renderCandidates();
       });
 
@@ -3398,21 +3610,32 @@ Nouvel accès possible après : ${nextEligibleAt}
         renderAnnouncements();
       });
 
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/examSubmissions`), (snap) => {
+        examSubmissionsMap = snap.exists() ? (snap.val() || {}) : {};
+        renderCandidates();
+      });
+
       onValue(ref(db, `competitions/${CONFIG.competitionId}/manualCorrections`), (snap) => {
         manualCorrectionsMap = snap.exists() ? (snap.val() || {}) : {};
         renderCandidates();
+      });
 
-        const all = manualCorrectionsMap || {};
-        let qcmDone = 0;
-        let writtenDone = 0;
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/candidateAccess`), (snap) => {
+        candidateAccessMap = snap.exists() ? (snap.val() || {}) : {};
+        computeSecurityMonitors();
+        renderCandidates();
+      });
 
-        Object.values(all).forEach((item) => {
-          if (item?.system?.autoCorrectedAt) qcmDone++;
-          if (item?.reviewQueue?.preparedAt) writtenDone++;
-        });
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/deviceLocks`), (snap) => {
+        deviceLocksMap = snap.exists() ? (snap.val() || {}) : {};
+        computeSecurityMonitors();
+        renderCandidates();
+      });
 
-        massQcmStatusText.textContent = qcmDone ? `${qcmDone} copie(s) QCM traitée(s)` : "-";
-        massWrittenStatusText.textContent = writtenDone ? `${writtenDone} copie(s) préparée(s)` : "-";
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/securityEvents`), (snap) => {
+        securityEventsMap = snap.exists() ? (snap.val() || {}) : {};
+        computeSecurityMonitors();
+        renderCandidates();
       });
     }
 
@@ -3422,22 +3645,26 @@ Nouvel accès possible après : ${nextEligibleAt}
     });
 
     saveSettingsBtn.addEventListener("click", saveCompetitionSettings);
-    saveSecuritySettingsBtn.addEventListener("click", saveSecuritySettings);
-    generateSessionCodeBtn.addEventListener("click", () => {
-      sessionCodeInput.value = generateSessionCode();
-    });
+    saveSecurityBtn.addEventListener("click", saveSecuritySettings);
+    rotateSessionCodeBtn.addEventListener("click", rotateSessionCode);
+    refreshSecurityMonitorBtn.addEventListener("click", computeSecurityMonitors);
+    forceLockAllCandidatesBtn.addEventListener("click", forceLockAllCandidates);
+    clearCandidateAccessBtn.addEventListener("click", clearCandidateAccess);
 
     addJuryBtn.addEventListener("click", addJuryEmail);
     publishResultsBtn.addEventListener("click", publishResultsToInsights);
+    showResultsBoardBtn.addEventListener("click", () => setResultsBoardVisibility(true));
+    hideResultsBoardBtn.addEventListener("click", () => setResultsBoardVisibility(false));
+
     saveChallengePubBtn.addEventListener("click", saveChallengePub);
     hideChallengePubBtn.addEventListener("click", hideChallengePub);
     loadChallengePubBtn.addEventListener("click", () => renderChallengePubPreview(challengePubData));
     addAnnouncementBtn.addEventListener("click", addAnnouncement);
 
-    autoCorrectQcmBtn.addEventListener("click", autoCorrectAllQcm);
+    autoCorrectAllBtn.addEventListener("click", autoCorrectAllQCM);
+    rebuildLeaderboardBtn.addEventListener("click", rebuildLeaderboard);
     prepareManualReviewBtn.addEventListener("click", prepareManualReview);
-    rebuildFinalScoresBtn.addEventListener("click", rebuildFinalScores);
-    showResultsPublicBtn.addEventListener("click", showResultsPublicly);
+    markAllPendingReviewBtn.addEventListener("click", markAllPendingReview);
 
     launchCompetitionBtn.addEventListener("click", launchCompetition);
     finishCompetitionBtn.addEventListener("click", finishCompetitionNow);
