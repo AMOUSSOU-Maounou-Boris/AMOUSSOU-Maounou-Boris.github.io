@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestion des cookies | Boris Research Hub</title>
+  <style>
+    *{ box-sizing:border-box; }
+
+    :root{
+      --bg:#041126;
+      --bg2:#0a2659;
+      --bg3:#123d84;
+      --card:rgba(255,255,255,.95);
+      --card-soft:rgba(248,252,255,.96);
+      --card-warm:rgba(255,250,241,.96);
+      --text:#0b2340;
+      --muted:#61748d;
+      --line:#d9e6f4;
+      --blue:#2f8cff;
+      --blue-dark:#0f4d92;
+      --green:#19be69;
+      --orange:#ff9f1a;
+      --red:#df4b4b;
+      --gold:#d6a62d;
+      --shadow:0 18px 42px rgba(7,31,66,.14);
+      --radius:24px;
+      --max:1480px;
+    }
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#fff;
+      background:
+        radial-gradient(circle at 14% 18%, rgba(114,214,255,.18) 0%, rgba(114,214,255,.04) 18%, transparent 28%),
+        radial-gradient(circle at 86% 14%, rgba(255,214,138,.14) 0%, rgba(255,214,138,.04) 14%, transparent 25%),
+        radial-gradient(circle at 20% 80%, rgba(74,195,255,.15) 0%, rgba(74,195,255,.05) 12%, transparent 22%),
+        linear-gradient(120deg, var(--bg) 0%, var(--bg2) 42%, var(--bg3) 68%, #081a36 100%);
+      background-attachment:fixed;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.6;
+      background:
+        radial-gradient(circle at 22% 28%, rgba(255,255,255,.14) 0 1.5px, transparent 2.4px),
+        radial-gradient(circle at 74% 22%, rgba(255,255,255,.10) 0 1.6px, transparent 2.5px),
+        radial-gradient(circle at 86% 66%, rgba(255,255,255,.11) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 38% 78%, rgba(255,255,255,.10) 0 1.5px, transparent 2.5px);
+      background-size:300px 300px, 400px 400px, 480px 480px, 260px 260px;
+      animation:stars 10s linear infinite;
+      z-index:0;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:40;
+      background:rgba(8,46,91,.88);
+      backdrop-filter:blur(10px);
+      box-shadow:0 8px 18px rgba(0,0,0,.12);
+    }
+
+    .topbar-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:16px 18px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:12px 20px;
+    }
+
+    .topbar a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+      font-size:15px;
+      opacity:.95;
+    }
+
+    .topbar a.active,
+    .topbar a:hover{
+      color:#a9dcff;
+    }
+
+    .page{
+      position:relative;
+      z-index:2;
+      max-width:var(--max);
+      margin:22px auto 40px;
+      padding:0 18px 24px;
+      display:grid;
+      grid-template-columns:310px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .sidebar{
+      position:sticky;
+      top:92px;
+    }
+
+    .hero,
+    .card,
+    .admin-card,
+    .main-card,
+    .cookie-card{
+      border-radius:28px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      padding:28px;
+      background:linear-gradient(135deg, rgba(8,41,90,.97) 0%, rgba(20,86,171,.94) 54%, rgba(58,152,255,.90) 100%);
+      overflow:hidden;
+      position:relative;
+      color:#fff;
+      margin-bottom:18px;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      right:-70px;
+      top:-70px;
+      width:240px;
+      height:240px;
+      border-radius:50%;
+      background:rgba(255,255,255,.09);
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.22);
+      font-size:13px;
+      font-weight:900;
+      margin-bottom:14px;
+      position:relative;
+      z-index:2;
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size:38px;
+      line-height:1.08;
+      position:relative;
+      z-index:2;
+    }
+
+    .hero p{
+      margin:0;
+      line-height:1.8;
+      font-size:15px;
+      max-width:900px;
+      color:rgba(255,255,255,.96);
+      position:relative;
+      z-index:2;
+    }
+
+    .card{
+      background:var(--card);
+      color:var(--text);
+      border:1px solid #e3edf7;
+      padding:18px;
+      margin-bottom:18px;
+    }
+
+    .admin-card{
+      background:var(--card-warm);
+      color:var(--text);
+      border:1px solid #efd9a5;
+      padding:18px;
+      margin-bottom:18px;
+    }
+
+    .main-card{
+      background:rgba(255,255,255,.95);
+      color:var(--text);
+      border:1px solid #e3edf7;
+      padding:22px;
+    }
+
+    .cookie-card{
+      background:#fff;
+      border:1px solid var(--line);
+      padding:18px;
+    }
+
+    .title{
+      margin:0 0 10px;
+      color:#082e5b;
+      font-size:20px;
+    }
+
+    .muted{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .mini-line{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:11px 12px;
+      border-radius:16px;
+      background:#f8fbff;
+      border:1px solid var(--line);
+      margin-bottom:10px;
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green);
+      flex:0 0 10px;
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .section-head h2{
+      margin:0 0 6px;
+      color:#082e5b;
+      font-size:28px;
+    }
+
+    .section-head p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:1.2fr .9fr .9fr .9fr .9fr;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    input, select{
+      width:100%;
+      border:1px solid #c9dcec;
+      border-radius:15px;
+      min-height:50px;
+      padding:0 14px;
+      outline:none;
+      font-size:14px;
+      color:var(--text);
+      background:#fff;
+    }
+
+    .btn{
+      min-height:48px;
+      border:none;
+      border-radius:16px;
+      padding:0 18px;
+      font-size:14px;
+      font-weight:900;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .btn:hover{ transform:translateY(-1px); }
+    .btn.blue{ background:#0f4d92; color:#fff; }
+    .btn.green{ background:var(--green); color:#fff; }
+    .btn.orange{ background:var(--orange); color:#fff; }
+    .btn.red{ background:var(--red); color:#fff; }
+    .btn.gold{ background:linear-gradient(135deg,#d5a52f,#b98512); color:#fff; }
+    .btn.ghost{ background:#edf5fd; color:#0b2340; }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:14px;
+      margin-bottom:18px;
+    }
+
+    .stat-box{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+      padding:16px;
+    }
+
+    .stat-box .k{
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .stat-box .v{
+      color:#082e5b;
+      font-size:22px;
+      font-weight:900;
+      line-height:1.35;
+    }
+
+    .cookies-list{
+      display:grid;
+      gap:16px;
+    }
+
+    .cookie-top{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .cookie-name{
+      font-size:20px;
+      font-weight:900;
+      color:#082e5b;
+      line-height:1.3;
+    }
+
+    .cookie-meta{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      white-space:pre-wrap;
+      margin-top:6px;
+      word-break:break-word;
+    }
+
+    .badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .tag.accepted{ background:#eefcf5; color:#167748; }
+    .tag.rejected{ background:#fff3f3; color:#b33e3e; }
+    .tag.pending{ background:#fff8e7; color:#8a6200; }
+    .tag.member{ background:#edf4ff; color:#0f4d92; }
+
+    .cookie-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .info-box{
+      border:1px solid #e4edf6;
+      background:#fcfdff;
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .info-box .label{
+      color:var(--muted);
+      font-size:11px;
+      text-transform:uppercase;
+      font-weight:800;
+      margin-bottom:7px;
+      letter-spacing:.3px;
+    }
+
+    .info-box .value{
+      color:#0b2340;
+      font-size:14px;
+      line-height:1.65;
+      font-weight:800;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .cookie-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .empty-box{
+      border:1px dashed #d0ddeb;
+      border-radius:20px;
+      background:#fbfdff;
+      padding:20px;
+      color:var(--muted);
+      line-height:1.7;
+      text-align:center;
+      font-weight:700;
+    }
+
+    .locked{
+      max-width:920px;
+      margin:90px auto 40px;
+      padding:0 18px;
+      position:relative;
+      z-index:2;
+    }
+
+    .locked-card{
+      background:rgba(255,255,255,.94);
+      border:1px solid #e3edf7;
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      padding:30px;
+      text-align:center;
+      color:var(--text);
+    }
+
+    .locked-card h2{
+      margin:0 0 12px;
+      color:#082e5b;
+      font-size:32px;
+    }
+
+    .locked-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:15px;
+    }
+
+    .howto{
+      margin-top:28px;
+      border-top:1px solid #e4edf7;
+      padding-top:18px;
+      text-align:left;
+    }
+
+    .howto h3{
+      margin:0 0 10px;
+      color:#082e5b;
+      font-size:20px;
+    }
+
+    .howto p{
+      margin:0 0 10px;
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    .notice{
+      border:1px dashed #cddceb;
+      border-radius:18px;
+      background:#f8fbff;
+      padding:16px;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+      margin-bottom:18px;
+      white-space:pre-wrap;
+    }
+
+    .hidden{ display:none !important; }
+
+    @keyframes stars{
+      0%,100%{ opacity:.58; transform:scale(1); }
+      50%{ opacity:.8; transform:scale(1.01); }
+    }
+
+    @media (max-width:1280px){
+      .page{ grid-template-columns:1fr; }
+      .sidebar{ position:static; }
+      .toolbar,
+      .stats-grid,
+      .cookie-grid{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media (max-width:860px){
+      .toolbar,
+      .stats-grid,
+      .cookie-grid{
+        grid-template-columns:1fr;
+      }
+      .hero h1{ font-size:31px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html">Home</a>
+      <a href="insights.html#challenge-pub">Insights</a>
+      <a href="competition.html">Concours</a>
+      <a href="competition-admin.html">Admin concours</a>
+      <a href="competition-jury.html">Jury concours</a>
+      <a href="competition-sponsors.html">Sponsors</a>
+      <a href="profile.html">Mon compte</a>
+      <a href="cookies-admin.html" class="active">Cookies admin</a>
+    </div>
+  </header>
+
+  <div id="lockedView" class="locked hidden">
+    <div class="locked-card">
+      <h2>Accès réservé à l’administrateur</h2>
+      <p>
+        Cette page privée de gestion des cookies est visible uniquement pour
+        le compte administrateur officiel connecté avec l’adresse :
+        <strong>borisamoussou01@gmail.com</strong>.
+      </p>
+
+      <div class="howto">
+        <h3>Comment la rendre visible pour toi</h3>
+        <p>1. Connecte-toi sur ton site avec le compte <strong>borisamoussou01@gmail.com</strong>.</p>
+        <p>2. Vérifie que Firebase Auth te reconnaît bien avec cette adresse.</p>
+        <p>3. Ouvre ensuite cette page : <strong>cookies-admin.html</strong>.</p>
+        <p>4. Le code compare automatiquement l’email connecté à <strong>borisamoussou01@gmail.com</strong>.</p>
+        <p>5. Si les deux correspondent exactement, la page admin s’affiche toute seule.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminView" class="hidden">
+    <div class="page">
+      <aside class="sidebar">
+        <div class="admin-card">
+          <h3 class="title">Centre de contrôle cookies</h3>
+          <p class="muted">
+            Cette page te permet de voir tous les consentements cookies enregistrés
+            lors de la création de comptes, les refus, les dates, les appareils,
+            ainsi que certaines métadonnées utiles au suivi administratif.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="mini-line"><span class="dot"></span><span id="adminEmailText">Admin connecté</span></div>
+          <div class="mini-line"><span class="dot"></span><span id="miniCountTotal">Total consentements : 0</span></div>
+          <div class="mini-line"><span class="dot"></span><span id="miniCountAccepted">Acceptés : 0</span></div>
+          <div class="mini-line"><span class="dot"></span><span id="miniCountRejected">Refusés : 0</span></div>
+          <div class="mini-line"><span class="dot"></span><span id="miniCountLinked">Liés à un compte : 0</span></div>
+        </div>
+
+        <div class="card">
+          <h3 class="title">Chemin base de données</h3>
+          <p class="muted">
+            Les consentements seront lus ici :
+            <br><br>
+            <strong>siteSecurity/cookieConsents</strong>
+          </p>
+        </div>
+
+        <div class="card">
+          <h3 class="title">Utilité</h3>
+          <p class="muted">
+            Tu peux t’en servir pour vérifier quels utilisateurs ont accepté les cookies,
+            à quel moment, depuis quel appareil déclaré, et si le consentement a été
+            associé ou non à un compte créé sur le site.
+          </p>
+        </div>
+      </aside>
+
+      <main>
+        <section class="hero">
+          <div class="hero-badge">Private Cookie Dashboard</div>
+          <h1>Gestion et vue des cookies collectés</h1>
+          <p>
+            Tableau de bord privé pour consulter tous les consentements cookies enregistrés
+            sur le site. Cette page est faite pour être liée à ton espace administrateur
+            et visible uniquement pour l’administrateur officiel connecté avec
+            <strong>borisamoussou01@gmail.com</strong>.
+          </p>
+        </section>
+
+        <section class="main-card">
+          <div class="section-head">
+            <div>
+              <h2>Consentements enregistrés</h2>
+              <p>Recherche, filtre, lecture détaillée et gestion basique des consentements cookies.</p>
+            </div>
+          </div>
+
+          <div class="notice">Conseil : au moment d’intégrer cette page, fais enregistrer depuis signup.html au moins ces données : statut du consentement, date, email saisi, nom, userAgent, langue, fuseau horaire, page source, adresse IP si tu as déjà un système légal et conforme pour la stocker côté serveur.</div>
+
+          <div class="toolbar">
+            <input id="searchInput" type="text" placeholder="Rechercher par nom, email, UID, appareil, navigateur..." />
+            <select id="statusFilter">
+              <option value="all">Tous les statuts</option>
+              <option value="accepted">Acceptés</option>
+              <option value="rejected">Refusés</option>
+              <option value="pending">En attente</option>
+            </select>
+            <select id="linkFilter">
+              <option value="all">Tous les liens compte</option>
+              <option value="linked">Liés à un compte</option>
+              <option value="unlinked">Non liés</option>
+            </select>
+            <button class="btn gold" id="refreshBtn" type="button">Actualiser</button>
+            <button class="btn ghost" id="exportBtn" type="button">Préparer export JSON</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="k">Total</div>
+              <div class="v" id="statTotal">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="k">Acceptés</div>
+              <div class="v" id="statAccepted">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="k">Refusés</div>
+              <div class="v" id="statRejected">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="k">En attente</div>
+              <div class="v" id="statPending">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="k">Liés à un compte</div>
+              <div class="v" id="statLinked">0</div>
+            </div>
+          </div>
+
+          <div class="cookies-list" id="cookiesBox">
+            <div class="empty-box">Chargement des consentements cookies...</div>
+          </div>
+        </section>
+              </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+    const COOKIE_DB_PATH = "siteSecurity/cookieConsents";
+
+    const lockedView = document.getElementById("lockedView");
+    const adminView = document.getElementById("adminView");
+
+    const cookiesBox = document.getElementById("cookiesBox");
+
+    const statTotal = document.getElementById("statTotal");
+    const statAccepted = document.getElementById("statAccepted");
+    const statRejected = document.getElementById("statRejected");
+    const statPending = document.getElementById("statPending");
+    const statLinked = document.getElementById("statLinked");
+
+    const miniCountTotal = document.getElementById("miniCountTotal");
+    const miniCountAccepted = document.getElementById("miniCountAccepted");
+    const miniCountRejected = document.getElementById("miniCountRejected");
+    const miniCountLinked = document.getElementById("miniCountLinked");
+
+    const adminEmailText = document.getElementById("adminEmailText");
+
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const linkFilter = document.getElementById("linkFilter");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const exportBtn = document.getElementById("exportBtn");
+
+    let allCookies = [];
+    let currentUser = null;
+
+    function isAdmin(user){
+      return user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    }
+
+    function escapeHtml(text = ""){
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(ts){
+      if(!ts) return "—";
+      try{
+        return new Date(ts).toLocaleString();
+      }catch{
+        return "—";
+      }
+    }
+
+    function getStatusTag(status){
+      if(status === "accepted") return `<span class="tag accepted">Accepté</span>`;
+      if(status === "rejected") return `<span class="tag rejected">Refusé</span>`;
+      return `<span class="tag pending">En attente</span>`;
+    }
+
+    function getLinkTag(isLinked){
+      return isLinked
+        ? `<span class="tag member">Compte lié</span>`
+        : `<span class="tag pending">Non lié</span>`;
+    }
+
+    function computeStats(list){
+      let total = list.length;
+      let accepted = list.filter(c => c.status === "accepted").length;
+      let rejected = list.filter(c => c.status === "rejected").length;
+      let pending = total - accepted - rejected;
+      let linked = list.filter(c => c.linkedToUid).length;
+
+      statTotal.textContent = total;
+      statAccepted.textContent = accepted;
+      statRejected.textContent = rejected;
+      statPending.textContent = pending;
+      statLinked.textContent = linked;
+
+      miniCountTotal.textContent = "Total consentements : " + total;
+      miniCountAccepted.textContent = "Acceptés : " + accepted;
+      miniCountRejected.textContent = "Refusés : " + rejected;
+      miniCountLinked.textContent = "Liés à un compte : " + linked;
+    }
+
+    function renderList(){
+      const q = (searchInput.value || "").toLowerCase().trim();
+      const status = statusFilter.value;
+      const link = linkFilter.value;
+
+      let list = allCookies.filter(item => {
+        const text = JSON.stringify(item).toLowerCase();
+
+        if(q && !text.includes(q)) return false;
+        if(status !== "all" && item.status !== status) return false;
+
+        if(link === "linked" && !item.linkedToUid) return false;
+        if(link === "unlinked" && item.linkedToUid) return false;
+
+        return true;
+      });
+
+      computeStats(list);
+
+      if(!list.length){
+        cookiesBox.innerHTML = `<div class="empty-box">Aucun résultat trouvé.</div>`;
+        return;
+      }
+
+      cookiesBox.innerHTML = list.map(item => {
+        return `
+          <div class="cookie-card">
+            <div class="cookie-top">
+              <div>
+                <div class="cookie-name">${escapeHtml(item.email || "Utilisateur inconnu")}</div>
+                <div class="cookie-meta">
+Nom : ${escapeHtml(item.name || "—")}
+UID : ${escapeHtml(item.linkedToUid || "—")}
+Créé le : ${formatDate(item.createdAt)}
+                </div>
+              </div>
+
+              <div class="badges">
+                ${getStatusTag(item.status)}
+                ${getLinkTag(item.linkedToUid)}
+              </div>
+            </div>
+
+            <div class="cookie-grid">
+              <div class="info-box">
+                <div class="label">Appareil / Navigateur</div>
+                <div class="value">${escapeHtml(item.userAgent || "—")}</div>
+              </div>
+
+              <div class="info-box">
+                <div class="label">Langue / Pays</div>
+                <div class="value">${escapeHtml(item.language || "—")}</div>
+              </div>
+
+              <div class="info-box">
+                <div class="label">Fuseau horaire</div>
+                <div class="value">${escapeHtml(item.timezone || "—")}</div>
+              </div>
+            </div>
+
+            <div class="cookie-actions">
+              <button class="btn red delete-btn" data-id="${item.id}">Supprimer</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if(!confirm("Supprimer ce consentement ?")) return;
+          const id = btn.dataset.id;
+          await remove(ref(db, COOKIE_DB_PATH + "/" + id));
+        });
+      });
+    }
+
+    function loadCookies(){
+      onValue(ref(db, COOKIE_DB_PATH), snap => {
+        const data = snap.val() || {};
+        allCookies = Object.entries(data).map(([id, val]) => ({
+          id,
+          ...val
+        }));
+        renderList();
+      });
+    }
+
+    function exportJSON(){
+      if(!allCookies.length){
+        alert("Aucune donnée à exporter.");
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(allCookies, null, 2)], { type:"application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "cookies-consents.json";
+      a.click();
+
+      URL.revokeObjectURL(url);
+    }
+
+    searchInput.addEventListener("input", renderList);
+    statusFilter.addEventListener("change", renderList);
+    linkFilter.addEventListener("change", renderList);
+    refreshBtn.addEventListener("click", renderList);
+    exportBtn.addEventListener("click", exportJSON);
+
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+
+      if(!isAdmin(user)){
+        lockedView.classList.remove("hidden");
+        adminView.classList.add("hidden");
+        return;
+      }
+
+      lockedView.classList.add("hidden");
+      adminView.classList.remove("hidden");
+
+      adminEmailText.textContent = "Admin connecté : " + (user.email || "");
+      loadCookies();
+    });
+  </script>
+</body>
+</html>
