@@ -420,6 +420,8 @@
       <a href="contact.html">Contact</a>
       <a href="insights.html#challenge-pub">Insights</a>
       <a href="competition.html">Concours</a>
+      <a href="competition-jury.html">Jury concours</a>
+      <a href="competition-admin.html">Admin concours</a>
       <a href="competition-rules.html">Règlement</a>
       <a href="verify-certificate.html" class="active">Vérifier certificat</a>
       <a href="profile.html">Mon compte</a>
@@ -432,19 +434,23 @@
       <h1>Vérification officielle d’un certificat</h1>
       <p>
         Cette page permet de vérifier si un certificat Chem Challenge a bien été délivré
-        et validé officiellement par l’administration. La vérification est maintenant
-        directement liée aux certificats réellement enregistrés dans le système du concours.
+        et validé officiellement par l’administration. La vérification est directement
+        liée aux certificats réellement générés depuis <strong>competition-admin.html</strong>,
+        en cohérence avec <strong>competition.html</strong>, <strong>competition-jury.html</strong>
+        et la publication officielle dans <strong>insights.html</strong>.
       </p>
     </div>
   </section>
 
   <main class="wrap">
     <section class="card">
-      <div class="official-pill">Base liée au système Chem Challenge</div>
+      <div class="official-pill">Base liée au système officiel Chem Challenge</div>
       <h2 class="title">Rechercher un certificat</h2>
       <p class="muted">
         Saisissez le <strong>numéro de vérification</strong> du certificat.
         Vous pouvez aussi essayer le <strong>code candidat</strong> s’il figure sur le document.
+        Les informations affichées ici doivent correspondre exactement aux données validées
+        par l’administration lors de la délivrance du certificat.
       </p>
 
       <div class="field">
@@ -456,13 +462,15 @@
           autocomplete="off"
         />
         <div class="hint">
-          Formats reconnus ici : numéro de vérification admin, code candidat, ou identifiant lié au certificat.
+          Formats reconnus ici : numéro de vérification admin, code candidat, identifiant lié au certificat,
+          ou valeur enregistrée officiellement dans le système du concours.
         </div>
       </div>
 
       <div class="actions">
         <button class="btn btn-primary" id="verifyBtn">Vérifier</button>
         <button class="btn btn-outline" id="resetBtn">Réinitialiser</button>
+        <a class="btn btn-outline" href="competition-rules.html">Lire le règlement</a>
       </div>
 
       <div id="resultBox" class="result">
@@ -519,8 +527,11 @@
 
       <div class="note-box">
         <strong style="color:#0b57a4;">Information :</strong><br>
-        Cette page lit désormais les certificats réellement délivrés par l’admin dans le système du concours.
-        Tu n’as pas besoin de modifier `competition.html`, `competition-admin.html` ni `competition-jury.html`.
+        Cette page lit les certificats réellement délivrés par l’administrateur depuis
+        <strong>competition-admin.html</strong>. Elle reste cohérente avec :
+        <strong>competition.html</strong> pour le candidat,
+        <strong>competition-jury.html</strong> pour le jury,
+        et <strong>insights.html</strong> pour la communication officielle du concours.
       </div>
     </section>
 
@@ -540,23 +551,32 @@
           <li>le code candidat,</li>
           <li>la date de délivrance,</li>
           <li>l’édition concernée,</li>
-          <li>l’autorité de délivrance.</li>
+          <li>l’autorité de délivrance,</li>
+          <li>les informations officielles retenues au moment de la validation.</li>
         </ul>
       </div>
 
       <div class="side-box">
         <strong>Connexion avec ton système</strong>
-        Cette page est pensée pour fonctionner avec les certificats enregistrés par `competition-admin.html` et rester cohérente avec `competition.html`, `competition-jury.html` et `insights.html`.
+        Cette page fonctionne avec les certificats enregistrés depuis <strong>competition-admin.html</strong>
+        et reste cohérente avec <strong>competition.html</strong>, <strong>competition-jury.html</strong>
+        et <strong>insights.html → Challenge Pub</strong>.
       </div>
 
       <div class="side-box">
-        <strong>Rappel</strong>
+        <strong>Rappel important</strong>
         Si aucun résultat n’apparaît, cela signifie généralement que :
         <ul class="mini-list">
           <li>le code saisi est incorrect,</li>
           <li>le certificat n’a pas encore été délivré,</li>
-          <li>ou le document ne provient pas du système officiel.</li>
+          <li>ou le document ne provient pas du système officiel du concours.</li>
         </ul>
+      </div>
+
+      <div class="side-box">
+        <strong>Cadre officiel</strong>
+        Pour comprendre les conditions de validité, de délivrance et de contrôle,
+        consulte aussi la page <strong>competition-rules.html</strong>.
       </div>
     </aside>
   </main>
