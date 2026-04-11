@@ -207,7 +207,6 @@
       color:var(--muted);
       line-height:1.45;
       font-size:14px;
-      white-space:pre-wrap;
     }
 
     .main{
@@ -377,7 +376,6 @@
       outline:none;
       font-size:15px;
       color:var(--text);
-      font-family:inherit;
     }
 
     textarea{
@@ -428,12 +426,41 @@
 
     .btn:hover{ transform:translateY(-1px); }
 
-    .btn.primary{ background:#1557a6; color:#fff; }
-    .btn.secondary{ background:#eaf1f9; color:var(--nav); }
-    .btn.green{ background:var(--green); color:#fff; }
-    .btn.orange{ background:var(--orange); color:#fff; }
-    .btn.gold{ background:linear-gradient(135deg, #d2a331, #b78410); color:#fff; }
-    .btn.red{ background:var(--red); color:#fff; }
+    .btn.primary{
+      background:#1557a6;
+      color:#fff;
+    }
+
+    .btn.secondary{
+      background:#eaf1f9;
+      color:var(--nav);
+    }
+
+    .btn.green{
+      background:var(--green);
+      color:#fff;
+    }
+
+    .btn.orange{
+      background:var(--orange);
+      color:#fff;
+    }
+
+    .btn.gold{
+      background:linear-gradient(135deg, #d2a331, #b78410);
+      color:#fff;
+    }
+
+    .btn.red{
+      background:var(--red);
+      color:#fff;
+    }
+
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none !important;
+    }
 
     .status-box{
       padding:16px;
@@ -470,7 +497,7 @@
     .tag-close{ background:#ffe9e9; color:#b62727; }
     .tag-live-red{ background:#ffe6e6; color:#b11818; }
     .tag-finished{ background:#ffe6e6; color:#b11818; }
-    .tag-locked{ background:#edf4ff; color:#0f4d92; }
+    .tag-locked{ background:#e8edff; color:#294fa6; }
 
     .live-shell{
       border:1px solid var(--line);
@@ -528,33 +555,21 @@
 
     .security-grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
+      grid-template-columns:1fr 1fr;
       gap:14px;
-      margin-top:14px;
     }
 
-    .security-mini{
+    .security-box{
+      padding:16px;
       border:1px solid var(--line);
-      border-radius:16px;
-      background:#fff;
-      padding:14px;
+      border-radius:18px;
+      background:#fbfdff;
     }
 
-    .security-mini .k{
-      color:var(--muted);
-      font-size:12px;
-      text-transform:uppercase;
-      font-weight:700;
-      margin-bottom:6px;
-    }
-
-    .security-mini .v{
+    .security-box h4{
+      margin:0 0 8px;
       color:var(--nav);
-      font-size:14px;
-      font-weight:800;
-      line-height:1.5;
-      word-break:break-word;
-      white-space:pre-wrap;
+      font-size:16px;
     }
 
     .exam-shell{
@@ -633,7 +648,6 @@
       font-weight:900;
       line-height:1.35;
       margin-bottom:18px;
-      white-space:pre-wrap;
     }
 
     .question-type-pill{
@@ -748,7 +762,6 @@
       align-items:center;
       justify-content:center;
       font-weight:900;
-      flex:0 0 38px;
     }
 
     .leader-name{
@@ -760,7 +773,6 @@
     .leader-sub{
       color:var(--muted);
       font-size:13px;
-      white-space:pre-wrap;
     }
 
     .leader-score{
@@ -826,6 +838,139 @@
       white-space:pre-wrap;
     }
 
+    .forbidden-screen{
+      display:none;
+      min-height:70vh;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:30px;
+      border:1px solid var(--line);
+      border-radius:24px;
+      background:linear-gradient(180deg,#f8fbff 0%, #edf4ff 100%);
+      box-shadow:var(--shadow);
+    }
+
+    .forbidden-screen.show{
+      display:flex;
+    }
+
+    .forbidden-inner{
+      max-width:780px;
+    }
+
+    .forbidden-inner h2{
+      margin:0 0 16px;
+      font-size:40px;
+      color:var(--nav);
+      line-height:1.2;
+    }
+
+    .forbidden-inner p{
+      margin:0;
+      font-size:18px;
+      color:var(--muted);
+      line-height:1.8;
+      white-space:pre-wrap;
+    }
+
+    .results-board{
+      display:none;
+      padding:22px;
+    }
+
+    .results-board.show{
+      display:block;
+    }
+
+    .results-hero{
+      border:1px solid var(--line);
+      border-radius:22px;
+      background:linear-gradient(135deg,#0c3f79 0%, #1557a6 55%, #2f8cff 100%);
+      color:#fff;
+      padding:24px;
+      margin-bottom:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .results-hero h2{
+      margin:0 0 10px;
+      font-size:34px;
+      color:#fff;
+    }
+
+    .results-hero p{
+      margin:0;
+      color:rgba(255,255,255,.94);
+      line-height:1.7;
+    }
+
+    .results-table-wrap{
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+    }
+
+    table.results-table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:780px;
+    }
+
+    .results-table th,
+    .results-table td{
+      padding:14px 12px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      font-size:14px;
+    }
+
+    .results-table th{
+      background:#f5f9ff;
+      color:var(--nav);
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+
+    .winner-strip{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin:18px 0;
+    }
+
+    .winner-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+      padding:18px;
+    }
+
+    .winner-card .title{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      font-weight:700;
+    }
+
+    .winner-card .name{
+      color:var(--nav);
+      font-size:20px;
+      font-weight:900;
+      line-height:1.35;
+      margin-bottom:6px;
+    }
+
+    .winner-card .sub{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+      white-space:pre-wrap;
+    }
+
     .certificate-shell{
       border:2px solid #ead395;
       background:linear-gradient(180deg, #fffdf8, #fffaf0);
@@ -864,7 +1009,6 @@
       color:#7b693f;
       font-weight:700;
       margin-top:6px;
-      white-space:pre-wrap;
     }
 
     .certificate-photo{
@@ -909,7 +1053,6 @@
       color:var(--nav);
       margin:10px 0;
       line-height:1.25;
-      white-space:pre-wrap;
     }
 
     .certificate-center .certificate-text{
@@ -918,7 +1061,6 @@
       max-width:850px;
       margin:0 auto;
       font-size:16px;
-      white-space:pre-wrap;
     }
 
     .certificate-meta{
@@ -949,7 +1091,6 @@
       font-weight:900;
       line-height:1.4;
       word-break:break-word;
-      white-space:pre-wrap;
     }
 
     .certificate-footer{
@@ -971,7 +1112,6 @@
       color:#7b6530;
       font-weight:800;
       max-width:290px;
-      white-space:pre-wrap;
     }
 
     .verify-box{
@@ -979,7 +1119,6 @@
       color:#7b6530;
       font-size:14px;
       line-height:1.6;
-      white-space:pre-wrap;
     }
 
     .certificate-lock{
@@ -1036,7 +1175,6 @@
       font-size:13px;
       line-height:1.55;
       margin-bottom:8px;
-      white-space:pre-wrap;
     }
 
     .challenge-pub-content{
@@ -1044,215 +1182,6 @@
       line-height:1.65;
       white-space:pre-wrap;
       font-size:14px;
-    }
-
-    .security-access-card{
-      border:1px solid var(--line);
-      background:#fbfdff;
-      border-radius:18px;
-      padding:18px;
-    }
-
-    .security-access-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    .forbidden-screen{
-      display:none;
-      min-height:calc(100vh - 120px);
-      align-items:center;
-      justify-content:center;
-      padding:30px 18px;
-    }
-
-    .forbidden-shell{
-      width:100%;
-      max-width:900px;
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:30px;
-      box-shadow:var(--shadow);
-      padding:38px 28px;
-      text-align:center;
-    }
-
-    .forbidden-badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:10px 16px;
-      border-radius:999px;
-      background:#ffe6e6;
-      color:#b11818;
-      font-weight:900;
-      font-size:14px;
-      margin-bottom:16px;
-    }
-
-    .forbidden-title{
-      margin:0 0 14px;
-      font-size:38px;
-      line-height:1.1;
-      color:var(--nav);
-      font-weight:900;
-    }
-
-    .forbidden-text{
-      color:var(--muted);
-      line-height:1.8;
-      font-size:16px;
-      max-width:760px;
-      margin:0 auto 18px;
-      white-space:pre-wrap;
-    }
-
-    .forbidden-mini{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-      margin-top:20px;
-    }
-
-    .forbidden-mini .box{
-      border:1px solid var(--line);
-      background:#fbfdff;
-      border-radius:18px;
-      padding:14px;
-      text-align:left;
-    }
-
-    .forbidden-mini .k{
-      color:var(--muted);
-      font-size:12px;
-      text-transform:uppercase;
-      font-weight:700;
-      margin-bottom:6px;
-    }
-
-    .forbidden-mini .v{
-      color:var(--nav);
-      font-size:14px;
-      font-weight:800;
-      line-height:1.5;
-      white-space:pre-wrap;
-      word-break:break-word;
-    }
-
-    .results-board-shell{
-      display:none;
-      padding:22px;
-    }
-
-    .results-board-header{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:flex-start;
-      flex-wrap:wrap;
-      margin-bottom:18px;
-    }
-
-    .results-board-title{
-      font-size:30px;
-      font-weight:900;
-      color:var(--nav);
-      margin:0 0 8px;
-    }
-
-    .results-top-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-      margin-bottom:18px;
-    }
-
-    .results-top-box{
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:#fbfdff;
-      padding:16px;
-    }
-
-    .results-top-box .k{
-      color:var(--muted);
-      font-size:12px;
-      text-transform:uppercase;
-      font-weight:700;
-      margin-bottom:8px;
-    }
-
-    .results-top-box .v{
-      color:var(--nav);
-      font-size:20px;
-      font-weight:900;
-      line-height:1.35;
-      white-space:pre-wrap;
-    }
-
-    .results-table{
-      display:grid;
-      gap:12px;
-    }
-
-    .results-row{
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:#fff;
-      padding:14px 16px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      align-items:center;
-    }
-
-    .results-row-left{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      min-width:0;
-    }
-
-    .results-rank{
-      width:42px;
-      height:42px;
-      border-radius:50%;
-      background:#e9f2ff;
-      color:#0f4d92;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:900;
-      flex:0 0 42px;
-    }
-
-    .results-name{
-      font-weight:900;
-      color:var(--nav);
-      margin-bottom:4px;
-      white-space:pre-wrap;
-    }
-
-    .results-sub{
-      color:var(--muted);
-      font-size:13px;
-      white-space:pre-wrap;
-    }
-
-    .results-score{
-      font-size:22px;
-      font-weight:900;
-      color:var(--nav);
-      white-space:nowrap;
-    }
-
-    .print-actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-top:14px;
     }
 
     .hidden{ display:none !important; }
@@ -1330,43 +1259,11 @@
       margin:18px auto 0;
     }
 
-    @media (max-width:1200px){
-      .page{
-        grid-template-columns:1fr;
-      }
-      .sidebar,.rightbar{
-        position:static;
-      }
-      .results-top-grid,
-      .security-grid,
-      .forbidden-mini{
-        grid-template-columns:1fr 1fr;
-      }
-    }
-
-    @media (max-width:900px){
-      .info-grid,
-      .form-grid,
-      .two-col,
-      .certificate-meta,
-      .security-access-grid,
-      .results-top-grid,
-      .forbidden-mini{
-        grid-template-columns:1fr;
-      }
-      .hero h1{ font-size:32px; }
-      .question-text{ font-size:21px; }
-      .certificate-center .student-name{ font-size:28px; }
-      .live-countdown{ font-size:28px; }
-      .forbidden-title{ font-size:30px; }
-    }
-
     @media print{
       body *{
         visibility:hidden;
       }
-      #certificateCard,
-      #certificateCard *{
+      #certificateCard, #certificateCard *{
         visibility:visible;
       }
       #certificateCard{
@@ -1377,6 +1274,34 @@
         box-shadow:none !important;
         border:none !important;
       }
+      #printCertificateBtn{
+        display:none !important;
+      }
+    }
+
+    @media (max-width:1200px){
+      .page{
+        grid-template-columns:1fr;
+      }
+      .sidebar,.rightbar{
+        position:static;
+      }
+    }
+
+    @media (max-width:900px){
+      .info-grid,
+      .form-grid,
+      .two-col,
+      .certificate-meta,
+      .security-grid,
+      .winner-strip{
+        grid-template-columns:1fr;
+      }
+      .hero h1{ font-size:32px; }
+      .question-text{ font-size:21px; }
+      .certificate-center .student-name{ font-size:28px; }
+      .live-countdown{ font-size:28px; }
+      .forbidden-inner h2{ font-size:30px; }
     }
   </style>
 </head>
@@ -1396,36 +1321,6 @@
       <a href="competition-rules.html">Règlement officiel</a>
       <a href="verify-certificate.html">Vérifier un certificat</a>
       <a href="profile.html"><span class="nav-online-dot"></span>Mon compte</a>
-    </div>
-  </div>
-
-  <div class="forbidden-screen" id="forbiddenScreen">
-    <div class="forbidden-shell">
-      <div class="forbidden-badge">Accès protégé</div>
-      <h1 class="forbidden-title">Compétition en cours, accès interdits à toute personne non candidats</h1>
-      <p class="forbidden-text" id="forbiddenText">
-Seuls les candidats autorisés, connectés avec leur mail validé, leur code unique de session et leur appareil déjà vérifié peuvent accéder à la salle de concours ou suivre leur dossier pendant la session.
-      </p>
-
-      <div class="forbidden-mini">
-        <div class="box">
-          <div class="k">Session</div>
-          <div class="v" id="forbiddenSessionStatus">Compétition verrouillée</div>
-        </div>
-        <div class="box">
-          <div class="k">Accès requis</div>
-          <div class="v" id="forbiddenNeedText">Mail candidat + code unique + appareil reconnu</div>
-        </div>
-        <div class="box">
-          <div class="k">Règle</div>
-          <div class="v" id="forbiddenRuleText">Aucun accès externe pendant l’épreuve</div>
-        </div>
-      </div>
-
-      <div class="btn-row" style="justify-content:center; margin-top:20px;">
-        <button class="btn secondary" id="refreshForbiddenBtn" type="button">Actualiser</button>
-        <a class="btn secondary" href="insights.html#challenge-pub">Voir Challenge Pub</a>
-      </div>
     </div>
   </div>
 
@@ -1457,36 +1352,30 @@ Seuls les candidats autorisés, connectés avec leur mail validé, leur code uni
 
         <div class="hub-card">
           <h4>Organisation liée</h4>
-          <p>Cette page fonctionne avec competition-admin.html, competition-jury.html et la sous-section Challenge Pub dans insights.html.</p>
+          <p>Cette page fonctionne avec <strong>competition-admin.html</strong>, <strong>competition-jury.html</strong> et la sous-section <strong>Challenge Pub</strong> dans <strong>insights.html</strong>.</p>
         </div>
 
         <div class="hub-card">
           <h4>Contrôle administrateur</h4>
-          <p>L’adresse borisamoussou01@gmail.com garde le contrôle des inscriptions, du jury, des résultats, de la publication concours et des certificats.</p>
+          <p>L’adresse <strong>borisamoussou01@gmail.com</strong> garde le contrôle des inscriptions, du jury, des résultats, de la publication concours et des certificats.</p>
         </div>
 
         <div class="hub-card">
-          <h4>Verrouillage sécurité</h4>
-          <p id="leftSecuritySummary">Session contrôlée par l’admin.
-Accès candidat verrouillé par code unique, appareil reconnu et période de réadmission limitée.</p>
-        </div>
-
-        <div class="hub-card">
-          <h4>Identité certificat</h4>
-          <p>Le certificat reprend uniquement les vraies informations verrouillées du candidat au moment de l’examen. Elles ne sont plus modifiables après la session.</p>
+          <h4>Expérience candidat</h4>
+          <p>Inscription détaillée, vérification d’accès, test, suivi du dossier, demande de certificat, affichage du certificat final et accès rapide à Challenge Pub.</p>
         </div>
       </div>
     </aside>
 
     <main class="main" id="competitionMain">
-      <section class="card hero" id="heroSection">
+      <section class="card hero">
         <div class="hero-top">
           <div>
             <h1 id="heroChallengeTitle">Chem Challenge</h1>
             <p id="heroChallengeText">
               Bienvenue dans l’espace officiel du concours de chimie. Cette interface permet
-              l’inscription des candidats, le suivi du dossier, l’accès à l’épreuve,
-              la consultation du classement et la demande de certificat.
+              l’inscription des candidats, le suivi du dossier, l’accès sécurisé à l’épreuve,
+              la consultation du classement après publication officielle et la demande de certificat.
             </p>
           </div>
           <div class="hero-badge" id="heroEditionBadge">Édition académique</div>
@@ -1512,7 +1401,7 @@ Accès candidat verrouillé par code unique, appareil reconnu et période de ré
         </div>
       </section>
 
-      <section class="card section" style="padding-top:20px;" id="officialIntroSection">
+      <section class="card section" style="padding-top:20px;">
         <div style="
           border:1px solid var(--line);
           background:linear-gradient(135deg,#0c3f79 0%, #1557a6 55%, #2f8cff 100%);
@@ -1555,10 +1444,10 @@ Accès candidat verrouillé par code unique, appareil reconnu et période de ré
                 Espace officiel du concours
               </div>
 
-              <div style="font-size:15px; line-height:1.75; color:rgba(255,255,255,.94); white-space:pre-wrap;">
-Cette interface est liée à l’administration, au jury et à la publication Challenge Pub.
-Le règlement officiel, la vérification des certificats et la validation des résultats
-renforcent la crédibilité institutionnelle du concours sans détruire ton système actuel.
+              <div style="font-size:15px; line-height:1.75; color:rgba(255,255,255,.94);">
+                Cette interface est liée à l’administration, au jury et à la publication Challenge Pub.
+                Le règlement officiel, la vérification des certificats, la sécurité d’accès et la validation
+                humaine des résultats renforcent la crédibilité institutionnelle du concours.
               </div>
             </div>
 
@@ -1579,8 +1468,8 @@ renforcent la crédibilité institutionnelle du concours sans détruire ton syst
                 border-radius:18px;
                 padding:14px;
               ">
-                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Vérification</div>
-                <div style="font-size:16px; font-weight:900;">Code officiel contrôlable</div>
+                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Sécurité</div>
+                <div style="font-size:16px; font-weight:900;">Code + mail + appareil</div>
               </div>
             </div>
           </div>
@@ -1628,7 +1517,7 @@ renforcent la crédibilité institutionnelle du concours sans détruire ton syst
 
           <div style="border:1px solid var(--line); background:#fbfdff; border-radius:18px; padding:16px;">
             <div style="font-size:12px; color:var(--muted); margin-bottom:8px; font-weight:700; text-transform:uppercase;">Certificat</div>
-            <div style="font-size:17px; color:var(--nav); font-weight:900; line-height:1.4;">Délivré en 1 clic par l’admin</div>
+            <div style="font-size:17px; color:var(--nav); font-weight:900; line-height:1.4;">Délivré par l’admin</div>
           </div>
 
           <div style="border:1px solid var(--line); background:#fbfdff; border-radius:18px; padding:16px;">
@@ -1638,64 +1527,63 @@ renforcent la crédibilité institutionnelle du concours sans détruire ton syst
         </div>
       </section>
 
-      <section class="card section" id="securityGovernedSection">
-        <h2>Sécurité gouvernée par l’administrateur</h2>
-        <p>
-          Ces paramètres sont lus automatiquement depuis <strong>competition-admin.html</strong> et appliqués
-          à cette page pendant toute la session.
-        </p>
-
-        <div class="security-grid">
-          <div class="security-mini">
-            <div class="k">Code de session</div>
-            <div class="v" id="securitySessionCodeText">Non chargé</div>
-          </div>
-
-          <div class="security-mini">
-            <div class="k">Verrou appareil</div>
-            <div class="v" id="securityDeviceModeText">Non chargé</div>
-          </div>
-
-          <div class="security-mini">
-            <div class="k">Nouvel accès</div>
-            <div class="v" id="securityCooldownText">Non chargé</div>
+      <section class="card section" id="forbiddenSection" style="display:none;">
+        <div class="forbidden-screen" id="forbiddenScreen">
+          <div class="forbidden-inner">
+            <h2>Compétition en cours, accès interdits à toute personne non candidats</h2>
+            <p id="forbiddenText">
+Seuls les candidats approuvés, vérifiés par leur code unique, leur mail et leur appareil autorisé peuvent continuer pendant la session officielle.
+            </p>
+            <div class="btn-row" style="justify-content:center;">
+              <button class="btn secondary" id="refreshForbiddenBtn" type="button">Actualiser mon accès</button>
+            </div>
           </div>
         </div>
+      </section>
 
-        <div class="security-access-card" style="margin-top:16px;">
-          <h3>Vérification candidat avant l’épreuve</h3>
+      <section class="card section" id="resultsBoardSection" style="display:none;">
+        <div class="results-board" id="resultsBoard">
+          <div class="results-hero">
+            <h2>Résultats officiels du concours</h2>
+            <p id="resultsHeroText">
+              Ces résultats sont visibles uniquement après publication officielle par l’administrateur.
+            </p>
+          </div>
 
-          <div class="security-access-grid">
-            <div class="field">
-              <label for="candidateSessionCodeInput">Code unique de session</label>
-              <input id="candidateSessionCodeInput" type="text" placeholder="Code donné par l’administration" />
+          <div class="winner-strip" id="winnerStrip">
+            <div class="winner-card">
+              <div class="title">Premier</div>
+              <div class="name">-</div>
+              <div class="sub">-</div>
             </div>
-
-            <div class="field">
-              <label for="candidateDeviceLabelInput">Nom de l’appareil utilisé</label>
-              <input id="candidateDeviceLabelInput" type="text" placeholder="Ex. HP Laptop Boris / Samsung A54" />
+            <div class="winner-card">
+              <div class="title">Deuxième</div>
+              <div class="name">-</div>
+              <div class="sub">-</div>
             </div>
-
-            <div class="field full">
-              <div class="check-row">
-                <input id="candidateStrictCheck" type="checkbox" />
-                <div class="hint">
-                  Je confirme que je composerai seul, sur cet appareil déclaré, avec ce même mail
-                  et que toute tentative d’accès externe pendant la compétition pourra bloquer mon dossier.
-                </div>
-              </div>
+            <div class="winner-card">
+              <div class="title">Troisième</div>
+              <div class="name">-</div>
+              <div class="sub">-</div>
             </div>
           </div>
 
-          <div class="btn-row">
-            <button class="btn primary" id="verifyCandidateAccessBtn" type="button">Vérifier mon accès candidat</button>
-            <button class="btn secondary" id="refreshCandidateSecurityBtn" type="button">Actualiser les règles</button>
-          </div>
-
-          <div class="status-box">
-            <strong>État de contrôle</strong>
-            <div class="status-tag tag-none" id="candidateAccessTag">Non vérifié</div>
-            <div class="hint" id="candidateAccessText">Le code unique, le mail et l’appareil devront être validés avant l’entrée dans la compétition.</div>
+          <div class="results-table-wrap">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Rang</th>
+                  <th>Candidat</th>
+                  <th>Code</th>
+                  <th>Score</th>
+                  <th>Pourcentage</th>
+                  <th>Soumis le</th>
+                </tr>
+              </thead>
+              <tbody id="resultsTableBody">
+                <tr><td colspan="6">Aucun résultat officiel pour le moment.</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -1708,7 +1596,7 @@ renforcent la crédibilité institutionnelle du concours sans détruire ton syst
             <div class="list-item">
               <strong>Règlement officiel</strong>
               <span>
-Le concours dispose maintenant d’une page dédiée de règlement officiel,
+Le concours dispose d’une page dédiée de règlement officiel,
 consultable directement depuis cette interface.
               </span>
             </div>
@@ -1734,7 +1622,7 @@ via une page officielle de vérification.
               <span>
 1. Soumettre le dossier
 2. Attendre la validation
-3. Vérifier son accès sécurisé
+3. Vérifier son accès candidat
 4. Passer l’épreuve quand elle est ouverte
 5. Demander le certificat
 6. Vérifier ou imprimer le certificat délivré
@@ -1746,7 +1634,7 @@ via une page officielle de vérification.
             <div class="list-item">
               <strong>Accès rapide</strong>
               <span>
-Utilise les boutons ci-dessous pour ouvrir directement les deux pages officielles du concours.
+Utilise les boutons ci-dessous pour ouvrir directement les pages officielles du concours.
               </span>
 
               <div class="btn-row" style="margin-top:12px;">
@@ -1764,10 +1652,9 @@ mais la validation officielle finale dépend toujours de l’administration.
             </div>
 
             <div class="list-item">
-              <strong>Fenêtre de réadmission</strong>
-              <span id="cooldownHumanText">
-Un candidat ayant déjà participé ne peut pas réutiliser le même mail et le même appareil
-avant la période de réadmission définie par l’administrateur.
+              <strong>Sécurité de session</strong>
+              <span>
+Le candidat doit être approuvé, vérifié avec son code de session, et reconnu sur son appareil avant l’entrée dans la salle de concours.
               </span>
             </div>
           </div>
@@ -1826,37 +1713,38 @@ avant la période de réadmission définie par l’administrateur.
             </div>
             <div class="list-item">
               <strong>3. Suivi par le jury</strong>
-              <span>Le jury peut consulter, commenter, noter ou recommander un statut depuis sa salle de correction.</span>
+              <span>Le jury peut consulter, commenter, noter et transmettre une évaluation structurée à l’administration.</span>
             </div>
             <div class="list-item">
-              <strong>4. Lancement du test</strong>
+              <strong>4. Vérification d’accès</strong>
+              <span>Avant l’épreuve, le candidat vérifie son accès avec son mail, son appareil et un code de session géré par l’admin.</span>
+            </div>
+            <div class="list-item">
+              <strong>5. Lancement du test</strong>
               <span>Le candidat approuvé accède ensuite à l’épreuve depuis cette page, avec synchronisation centralisée par l’admin.</span>
             </div>
             <div class="list-item">
-              <strong>5. Demande et émission du certificat</strong>
-              <span>Après le test, le candidat demande son certificat, mais seul l’administrateur peut le délivrer en un clic.</span>
+              <strong>6. Demande et émission du certificat</strong>
+              <span>Après le test, le candidat demande son certificat, mais seul l’administrateur peut le délivrer.</span>
             </div>
           </div>
 
           <div class="list">
             <div class="list-item">
               <strong>Contrôle central</strong>
-              <span>Le système est pensé pour que l’administrateur principal garde la maîtrise finale de tout le concours.</span>
+              <span>Le système est conçu pour que l’administrateur principal garde la maîtrise finale de tout le concours.</span>
             </div>
             <div class="list-item">
               <strong>Confort candidat</strong>
-              <span>Le formulaire contient assez de paramètres pour donner une impression sérieuse, claire et professionnelle.</span>
+              <span>Le formulaire reste sérieux, lisible et professionnel, tout en ajoutant des sécurités de session plus strictes.</span>
             </div>
             <div class="list-item">
-              <strong>Usage ultra strict</strong>
-              <span>
-Pendant la session, l’accès devient strictement personnel.
-Le code unique, le mail et l’appareil déclaré doivent correspondre.
-              </span>
+              <strong>Pas de score trop tôt</strong>
+              <span>Le score reste masqué tant que l’administration n’a pas affiché officiellement les résultats.</span>
             </div>
             <div class="list-item">
               <strong>Base commune</strong>
-              <span>Vous êtes liés directement à l’admin, au jury, aux résultats centralisés et à Insights.</span>
+              <span>Tu es lié directement à l’admin, au jury, au tableau de résultats et à Insights/Challenge Pub.</span>
             </div>
           </div>
         </div>
@@ -1870,7 +1758,6 @@ Le code unique, le mail et l’appareil déclaré doivent correspondre.
             <div class="status-tag tag-none" id="registrationStatusTag">Inscriptions : -</div>
             <div class="status-tag tag-none" id="examStatusTag">Épreuve : -</div>
             <div class="status-tag tag-none" id="resultVisibilityTag">Résultats : -</div>
-            <div class="status-tag tag-none" id="identityLockTag">Identité certificat : -</div>
           </div>
           <div class="hint" id="challengeStatusText" style="margin-top:10px;">
             Les paramètres du challenge seront affichés ici.
@@ -2032,7 +1919,7 @@ Le code unique, le mail et l’appareil déclaré doivent correspondre.
             <div class="check-row">
               <input id="agreeIntegrity" type="checkbox" />
               <div class="hint">
-                Je m’engage à respecter l’intégrité académique, à ne pas tricher, et à ne pas perturber le bon déroulement du concours.
+                Je m’engage à respecter l’intégrité académique, à ne pas tricher, à ne pas utiliser une aide extérieure interdite et à ne pas perturber le bon déroulement du concours.
               </div>
             </div>
           </div>
@@ -2050,11 +1937,67 @@ Le code unique, le mail et l’appareil déclaré doivent correspondre.
         </div>
       </section>
 
+      <section class="card section" id="candidateAccessSection">
+        <h2>Vérification d’accès candidat</h2>
+        <p>
+          Avant d’entrer dans la salle de concours, le candidat approuvé doit faire vérifier son accès
+          avec son mail connecté, son appareil actuel et le code unique de session défini par l’administration.
+        </p>
+
+        <div class="security-grid">
+          <div class="security-box">
+            <h4>Contrôle de session</h4>
+
+            <div class="field">
+              <label for="candidateSessionCodeInput">Code unique de vérification</label>
+              <input id="candidateSessionCodeInput" type="text" placeholder="Code communiqué pour la session" />
+            </div>
+
+            <div class="field" style="margin-top:12px;">
+              <label for="candidateDeviceLabelInput">Nom de l’appareil utilisé</label>
+              <input id="candidateDeviceLabelInput" type="text" placeholder="Ex. Mon PC HP, iPhone de Boris..." />
+            </div>
+
+            <div class="field full" style="margin-top:12px;">
+              <div class="check-row">
+                <input id="candidateStrictCheck" type="checkbox" />
+                <div class="hint">
+                  Je confirme que je passe l’épreuve sur cet appareil et que je comprends que le même mail et le même appareil seront bloqués pour une nouvelle session pendant 3 mois après la fin de cette session.
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn green" id="verifyCandidateAccessBtn">Vérifier mon accès</button>
+              <button class="btn secondary" id="refreshCandidateSecurityBtn">Actualiser</button>
+            </div>
+          </div>
+
+          <div class="security-box">
+            <h4>État de sécurité</h4>
+            <div class="status-box" style="margin-top:0;">
+              <strong>Accès candidat</strong>
+              <div class="status-tag tag-none" id="candidateAccessTag">Non vérifié</div>
+              <div class="hint" id="candidateAccessText">
+Le code unique, le mail et l’appareil devront être validés avant l’entrée dans la compétition.
+              </div>
+            </div>
+
+            <div class="notice" style="margin-top:12px;">
+• accès candidat vérifié avant l’épreuve
+• verrouillage par appareil pour la session
+• blocage des accès non candidats quand la compétition est en cours
+• réutilisation du même mail/appareil bloquée pendant 3 mois après la fin de la session
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="card section" id="contestAccessSection">
         <h2>Accès à l’épreuve</h2>
         <p>
-          L’épreuve devient disponible après validation administrative, vérification candidat,
-          ouverture de l’épreuve et lancement officiel par l’admin.
+          L’épreuve devient disponible après validation administrative, vérification d’accès candidat
+          et lancement officiel par l’admin.
         </p>
 
         <div class="status-box">
@@ -2062,15 +2005,14 @@ Le code unique, le mail et l’appareil déclaré doivent correspondre.
           <div class="hint" style="margin-bottom:10px;">
 • être connecté au site
 • avoir une inscription approuvée
-• avoir validé le code de session candidat
-• utiliser l’appareil déclaré pour la session
+• avoir vérifié son accès candidat
 • épreuve ouverte par l’admin
 • compétition effectivement lancée
 • une seule tentative
 • temps limité à 50 minutes
 • mélange de QCM et de réponses rédigées
 • changement répété d’onglet = avertissement puis soumission automatique
-• score masqué tant que l’admin n’a pas affiché les résultats
+• score masqué jusqu’à affichage officiel des résultats
           </div>
 
           <div class="btn-row">
@@ -2115,7 +2057,7 @@ Le code unique, le mail et l’appareil déclaré doivent correspondre.
         <div class="result-box" id="resultBox">
           <strong>Épreuve terminée</strong>
           <div class="result-score" id="resultScore">Résultat en attente</div>
-          <div class="hint" id="resultText">Ta copie a été enregistrée. Le score restera masqué jusqu’à validation et affichage des résultats par l’administration.</div>
+          <div class="hint" id="resultText">Ta copie a été enregistrée. Le score sera visible seulement après validation et affichage officiel des résultats.</div>
         </div>
       </section>
 
@@ -2133,8 +2075,7 @@ Le code unique, le mail et l’appareil déclaré doivent correspondre.
 
         <div class="notice" style="margin-bottom:14px;">
 Toute délivrance de certificat dépend de l’administration.
-Après émission, le certificat pourra être vérifié grâce à son numéro officiel.
-Les informations affichées sur le certificat seront reprises depuis les données verrouillées du candidat au moment de l’examen.
+Les informations du certificat sont verrouillées à partir des données exactes enregistrées pour le candidat pendant l’inscription et l’examen.
         </div>
 
         <div class="form-grid">
@@ -2236,61 +2177,28 @@ Les informations affichées sur le certificat seront reprises depuis les donnée
           <div class="certificate-footer">
             <div class="signature-box">
               <div class="signature-line">
-AMOUSSOU Maounou Boris
-Directeur et fondateur de Chem Challenge
+                AMOUSSOU Maounou Boris<br>
+                Directeur et fondateur de Chem Challenge
               </div>
             </div>
 
             <div class="verify-box">
               <div class="certificate-lock">Délivré par l’administrateur</div>
               <div style="margin-top:10px;" id="certificateIssuedInfo">Certificat validé.</div>
-              <div class="print-actions">
+              <div class="btn-row" style="justify-content:flex-end;">
                 <a href="verify-certificate.html" class="btn secondary" style="display:inline-flex;">Vérifier ce certificat</a>
-                <button class="btn primary" id="printCertificateBtn" type="button">Imprimer / PDF</button>
+                <button class="btn primary" id="printCertificateBtn" type="button">Imprimer en PDF</button>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="card section" id="leaderboardSection">
+      <section class="card section">
         <h2>Classement</h2>
-        <p>Le classement ci-dessous affiche les meilleurs résultats de l’édition en cours.</p>
+        <p>Le classement ci-dessous affiche les meilleurs résultats de l’édition en cours après publication officielle par l’administration.</p>
         <div class="leaderboard" id="leaderboardBox">
-          <div class="notice">Aucun résultat disponible pour le moment.</div>
-        </div>
-      </section>
-
-      <section class="card results-board-shell" id="resultsBoardSection">
-        <div class="results-board-header">
-          <div>
-            <h2 class="results-board-title">Résultats officiels du concours</h2>
-            <div class="hint" id="resultsBoardMetaText">Les résultats deviennent visibles uniquement après action de l’administrateur.</div>
-          </div>
-          <a class="btn secondary" href="insights.html#challenge-pub">Voir aussi Challenge Pub</a>
-        </div>
-
-        <div class="results-top-grid">
-          <div class="results-top-box">
-            <div class="k">Édition</div>
-            <div class="v" id="resultsBoardEdition">-</div>
-          </div>
-          <div class="results-top-box">
-            <div class="k">Meilleur gagnant</div>
-            <div class="v" id="resultsBoardWinner">-</div>
-          </div>
-          <div class="results-top-box">
-            <div class="k">Meilleur score</div>
-            <div class="v" id="resultsBoardTopScore">-</div>
-          </div>
-          <div class="results-top-box">
-            <div class="k">Visibilité</div>
-            <div class="v" id="resultsBoardVisibility">-</div>
-          </div>
-        </div>
-
-        <div class="results-table" id="resultsBoardList">
-          <div class="notice">Les résultats officiels n’ont pas encore été affichés.</div>
+          <div class="notice">Aucun résultat officiel disponible pour le moment.</div>
         </div>
       </section>
     </main>
@@ -2309,32 +2217,38 @@ Directeur et fondateur de Chem Challenge
       </div>
 
       <div class="mini-box">
-        <h4>Accès candidat</h4>
-        <p id="rightSecuritySummary">
-Mail candidat, code unique et appareil déclaré doivent être cohérents.
-La session est pilotée par l’admin.
+        <h4>Liaison de votre page</h4>
+        <p>
+Les données candidates, jury, validation, Challenge Pub, résultats, correction et certificat
+sont partagées avec <strong>competition-admin.html</strong>, <strong>competition-jury.html</strong> et <strong>insights.html</strong>.
         </p>
       </div>
 
       <div class="mini-box">
         <h4>Admin principal</h4>
         <p>
-Le contrôle final est pensé pour Ing., Maounou Boris AMOUSSOU.
+Le contrôle final est pensé pour <strong>Ing., Maounou Boris AMOUSSOU</strong>.
+        </p>
+      </div>
+
+      <div class="mini-box">
+        <h4>Sécurité</h4>
+        <p>
+Code unique de session, vérification du mail connecté, appareil verrouillé pour la session, anti-changement d’onglet et blocage des non-candidats pendant l’épreuve.
         </p>
       </div>
 
       <div class="mini-box">
         <h4>Certificat</h4>
         <p>
-Le certificat contient le nom, la photo, la date, un numéro de vérification
-et la signature officielle. Les données sont verrouillées après l’examen.
+Le certificat contient le nom, la photo, la date, un numéro de vérification et la signature officielle. Les informations sont verrouillées depuis le dossier du candidat.
         </p>
       </div>
 
       <div class="mini-box">
         <h4>Règlement officiel</h4>
         <p>
-Consulte les règles officielles du concours avant ou après ton inscription.
+Consulte les règles officielles du concours avant ou après ton inscription pour mieux comprendre le cadre académique.
         </p>
         <div class="btn-row">
           <a class="btn secondary" href="competition-rules.html">Ouvrir le règlement</a>
@@ -2414,7 +2328,7 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
       { id:"q11", text:"Quelle loi relie pression et volume d’un gaz à température constante ?", options:["Loi de Boyle-Mariotte","Loi de Raoult","Loi de Hess","Loi de Faraday"], answer:0 },
       { id:"q12", text:"Un composé organique saturé ne contient que des liaisons :", options:["Simples","Doubles","Triples","Aromatiques uniquement"], answer:0 },
       { id:"q13", text:"Quel métal est couramment utilisé comme conducteur dans un circuit électrochimique ?", options:["Cuivre","Soufre","Carbone amorphe uniquement","Silice"], answer:0 },
-      { id:"q14", text:"Quelle espèce est une base selon Brønsted ?", options:["Une espèce qui capte un proton","Une espèce qui cède un proton","Une espèce neutre uniquement","Une espèce qui perd un neutron"], answer:0 },
+      { id:"q14", text:"Quelle espèce est une base selon Brønsted ?", options:["Une espèce qui capte un proton","Une espèce qui cède un proton","Une espèce qui gagne un électron","Une espèce neutre"], answer:0 },
       { id:"q15", text:"La formule de l’acide sulfurique est :", options:["HCl","H₂SO₄","HNO₃","H₃PO₄"], answer:1 },
       { id:"q16", text:"Dans un titrage, le point d’équivalence correspond au moment où :", options:["Le volume est nul","Les réactifs sont introduits en proportions stœchiométriques","Le pH vaut toujours 7","La solution devient incolore"], answer:1 },
       { id:"q17", text:"Quelle particule possède une charge négative dans l’atome ?", options:["Le proton","Le neutron","L’électron","Le nucléon"], answer:2 },
@@ -2471,12 +2385,17 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
     const competitionSidebar = document.getElementById("competitionSidebar");
     const competitionMain = document.getElementById("competitionMain");
     const competitionRightbar = document.getElementById("competitionRightbar");
+
+    const forbiddenSection = document.getElementById("forbiddenSection");
     const forbiddenScreen = document.getElementById("forbiddenScreen");
     const forbiddenText = document.getElementById("forbiddenText");
-    const forbiddenSessionStatus = document.getElementById("forbiddenSessionStatus");
-    const forbiddenNeedText = document.getElementById("forbiddenNeedText");
-    const forbiddenRuleText = document.getElementById("forbiddenRuleText");
     const refreshForbiddenBtn = document.getElementById("refreshForbiddenBtn");
+
+    const resultsBoardSection = document.getElementById("resultsBoardSection");
+    const resultsBoard = document.getElementById("resultsBoard");
+    const resultsHeroText = document.getElementById("resultsHeroText");
+    const winnerStrip = document.getElementById("winnerStrip");
+    const resultsTableBody = document.getElementById("resultsTableBody");
 
     const userNameEl = document.getElementById("userName");
     const userEmailEl = document.getElementById("userEmail");
@@ -2493,28 +2412,12 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
     const registrationStatusTag = document.getElementById("registrationStatusTag");
     const examStatusTag = document.getElementById("examStatusTag");
     const resultVisibilityTag = document.getElementById("resultVisibilityTag");
-    const identityLockTag = document.getElementById("identityLockTag");
     const challengeStatusText = document.getElementById("challengeStatusText");
 
     const liveStatusBadge = document.getElementById("liveStatusBadge");
     const liveCountdownText = document.getElementById("liveCountdownText");
     const liveStatusText = document.getElementById("liveStatusText");
     const liveMetaText = document.getElementById("liveMetaText");
-
-    const securitySessionCodeText = document.getElementById("securitySessionCodeText");
-    const securityDeviceModeText = document.getElementById("securityDeviceModeText");
-    const securityCooldownText = document.getElementById("securityCooldownText");
-    const leftSecuritySummary = document.getElementById("leftSecuritySummary");
-    const rightSecuritySummary = document.getElementById("rightSecuritySummary");
-    const cooldownHumanText = document.getElementById("cooldownHumanText");
-
-    const candidateSessionCodeInput = document.getElementById("candidateSessionCodeInput");
-    const candidateDeviceLabelInput = document.getElementById("candidateDeviceLabelInput");
-    const candidateStrictCheck = document.getElementById("candidateStrictCheck");
-    const verifyCandidateAccessBtn = document.getElementById("verifyCandidateAccessBtn");
-    const refreshCandidateSecurityBtn = document.getElementById("refreshCandidateSecurityBtn");
-    const candidateAccessTag = document.getElementById("candidateAccessTag");
-    const candidateAccessText = document.getElementById("candidateAccessText");
 
     const challengePubStatus = document.getElementById("challengePubStatus");
     const challengePubMeta = document.getElementById("challengePubMeta");
@@ -2548,6 +2451,15 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
     const refreshStatusBtn = document.getElementById("refreshStatusBtn");
     const registrationTag = document.getElementById("registrationTag");
     const registrationText = document.getElementById("registrationText");
+
+    const candidateSessionCodeInput = document.getElementById("candidateSessionCodeInput");
+    const candidateDeviceLabelInput = document.getElementById("candidateDeviceLabelInput");
+    const candidateStrictCheck = document.getElementById("candidateStrictCheck");
+    const verifyCandidateAccessBtn = document.getElementById("verifyCandidateAccessBtn");
+    const refreshCandidateSecurityBtn = document.getElementById("refreshCandidateSecurityBtn");
+    const candidateAccessTag = document.getElementById("candidateAccessTag");
+    const candidateAccessText = document.getElementById("candidateAccessText");
+
     const startExamBtn = document.getElementById("startExamBtn");
     const fullscreenBtn = document.getElementById("fullscreenBtn");
 
@@ -2593,17 +2505,12 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
     const printCertificateBtn = document.getElementById("printCertificateBtn");
 
     const leaderboardBox = document.getElementById("leaderboardBox");
-    const resultsBoardSection = document.getElementById("resultsBoardSection");
-    const resultsBoardMetaText = document.getElementById("resultsBoardMetaText");
-    const resultsBoardEdition = document.getElementById("resultsBoardEdition");
-    const resultsBoardWinner = document.getElementById("resultsBoardWinner");
-    const resultsBoardTopScore = document.getElementById("resultsBoardTopScore");
-    const resultsBoardVisibility = document.getElementById("resultsBoardVisibility");
-    const resultsBoardList = document.getElementById("resultsBoardList");
 
     let currentUser = null;
     let currentRegistration = null;
     let currentProfile = {};
+    let currentCertificateData = null;
+
     let competitionSettings = null;
     let securitySettings = null;
     let liveControlState = null;
@@ -2630,11 +2537,15 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
     let candidateAccessVerified = false;
     let deviceFingerprint = "";
     let deviceLabelSaved = "";
-    let currentCertificateData = null;
-    let resultBoardDataMap = {};
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
+    }
+
+    function escapeHtml(value = "") {
+      const div = document.createElement("div");
+      div.textContent = String(value || "");
+      return div.innerHTML;
     }
 
     function shuffleArray(arr) {
@@ -2664,12 +2575,6 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
       return `${min}:${sec}`;
     }
 
-    function addMonths(ts, months) {
-      const d = new Date(ts || Date.now());
-      d.setMonth(d.getMonth() + Number(months || CONFIG.defaultCooldownMonths));
-      return d.getTime();
-    }
-
     function makeCandidateCode(uid) {
       const clean = uid.replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toUpperCase();
       return `CHEM-${clean}`;
@@ -2684,9 +2589,98 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
       return `CC-${y}${m}${dd}-${clean}`;
     }
 
+    function addMonths(ts, months) {
+      const d = new Date(ts || Date.now());
+      d.setMonth(d.getMonth() + months);
+      return d.getTime();
+    }
+
     function applyTag(el, className, text) {
       el.className = "status-tag " + className;
       el.textContent = text;
+    }
+
+    function setRegistrationStatus(type, text) {
+      if (type === "pending") {
+        applyTag(registrationTag, "tag-pending", "En attente de validation");
+      } else if (type === "approved") {
+        applyTag(registrationTag, "tag-approved", "Inscription approuvée");
+      } else if (type === "rejected") {
+        applyTag(registrationTag, "tag-rejected", "Inscription refusée");
+      } else if (type === "locked") {
+        applyTag(registrationTag, "tag-locked", "Accès temporairement verrouillé");
+      } else {
+        applyTag(registrationTag, "tag-none", "Aucune inscription enregistrée");
+      }
+      registrationText.textContent = text;
+    }
+
+    function setCertificateStatus(type, text) {
+      if (type === "pending") {
+        applyTag(certificateTag, "tag-pending", "Demande envoyée");
+      } else if (type === "issued") {
+        applyTag(certificateTag, "tag-issued", "Certificat délivré");
+      } else if (type === "rejected") {
+        applyTag(certificateTag, "tag-rejected", "Demande refusée");
+      } else {
+        applyTag(certificateTag, "tag-none", "Aucune demande pour le moment");
+      }
+      certificateText.textContent = text;
+    }
+
+    function setCandidateAccessStatus(type, text) {
+      if (type === "approved") {
+        applyTag(candidateAccessTag, "tag-approved", "Accès vérifié");
+      } else if (type === "locked") {
+        applyTag(candidateAccessTag, "tag-locked", "Appareil verrouillé");
+      } else if (type === "rejected") {
+        applyTag(candidateAccessTag, "tag-rejected", "Accès refusé");
+      } else {
+        applyTag(candidateAccessTag, "tag-none", "Non vérifié");
+      }
+      candidateAccessText.textContent = text;
+    }
+
+    function getSessionCode() {
+      return sanitizeText(securitySettings?.sessionCode || "");
+    }
+
+    function getCooldownMonths() {
+      const v = Number(securitySettings?.rejoinCooldownMonths ?? CONFIG.defaultCooldownMonths);
+      return Number.isFinite(v) && v > 0 ? v : CONFIG.defaultCooldownMonths;
+    }
+
+    function buildDeviceFingerprint() {
+      const raw = [
+        navigator.userAgent || "",
+        navigator.language || "",
+        screen.width || "",
+        screen.height || "",
+        new Date().getTimezoneOffset()
+      ].join("|");
+
+      let hash = 0;
+      for (let i = 0; i < raw.length; i++) {
+        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+        hash |= 0;
+      }
+      return "DEV-" + Math.abs(hash).toString(16).toUpperCase();
+    }
+
+    function hashPseudoIpBase() {
+      const raw = [
+        navigator.platform || "",
+        navigator.hardwareConcurrency || "",
+        navigator.maxTouchPoints || "",
+        screen.colorDepth || ""
+      ].join("|");
+
+      let hash = 0;
+      for (let i = 0; i < raw.length; i++) {
+        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+        hash |= 0;
+      }
+      return "NET-" + Math.abs(hash).toString(16).toUpperCase();
     }
 
     function stopLiveCountdownTimer() {
@@ -2706,50 +2700,101 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
       setExamFullscreenMode(shouldFocusExam);
     }
 
-    function buildDeviceFingerprint() {
-      const raw = [
-        navigator.userAgent || "",
-        navigator.language || "",
-        screen.width || "",
-        screen.height || "",
-        Intl.DateTimeFormat().resolvedOptions().timeZone || "",
-        navigator.platform || ""
-      ].join("||");
+    function showForbiddenScreen(messageText) {
+      forbiddenSection.style.display = "block";
+      forbiddenScreen.classList.add("show");
+      forbiddenText.textContent = messageText || "Compétition en cours, accès interdits à toute personne non candidats.";
+    }
 
-      let hash = 0;
-      for (let i = 0; i < raw.length; i++) {
-        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
-        hash |= 0;
+    function hideForbiddenScreen() {
+      forbiddenScreen.classList.remove("show");
+      forbiddenSection.style.display = "none";
+    }
+
+    function showResultsBoard() {
+      resultsBoardSection.style.display = "block";
+      resultsBoard.classList.add("show");
+    }
+
+    function hideResultsBoard() {
+      resultsBoard.classList.remove("show");
+      resultsBoardSection.style.display = "none";
+    }
+
+    function applySettingsToUI(settings = null) {
+      const s = settings || {};
+      const title = sanitizeText(s.challengeTitle || CONFIG.defaultTitle);
+      const edition = sanitizeText(s.editionTitle || CONFIG.defaultEdition);
+      const regStatus = sanitizeText(s.registrationStatus || "open");
+      const examStatus = sanitizeText(s.examStatus || "open");
+      const resultVisibility = sanitizeText(s.resultVisibility || "hidden");
+      const announcement = sanitizeText(s.announcement || "");
+
+      heroChallengeTitle.textContent = title;
+      heroEditionBadge.textContent = edition;
+      editionLabel.textContent = edition;
+      announcementBox.textContent = announcement || "Aucune annonce pour le moment.";
+      sidebarAnnouncement.textContent = announcement || "Aucune annonce pour le moment.";
+
+      applyTag(registrationStatusTag, regStatus === "open" ? "tag-open" : "tag-close", `Inscriptions : ${regStatus === "open" ? "Ouvertes" : "Fermées"}`);
+      applyTag(examStatusTag, examStatus === "open" ? "tag-open" : "tag-close", `Épreuve : ${examStatus === "open" ? "Ouverte" : "Fermée"}`);
+      applyTag(resultVisibilityTag, resultVisibility === "visible" ? "tag-open" : "tag-none", `Résultats : ${resultVisibility === "visible" ? "Visibles" : "Masqués"}`);
+
+      challengeStatusText.textContent =
+        `Challenge : ${title} | Édition : ${edition} | Inscriptions : ${regStatus === "open" ? "ouvertes" : "fermées"} | Épreuve : ${examStatus === "open" ? "ouverte" : "fermée"} | Résultats : ${resultVisibility === "visible" ? "visibles" : "masqués"}.`;
+
+      certificateBrand.textContent = title;
+      certificateEditionText.textContent = edition;
+
+      if (resultVisibility === "visible") showResultsBoard();
+      else hideResultsBoard();
+    }
+
+    function applySecurityToUI(settings = null) {
+      const s = settings || {};
+      const code = sanitizeText(s.sessionCode || "");
+      const mode = sanitizeText(s.deviceLockMode || "strict");
+      const gate = sanitizeText(s.candidateGateMode || "strict");
+      const cooldown = getCooldownMonths();
+
+      const currentText =
+`Code de session : ${code ? "défini par l’administration" : "non défini"}
+Verrouillage appareil : ${mode}
+Filtre accès candidat : ${gate}
+Nouveau passage avec même mail/appareil : bloqué ${cooldown} mois après la fin de session.`;
+
+      candidateAccessText.textContent = candidateAccessTag.classList.contains("tag-approved")
+        ? candidateAccessText.textContent
+        : currentText;
+    }
+
+    function renderChallengePub(data = null) {
+      if (!data || String(data.visibility || "visible") === "hidden") {
+        challengePubStatus.textContent = data ? "Publication concours masquée" : "Aucune publication concours";
+        challengePubMeta.textContent = "Publication concours synchronisée avec l’administration.";
+        challengePubPreview.textContent = data
+          ? "La publication officielle existe mais elle est actuellement masquée par l’administration."
+          : "Aucune publication concours pour le moment.";
+        sidebarChallengePub.textContent = data
+          ? "Publication officielle masquée par l’administration."
+          : "Aucune publication concours pour le moment.";
+        return;
       }
-      return "DEV-" + Math.abs(hash).toString(16).toUpperCase();
-    }
 
-    function hashPseudoIpBase() {
-      const raw = [
-        navigator.userAgent || "",
-        navigator.language || "",
-        navigator.platform || "",
-        Intl.DateTimeFormat().resolvedOptions().timeZone || ""
-      ].join("##");
+      const title = sanitizeText(data.title || "Publication Challenge Pub");
+      const badge = sanitizeText(data.badge || "Publication officielle");
+      const winnerName = sanitizeText(data.winnerName || "");
+      const winnerScore = sanitizeText(data.winnerScore || "");
+      const summary = sanitizeText(data.summary || "");
+      const content = sanitizeText(data.content || "");
+      const edition = sanitizeText(data.editionTitle || competitionSettings?.editionTitle || CONFIG.defaultEdition);
+      const by = sanitizeText(data.updatedByEmail || data.createdByEmail || CONFIG.adminEmail);
+      const at = formatDateTime(data.updatedAt || data.createdAt);
 
-      let hash = 0;
-      for (let i = 0; i < raw.length; i++) {
-        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
-        hash |= 0;
-      }
-      return "IPX-" + Math.abs(hash).toString(16).toUpperCase();
-    }
-
-    function isAdmin(email = "") {
-      return String(email).toLowerCase() === CONFIG.adminEmail.toLowerCase();
-    }
-
-    function getCooldownMonths() {
-      return Number(securitySettings?.rejoinCooldownMonths || CONFIG.defaultCooldownMonths);
-    }
-
-    function getSessionCode() {
-      return sanitizeText(securitySettings?.sessionCode || "");
+      challengePubStatus.textContent = badge || "Publication concours disponible";
+      challengePubMeta.textContent = `${edition} · Publié le ${at} · Par ${by}`;
+      challengePubPreview.textContent = `${title}${winnerName ? "\n\nGagnant : " + winnerName : ""}${winnerScore ? "\nScore : " + winnerScore : ""}${summary ? "\n\n" + summary : ""}${content ? "\n\n" + content : ""}`;
+      sidebarChallengePub.textContent = `${title}${summary ? "\n" + summary.slice(0, 140) + (summary.length > 140 ? "..." : "") : ""}`;
     }
 
     function canRegisterNow() {
@@ -2775,61 +2820,12 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
       return sanitizeText(liveControlState?.status || "idle") === "finished";
     }
 
-    function setRegistrationStatus(type, text) {
-      registrationTag.className = "status-tag";
-      if (type === "pending") {
-        registrationTag.classList.add("tag-pending");
-        registrationTag.textContent = "En attente de validation";
-      } else if (type === "approved") {
-        registrationTag.classList.add("tag-approved");
-        registrationTag.textContent = "Inscription approuvée";
-      } else if (type === "rejected") {
-        registrationTag.classList.add("tag-rejected");
-        registrationTag.textContent = "Inscription refusée";
-      } else if (type === "locked") {
-        registrationTag.classList.add("tag-locked");
-        registrationTag.textContent = "Accès verrouillé";
-      } else {
-        registrationTag.classList.add("tag-none");
-        registrationTag.textContent = "Aucune inscription enregistrée";
-      }
-      registrationText.textContent = text;
-    }
-
-    function setCertificateStatus(type, text) {
-      certificateTag.className = "status-tag";
-      if (type === "pending") {
-        certificateTag.classList.add("tag-pending");
-        certificateTag.textContent = "Demande envoyée";
-      } else if (type === "issued") {
-        certificateTag.classList.add("tag-issued");
-        certificateTag.textContent = "Certificat délivré";
-      } else if (type === "rejected") {
-        certificateTag.classList.add("tag-rejected");
-        certificateTag.textContent = "Demande refusée";
-      } else {
-        certificateTag.classList.add("tag-none");
-        certificateTag.textContent = "Aucune demande pour le moment";
-      }
-      certificateText.textContent = text;
-    }
-
-    function setCandidateAccessStatus(type, text) {
-      candidateAccessTag.className = "status-tag";
-      if (type === "approved") {
-        candidateAccessTag.classList.add("tag-approved");
-        candidateAccessTag.textContent = "Accès vérifié";
-      } else if (type === "locked") {
-        candidateAccessTag.classList.add("tag-locked");
-        candidateAccessTag.textContent = "Accès verrouillé";
-      } else if (type === "rejected") {
-        candidateAccessTag.classList.add("tag-rejected");
-        candidateAccessTag.textContent = "Accès refusé";
-      } else {
-        candidateAccessTag.classList.add("tag-none");
-        candidateAccessTag.textContent = "Non vérifié";
-      }
-      candidateAccessText.textContent = text;
+    function shouldLockPublicAccess() {
+      if (!isLiveCompetitionStarted()) return false;
+      if (!currentRegistration) return true;
+      if (currentRegistration.status !== "approved") return true;
+      if (!candidateAccessVerified) return true;
+      return false;
     }
 
     function updateWarningUI() {
@@ -2858,175 +2854,13 @@ Les résultats officiels du concours sont ceux confirmés par l’administration
       });
     }
 
-    function applySettingsToUI(settings = null) {
-      const s = settings || {};
-      const title = sanitizeText(s.challengeTitle || CONFIG.defaultTitle);
-      const edition = sanitizeText(s.editionTitle || CONFIG.defaultEdition);
-      const regStatus = sanitizeText(s.registrationStatus || "open");
-      const examStatus = sanitizeText(s.examStatus || "open");
-      const resultVisibility = sanitizeText(s.resultVisibility || "hidden");
-      const announcement = sanitizeText(s.announcement || "");
-
-      heroChallengeTitle.textContent = title;
-      heroEditionBadge.textContent = edition;
-      editionLabel.textContent = edition;
-      announcementBox.textContent = announcement || "Aucune annonce pour le moment.";
-      sidebarAnnouncement.textContent = announcement || "Aucune annonce pour le moment.";
-
-      applyTag(registrationStatusTag, regStatus === "open" ? "tag-open" : "tag-close", `Inscriptions : ${regStatus === "open" ? "Ouvertes" : "Fermées"}`);
-      applyTag(examStatusTag, examStatus === "open" ? "tag-open" : "tag-close", `Épreuve : ${examStatus === "open" ? "Ouverte" : "Fermée"}`);
-      applyTag(resultVisibilityTag, resultVisibility === "visible" ? "tag-open" : "tag-none", `Résultats : ${resultVisibility === "visible" ? "Visibles" : "Masqués"}`);
-      applyTag(identityLockTag, "tag-locked", `Identité certificat : verrouillée`);
-
-      challengeStatusText.textContent =
-        `Challenge : ${title} | Édition : ${edition} | Inscriptions : ${regStatus === "open" ? "ouvertes" : "fermées"} | Épreuve : ${examStatus === "open" ? "ouverte" : "fermée"} | Résultats : ${resultVisibility === "visible" ? "visibles" : "masqués"}.`;
-
-      certificateBrand.textContent = title;
-      certificateEditionText.textContent = edition;
-
-      if (resultVisibility === "visible") {
-        showResultsBoardOnly();
-      } else {
-        hideResultsBoardOnly();
-      }
-    }
-
-    function applySecurityToUI(security = null) {
-      securitySettings = security || {};
-      const sessionCode = getSessionCode() || "Non défini";
-      const deviceMode = sanitizeText(securitySettings?.deviceLockMode || "strict");
-      const cooldown = getCooldownMonths();
-      const gateMode = sanitizeText(securitySettings?.candidateGateMode || "strict");
-
-      securitySessionCodeText.textContent = sessionCode;
-      securityDeviceModeText.textContent = deviceMode === "strict" ? "Strict (appareil verrouillé)" : deviceMode;
-      securityCooldownText.textContent = `${cooldown} mois après fin de session`;
-      cooldownHumanText.textContent = `Un candidat ayant déjà participé ne peut pas réutiliser le même mail et le même appareil avant ${cooldown} mois après la fin de la session.`;
-      leftSecuritySummary.textContent =
-`Session contrôlée par l’admin.
-Code de session : ${sessionCode}
-Mode appareil : ${deviceMode}
-Nouvel accès : ${cooldown} mois après session.`;
-      rightSecuritySummary.textContent =
-`Mail candidat, code unique et appareil déclaré doivent être cohérents.
-Mode d’accès : ${gateMode}
-Nouvelle réadmission : ${cooldown} mois après la session.`;
-
-      forbiddenSessionStatus.textContent = isLiveCompetitionStarted() ? "Compétition active" : "Compétition verrouillée";
-      forbiddenNeedText.textContent = `Mail candidat + code ${sessionCode !== "Non défini" ? "de session" : "unique"} + appareil reconnu`;
-      forbiddenRuleText.textContent = "Aucun accès externe pendant l’épreuve";
-    }
-
-    function renderChallengePub(data = null) {
-      if (!data) {
-        challengePubStatus.textContent = "Aucune publication concours";
-        challengePubMeta.textContent = "Publication concours synchronisée avec l’administration.";
-        challengePubPreview.textContent = "Aucune publication concours pour le moment.";
-        sidebarChallengePub.textContent = "Aucune publication concours pour le moment.";
-        return;
-      }
-
-      const title = sanitizeText(data.title || "Publication Challenge Pub");
-      const content = sanitizeText(data.content || "");
-      const edition = sanitizeText(data.editionTitle || competitionSettings?.editionTitle || CONFIG.defaultEdition);
-      const by = sanitizeText(data.updatedByEmail || data.createdByEmail || CONFIG.adminEmail);
-      const at = formatDateTime(data.updatedAt || data.createdAt);
-      const visibility = sanitizeText(data.visibility || "visible");
-
-      challengePubStatus.textContent = visibility === "hidden" ? "Publication concours masquée" : "Publication concours disponible";
-      challengePubMeta.textContent = `${edition} · Publié le ${at} · Par ${by}`;
-      challengePubPreview.textContent = `${title}${content ? "\n\n" + content : ""}`;
-      sidebarChallengePub.textContent = `${title}${content ? "\n" + content.slice(0, 140) + (content.length > 140 ? "..." : "") : ""}`;
-    }
-
-    function showForbiddenScreen(message = "") {
-      forbiddenScreen.style.display = "flex";
-      competitionPage.classList.add("hidden");
-      if (message) forbiddenText.textContent = message;
-    }
-
-    function hideForbiddenScreen() {
-      forbiddenScreen.style.display = "none";
-      competitionPage.classList.remove("hidden");
-    }
-
-    function showResultsBoardOnly() {
-      resultsBoardSection.style.display = "block";
-      document.getElementById("heroSection").classList.add("hidden");
-      document.getElementById("officialIntroSection").classList.add("hidden");
-      document.getElementById("securityGovernedSection").classList.add("hidden");
-      document.getElementById("liveStatusSection").classList.add("hidden");
-      document.getElementById("challengeStatusSection").classList.add("hidden");
-      document.getElementById("registrationSection").classList.add("hidden");
-      document.getElementById("contestAccessSection").classList.add("hidden");
-      document.getElementById("certificateRequestSection").classList.add("hidden");
-      document.getElementById("leaderboardSection").classList.add("hidden");
-      examSection.classList.add("hidden");
-    }
-
-    function hideResultsBoardOnly() {
-      resultsBoardSection.style.display = "none";
-      document.getElementById("heroSection").classList.remove("hidden");
-      document.getElementById("officialIntroSection").classList.remove("hidden");
-      document.getElementById("securityGovernedSection").classList.remove("hidden");
-      document.getElementById("liveStatusSection").classList.remove("hidden");
-      document.getElementById("challengeStatusSection").classList.remove("hidden");
-      document.getElementById("registrationSection").classList.remove("hidden");
-      document.getElementById("contestAccessSection").classList.remove("hidden");
-      document.getElementById("certificateRequestSection").classList.remove("hidden");
-      document.getElementById("leaderboardSection").classList.remove("hidden");
-    }
-
-    function renderResultsBoard(items = []) {
-      const resultVisibility = sanitizeText(competitionSettings?.resultVisibility || "hidden");
-      const edition = sanitizeText(competitionSettings?.editionTitle || CONFIG.defaultEdition);
-
-      resultsBoardEdition.textContent = edition;
-      resultsBoardVisibility.textContent = resultVisibility === "visible" ? "Affichés" : "Masqués";
-
-      if (!items.length) {
-        resultsBoardWinner.textContent = "-";
-        resultsBoardTopScore.textContent = "-";
-        resultsBoardMetaText.textContent = "Les résultats deviennent visibles uniquement après action de l’administrateur.";
-        resultsBoardList.innerHTML = `<div class="notice">Les résultats officiels n’ont pas encore été affichés.</div>`;
-        return;
-      }
-
-      const sorted = [...items].sort((a, b) => {
-        if ((a.rank ?? 999999) !== (b.rank ?? 999999)) return (a.rank ?? 999999) - (b.rank ?? 999999);
-        return (b.percent || 0) - (a.percent || 0);
-      });
-
-      const top = sorted[0];
-      resultsBoardWinner.textContent = sanitizeText(top.displayName || top.candidateCode || "Participant");
-      resultsBoardTopScore.textContent = `${top.score || 0} / ${top.totalQuestions || CONFIG.totalQuestionsToAsk}`;
-      resultsBoardMetaText.textContent = "Résultats officiels affichés par l’administration.";
-
-      resultsBoardList.innerHTML = sorted.map((item, index) => `
-        <div class="results-row">
-          <div class="results-row-left">
-            <div class="results-rank">${item.rank || index + 1}</div>
-            <div>
-              <div class="results-name">${sanitizeText(item.displayName || item.candidateCode || "Participant")}</div>
-              <div class="results-sub">${sanitizeText(item.candidateCode || "")}</div>
-            </div>
-          </div>
-          <div class="results-score">${item.score || 0} / ${item.totalQuestions || CONFIG.totalQuestionsToAsk}</div>
-        </div>
-      `).join("");
-    }
-
-    function shouldLockPublicAccess() {
-      if (!liveControlReady) return false;
-      if (!isLiveCompetitionStarted()) return false;
-      if (!currentRegistration) return true;
-      if (currentRegistration.status !== "approved") return true;
-      if (!candidateAccessVerified) return true;
-      return false;
-    }
-
     function updateLiveExamAvailabilityUI() {
       if (!currentRegistration) {
+        startExamBtn.disabled = true;
+        return;
+      }
+
+      if (currentRegistration.status !== "approved") {
         startExamBtn.disabled = true;
         return;
       }
@@ -3036,16 +2870,61 @@ Nouvelle réadmission : ${cooldown} mois après la session.`;
         return;
       }
 
-      if (currentRegistration.status === "approved" && !currentRegistration.hasPlayed && !currentRegistration.examCompleted) {
-        if (!canStartExamNow()) {
-          startExamBtn.disabled = true;
-          return;
-        }
-        startExamBtn.disabled = !isLiveCompetitionStarted();
+      if (currentRegistration.hasPlayed || currentRegistration.examCompleted) {
+        startExamBtn.disabled = true;
         return;
       }
 
-      startExamBtn.disabled = true;
+      if (!canStartExamNow()) {
+        startExamBtn.disabled = true;
+        return;
+      }
+
+      startExamBtn.disabled = !isLiveCompetitionStarted();
+    }
+
+    function renderResultsBoard(list = []) {
+      if (!canShowLeaderboard()) {
+        hideResultsBoard();
+        return;
+      }
+
+      showResultsBoard();
+      resultsHeroText.textContent = `Classement officiel publié par l’administration pour ${sanitizeText(competitionSettings?.editionTitle || CONFIG.defaultEdition)}.`;
+
+      const winners = list.slice(0, 3);
+      const winnerCards = winnerStrip.querySelectorAll(".winner-card");
+
+      winnerCards.forEach((card, idx) => {
+        const item = winners[idx];
+        const nameEl = card.querySelector(".name");
+        const subEl = card.querySelector(".sub");
+        if (!item) {
+          nameEl.textContent = "-";
+          subEl.textContent = "-";
+          return;
+        }
+        nameEl.textContent = sanitizeText(item.displayName || item.candidateCode || "Participant");
+        subEl.textContent = `Code : ${sanitizeText(item.candidateCode || "-")}
+Score : ${item.score || 0}/${item.totalQuestions || CONFIG.totalQuestionsToAsk}
+Pourcentage : ${item.percent || 0}%`;
+      });
+
+      if (!list.length) {
+        resultsTableBody.innerHTML = `<tr><td colspan="6">Aucun résultat officiel pour le moment.</td></tr>`;
+        return;
+      }
+
+      resultsTableBody.innerHTML = list.map((item, index) => `
+        <tr>
+          <td>${item.rank || index + 1}</td>
+          <td>${escapeHtml(item.displayName || item.candidateCode || "Participant")}</td>
+          <td>${escapeHtml(item.candidateCode || "-")}</td>
+          <td>${item.score || 0}/${item.totalQuestions || CONFIG.totalQuestionsToAsk}</td>
+          <td>${item.percent || 0}%</td>
+          <td>${escapeHtml(formatDateTime(item.submittedAt))}</td>
+        </tr>
+      `).join("");
     }
 
     async function maybeAutoEnterExamMode() {
@@ -3053,10 +2932,10 @@ Nouvelle réadmission : ${cooldown} mois après la session.`;
 
       if (!currentUser || !currentRegistration) return;
       if (examStarted || examFinished) return;
-      if (!candidateAccessVerified) return;
       if (!canStartExamNow()) return;
       if (!isLiveCompetitionStarted()) return;
       if (currentRegistration.status !== "approved") return;
+      if (!candidateAccessVerified) return;
       if (currentRegistration.hasPlayed || currentRegistration.examCompleted) return;
       if (currentRegistration.examStarted && !currentRegistration.examCompleted) return;
 
@@ -3081,7 +2960,7 @@ Nouvelle réadmission : ${cooldown} mois après la session.`;
         liveStatusText.textContent = "La compétition est en cours. Le chrono descend automatiquement sans rechargement.";
         liveMetaText.textContent = `Lancée par : ${sanitizeText(liveData?.launchedByEmail || CONFIG.adminEmail)} · Début : ${formatDateTime(liveData?.startedAt)} · Fin prévue : ${formatDateTime(liveData?.endsAt)}`;
 
-        const paint = () => {
+        const paint = async () => {
           const left = Math.max(0, Math.floor(((liveData?.endsAt || 0) - Date.now()) / 1000));
           liveCountdownText.textContent = formatTime(left);
           liveCountdownText.classList.remove("finished");
@@ -3089,29 +2968,24 @@ Nouvelle réadmission : ${cooldown} mois après la session.`;
           if (examStarted && !examFinished) {
             timeLeft = left;
             timerBox.textContent = `Temps restant : ${formatTime(left)}`;
-            saveExamProgress();
+            await saveExamProgress();
+          }
+
+          if (shouldLockPublicAccess()) {
+            showForbiddenScreen("Compétition en cours, accès interdits à toute personne non candidats.\n\nSeuls les candidats approuvés, avec code de session valide, mail connecté autorisé et appareil reconnu, peuvent continuer.");
+          } else {
+            hideForbiddenScreen();
           }
 
           if (left <= 0 && examStarted && !examFinished && !autoSubmittedByLiveFinish) {
             autoSubmittedByLiveFinish = true;
-            finalizeExam("live_finished");
+            await finalizeExam("live_finished");
           }
         };
 
         paint();
         liveCountdownTimer = setInterval(paint, 1000);
         updateLiveExamAvailabilityUI();
-
-        if (shouldLockPublicAccess()) {
-          showForbiddenScreen(
-`Compétition en cours, accès interdits à toute personne non candidats.
-
-Seuls les candidats approuvés, vérifiés par le code de session, le mail utilisé et l’appareil reconnu peuvent continuer.`
-          );
-        } else {
-          hideForbiddenScreen();
-        }
-
         maybeAutoEnterExamMode();
         return;
       }
@@ -3124,12 +2998,13 @@ Seuls les candidats approuvés, vérifiés par le code de session, le mail utili
         liveStatusText.textContent = "La compétition est terminée. La copie doit être envoyée automatiquement.";
         liveMetaText.textContent = `Fin : ${formatDateTime(liveData?.finishedAt || liveData?.endsAt)} · Dernière mise à jour : ${formatDateTime(liveData?.updatedAt)}`;
 
+        hideForbiddenScreen();
+
         if (examStarted && !examFinished && !autoSubmittedByLiveFinish) {
           autoSubmittedByLiveFinish = true;
           finalizeExam("live_finished");
         }
 
-        hideForbiddenScreen();
         updateLiveExamAvailabilityUI();
         syncCompetitionDisplayMode();
         return;
@@ -3168,8 +3043,186 @@ Seuls les candidats approuvés, vérifiés par le code de session, le mail utili
       }
     }
 
-    function getLockedIdentityPayload() {
-      return {
+    async function loadSecuritySettings() {
+      const snap = await get(ref(db, `competitions/${CONFIG.competitionId}/securitySettings`));
+      securitySettings = snap.exists() ? (snap.val() || {}) : {
+        sessionCode: "",
+        deviceLockMode: "strict",
+        candidateGateMode: "strict",
+        rejoinCooldownMonths: CONFIG.defaultCooldownMonths
+      };
+      applySecurityToUI(securitySettings);
+    }
+
+    async function loadCurrentCandidateAccess() {
+      if (!currentUser) return;
+
+      const accessSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/candidateAccess/${currentUser.uid}`));
+      if (!accessSnap.exists()) {
+        candidateAccessVerified = false;
+        setCandidateAccessStatus("none", `Code de session : ${getSessionCode() ? "défini par l’administration" : "non défini"}\nVérifie ton accès candidat pour lier ton mail et ton appareil à cette session.`);
+        updateLiveExamAvailabilityUI();
+        return;
+      }
+
+      const access = accessSnap.val() || {};
+      const currentFp = deviceFingerprint;
+      const isSameDevice = sanitizeText(access.deviceFingerprint || "") === sanitizeText(currentFp || "");
+      const isVerified = !!access.verified && isSameDevice;
+
+      if (isVerified) {
+        candidateAccessVerified = true;
+        deviceLabelSaved = sanitizeText(access.deviceLabel || "");
+        setCandidateAccessStatus("approved", `Accès vérifié.\nMail : ${sanitizeText(currentUser.email || "-")}\nAppareil : ${deviceLabelSaved || "appareil validé"}\nCode session : validé\nDernière vérification : ${formatDateTime(access.verifiedAt)}`);
+      } else if (access.verified && !isSameDevice) {
+        candidateAccessVerified = false;
+        setCandidateAccessStatus("rejected", "Cet appareil n’est pas celui qui a été validé pour cette session. Utilise l’appareil déjà autorisé par l’administration.");
+      } else {
+        candidateAccessVerified = false;
+        setCandidateAccessStatus("none", "Ton accès candidat n’est pas encore validé.");
+      }
+
+      updateLiveExamAvailabilityUI();
+    }
+
+    async function verifyCandidateAccess() {
+      if (!currentUser) {
+        alert("Tu dois être connecté.");
+        return;
+      }
+
+      if (!currentRegistration) {
+        alert("Tu dois d’abord soumettre ton inscription.");
+        return;
+      }
+
+      if (currentRegistration.status !== "approved") {
+        alert("Ton inscription doit d’abord être approuvée par l’administration.");
+        return;
+      }
+
+      const enteredCode = sanitizeText(candidateSessionCodeInput.value);
+      const deviceLabel = sanitizeText(candidateDeviceLabelInput.value);
+      const expectedCode = getSessionCode();
+
+      if (!expectedCode) {
+        alert("Le code de session n’a pas encore été défini par l’administration.");
+        return;
+      }
+
+      if (!enteredCode || enteredCode !== expectedCode) {
+        setCandidateAccessStatus("rejected", "Code unique de vérification invalide.");
+        return;
+      }
+
+      if (!deviceLabel) {
+        alert("Merci d’indiquer le nom de l’appareil utilisé.");
+        return;
+      }
+
+      if (!candidateStrictCheck.checked) {
+        alert("Tu dois confirmer l’engagement de session avant la vérification.");
+        return;
+      }
+
+      const sessionStatus = sanitizeText(liveControlState?.status || "idle");
+      const sessionFinishedAt = liveControlState?.finishedAt || liveControlState?.endsAt || Date.now();
+      const cooldownMonths = getCooldownMonths();
+
+      const lockSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/deviceLocks/${currentUser.uid}`));
+      const existingLock = lockSnap.exists() ? (lockSnap.val() || {}) : null;
+
+      if (existingLock) {
+        const lockMail = sanitizeText(existingLock.email || "");
+        const lockDeviceFp = sanitizeText(existingLock.deviceFingerprint || "");
+        const cooldownUntil = Number(existingLock.cooldownUntil || 0);
+
+        if (
+          lockMail &&
+          lockMail.toLowerCase() === sanitizeText(currentUser.email || "").toLowerCase() &&
+          lockDeviceFp &&
+          lockDeviceFp === deviceFingerprint &&
+          Date.now() < cooldownUntil &&
+          existingLock.sessionState === "cooldown"
+        ) {
+          candidateAccessVerified = false;
+          setCandidateAccessStatus(
+            "locked",
+            `Le même mail et le même appareil sont bloqués jusqu’au ${formatDateTime(cooldownUntil)} pour cette édition/session.`
+          );
+          return;
+        }
+      }
+
+      const payload = {
+        uid: currentUser.uid,
+        email: sanitizeText(currentUser.email || ""),
+        candidateCode: sanitizeText(currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)),
+        deviceFingerprint,
+        pseudoNetworkFingerprint: hashPseudoIpBase(),
+        deviceLabel,
+        verified: true,
+        verifiedAt: Date.now(),
+        verifiedBy: "self_candidate_precheck",
+        sessionCodeHash: enteredCode,
+        liveSessionStartedAt: liveControlState?.startedAt || null,
+        sessionState: sessionStatus === "finished" ? "cooldown" : "active"
+      };
+
+      await set(ref(db, `competitions/${CONFIG.competitionId}/candidateAccess/${currentUser.uid}`), payload);
+
+      await set(ref(db, `competitions/${CONFIG.competitionId}/deviceLocks/${currentUser.uid}`), {
+        uid: currentUser.uid,
+        email: sanitizeText(currentUser.email || ""),
+        deviceFingerprint,
+        pseudoNetworkFingerprint: hashPseudoIpBase(),
+        deviceLabel,
+        sessionState: sessionStatus === "finished" ? "cooldown" : "active",
+        verifiedAt: Date.now(),
+        lastSeenAt: Date.now(),
+        cooldownUntil: addMonths(sessionFinishedAt, cooldownMonths),
+        cooldownMonths,
+        competitionId: CONFIG.competitionId
+      });
+
+      await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`), {
+        accessVerified: true,
+        accessVerifiedAt: Date.now(),
+        accessVerifiedDeviceLabel: deviceLabel,
+        accessVerifiedFingerprint: deviceFingerprint,
+        updatedAt: Date.now()
+      });
+
+      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+        type: "candidate_access_verified",
+        uid: currentUser.uid,
+        email: sanitizeText(currentUser.email || ""),
+        deviceLabel,
+        deviceFingerprint,
+        at: Date.now()
+      });
+
+      candidateAccessVerified = true;
+      deviceLabelSaved = deviceLabel;
+      setCandidateAccessStatus("approved", `Accès vérifié.\nMail : ${sanitizeText(currentUser.email || "-")}\nAppareil : ${deviceLabel}\nCode session : validé`);
+      updateLiveExamAvailabilityUI();
+      maybeAutoEnterExamMode();
+    }
+
+    async function registerCompetition() {
+      if (!currentUser) {
+        alert("Tu dois être connecté.");
+        return;
+      }
+
+      if (!canRegisterNow() && !currentRegistration) {
+        alert("Les inscriptions sont actuellement fermées par l’administrateur.");
+        return;
+      }
+
+      const payload = {
+        uid: currentUser.uid,
+        email: currentUser.email || "",
         fullName: sanitizeText(fullName.value),
         displayName: sanitizeText(displayName.value),
         gender: sanitizeText(gender.value),
@@ -3191,175 +3244,6 @@ Seuls les candidats approuvés, vérifiés par le code de session, le mail utili
         experience: sanitizeText(experience.value),
         specialNeeds: sanitizeText(specialNeeds.value)
       };
-    }
-
-    function fillRegistrationForm(data = {}) {
-      fullName.value = data.fullName || "";
-      displayName.value = data.displayName || "";
-      gender.value = data.gender || "";
-      birthDate.value = data.birthDate || "";
-      nationality.value = data.nationality || "";
-      country.value = data.country || "";
-      city.value = data.city || "";
-      phone.value = data.phone || "";
-      schoolLevel.value = data.schoolLevel || "";
-      category.value = data.category || "";
-      institution.value = data.institution || "";
-      department.value = data.department || "";
-      studentId.value = data.studentId || "";
-      preferredLanguage.value = data.preferredLanguage || "";
-      chemistryLevel.value = data.chemistryLevel || "";
-      specialization.value = data.specialization || "";
-      motivation.value = data.motivation || "";
-      expectations.value = data.expectations || "";
-      experience.value = data.experience || "";
-      specialNeeds.value = data.specialNeeds || "";
-    }
-
-    function applyIdentityLockToCertificateInputs() {
-      certFullName.disabled = true;
-      certInstitution.disabled = true;
-      certRole.disabled = true;
-
-      if (currentRegistration?.identityLock) {
-        certFullName.value = currentRegistration.identityLock.fullName || "";
-        certInstitution.value = currentRegistration.identityLock.institution || "";
-        certRole.value = currentRegistration.identityLock.schoolLevel || "";
-      } else {
-        certFullName.value = currentRegistration?.fullName || "";
-        certInstitution.value = currentRegistration?.institution || "";
-        certRole.value = currentRegistration?.schoolLevel || "";
-      }
-    }
-
-    function getCooldownUntil(registration) {
-      const finishedAt =
-        registration?.sessionLock?.finishedAt ||
-        registration?.submittedAt ||
-        registration?.examMeta?.finishedAt ||
-        registration?.updatedAt ||
-        0;
-
-      if (!finishedAt) return 0;
-      return addMonths(finishedAt, getCooldownMonths());
-    }
-
-    function isStillInCooldown(registration) {
-      const until = getCooldownUntil(registration);
-      return until && Date.now() < until;
-    }
-
-    function getStoredCandidateSecurity(registration) {
-      return registration?.candidateAccess || {};
-    }
-
-    async function verifyCandidateAccessFlow() {
-      if (!currentUser) {
-        alert("Tu dois être connecté.");
-        return;
-      }
-
-      if (!currentRegistration) {
-        setCandidateAccessStatus("rejected", "Tu dois d’abord enregistrer ton inscription.");
-        return;
-      }
-
-      if (currentRegistration.status !== "approved") {
-        setCandidateAccessStatus("rejected", "Ton inscription doit d’abord être approuvée.");
-        return;
-      }
-
-      const sessionCode = sanitizeText(candidateSessionCodeInput.value);
-      const expectedSessionCode = getSessionCode();
-      const deviceLabel = sanitizeText(candidateDeviceLabelInput.value);
-
-      if (!candidateStrictCheck.checked) {
-        setCandidateAccessStatus("rejected", "Tu dois confirmer l’engagement strict de sécurité.");
-        return;
-      }
-
-      if (!sessionCode || !expectedSessionCode || sessionCode !== expectedSessionCode) {
-        setCandidateAccessStatus("rejected", "Code de session invalide.");
-        return;
-      }
-
-      if (!deviceLabel) {
-        setCandidateAccessStatus("rejected", "Merci d’indiquer le nom de l’appareil utilisé.");
-        return;
-      }
-
-      deviceFingerprint = buildDeviceFingerprint();
-      const pseudoIp = hashPseudoIpBase();
-
-      const existingSecurity = getStoredCandidateSecurity(currentRegistration);
-      const existingDevice = sanitizeText(existingSecurity.deviceFingerprint || "");
-      const existingPseudoIp = sanitizeText(existingSecurity.pseudoIp || "");
-
-      if (existingDevice && existingDevice !== deviceFingerprint) {
-        setCandidateAccessStatus("locked", "Cet accès est refusé : l’appareil n’est pas celui enregistré pour cette session.");
-        return;
-      }
-
-      if (existingPseudoIp && existingPseudoIp !== pseudoIp) {
-        setCandidateAccessStatus("locked", "Cet accès est refusé : la signature d’accès de cet appareil ne correspond pas à celle de la session.");
-        return;
-      }
-
-      deviceLabelSaved = deviceLabel;
-      candidateAccessVerified = true;
-
-      await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`), {
-        candidateAccess: {
-          verified: true,
-          verifiedAt: Date.now(),
-          sessionCode,
-          deviceLabel,
-          deviceFingerprint,
-          pseudoIp,
-          verifiedEmail: currentUser.email || "",
-          lockedForSession: true
-        },
-        updatedAt: Date.now()
-      });
-
-      currentRegistration = {
-        ...(currentRegistration || {}),
-        candidateAccess: {
-          verified: true,
-          verifiedAt: Date.now(),
-          sessionCode,
-          deviceLabel,
-          deviceFingerprint,
-          pseudoIp,
-          verifiedEmail: currentUser.email || "",
-          lockedForSession: true
-        }
-      };
-
-      setCandidateAccessStatus("approved", "Accès candidat vérifié. Tu peux entrer dans la compétition quand elle sera lancée par l’admin.");
-      updateLiveExamAvailabilityUI();
-      hideForbiddenScreen();
-      await maybeAutoEnterExamMode();
-    }
-
-    async function registerCompetition() {
-      if (!currentUser) {
-        alert("Tu dois être connecté.");
-        return;
-      }
-
-      if (!canRegisterNow() && !currentRegistration) {
-        alert("Les inscriptions sont actuellement fermées par l’administrateur.");
-        return;
-      }
-
-      if (currentRegistration?.hasPlayed && isStillInCooldown(currentRegistration)) {
-        const until = getCooldownUntil(currentRegistration);
-        alert(`Nouvelle participation bloquée jusqu’au ${formatDateTime(until)}.`);
-        return;
-      }
-
-      const payload = getLockedIdentityPayload();
 
       const requiredFields = [
         payload.fullName, payload.country, payload.city, payload.phone,
@@ -3381,9 +3265,9 @@ Seuls les candidats approuvés, vérifiés par le code de session, le mail utili
       const existingSnap = await get(participantRef);
       const existing = existingSnap.exists() ? existingSnap.val() : null;
 
-      if (existing?.hasPlayed && isStillInCooldown(existing)) {
-        const until = getCooldownUntil(existing);
-        alert(`Cet accès est bloqué jusqu’au ${formatDateTime(until)} avec ce même mail et ce même appareil.`);
+      const existingCooldownUntil = Number(existing?.cooldownUntil || 0);
+      if (existingCooldownUntil && Date.now() < existingCooldownUntil) {
+        setRegistrationStatus("locked", `Cet accès candidat est temporairement verrouillé jusqu’au ${formatDateTime(existingCooldownUntil)}.`);
         return;
       }
 
@@ -3404,16 +3288,25 @@ Seuls les candidats approuvés, vérifiés par le code de session, le mail utili
         score: existing?.score ?? null,
         totalQuestions: existing?.totalQuestions ?? null,
         percent: existing?.percent ?? null,
-        scoreVisibleToCandidate: existing?.scoreVisibleToCandidate || false,
-        sessionLock: existing?.sessionLock || {
-          deviceFingerprint: "",
-          pseudoIp: "",
-          deviceLabel: "",
-          sessionCode: "",
-          lockedAt: 0,
-          finishedAt: 0
-        },
-        identityLock: existing?.identityLock || null
+        lockedProfileSnapshot: existing?.lockedProfileSnapshot || {
+          fullName: payload.fullName,
+          displayName: payload.displayName,
+          gender: payload.gender,
+          birthDate: payload.birthDate,
+          nationality: payload.nationality,
+          country: payload.country,
+          city: payload.city,
+          phone: payload.phone,
+          schoolLevel: payload.schoolLevel,
+          category: payload.category,
+          institution: payload.institution,
+          department: payload.department,
+          studentId: payload.studentId,
+          preferredLanguage: payload.preferredLanguage,
+          chemistryLevel: payload.chemistryLevel,
+          specialization: payload.specialization,
+          photoURL: currentProfile.photoURL || currentProfile.profilePhoto || currentProfile.avatar || ""
+        }
       };
 
       await set(participantRef, finalPayload);
@@ -3436,32 +3329,45 @@ Seuls les candidats approuvés, vérifiés par le code de session, le mail utili
       const snap = await get(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`));
       if (!snap.exists()) {
         currentRegistration = null;
-        candidateAccessVerified = false;
         setRegistrationStatus("none", canRegisterNow()
           ? "Remplis le formulaire puis soumets ton dossier."
           : "Les inscriptions sont actuellement fermées par l’administrateur."
         );
-        setCandidateAccessStatus("none", "Le code unique, le mail et l’appareil devront être validés avant l’entrée dans la compétition.");
         startExamBtn.disabled = true;
+        certFullName.value = "";
+        certInstitution.value = "";
+        certRole.value = "";
         syncCompetitionDisplayMode();
         return;
       }
 
-      currentRegistration = snap.val();
-      fillRegistrationForm(currentRegistration);
-      applyIdentityLockToCertificateInputs();
+      currentRegistration = snap.val() || {};
+      const profileLock = currentRegistration.lockedProfileSnapshot || {};
 
-      const access = getStoredCandidateSecurity(currentRegistration);
-      deviceFingerprint = buildDeviceFingerprint();
-      candidateAccessVerified = !!(access.verified && access.deviceFingerprint && access.deviceFingerprint === deviceFingerprint);
+      fullName.value = currentRegistration.fullName || "";
+      displayName.value = currentRegistration.displayName || "";
+      gender.value = currentRegistration.gender || "";
+      birthDate.value = currentRegistration.birthDate || "";
+      nationality.value = currentRegistration.nationality || "";
+      country.value = currentRegistration.country || "";
+      city.value = currentRegistration.city || "";
+      phone.value = currentRegistration.phone || "";
+      schoolLevel.value = currentRegistration.schoolLevel || "";
+      category.value = currentRegistration.category || "";
+      institution.value = currentRegistration.institution || "";
+      department.value = currentRegistration.department || "";
+      studentId.value = currentRegistration.studentId || "";
+      preferredLanguage.value = currentRegistration.preferredLanguage || "";
+      chemistryLevel.value = currentRegistration.chemistryLevel || "";
+      specialization.value = currentRegistration.specialization || "";
+      motivation.value = currentRegistration.motivation || "";
+      expectations.value = currentRegistration.expectations || "";
+      experience.value = currentRegistration.experience || "";
+      specialNeeds.value = currentRegistration.specialNeeds || "";
 
-      if (candidateAccessVerified) {
-        setCandidateAccessStatus("approved", "Accès candidat déjà vérifié sur cet appareil.");
-        candidateDeviceLabelInput.value = access.deviceLabel || "";
-        deviceLabelSaved = access.deviceLabel || "";
-      } else {
-        setCandidateAccessStatus("none", "Le code unique, le mail et l’appareil devront être validés avant l’entrée dans la compétition.");
-      }
+      certFullName.value = profileLock.fullName || currentRegistration.fullName || "";
+      certInstitution.value = profileLock.institution || currentRegistration.institution || "";
+      certRole.value = profileLock.schoolLevel || currentRegistration.schoolLevel || "";
 
       if (currentRegistration.status === "pending") {
         setRegistrationStatus(
@@ -3470,22 +3376,10 @@ Seuls les candidats approuvés, vérifiés par le code de session, le mail utili
         );
         startExamBtn.disabled = true;
       } else if (currentRegistration.status === "approved") {
-        if (currentRegistration.hasPlayed && isStillInCooldown(currentRegistration)) {
-          setRegistrationStatus(
-            "locked",
-            `Nouvelle tentative bloquée jusqu’au ${formatDateTime(getCooldownUntil(currentRegistration))}. Le même mail et le même appareil ne peuvent pas réaccéder avant cette date.`
-          );
-          startExamBtn.disabled = true;
-        } else if (!canStartExamNow()) {
+        if (!canStartExamNow()) {
           setRegistrationStatus(
             "approved",
             `Ton inscription est approuvée, mais l’épreuve est actuellement fermée par l’administrateur. Référence candidat : ${currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)}.`
-          );
-          startExamBtn.disabled = true;
-        } else if (!candidateAccessVerified) {
-          setRegistrationStatus(
-            "approved",
-            `Ton inscription est approuvée. Tu dois maintenant vérifier ton accès candidat avec le code de session et ton appareil avant de commencer.`
           );
           startExamBtn.disabled = true;
         } else if (!isLiveCompetitionStarted() && !(currentRegistration.examStarted && !currentRegistration.examCompleted)) {
@@ -3495,20 +3389,16 @@ Seuls les candidats approuvés, vérifiés par le code de session, le mail utili
           );
           startExamBtn.disabled = true;
         } else if (currentRegistration.hasPlayed || currentRegistration.examCompleted) {
-          const scoreVisible = canShowLeaderboard() || currentRegistration.scoreVisibleToCandidate;
           setRegistrationStatus(
             "approved",
-            scoreVisible
-              ? `Ta tentative a déjà été utilisée. Score enregistré : ${currentRegistration.score ?? 0}/${currentRegistration.totalQuestions || CONFIG.totalQuestionsToAsk}.`
-              : `Ta tentative a déjà été utilisée. Ta copie a été enregistrée. Le score reste masqué jusqu’à affichage officiel des résultats.`
+            `Ton inscription est approuvée. Ta tentative a déjà été utilisée pour cette session. Ton résultat restera masqué tant que l’administration n’a pas affiché les résultats.`
           );
           startExamBtn.disabled = true;
         } else {
           setRegistrationStatus(
             "approved",
-            `Ton inscription est approuvée. Tu peux maintenant passer l’épreuve dès que la session officielle est active. Référence candidat : ${currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)}.`
+            `Ton inscription est approuvée. Vérifie maintenant ton accès candidat avant de commencer l’épreuve. Référence candidat : ${currentRegistration.candidateCode || makeCandidateCode(currentUser.uid)}.`
           );
-          startExamBtn.disabled = !isLiveCompetitionStarted();
         }
       } else if (currentRegistration.status === "rejected") {
         setRegistrationStatus(
@@ -3521,16 +3411,14 @@ Seuls les candidats approuvés, vérifiés par le code de session, le mail utili
         startExamBtn.disabled = true;
       }
 
-      if (shouldLockPublicAccess()) {
-        showForbiddenScreen(
-`Compétition en cours, accès interdits à toute personne non candidats.
-
-Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent continuer sur competition.html pendant la session.`
-        );
-      } else {
-        hideForbiddenScreen();
+      const cooldownUntil = Number(currentRegistration.cooldownUntil || 0);
+      if (cooldownUntil && Date.now() < cooldownUntil) {
+        setRegistrationStatus("locked", `Le même mail et le même appareil sont bloqués jusqu’au ${formatDateTime(cooldownUntil)} pour cette session.`);
+        startExamBtn.disabled = true;
       }
 
+      await loadCurrentCandidateAccess();
+      updateLiveExamAvailabilityUI();
       maybeAutoEnterExamMode();
       syncCompetitionDisplayMode();
     }
@@ -3566,7 +3454,7 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
         div.className = "option";
         div.innerHTML = `
           <div class="option-bullet">${String.fromCharCode(65 + i)}</div>
-          <div>${sanitizeText(opt)}</div>
+          <div>${escapeHtml(opt)}</div>
         `;
         div.addEventListener("click", () => {
           document.querySelectorAll(".option").forEach(el => el.classList.remove("selected"));
@@ -3584,7 +3472,7 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
     }
 
     async function saveExamProgress() {
-      if (!currentUser) return;
+      if (!currentUser || !currentRegistration) return;
       const prevStartedAt = currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || liveControlState?.startedAt || Date.now();
 
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}/examMeta`), {
@@ -3593,8 +3481,23 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
         currentQuestionIndex,
         warnings,
         timeLeft,
-        inProgress: examStarted && !examFinished
+        inProgress: examStarted && !examFinished,
+        accessVerified: candidateAccessVerified,
+        deviceFingerprint,
+        deviceLabel: deviceLabelSaved || sanitizeText(candidateDeviceLabelInput.value)
       });
+
+      await update(ref(db, `competitions/${CONFIG.competitionId}/deviceLocks/${currentUser.uid}`), {
+        uid: currentUser.uid,
+        email: sanitizeText(currentUser.email || ""),
+        deviceFingerprint,
+        pseudoNetworkFingerprint: hashPseudoIpBase(),
+        deviceLabel: deviceLabelSaved || sanitizeText(candidateDeviceLabelInput.value),
+        sessionState: examFinished ? "cooldown" : "active",
+        lastSeenAt: Date.now(),
+        cooldownUntil: addMonths((liveControlState?.finishedAt || liveControlState?.endsAt || Date.now()), getCooldownMonths()),
+        cooldownMonths: getCooldownMonths()
+      }).catch(() => {});
     }
 
     async function saveDetailedSubmission(reason = "completed") {
@@ -3607,8 +3510,8 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       await set(ref(db, `competitions/${CONFIG.competitionId}/examSubmissions/${currentUser.uid}`), {
         uid: currentUser.uid,
         email: currentUser.email || "",
-        fullName: sanitizeText(currentRegistration?.identityLock?.fullName || currentRegistration?.fullName || currentUser.displayName || "Participant"),
-        displayName: sanitizeText(currentRegistration?.identityLock?.displayName || currentRegistration?.displayName || currentRegistration?.fullName || currentUser.displayName || "Participant"),
+        fullName: sanitizeText(currentRegistration?.fullName || currentUser.displayName || "Participant"),
+        displayName: sanitizeText(currentRegistration?.displayName || currentRegistration?.fullName || currentUser.displayName || "Participant"),
         candidateCode: currentRegistration?.candidateCode || makeCandidateCode(currentUser.uid),
         submittedAt: Date.now(),
         startedAt: currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || liveControlState?.startedAt || Date.now(),
@@ -3618,9 +3521,8 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
         answerCount: examResponses.length,
         autoScore,
         totalQuestions: total,
-        answers: examResponses,
-        sessionLock: currentRegistration?.sessionLock || {},
-        identityLock: currentRegistration?.identityLock || {}
+        resultVisible: false,
+        answers: examResponses
       });
 
       examSubmissionSaved = true;
@@ -3639,7 +3541,7 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       const total = examQuestions.length;
       const percent = Math.round((score / total) * 100);
       const startedAt = currentRegistration?.examMeta?.startedAt || currentRegistration?.startedAt || liveControlState?.startedAt || Date.now();
-      const finishedAt = Date.now();
+      const cooldownUntil = addMonths((liveControlState?.finishedAt || liveControlState?.endsAt || Date.now()), getCooldownMonths());
 
       await saveDetailedSubmission(reason);
 
@@ -3651,21 +3553,21 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
         totalQuestions: total,
         percent,
         finishReason: reason,
-        submittedAt: finishedAt,
-        updatedAt: finishedAt,
-        scoreVisibleToCandidate: false,
+        submittedAt: Date.now(),
+        updatedAt: Date.now(),
+        resultVisibleToCandidate: false,
+        scorePublished: false,
+        cooldownUntil,
         examMeta: {
           startedAt,
-          finishedAt,
-          updatedAt: finishedAt,
+          updatedAt: Date.now(),
           currentQuestionIndex: total,
           warnings,
           timeLeft: 0,
-          inProgress: false
-        },
-        sessionLock: {
-          ...(currentRegistration?.sessionLock || {}),
-          finishedAt
+          inProgress: false,
+          accessVerified: candidateAccessVerified,
+          deviceFingerprint,
+          deviceLabel: deviceLabelSaved || sanitizeText(candidateDeviceLabelInput.value)
         }
       });
 
@@ -3677,46 +3579,57 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
         score,
         totalQuestions: total,
         percent,
-        submittedAt: finishedAt,
-        scoreVisibleToCandidate: false,
+        submittedAt: Date.now(),
+        cooldownUntil,
+        resultVisibleToCandidate: false,
+        scorePublished: false,
         examMeta: {
           startedAt,
-          finishedAt,
-          updatedAt: finishedAt,
+          updatedAt: Date.now(),
           currentQuestionIndex: total,
           warnings,
           timeLeft: 0,
-          inProgress: false
-        },
-        sessionLock: {
-          ...(currentRegistration?.sessionLock || {}),
-          finishedAt
+          inProgress: false,
+          accessVerified: candidateAccessVerified,
+          deviceFingerprint,
+          deviceLabel: deviceLabelSaved || sanitizeText(candidateDeviceLabelInput.value)
         }
       };
 
+      await update(ref(db, `competitions/${CONFIG.competitionId}/deviceLocks/${currentUser.uid}`), {
+        uid: currentUser.uid,
+        email: sanitizeText(currentUser.email || ""),
+        deviceFingerprint,
+        pseudoNetworkFingerprint: hashPseudoIpBase(),
+        deviceLabel: deviceLabelSaved || sanitizeText(candidateDeviceLabelInput.value),
+        sessionState: "cooldown",
+        lastSeenAt: Date.now(),
+        cooldownUntil,
+        cooldownMonths: getCooldownMonths()
+      }).catch(() => {});
+
       await set(ref(db, `competitions/${CONFIG.competitionId}/leaderboard/${currentUser.uid}`), {
         uid: currentUser.uid,
-        displayName: sanitizeText(currentRegistration?.identityLock?.displayName || currentRegistration?.displayName || currentRegistration?.identityLock?.fullName || currentRegistration?.fullName || currentUser.displayName || "Participant"),
+        displayName: sanitizeText(currentRegistration?.displayName || currentRegistration?.fullName || currentUser.displayName || "Participant"),
         candidateCode: currentRegistration?.candidateCode || makeCandidateCode(currentUser.uid),
         score,
         totalQuestions: total,
         percent,
-        submittedAt: finishedAt,
-        rank: null,
-        scoreVisible: false
+        submittedAt: Date.now(),
+        resultVisible: false
       });
 
       resultBox.style.display = "block";
       resultScore.textContent = "Résultat en attente";
 
       if (reason === "warnings_limit") {
-        resultText.textContent = "Ton épreuve a été soumise automatiquement après trop d’avertissements. Le score reste masqué jusqu’à affichage officiel des résultats.";
+        resultText.textContent = "Ton épreuve a été soumise automatiquement après trop d’avertissements. Le score restera masqué jusqu’à publication officielle des résultats.";
       } else if (reason === "timeout") {
-        resultText.textContent = "Le temps est écoulé. Ton épreuve a été soumise automatiquement. Le score reste masqué jusqu’à affichage officiel des résultats.";
+        resultText.textContent = "Le temps est écoulé. Ton épreuve a été soumise automatiquement. Le score restera masqué jusqu’à publication officielle des résultats.";
       } else if (reason === "live_finished") {
-        resultText.textContent = "Terminée, votre candidature est envoyée. Le score reste masqué jusqu’à affichage officiel des résultats.";
+        resultText.textContent = "Terminée, votre candidature est envoyée. Le score restera masqué jusqu’à publication officielle des résultats.";
       } else {
-        resultText.textContent = "Ta copie a été enregistrée. Le score restera masqué jusqu’à validation et affichage des résultats par l’administration.";
+        resultText.textContent = "Ta copie a été enregistrée avec succès. Le score restera masqué jusqu’à publication officielle des résultats.";
       }
 
       timerBox.textContent = `Temps restant : 00:00`;
@@ -3805,7 +3718,7 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       if (!currentUser || !currentRegistration) return;
 
       if (!candidateAccessVerified) {
-        if (!silent) alert("Tu dois d’abord vérifier ton accès candidat.");
+        if (!silent) alert("Tu dois d’abord faire vérifier ton accès candidat.");
         return;
       }
 
@@ -3829,12 +3742,6 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
         return;
       }
 
-      const expectedDevice = sanitizeText(currentRegistration?.candidateAccess?.deviceFingerprint || "");
-      if (expectedDevice && expectedDevice !== buildDeviceFingerprint()) {
-        if (!silent) alert("Cet appareil n’est pas autorisé pour cette session.");
-        return;
-      }
-
       examQuestions = buildExamQuestions();
       examResponses = [];
       currentQuestionIndex = 0;
@@ -3851,22 +3758,6 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       resultBox.style.display = "none";
 
       const startedAt = liveControlState?.startedAt || Date.now();
-      const identityLock = currentRegistration?.identityLock || {
-        ...getLockedIdentityPayload(),
-        photoURL: currentProfile.photoURL || currentProfile.profilePhoto || currentProfile.avatar || "",
-        lockedAt: startedAt,
-        lockedBy: "candidate_exam_start"
-      };
-
-      const pseudoIp = hashPseudoIpBase();
-      const lockPayload = {
-        deviceFingerprint: buildDeviceFingerprint(),
-        pseudoIp,
-        deviceLabel: sanitizeText(candidateDeviceLabelInput.value || deviceLabelSaved || currentRegistration?.candidateAccess?.deviceLabel || ""),
-        sessionCode: sanitizeText(currentRegistration?.candidateAccess?.sessionCode || getSessionCode()),
-        lockedAt: startedAt,
-        finishedAt: 0
-      };
 
       await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${currentUser.uid}`), {
         examStarted: true,
@@ -3874,15 +3765,20 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
         hasPlayed: false,
         startedAt,
         updatedAt: Date.now(),
-        identityLock,
-        sessionLock: lockPayload,
+        accessVerified: true,
+        accessVerifiedAt: Date.now(),
+        accessVerifiedDeviceLabel: deviceLabelSaved || sanitizeText(candidateDeviceLabelInput.value),
+        accessVerifiedFingerprint: deviceFingerprint,
         examMeta: {
           startedAt,
           updatedAt: Date.now(),
           currentQuestionIndex: 0,
           warnings: 0,
           timeLeft,
-          inProgress: true
+          inProgress: true,
+          accessVerified: true,
+          deviceFingerprint,
+          deviceLabel: deviceLabelSaved || sanitizeText(candidateDeviceLabelInput.value)
         }
       });
 
@@ -3892,19 +3788,20 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
         examCompleted: false,
         hasPlayed: false,
         startedAt,
-        identityLock,
-        sessionLock: lockPayload,
+        accessVerified: true,
         examMeta: {
           startedAt,
           updatedAt: Date.now(),
           currentQuestionIndex: 0,
           warnings: 0,
           timeLeft,
-          inProgress: true
+          inProgress: true,
+          accessVerified: true,
+          deviceFingerprint,
+          deviceLabel: deviceLabelSaved || sanitizeText(candidateDeviceLabelInput.value)
         }
       };
 
-      applyIdentityLockToCertificateInputs();
       updateWarningUI();
       examSection.style.display = "block";
       syncCompetitionDisplayMode();
@@ -3926,24 +3823,28 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
         return;
       }
 
-      const locked = currentRegistration.identityLock || {};
+      const locked = currentRegistration.lockedProfileSnapshot || {};
+      const lockedFullName = sanitizeText(locked.fullName || currentRegistration.fullName || currentUser.displayName || "Participant");
+      const lockedInstitution = sanitizeText(locked.institution || currentRegistration.institution || "");
+      const lockedRole = sanitizeText(locked.schoolLevel || currentRegistration.schoolLevel || "");
+      const lockedPhoto = locked.photoURL || currentRegistration.photoURL || currentProfile.photoURL || currentProfile.profilePhoto || currentProfile.avatar || "";
+
       const payload = {
         uid: currentUser.uid,
         email: currentUser.email || "",
-        fullName: sanitizeText(locked.fullName || currentRegistration.fullName || currentUser.displayName || "Participant"),
+        fullName: lockedFullName,
         mentionWanted: sanitizeText(certMention.value || "Participation"),
-        institution: sanitizeText(locked.institution || currentRegistration.institution || ""),
-        roleLabel: sanitizeText(locked.schoolLevel || currentRegistration.schoolLevel || ""),
+        institution: lockedInstitution,
+        roleLabel: lockedRole,
         messageToAdmin: sanitizeText(certReason.value),
         score: currentRegistration.score ?? null,
         totalQuestions: currentRegistration.totalQuestions ?? CONFIG.totalQuestionsToAsk,
         candidateCode: currentRegistration.candidateCode || makeCandidateCode(currentUser.uid),
-        photoURL: locked.photoURL || currentRegistration.photoURL || currentProfile.photoURL || currentProfile.profilePhoto || currentProfile.avatar || "",
+        photoURL: lockedPhoto,
         requestStatus: "pending",
         requestedAt: Date.now(),
         updatedAt: Date.now(),
-        identityLock: locked,
-        sessionLock: currentRegistration.sessionLock || {}
+        lockedProfileSnapshot: locked
       };
 
       await set(ref(db, `competitions/${CONFIG.competitionId}/certificateRequests/${currentUser.uid}`), payload);
@@ -4003,10 +3904,9 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       const title = sanitizeText(cert.competitionTitle || settings.challengeTitle || CONFIG.defaultTitle);
       const edition = sanitizeText(cert.editionTitle || settings.editionTitle || CONFIG.defaultEdition);
 
-      const locked = cert.identityLock || currentRegistration?.identityLock || {};
-      const finalName = sanitizeText(locked.fullName || cert.fullName || currentRegistration?.fullName || "Participant");
-      const finalLevel = sanitizeText(locked.schoolLevel || cert.roleLabel || currentRegistration?.schoolLevel || "-");
-      const finalInstitution = sanitizeText(locked.institution || cert.institution || currentRegistration?.institution || "-");
+      const finalName = sanitizeText(cert.fullName || currentRegistration?.lockedProfileSnapshot?.fullName || currentRegistration?.fullName || "Participant");
+      const finalLevel = sanitizeText(cert.roleLabel || currentRegistration?.lockedProfileSnapshot?.schoolLevel || currentRegistration?.schoolLevel || "-");
+      const finalInstitution = sanitizeText(cert.institution || currentRegistration?.lockedProfileSnapshot?.institution || currentRegistration?.institution || "-");
       const finalMention = sanitizeText(cert.mentionLabel || cert.mentionWanted || "Participation");
       const verification = sanitizeText(cert.verificationNumber || makeVerificationNumber(currentUser.uid));
       const issuedOn = formatDate(cert.issuedAt || Date.now());
@@ -4022,7 +3922,7 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       certificateVerify.textContent = verification;
       certificateIssuedInfo.innerHTML = `Délivré le ${issuedOn}<br>Validation admin : ${sanitizeText(cert.issuedByEmail || CONFIG.adminEmail)}`;
 
-      const photo = locked.photoURL || cert.photoURL || currentProfile.photoURL || currentProfile.profilePhoto || currentProfile.avatar || "";
+      const photo = cert.photoURL || currentRegistration?.lockedProfileSnapshot?.photoURL || currentProfile.photoURL || currentProfile.profilePhoto || currentProfile.avatar || "";
       const initials = finalName.split(" ").map(v => v[0]).slice(0,2).join("").toUpperCase() || "CC";
       certificatePhotoFallback.textContent = initials;
 
@@ -4036,16 +3936,10 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       }
     }
 
-    function startChallengePubListener() {
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`), (snap) => {
-        challengePubData = snap.exists() ? (snap.val() || {}) : null;
-        renderChallengePub(challengePubData);
-      });
-    }
-
     function loadLeaderboard() {
       if (!canShowLeaderboard()) {
         leaderboardBox.innerHTML = `<div class="notice">Le classement est actuellement masqué par l’administrateur.</div>`;
+        renderResultsBoard([]);
         return;
       }
 
@@ -4055,38 +3949,45 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       const boardQuery = query(
         ref(db, `competitions/${CONFIG.competitionId}/leaderboard`),
         orderByChild("percent"),
-        limitToLast(50)
+        limitToLast(200)
       );
 
-      onValue(boardQuery, (snap) => {
+      onValue(boardQuery, async (snap) => {
         if (!canShowLeaderboard()) {
           leaderboardBox.innerHTML = `<div class="notice">Le classement est actuellement masqué par l’administrateur.</div>`;
+          renderResultsBoard([]);
           return;
         }
 
         if (!snap.exists()) {
-          leaderboardBox.innerHTML = `<div class="notice">Aucun résultat disponible pour le moment.</div>`;
+          leaderboardBox.innerHTML = `<div class="notice">Aucun résultat officiel disponible pour le moment.</div>`;
           renderResultsBoard([]);
           return;
         }
 
         const arr = [];
-        snap.forEach(child => arr.push(child.val()));
+        snap.forEach(child => arr.push(child.val() || {}));
+
         arr.sort((a, b) => {
           if ((b.percent || 0) !== (a.percent || 0)) return (b.percent || 0) - (a.percent || 0);
           return (a.submittedAt || 0) - (b.submittedAt || 0);
         });
 
+        const publishedRanked = arr.map((item, index) => ({
+          ...item,
+          rank: index + 1
+        }));
+
         leaderboardBox.innerHTML = "";
-        arr.slice(0, 10).forEach((item, index) => {
+        publishedRanked.slice(0, 10).forEach((item) => {
           const div = document.createElement("div");
           div.className = "leader-item";
           div.innerHTML = `
             <div class="leader-left">
-              <div class="rank">${item.rank || index + 1}</div>
+              <div class="rank">${item.rank}</div>
               <div>
-                <div class="leader-name">${sanitizeText(item.displayName || item.candidateCode || "Participant")}</div>
-                <div class="leader-sub">${sanitizeText(item.candidateCode || "")}</div>
+                <div class="leader-name">${escapeHtml(item.displayName || item.candidateCode || "Participant")}</div>
+                <div class="leader-sub">${escapeHtml(item.candidateCode || "")}</div>
               </div>
             </div>
             <div class="leader-score">${item.score || 0} / ${item.totalQuestions || CONFIG.totalQuestionsToAsk}</div>
@@ -4094,7 +3995,7 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
           leaderboardBox.appendChild(div);
         });
 
-        renderResultsBoard(arr);
+        renderResultsBoard(publishedRanked);
       });
     }
 
@@ -4132,6 +4033,13 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
           updateWarningUI();
           await saveExamProgress();
 
+          await push(ref(db, `competitions/${CONFIG.competitionId}/securityEvents/${currentUser.uid}`), {
+            uid: currentUser.uid,
+            type: "visibility_change_hidden",
+            warnings,
+            at: Date.now()
+          }).catch(() => {});
+
           if (warnings >= CONFIG.maxWarnings) {
             alert("Trop d’avertissements. L’épreuve va être soumise automatiquement.");
             await finalizeExam("warnings_limit");
@@ -4146,6 +4054,15 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
           e.preventDefault();
           e.returnValue = "";
         }
+      });
+
+      window.addEventListener("blur", async () => {
+        if (!examStarted || examFinished) return;
+        await push(ref(db, `competitions/${CONFIG.competitionId}/securityEvents/${currentUser.uid}`), {
+          uid: currentUser.uid,
+          type: "window_blur",
+          at: Date.now()
+        }).catch(() => {});
       });
     }
 
@@ -4172,7 +4089,7 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       });
     }
 
-    function startSecurityListener() {
+    function startSecuritySettingsListener() {
       onValue(ref(db, `competitions/${CONFIG.competitionId}/securitySettings`), async (snap) => {
         securitySettings = snap.exists() ? (snap.val() || {}) : {
           sessionCode: "",
@@ -4181,7 +4098,7 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
           rejoinCooldownMonths: CONFIG.defaultCooldownMonths
         };
         applySecurityToUI(securitySettings);
-        await loadRegistrationStatus();
+        await loadCurrentCandidateAccess();
       });
     }
 
@@ -4194,9 +4111,33 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       });
     }
 
-    refreshForbiddenBtn.addEventListener("click", async () => {
-      await loadRegistrationStatus();
-    });
+    function startChallengePubListener() {
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`), (snap) => {
+        challengePubData = snap.exists() ? (snap.val() || {}) : null;
+        renderChallengePub(challengePubData);
+      });
+    }
+
+    function startResultsPublishListener() {
+      onValue(ref(db, `competitions/${CONFIG.competitionId}/resultsPublication`), async (snap) => {
+        const resultPub = snap.exists() ? (snap.val() || {}) : null;
+        const isVisible = !!resultPub?.showResults;
+        if (competitionSettings) {
+          competitionSettings.resultVisibility = isVisible ? "visible" : "hidden";
+          applySettingsToUI(competitionSettings);
+        }
+        if (!isVisible) {
+          hideResultsBoard();
+        } else {
+          showResultsBoard();
+          if (!leaderboardUnsubscribeAttached) loadLeaderboard();
+        }
+
+        if (currentRegistration) {
+          currentRegistration.scorePublished = isVisible;
+        }
+      });
+    }
 
     logoutBtn.addEventListener("click", async () => {
       await signOut(auth);
@@ -4208,12 +4149,18 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
     fullscreenBtn.addEventListener("click", requestFullscreenMode);
     requestCertificateBtn.addEventListener("click", requestCertificate);
     refreshCertificateBtn.addEventListener("click", loadCertificateStatus);
-    verifyCandidateAccessBtn.addEventListener("click", verifyCandidateAccessFlow);
-    refreshCandidateSecurityBtn.addEventListener("click", loadRegistrationStatus);
 
-    printCertificateBtn.addEventListener("click", () => {
-      if (!currentCertificateData) return;
-      window.print();
+    verifyCandidateAccessBtn.addEventListener("click", verifyCandidateAccess);
+    refreshCandidateSecurityBtn.addEventListener("click", async () => {
+      await loadSecuritySettings();
+      await loadCurrentCandidateAccess();
+      await loadRegistrationStatus();
+    });
+
+    refreshForbiddenBtn.addEventListener("click", async () => {
+      await loadSecuritySettings();
+      await loadCurrentCandidateAccess();
+      await loadRegistrationStatus();
     });
 
     startExamBtn.addEventListener("click", async () => {
@@ -4222,6 +4169,11 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
     });
 
     nextQuestionBtn.addEventListener("click", handleNextQuestion);
+
+    printCertificateBtn.addEventListener("click", () => {
+      if (!currentCertificateData) return;
+      window.print();
+    });
 
     setupAntiCheat();
 
@@ -4239,12 +4191,16 @@ Seuls les candidats approuvés et vérifiés sur leur appareil déclaré peuvent
       memberStatusText.textContent = "Espace concours privé";
 
       await loadUserProfile(user.uid);
+      await loadSecuritySettings();
       startSettingsListener();
-      startSecurityListener();
+      startSecuritySettingsListener();
       startLiveControlListener();
       startChallengePubListener();
+      startResultsPublishListener();
+
       await loadRegistrationStatus();
       await loadCertificateStatus();
+
       loadLeaderboard();
       syncCompetitionDisplayMode();
     });
