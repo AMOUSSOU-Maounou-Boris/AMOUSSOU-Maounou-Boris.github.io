@@ -18,7 +18,7 @@
 
     .card{
       width:100%;
-      max-width:520px;
+      max-width:560px;
       background:#fff;
       border-radius:24px;
       padding:28px;
@@ -57,6 +57,56 @@
     .invite-box.bad{
       background:#fff4f4;
       color:#b42318;
+    }
+
+    .cookie-box{
+      border:1px solid #dce7f3;
+      background:#f8fbff;
+      padding:14px;
+      border-radius:14px;
+      font-size:14px;
+      margin-bottom:16px;
+      line-height:1.6;
+    }
+
+    .cookie-box strong{
+      display:block;
+      margin-bottom:6px;
+      color:#0b2f57;
+    }
+
+    .cookie-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .cookie-btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 14px;
+      font-weight:800;
+      cursor:pointer;
+      font-size:14px;
+    }
+
+    .cookie-btn.accept{
+      background:#0c3d73;
+      color:#fff;
+    }
+
+    .cookie-btn.reject{
+      background:#eef3f8;
+      color:#0b2f57;
+    }
+
+    .cookie-status{
+      margin-top:10px;
+      font-size:13px;
+      font-weight:700;
+      line-height:1.5;
+      color:#5e738b;
     }
 
     .field{ margin-bottom:14px; }
@@ -123,6 +173,14 @@
       font-weight:700;
       text-decoration:none;
     }
+
+    .small-note{
+      margin-top:12px;
+      font-size:12px;
+      line-height:1.6;
+      color:#6b7c91;
+      text-align:center;
+    }
   </style>
 </head>
 <body>
@@ -132,6 +190,19 @@
 
     <div id="inviteStatus" class="invite-box">
       Vérification du lien...
+    </div>
+
+    <div class="cookie-box" id="cookieBox">
+      <strong>Consentement cookies</strong>
+      Ce site utilise des cookies et le stockage local du navigateur pour garder la session, sécuriser l’accès et améliorer l’expérience utilisateur.  
+      Tu dois accepter ces cookies pour créer un compte et accéder aux espaces privés du site.
+      <div class="cookie-actions">
+        <button class="cookie-btn accept" id="acceptCookiesBtn" type="button">Accepter</button>
+        <button class="cookie-btn reject" id="rejectCookiesBtn" type="button">Refuser</button>
+      </div>
+      <div class="cookie-status" id="cookieStatus">
+        En attente de ta décision.
+      </div>
     </div>
 
     <div class="field">
@@ -161,6 +232,10 @@
     <div class="links">
       <a href="login.html">Se connecter</a>
     </div>
+
+    <div class="small-note">
+      Certaines informations techniques de contexte navigateur peuvent être enregistrées au moment de la création du compte pour l’administration et la sécurité du site.
+    </div>
   </div>
 
   <script type="module">
@@ -178,6 +253,7 @@
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+    const COOKIE_KEY = "brh_cookie_consent";
 
     const displayName = document.getElementById("displayName");
     const email = document.getElementById("email");
@@ -187,11 +263,19 @@
     const messageBox = document.getElementById("messageBox");
     const inviteStatus = document.getElementById("inviteStatus");
 
+    const cookieBox = document.getElementById("cookieBox");
+    const acceptCookiesBtn = document.getElementById("acceptCookiesBtn");
+    const rejectCookiesBtn = document.getElementById("rejectCookiesBtn");
+    const cookieStatus = document.getElementById("cookieStatus");
+
     const params = new URLSearchParams(window.location.search);
     const inviteToken = params.get("invite") || "";
 
     let inviteOk = false;
     let inviteData = null;
+    let cookieConsentAccepted = false;
+
+    const nowTs = () => Date.now();
 
     function showMsg(text, ok = false){
       messageBox.textContent = text;
@@ -203,6 +287,52 @@
       inviteStatus.className = "invite-box" + (type ? " " + type : "");
     }
 
+    function setCookieConsentState(accepted) {
+      cookieConsentAccepted = !!accepted;
+      signupBtn.disabled = !cookieConsentAccepted || !inviteOkReady();
+      cookieStatus.textContent = accepted
+        ? "Cookies acceptés. Tu peux continuer."
+        : "Tu dois accepter les cookies pour créer un compte.";
+    }
+
+    function inviteOkReady() {
+      const mail = email.value.trim().toLowerCase();
+      const isAdmin = mail === ADMIN_EMAIL.toLowerCase();
+      return isAdmin || inviteOk;
+    }
+
+    function refreshSignupButton() {
+      signupBtn.disabled = !(cookieConsentAccepted && inviteOkReady());
+    }
+
+    function getBrowserFingerprintInfo() {
+      let timezone = "";
+      try {
+        timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      } catch (e) {
+        timezone = "";
+      }
+
+      return {
+        userAgent: navigator.userAgent || "",
+        language: navigator.language || "",
+        languages: Array.isArray(navigator.languages) ? navigator.languages : [],
+        platform: navigator.platform || "",
+        cookieEnabled: navigator.cookieEnabled === true,
+        screenWidth: window.screen?.width || null,
+        screenHeight: window.screen?.height || null,
+        viewportWidth: window.innerWidth || null,
+        viewportHeight: window.innerHeight || null,
+        timezone,
+        referrer: document.referrer || "",
+        pageUrl: window.location.href || "",
+        hostname: window.location.hostname || "",
+        createdFromPage: "signup.html",
+        createdAtISO: new Date().toISOString(),
+        ipNote: "Adresse IP non collectée ici sans backend ou service externe."
+      };
+    }
+
     async function checkInvite(){
       const mail = email.value.trim().toLowerCase();
 
@@ -210,7 +340,7 @@
         inviteOk = true;
         inviteData = null;
         showInvite("Compte administrateur : accès libre. S’il existe déjà, connecte-toi simplement.", "ok");
-        signupBtn.disabled = false;
+        refreshSignupButton();
         return;
       }
 
@@ -218,7 +348,7 @@
         inviteOk = false;
         inviteData = null;
         showInvite("Lien d’invitation requis.", "bad");
-        signupBtn.disabled = true;
+        refreshSignupButton();
         return;
       }
 
@@ -229,7 +359,7 @@
           inviteOk = false;
           inviteData = null;
           showInvite("Invitation invalide.", "bad");
-          signupBtn.disabled = true;
+          refreshSignupButton();
           return;
         }
 
@@ -238,32 +368,57 @@
         if(inviteData.used){
           inviteOk = false;
           showInvite("Invitation déjà utilisée.", "bad");
-          signupBtn.disabled = true;
+          refreshSignupButton();
           return;
         }
 
         if(!inviteData.expiresAt || Date.now() > Number(inviteData.expiresAt)){
           inviteOk = false;
           showInvite("Invitation expirée.", "bad");
-          signupBtn.disabled = true;
+          refreshSignupButton();
           return;
         }
 
         inviteOk = true;
-        signupBtn.disabled = false;
         showInvite("Invitation valide.", "ok");
 
         if(inviteData.email){
           email.value = inviteData.email;
         }
+
+        refreshSignupButton();
       } catch(e){
         console.error(e);
         inviteOk = false;
         inviteData = null;
         showInvite("Erreur lors de la vérification de l’invitation.", "bad");
-        signupBtn.disabled = true;
+        refreshSignupButton();
       }
     }
+
+    function restoreCookieConsent() {
+      const saved = localStorage.getItem(COOKIE_KEY);
+      if (saved === "accepted") {
+        setCookieConsentState(true);
+      } else {
+        setCookieConsentState(false);
+      }
+    }
+
+    acceptCookiesBtn.addEventListener("click", () => {
+      localStorage.setItem(COOKIE_KEY, "accepted");
+      setCookieConsentState(true);
+    });
+
+    rejectCookiesBtn.addEventListener("click", () => {
+      localStorage.removeItem(COOKIE_KEY);
+      cookieConsentAccepted = false;
+      cookieStatus.textContent = "Tu as refusé les cookies. Retour vers la page publique...";
+      signupBtn.disabled = true;
+      setTimeout(() => {
+        window.location.replace("./index.html");
+      }, 900);
+    });
 
     email.addEventListener("input", checkInvite);
 
@@ -273,6 +428,12 @@
       const pass = password.value;
       const confirm = confirmPassword.value;
       const isAdmin = mail === ADMIN_EMAIL;
+      const browserInfo = getBrowserFingerprintInfo();
+
+      if (!cookieConsentAccepted) {
+        showMsg("Tu dois accepter les cookies pour créer un compte.");
+        return;
+      }
 
       if(!name || !mail || !pass || !confirm){
         showMsg("Remplis tous les champs.");
@@ -308,8 +469,18 @@
 
         await updateProfile(user, { displayName: name });
 
+        let verificationMailSent = false;
+        let verificationMailErrorCode = "";
+
         if(!isAdmin){
-          await sendEmailVerification(user);
+          try {
+            await sendEmailVerification(user);
+            verificationMailSent = true;
+          } catch (verifyErr) {
+            console.error("EMAIL VERIFICATION ERROR:", verifyErr);
+            verificationMailSent = false;
+            verificationMailErrorCode = verifyErr?.code || "";
+          }
         }
 
         await set(ref(db, "users/" + user.uid), {
@@ -321,12 +492,15 @@
           role: isAdmin ? "admin" : "member",
           accountStatus: isAdmin ? "approved" : "pending_admin_approval",
           approvedBy: isAdmin ? ADMIN_EMAIL : "",
-          approvedAt: isAdmin ? Date.now() : 0,
+          approvedAt: isAdmin ? nowTs() : 0,
           rejectedAt: 0,
           emailVerifiedAtSignup: isAdmin,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
+          createdAt: nowTs(),
+          updatedAt: nowTs(),
           signupInviteToken: isAdmin ? "" : inviteToken,
+          cookiesConsentAccepted: true,
+          cookiesConsentAcceptedAt: nowTs(),
+          signupContext: browserInfo,
           privacy: {
             hideEmail: true,
             hideBio: false,
@@ -334,7 +508,7 @@
           },
           presence: {
             online: false,
-            lastSeen: Date.now()
+            lastSeen: nowTs()
           }
         });
 
@@ -343,7 +517,7 @@
             used: true,
             usedByUid: user.uid,
             usedByEmail: mail,
-            usedAt: Date.now()
+            usedAt: nowTs()
           });
 
           await set(ref(db, "accountApprovals/" + user.uid), {
@@ -351,20 +525,44 @@
             displayName: name,
             email: mail,
             status: "pending_admin_approval",
-            createdAt: Date.now(),
+            createdAt: nowTs(),
             inviteToken: inviteToken,
             inviteCreatedBy: inviteData?.createdBy || "",
-            emailVerified: false
+            emailVerified: false,
+            cookiesConsentAccepted: true,
+            cookiesConsentAcceptedAt: nowTs(),
+            signupContext: browserInfo,
+            verificationMailSent,
+            verificationMailErrorCode: verificationMailErrorCode || "",
+            adminNote:
+              verificationMailSent
+                ? "Compte créé, mail de vérification envoyé."
+                : "Compte créé, mais l’envoi du mail de vérification a rencontré un problème ou un délai."
           });
 
-          showMsg("Compte créé. Vérifie ton email puis attends la validation admin.", true);
+          if (verificationMailSent) {
+            showMsg(
+              "Compte créé. Un e-mail de vérification vient d’être envoyé. Vérifie la boîte de réception, les spams et les courriers indésirables. Après validation de ton adresse, attends ensuite l’approbation admin.",
+              true
+            );
+          } else if (verificationMailErrorCode === "auth/too-many-requests") {
+            showMsg(
+              "Compte créé, mais trop de tentatives ont été détectées pour l’envoi du mail de vérification. Attends un moment avant de réessayer la connexion ou une nouvelle vérification.",
+              true
+            );
+          } else {
+            showMsg(
+              "Compte créé, mais le mail de vérification peut prendre du temps ou avoir rencontré un délai. Vérifie aussi les spams et les courriers indésirables, puis réessaie plus tard.",
+              true
+            );
+          }
         } else {
           showMsg("Compte admin créé avec succès. Tu peux maintenant te connecter.", true);
         }
 
         setTimeout(() => {
           window.location.replace("./login.html");
-        }, 2200);
+        }, 2600);
 
       } catch(e){
         console.error(e);
@@ -379,14 +577,17 @@
           showMsg("Adresse email invalide.");
         } else if(e.code === "auth/weak-password"){
           showMsg("Mot de passe trop faible.");
+        } else if(e.code === "auth/too-many-requests"){
+          showMsg("Trop de tentatives ont été détectées. Attends un moment avant de réessayer.");
         } else {
           showMsg(`Erreur réelle : ${e.code || "inconnue"} ${e.message || ""}`);
         }
       } finally {
-        signupBtn.disabled = false;
+        refreshSignupButton();
       }
     });
 
+    restoreCookieConsent();
     checkInvite();
   </script>
 </body>
