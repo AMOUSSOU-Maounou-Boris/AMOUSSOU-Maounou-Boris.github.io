@@ -450,6 +450,13 @@
       line-height:1.8;
     }
 
+    .msg-link{
+      color:#0f4d92;
+      text-decoration:underline;
+      font-weight:900;
+      word-break:break-all;
+    }
+
     .hidden{ display:none !important; }
 
     @keyframes stars{
@@ -505,9 +512,7 @@
         <p>3. Ouvre ensuite cette page : <strong>competition-support-admin.html</strong>.</p>
         <p>4. Le code compare automatiquement l’email connecté à <strong>borisamoussou01@gmail.com</strong>.</p>
         <p>5. Si les deux correspondent exactement, la page admin s’affiche toute seule.</p>
-        <p>
-          Donc tu n’as rien d’autre à activer : il suffit d’être connecté avec ce mail.
-        </p>
+        <p>Donc tu n’as rien d’autre à activer : il suffit d’être connecté avec ce mail.</p>
       </div>
     </div>
   </div>
@@ -636,9 +641,23 @@
 
     let currentUser = null;
     let messagesMap = {};
+    let inboxListenerStarted = false;
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
+    }
+
+    function escapeHtml(value = "") {
+      const div = document.createElement("div");
+      div.textContent = String(value);
+      return div.innerHTML;
+    }
+
+    function normalizeUrl(url = "") {
+      const clean = sanitizeText(url);
+      if (!clean) return "";
+      if (/^https?:\/\//i.test(clean)) return clean;
+      return `https://${clean}`;
     }
 
     function formatDateTime(ts) {
@@ -670,7 +689,8 @@
             item.supportType,
             item.edition,
             item.website,
-            item.message
+            item.message,
+            item.sourcePage
           ].join(" ").toLowerCase();
 
           const matchSearch = !search || haystack.includes(search);
@@ -702,6 +722,7 @@
     }
 
     async function setMessageStatus(id, status) {
+      if (!id) return;
       await update(ref(db, `${PATH}/${id}`), {
         status,
         updatedAt: Date.now(),
@@ -710,6 +731,7 @@
     }
 
     async function deleteMessage(id) {
+      if (!id) return;
       const ok = confirm("Supprimer ce message ?");
       if (!ok) return;
       await remove(ref(db, `${PATH}/${id}`));
@@ -718,16 +740,20 @@
     async function markAllRead() {
       const snap = await get(ref(db, PATH));
       if (!snap.exists()) return;
+
       const data = snap.val() || {};
       const updates = {};
+      const now = Date.now();
+
       Object.entries(data).forEach(([id, item]) => {
         const status = getStatusValue(item);
         if (status === "new") {
           updates[`${id}/status`] = "read";
-          updates[`${id}/updatedAt`] = Date.now();
+          updates[`${id}/updatedAt`] = now;
           updates[`${id}/updatedByEmail`] = currentUser?.email || ADMIN_EMAIL;
         }
       });
+
       if (Object.keys(updates).length) {
         await update(ref(db, PATH), updates);
       }
@@ -746,19 +772,21 @@
         const status = getStatusValue(item);
         const badgeClass = status === "done" ? "done" : status === "read" ? "read" : "new";
         const badgeText = status === "done" ? "Traité" : status === "read" ? "Lu" : "Nouveau";
+        const website = normalizeUrl(item.website || "");
 
         return `
           <article class="msg-card">
             <div class="msg-head">
               <div>
-                <div class="msg-name">${sanitizeText(item.name || "Sans nom")}</div>
+                <div class="msg-name">${escapeHtml(item.name || "Sans nom")}</div>
                 <div class="msg-meta">
-Organisation : ${sanitizeText(item.organization || "-")}
-Email : ${sanitizeText(item.email || "-")}
-Type : ${sanitizeText(item.supportType || "-")}
-Édition : ${sanitizeText(item.edition || "-")}
-Lien : ${sanitizeText(item.website || "-")}
-Date : ${sanitizeText(formatDateTime(item.createdAt))}
+Organisation : ${escapeHtml(item.organization || "-")}
+Email : ${escapeHtml(item.email || "-")}
+Type : ${escapeHtml(item.supportType || "-")}
+Édition : ${escapeHtml(item.edition || "-")}
+Lien : ${website ? `<a class="msg-link" href="${website}" target="_blank" rel="noopener">${escapeHtml(item.website || website)}</a>` : "-"}
+Date : ${escapeHtml(formatDateTime(item.createdAt))}
+Source : ${escapeHtml(item.sourcePage || "competition-sponsors.html")}
                 </div>
               </div>
 
@@ -767,7 +795,7 @@ Date : ${sanitizeText(formatDateTime(item.createdAt))}
               </div>
             </div>
 
-            <div class="msg-body">${sanitizeText(item.message || "Aucun message.")}</div>
+            <div class="msg-body">${escapeHtml(item.message || "Aucun message.")}</div>
 
             <div class="msg-actions">
               <button class="btn blue" type="button" data-mark-read="${item.id}">Marquer lu</button>
@@ -805,6 +833,9 @@ Date : ${sanitizeText(formatDateTime(item.createdAt))}
     }
 
     function startRealtimeInbox() {
+      if (inboxListenerStarted) return;
+      inboxListenerStarted = true;
+
       onValue(ref(db, PATH), (snap) => {
         messagesMap = snap.exists() ? (snap.val() || {}) : {};
         renderMessages();
