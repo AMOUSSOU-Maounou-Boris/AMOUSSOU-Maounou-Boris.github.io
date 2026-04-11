@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jury Concours | Boris Research Hub</title>
+  <title>Jury Concours | Chem Challenge</title>
+
   <style>
-    * { box-sizing: border-box; }
+    *{ box-sizing:border-box; }
 
     :root{
       --bg:#eaf5ff;
@@ -19,7 +20,7 @@
       --green:#18c34a;
       --red:#df4b4b;
       --orange:#ff9f1a;
-      --gold:#d1a028;
+      --gold:#cda434;
       --soft:#f4f8fc;
       --shadow:0 14px 34px rgba(7, 31, 66, 0.10);
       --radius:22px;
@@ -45,7 +46,7 @@
     }
 
     .topbar-inner{
-      max-width:1550px;
+      max-width:1500px;
       margin:0 auto;
       display:flex;
       align-items:center;
@@ -84,7 +85,7 @@
     }
 
     .page{
-      max-width:1550px;
+      max-width:1500px;
       margin:12px auto 40px;
       padding:0 18px;
       display:grid;
@@ -205,7 +206,7 @@
     .hub-card p{
       margin:0;
       color:var(--muted);
-      line-height:1.45;
+      line-height:1.5;
       font-size:14px;
     }
 
@@ -348,6 +349,7 @@
       outline:none;
       font-size:15px;
       color:var(--text);
+      font-family:inherit;
     }
 
     textarea{
@@ -494,6 +496,7 @@
     .tag-live{ background:#edf4ff; color:#0f4d92; }
     .tag-live-red{ background:#ffe6e6; color:#b11818; }
     .tag-finished{ background:#ffe6e6; color:#b11818; }
+    .tag-reviewed{ background:#eefbff; color:#0a5d7a; }
 
     .detail-grid{
       display:grid;
@@ -682,6 +685,13 @@
       outline:none;
     }
 
+    .score-big{
+      font-size:28px;
+      font-weight:900;
+      color:var(--nav);
+      line-height:1.2;
+    }
+
     .hidden{ display:none !important; }
 
     @media (max-width:1350px){
@@ -767,6 +777,7 @@
       </div>
 
       <a class="side-btn" href="competition.html">Voir côté candidat</a>
+      <a class="side-btn" href="competition-admin.html">Voir côté admin</a>
       <a class="side-btn" href="competition-rules.html">Règlement officiel</a>
       <a class="side-btn" href="verify-certificate.html">Vérifier un certificat</a>
       <a class="side-btn" href="insights.html#challenge-pub">Voir Challenge Pub</a>
@@ -780,22 +791,22 @@
 
         <div class="hub-card">
           <h4>Rôle du jury</h4>
-          <p>Le jury consulte les dossiers, ajoute un avis, une recommandation, une note et transmet une évaluation à l’administration.</p>
+          <p>Le jury consulte les dossiers, les copies détaillées, ajoute une note manuelle, une appréciation et une recommandation finale pour aider l’administration.</p>
         </div>
 
         <div class="hub-card">
-          <h4>Autorisation admin</h4>
-          <p>Seuls les emails autorisés par <strong>borisamoussou01@gmail.com</strong> peuvent accéder pleinement à cette page.</p>
+          <h4>Accès sécurisé</h4>
+          <p>Seuls les emails autorisés par <strong>borisamoussou01@gmail.com</strong> ou l’administrateur principal ont accès à cette page.</p>
+        </div>
+
+        <div class="hub-card">
+          <h4>Copies et contrôle</h4>
+          <p>Les réponses QCM peuvent être précorrigées automatiquement, mais les réponses rédigées et les décisions finales restent sous contrôle humain.</p>
         </div>
 
         <div class="hub-card">
           <h4>Pages liées</h4>
-          <p>Cette page partage les données avec <strong>competition.html</strong>, <strong>competition-admin.html</strong> et la sous-section <strong>Challenge Pub</strong> dans <strong>insights.html</strong>.</p>
-        </div>
-
-        <div class="hub-card">
-          <h4>Crédibilité concours</h4>
-          <p>Le jury peut aussi consulter le règlement officiel et la page de vérification des certificats déjà délivrés.</p>
+          <p>Cette page reste synchronisée avec <strong>competition.html</strong>, <strong>competition-admin.html</strong> et <strong>insights.html → Challenge Pub</strong>.</p>
         </div>
       </div>
     </aside>
@@ -804,10 +815,10 @@
       <section class="card hero">
         <div class="hero-top">
           <div>
-            <h1 id="heroChallengeTitle">Interface du jury - Chem Challenge</h1>
+            <h1 id="heroChallengeTitle">Interface du jury — Chem Challenge</h1>
             <p>
-              Depuis cet espace, le jury peut consulter les candidatures, apprécier les profils,
-              ajouter des commentaires, recommander une décision et transmettre une évaluation structurée à l’administration.
+              Depuis cet espace, le jury peut consulter les candidatures validées, corriger les réponses rédigées,
+              compléter l’évaluation automatique, ajouter des recommandations et transmettre une appréciation structurée à l’administration.
             </p>
           </div>
           <div class="hero-badge" id="heroEditionBadge">Édition en cours</div>
@@ -819,24 +830,24 @@
             <div class="value" id="statTotal">0</div>
           </div>
           <div class="stat-box">
-            <div class="label">En attente</div>
-            <div class="value" id="statPending">0</div>
-          </div>
-          <div class="stat-box">
             <div class="label">Approuvés</div>
             <div class="value" id="statApproved">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="label">Copies terminées</div>
+            <div class="value" id="statCompleted">0</div>
           </div>
           <div class="stat-box">
             <div class="label">Avis saisis</div>
             <div class="value" id="statReviewed">0</div>
           </div>
           <div class="stat-box">
-            <div class="label">Tests en cours</div>
-            <div class="value" id="statInProgress">0</div>
+            <div class="label">Réponses écrites à revoir</div>
+            <div class="value" id="statWrittenPending">0</div>
           </div>
           <div class="stat-box">
-            <div class="label">Tests terminés</div>
-            <div class="value" id="statCompleted">0</div>
+            <div class="label">Challenge Pub</div>
+            <div class="value" id="statChallengePub">-</div>
           </div>
         </div>
       </section>
@@ -881,14 +892,13 @@
               </div>
 
               <div style="font-size:31px; font-weight:900; line-height:1.15; margin-bottom:10px;">
-                Espace d’évaluation officielle du jury
+                Espace d’évaluation et de correction humaine
               </div>
 
               <div style="font-size:15px; line-height:1.75; color:rgba(255,255,255,.94);">
-                Cet espace permet au jury de consulter les dossiers, les copies remontées,
-                les réponses rédigées, les appréciations précédentes, ainsi que les éléments
-                officiels du concours. Le règlement et la vérification des certificats
-                renforcent désormais la crédibilité globale de l’édition en cours.
+                Cet espace permet au jury de travailler proprement sur les copies, en particulier les réponses rédigées,
+                sans afficher les résultats publics aux candidats avant décision officielle de l’administrateur.
+                Le jury assiste, contrôle et affine la correction, mais la publication finale reste centralisée côté admin.
               </div>
             </div>
 
@@ -899,8 +909,8 @@
                 border-radius:18px;
                 padding:14px;
               ">
-                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Référence</div>
-                <div style="font-size:16px; font-weight:900;">Règlement officiel</div>
+                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Contrôle</div>
+                <div style="font-size:16px; font-weight:900;">Correction humaine</div>
               </div>
 
               <div style="
@@ -909,8 +919,8 @@
                 border-radius:18px;
                 padding:14px;
               ">
-                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Contrôle public</div>
-                <div style="font-size:16px; font-weight:900;">Certificat vérifiable</div>
+                <div style="font-size:12px; opacity:.9; margin-bottom:6px; font-weight:700;">Publication</div>
+                <div style="font-size:16px; font-weight:900;">Admin uniquement</div>
               </div>
             </div>
           </div>
@@ -947,57 +957,20 @@
 
         <div class="grid-4" style="margin-top:16px;">
           <div class="mini-data">
-            <div class="k">Page règlement</div>
-            <div class="v">competition-rules.html</div>
+            <div class="k">Copie candidat</div>
+            <div class="v">QCM + réponses écrites</div>
           </div>
           <div class="mini-data">
-            <div class="k">Page vérification</div>
-            <div class="v">verify-certificate.html</div>
+            <div class="k">Résultat public</div>
+            <div class="v">Masqué avant validation admin</div>
           </div>
           <div class="mini-data">
-            <div class="k">Résultats officiels</div>
-            <div class="v">Validés côté admin</div>
+            <div class="k">Publication officielle</div>
+            <div class="v">Challenge Pub / Insights</div>
           </div>
           <div class="mini-data">
-            <div class="k">Certificats</div>
-            <div class="v">Délivrés par admin</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card section">
-        <h2>Repères officiels du concours</h2>
-
-        <div class="grid-2">
-          <div class="card" style="padding:18px; box-shadow:none;">
-            <h3>Pages publiques de référence</h3>
-
-            <div class="notice">
-              Le jury peut à présent consulter les deux pages de crédibilité du concours :
-              le règlement officiel et la vérification publique des certificats.
-            </div>
-
-            <div class="btn-row">
-              <a class="btn secondary" href="competition-rules.html">Voir le règlement</a>
-              <a class="btn secondary" href="verify-certificate.html">Voir la vérification</a>
-            </div>
-
-            <div class="small-note">
-              Cela aide le jury à travailler dans un cadre plus clair, plus propre et plus officiel.
-            </div>
-          </div>
-
-          <div class="card" style="padding:18px; box-shadow:none;">
-            <h3>Rôle du jury dans la crédibilité</h3>
-
-            <div class="notice">
-              Le jury contribue à la crédibilité du concours par la qualité des avis saisis,
-              l’examen des copies et la cohérence des évaluations transmises à l’administration.
-            </div>
-
-            <div class="small-note">
-              Les certificats visibles publiquement restent toutefois délivrés et validés par l’admin.
-            </div>
+            <div class="k">Certificat</div>
+            <div class="v">Émis côté admin uniquement</div>
           </div>
         </div>
       </section>
@@ -1022,10 +995,10 @@
           </div>
 
           <div class="notice">
-            • statut rouge lorsque la compétition est lancée<br>
-            • chrono vert pendant le décompte<br>
-            • bascule automatique en rouge à la fin<br>
-            • les copies détaillées remontent ici automatiquement pour correction
+            • statut rouge lorsque la compétition est lancée  
+            • chrono synchronisé avec l’admin et les candidats  
+            • fin automatique à l’expiration  
+            • copies remontées ici pour correction humaine
           </div>
         </div>
       </section>
@@ -1114,13 +1087,14 @@
             <h3>Accès rapide</h3>
             <div class="btn-row">
               <a class="btn secondary" href="competition.html">Ouvrir côté candidat</a>
+              <a class="btn secondary" href="competition-admin.html">Ouvrir côté admin</a>
               <a class="btn secondary" href="competition-rules.html">Ouvrir le règlement</a>
               <a class="btn secondary" href="verify-certificate.html">Ouvrir la vérification</a>
               <a class="btn secondary" href="insights.html#challenge-pub">Ouvrir Challenge Pub</a>
               <a class="btn secondary" href="insights.html">Ouvrir Insights</a>
             </div>
             <div class="small-note">
-              Le jury peut consulter Challenge Pub, le règlement et la vérification, mais seule la page admin peut publier ou modifier le contenu officiel.
+              Le jury lit le contenu officiel mais ne publie pas les résultats publics.
             </div>
           </div>
         </div>
@@ -1145,13 +1119,40 @@
       </section>
 
       <section class="card section">
+        <h2>Outils de correction jury</h2>
+
+        <div class="grid-2">
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Pré-correction globale</h3>
+            <div class="notice">
+              Le jury peut relancer une vue globale de correction, surtout pour vérifier l’état des copies, les questions écrites non notées et les avis déjà saisis.
+            </div>
+            <div class="btn-row">
+              <button class="btn primary" id="refreshGlobalReviewBtn" type="button">Actualiser la vue jury</button>
+              <button class="btn orange" id="markWrittenPendingBtn" type="button">Lister les copies écrites à revoir</button>
+            </div>
+          </div>
+
+          <div class="card" style="padding:18px; box-shadow:none;">
+            <h3>Consignes jury</h3>
+            <div class="notice">
+              • ne jamais publier un score public depuis ici  
+              • les réponses rédigées doivent être notées humainement  
+              • les recommandations jury servent d’aide à la validation finale  
+              • l’admin garde le dernier mot pour la publication et les certificats
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card section">
         <h2>Recherche et filtre</h2>
         <div class="toolbar">
           <input id="searchInput" type="text" placeholder="Rechercher par nom, email, code, pays..." />
           <select id="statusFilter">
             <option value="all">Tous les statuts</option>
-            <option value="pending">En attente</option>
             <option value="approved">Approuvés</option>
+            <option value="pending">En attente</option>
             <option value="rejected">Refusés</option>
           </select>
           <select id="reviewFilter">
@@ -1163,14 +1164,15 @@
         </div>
 
         <div class="notice">
-          Le jury peut enregistrer un avis autant de fois que nécessaire. Les informations seront visibles côté admin. Les copies détaillées incluent aussi les réponses rédigées à corriger manuellement.
+          Le jury peut enregistrer autant de fois que nécessaire un avis interne, une note manuelle sur les réponses écrites et une recommandation finale pour l’administration.
         </div>
       </section>
 
       <section class="card section">
         <h2>Dossiers à examiner</h2>
         <p>
-          Chaque fiche présente les informations du candidat, la copie détaillée, ainsi qu’une zone réservée à l’évaluation du jury.
+          Chaque fiche présente le profil du candidat, la copie détaillée, les scores automatiques connus,
+          ainsi qu’une zone réservée à l’évaluation humaine et à la recommandation du jury.
         </p>
 
         <div id="candidateList" class="panel-grid">
@@ -1182,9 +1184,9 @@
         <h2>Repère final de validation</h2>
         <div class="grid-2">
           <div class="card" style="padding:18px; box-shadow:none;">
-            <h3>Résultats et validation</h3>
+            <h3>Validation académique</h3>
             <div class="notice">
-              Les évaluations du jury soutiennent la validation finale, mais les résultats officiellement publiés restent centralisés côté administration.
+              Les évaluations du jury renforcent la qualité académique du concours, mais les résultats publiés officiellement restent centralisés côté administration.
             </div>
           </div>
 
@@ -1231,16 +1233,18 @@
     const logoutBtn = document.getElementById("logoutBtn");
 
     const statTotal = document.getElementById("statTotal");
-    const statPending = document.getElementById("statPending");
     const statApproved = document.getElementById("statApproved");
-    const statReviewed = document.getElementById("statReviewed");
-    const statInProgress = document.getElementById("statInProgress");
     const statCompleted = document.getElementById("statCompleted");
+    const statReviewed = document.getElementById("statReviewed");
+    const statWrittenPending = document.getElementById("statWrittenPending");
+    const statChallengePub = document.getElementById("statChallengePub");
 
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");
     const reviewFilter = document.getElementById("reviewFilter");
     const refreshBtn = document.getElementById("refreshBtn");
+    const refreshGlobalReviewBtn = document.getElementById("refreshGlobalReviewBtn");
+    const markWrittenPendingBtn = document.getElementById("markWrittenPendingBtn");
     const candidateList = document.getElementById("candidateList");
 
     const currentChallengeTitle = document.getElementById("currentChallengeTitle");
@@ -1265,13 +1269,12 @@
 
     let currentUser = null;
     let currentProfile = {};
-    let participantsMap = {};
+    let registrationsMap = {};
     let juryReviewsMap = {};
+    let manualCorrectionsMap = {};
     let competitionSettings = null;
     let juryAllowedMap = {};
     let challengePubData = null;
-    let examSubmissionsMap = {};
-    let manualCorrectionsMap = {};
     let liveControlState = null;
     let liveCountdownTimer = null;
 
@@ -1341,6 +1344,7 @@
         challengePubUpdateText.textContent = "-";
         challengePubByText.textContent = "-";
         challengePubVisibilityText.textContent = "-";
+        statChallengePub.textContent = "-";
         return;
       }
 
@@ -1369,6 +1373,7 @@ Mis en avant : ${pinned}
       challengePubUpdateText.textContent = formatDateTime(data.updatedAt || data.createdAt);
       challengePubByText.textContent = sanitizeText(data.updatedByEmail || data.createdByEmail || CONFIG.adminEmail);
       challengePubVisibilityText.textContent = visibility === "hidden" ? "Masquée" : "Visible";
+      statChallengePub.textContent = visibility === "hidden" ? "Masquée" : "Active";
     }
 
     function renderLiveControl(liveData = null) {
@@ -1399,7 +1404,7 @@ Mis en avant : ${pinned}
         liveStatusBadge.textContent = sanitizeText(state.finishedMessage || "Terminée, votre candidature est envoyée");
         liveCountdownText.textContent = "00:00";
         liveCountdownText.classList.add("finished");
-        liveStatusText.textContent = "La session est terminée. Les copies doivent être déjà remontées automatiquement pour correction.";
+        liveStatusText.textContent = "La session est terminée. Les copies doivent être remontées automatiquement pour correction.";
         liveMetaText.textContent = `Terminé le : ${formatDateTime(state.finishedAt || state.endsAt)} · Dernière mise à jour : ${formatDateTime(state.updatedAt)}`;
         return;
       }
@@ -1434,31 +1439,31 @@ Mis en avant : ${pinned}
     }
 
     function computeStats(filteredIds = null) {
-      const ids = filteredIds || Object.keys(participantsMap);
+      const ids = filteredIds || Object.keys(registrationsMap);
       let total = 0;
-      let pending = 0;
       let approved = 0;
-      let reviewed = 0;
-      let inProgress = 0;
       let completed = 0;
+      let reviewed = 0;
+      let writtenPending = 0;
 
       ids.forEach((uid) => {
-        const p = participantsMap[uid];
+        const p = registrationsMap[uid];
         if (!p) return;
         total++;
-        if (p.status === "pending") pending++;
         if (p.status === "approved") approved++;
-        if (juryReviewsMap[uid]) reviewed++;
-        if (p.examMeta?.inProgress || (p.examStarted && !p.examCompleted)) inProgress++;
         if (p.examCompleted) completed++;
+        if (juryReviewsMap[uid]) reviewed++;
+
+        const juryCorrection = manualCorrectionsMap?.[uid]?.jury || {};
+        const hasWrittenPending = Number(p.writtenPendingCount || 0) > 0 && (juryCorrection.correctionStatus || "pending") !== "reviewed";
+        if (hasWrittenPending) writtenPending++;
       });
 
       statTotal.textContent = total;
-      statPending.textContent = pending;
       statApproved.textContent = approved;
-      statReviewed.textContent = reviewed;
-      statInProgress.textContent = inProgress;
       statCompleted.textContent = completed;
+      statReviewed.textContent = reviewed;
+      statWrittenPending.textContent = writtenPending;
     }
 
     function getFilteredCandidateIds() {
@@ -1466,8 +1471,8 @@ Mis en avant : ${pinned}
       const status = statusFilter.value;
       const review = reviewFilter.value;
 
-      return Object.keys(participantsMap).filter((uid) => {
-        const p = participantsMap[uid] || {};
+      return Object.keys(registrationsMap).filter((uid) => {
+        const p = registrationsMap[uid] || {};
         const jury = juryReviewsMap[uid] || null;
 
         const haystack = [
@@ -1476,7 +1481,7 @@ Mis en avant : ${pinned}
         ].join(" ").toLowerCase();
 
         const matchSearch = !search || haystack.includes(search);
-        const matchStatus = status === "all" || p.status === status;
+        const matchStatus = status === "all" || (p.status || "pending") === status;
 
         let matchReview = true;
         if (review === "reviewed") matchReview = !!jury;
@@ -1486,8 +1491,8 @@ Mis en avant : ${pinned}
       });
     }
 
-    function renderSubmissionAnswers(submission) {
-      const answers = Array.isArray(submission?.answers) ? submission.answers : [];
+    function renderSubmissionAnswers(candidate) {
+      const answers = Array.isArray(candidate?.responses) ? candidate.responses : [];
       if (!answers.length) {
         return `<div class="notice" style="margin-top:10px;">Aucune copie détaillée enregistrée pour le moment.</div>`;
       }
@@ -1498,9 +1503,9 @@ Mis en avant : ${pinned}
             <div class="sub-answer">
               <strong>Question ${idx + 1}${ans?.type ? " · " + sanitizeText(ans.type) : ""}</strong>
               <div>
-Question : ${sanitizeText(ans?.questionText || "-")}
-Réponse envoyée : ${sanitizeText(ans?.answerLabel || ans?.answerText || ans?.typedAnswer || ans?.selectedOption || "-")}
-Bonne réponse / référence : ${sanitizeText(ans?.correctLabel || ans?.correctText || "-")}
+Question : ${sanitizeText(ans?.questionText || ans?.prompt || "-")}
+Réponse envoyée : ${sanitizeText(ans?.answerLabel || ans?.answerText || ans?.typedAnswer || ans?.selectedOption || ans?.answer || "-")}
+Bonne réponse / référence : ${sanitizeText(ans?.correctLabel || ans?.correctText || ans?.correctOption || "-")}
 Statut automatique : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === false ? "Incorrect" : "À corriger manuellement"}
               </div>
             </div>
@@ -1527,7 +1532,7 @@ Statut automatique : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === 
       const score = scoreRaw === "" ? null : Number(scoreRaw);
       const manualScore = manualScoreRaw === "" ? null : Number(manualScoreRaw);
 
-      if (!recommendation && !notes && (scoreRaw === "") && (manualScoreRaw === "")) {
+      if (!recommendation && !notes && scoreRaw === "" && manualScoreRaw === "") {
         alert("Ajoute au moins une recommandation, une note, un score ou une correction manuelle.");
         return;
       }
@@ -1543,9 +1548,9 @@ Statut automatique : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === 
         updatedAt: Date.now()
       };
 
-      await set(ref(db, `competitions/${CONFIG.competitionId}/juryReviews/${uid}`), payload);
+      await set(ref(db, `competition/${CONFIG.competitionId}/juryReviews/${uid}`), payload);
 
-      await update(ref(db, `competitions/${CONFIG.competitionId}/participants/${uid}`), {
+      await update(ref(db, `competition/${CONFIG.competitionId}/registrations/${uid}`), {
         juryRecommendation: payload.recommendation,
         juryScore: payload.score,
         juryNotes: payload.notes,
@@ -1553,7 +1558,7 @@ Statut automatique : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === 
         juryReviewedBy: payload.juryByEmail
       });
 
-      await update(ref(db, `competitions/${CONFIG.competitionId}/manualCorrections/${uid}/jury`), {
+      await update(ref(db, `competition/${CONFIG.competitionId}/manualCorrections/${uid}/jury`), {
         correctedByUid: currentUser.uid,
         correctedByEmail: currentUser.email || "",
         correctedByName: currentProfile.fullName || currentProfile.name || currentUser.displayName || "Membre du jury",
@@ -1563,7 +1568,7 @@ Statut automatique : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === 
         updatedAt: Date.now()
       });
 
-      await push(ref(db, `competitions/${CONFIG.competitionId}/activityLogs`), {
+      await push(ref(db, `competition/${CONFIG.competitionId}/activityLogs`), {
         type: "jury_review_saved",
         uid,
         juryEmail: payload.juryByEmail,
@@ -1584,16 +1589,14 @@ Statut automatique : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === 
       }
 
       ids.sort((a, b) => {
-        const pa = participantsMap[a] || {};
-        const pb = participantsMap[b] || {};
-        return (pb.createdAt || 0) - (pa.createdAt || 0);
+        const pa = registrationsMap[a] || {};
+        const pb = registrationsMap[b] || {};
+        return (pb.submittedAt || 0) - (pa.submittedAt || 0);
       });
 
       candidateList.innerHTML = ids.map((uid) => {
-        const p = participantsMap[uid] || {};
+        const p = registrationsMap[uid] || {};
         const jury = juryReviewsMap[uid] || {};
-        const examMeta = p.examMeta || {};
-        const submission = examSubmissionsMap[uid] || null;
         const juryCorrection = manualCorrectionsMap?.[uid]?.jury || {};
 
         const registrationStatusClass = getStatusTagClass(p.status || "none");
@@ -1602,7 +1605,7 @@ Statut automatique : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === 
           p.status === "rejected" ? "Inscription refusée" :
           p.status === "pending" ? "En attente" : "Sans statut";
 
-        const liveStatus = examMeta?.inProgress || (p.examStarted && !p.examCompleted) ? "live" : (p.examCompleted ? "completed" : "idle");
+        const liveStatus = p.examStarted && !p.examCompleted ? "live" : (p.examCompleted ? "completed" : "idle");
         const liveText =
           liveStatus === "live" ? "Test en cours" :
           liveStatus === "completed" ? "Test terminé" : "Pas encore lancé";
@@ -1611,13 +1614,15 @@ Statut automatique : ${ans?.isCorrect === true ? "Correct" : ans?.isCorrect === 
         const safeEmail = sanitizeText(p.email || "");
         const safeUid = sanitizeText(uid);
 
-        const submissionSummary = submission
-          ? `Copie reçue le : ${formatDateTime(submission.submittedAt || p.submittedAt)}
-Mode : ${sanitizeText(submission.mode || "mixte")}
-Questions envoyées : ${submission.answerCount != null ? submission.answerCount : (Array.isArray(submission.answers) ? submission.answers.length : "-")}
-Score automatique : ${submission.autoScore != null ? submission.autoScore : (p.score != null ? p.score : "-")}/${submission.totalQuestions != null ? submission.totalQuestions : (p.totalQuestions || "-")}
-Réponses rédigées : ${submission.writtenCount != null ? submission.writtenCount : "0"}`
-          : "Aucune copie détaillée enregistrée pour le moment.";
+        const rawAnswersCount = Array.isArray(p.responses) ? p.responses.length : 0;
+        const writtenPendingCount = Number(p.writtenPendingCount || 0);
+
+        const submissionSummary =
+`Copie reçue le : ${formatDateTime(p.examCompletedAt || p.submittedAt)}
+Questions envoyées : ${rawAnswersCount || "-"}
+Score QCM auto : ${p.qcmAutoScore != null ? p.qcmAutoScore : (p.score != null ? p.score : "-")}
+Score final visible candidat : ${p.finalScoreValidated ? (p.finalScore ?? "-") : "Masqué jusqu’à publication admin"}
+Réponses rédigées à revoir : ${writtenPendingCount}`;
 
         return `
           <div class="candidate-card">
@@ -1638,7 +1643,7 @@ Réponses rédigées : ${submission.writtenCount != null ? submission.writtenCou
                 <div class="status-tag ${registrationStatusClass}">
                   ${registrationStatusText}
                 </div>
-                <div class="status-tag ${liveStatus === "live" ? "tag-live" : "tag-none"}">
+                <div class="status-tag ${liveStatus === "live" ? "tag-live-red" : (liveStatus === "completed" ? "tag-reviewed" : "tag-none")}">
                   ${liveText}
                 </div>
               </div>
@@ -1658,12 +1663,12 @@ Réponses rédigées : ${submission.writtenCount != null ? submission.writtenCou
                 <div class="v">${sanitizeText(p.category || "-")}</div>
               </div>
               <div class="mini-data">
-                <div class="k">Résultat test</div>
-                <div class="v">${p.score != null ? `${p.score}/${p.totalQuestions || "-"}` : "Non disponible"}</div>
+                <div class="k">Score QCM auto</div>
+                <div class="v">${p.qcmAutoScore != null ? p.qcmAutoScore : "Non disponible"}</div>
               </div>
               <div class="mini-data">
-                <div class="k">Progression test</div>
-                <div class="v">${examMeta.currentQuestionIndex != null ? `${examMeta.currentQuestionIndex}/${p.totalQuestions || 50}` : "-"}</div>
+                <div class="k">Écrit à corriger</div>
+                <div class="v">${writtenPendingCount}</div>
               </div>
             </div>
 
@@ -1677,9 +1682,9 @@ Réponses rédigées : ${submission.writtenCount != null ? submission.writtenCou
                 <strong>Suivi du test</strong>
                 <span>
 État : ${liveText}
-Temps restant : ${examMeta.timeLeft != null ? examMeta.timeLeft + " s" : "-"}
-Avertissements : ${examMeta.warnings != null ? examMeta.warnings : "-"}
-Dernière mise à jour : ${formatDateTime(examMeta.updatedAt || p.updatedAt)}
+Date de début : ${formatDateTime(p.examStartedAt)}
+Date de fin : ${formatDateTime(p.examCompletedAt)}
+Dernière mise à jour : ${formatDateTime(p.updatedAt || p.submittedAt)}
                 </span>
               </div>
 
@@ -1719,7 +1724,7 @@ Mis à jour : ${formatDateTime(jury.updatedAt || p.juryReviewedAt)}
                 <span>${submissionSummary}</span>
                 <details class="copy-details">
                   <summary>Voir la copie complète et les réponses</summary>
-                  ${renderSubmissionAnswers(submission)}
+                  ${renderSubmissionAnswers(p)}
                 </details>
               </div>
 
@@ -1739,6 +1744,15 @@ Statut : ${sanitizeText(juryCorrection.correctionStatus || "pending")}
 Note manuelle : ${juryCorrection.manualScore != null ? juryCorrection.manualScore : "-"}
 Commentaires : ${sanitizeText(juryCorrection.notes || "-")}
 Mis à jour : ${formatDateTime(juryCorrection.updatedAt)}
+                </span>
+              </div>
+
+              <div class="detail-box">
+                <strong>Lecture score public</strong>
+                <span>
+Score interne total : ${p.finalScore != null ? p.finalScore : (p.qcmAutoScore != null ? p.qcmAutoScore : "-")}
+Publication publique : ${p.finalScoreValidated ? "prête côté admin" : "non visible candidat"}
+Résultat final publié : dépend du bouton “afficher les résultats” côté admin
                 </span>
               </div>
             </div>
@@ -1809,7 +1823,7 @@ Mis à jour : ${formatDateTime(juryCorrection.updatedAt)}
     }
 
     function startListeners() {
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/settings`), (snap) => {
+      onValue(ref(db, `competition/${CONFIG.competitionId}/settings`), (snap) => {
         competitionSettings = snap.exists() ? (snap.val() || {}) : null;
         applySettingsToUI(competitionSettings || {
           challengeTitle: "Chem Challenge",
@@ -1820,36 +1834,31 @@ Mis à jour : ${formatDateTime(juryCorrection.updatedAt)}
         });
       });
 
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/liveControl`), (snap) => {
+      onValue(ref(db, `competition/${CONFIG.competitionId}/liveControl`), (snap) => {
         liveControlState = snap.exists() ? (snap.val() || {}) : null;
         renderLiveControl(liveControlState);
       });
 
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/juryAllowedEmails`), (snap) => {
+      onValue(ref(db, `competition/${CONFIG.competitionId}/juryAllowedEmails`), (snap) => {
         juryAllowedMap = snap.exists() ? (snap.val() || {}) : {};
       });
 
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/participants`), (snap) => {
-        participantsMap = snap.exists() ? (snap.val() || {}) : {};
+      onValue(ref(db, `competition/${CONFIG.competitionId}/registrations`), (snap) => {
+        registrationsMap = snap.exists() ? (snap.val() || {}) : {};
         renderCandidates();
       });
 
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/juryReviews`), (snap) => {
+      onValue(ref(db, `competition/${CONFIG.competitionId}/juryReviews`), (snap) => {
         juryReviewsMap = snap.exists() ? (snap.val() || {}) : {};
         renderCandidates();
       });
 
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/examSubmissions`), (snap) => {
-        examSubmissionsMap = snap.exists() ? (snap.val() || {}) : {};
-        renderCandidates();
-      });
-
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/manualCorrections`), (snap) => {
+      onValue(ref(db, `competition/${CONFIG.competitionId}/manualCorrections`), (snap) => {
         manualCorrectionsMap = snap.exists() ? (snap.val() || {}) : {};
         renderCandidates();
       });
 
-      onValue(ref(db, `competitions/${CONFIG.competitionId}/challengePub/latest`), (snap) => {
+      onValue(ref(db, `competition/${CONFIG.competitionId}/challengePub`), (snap) => {
         challengePubData = snap.exists() ? (snap.val() || {}) : null;
         renderChallengePub(challengePubData);
       });
@@ -1861,6 +1870,12 @@ Mis à jour : ${formatDateTime(juryCorrection.updatedAt)}
     });
 
     refreshBtn.addEventListener("click", renderCandidates);
+    refreshGlobalReviewBtn.addEventListener("click", renderCandidates);
+    markWrittenPendingBtn.addEventListener("click", () => {
+      reviewFilter.value = "not_reviewed";
+      renderCandidates();
+    });
+
     searchInput.addEventListener("input", renderCandidates);
     statusFilter.addEventListener("change", renderCandidates);
     reviewFilter.addEventListener("change", renderCandidates);
@@ -1876,7 +1891,7 @@ Mis à jour : ${formatDateTime(juryCorrection.updatedAt)}
       const lowerEmail = (user.email || "").toLowerCase();
       const isAdmin = lowerEmail === CONFIG.adminEmail.toLowerCase();
 
-      const allowedSnap = await get(ref(db, `competitions/${CONFIG.competitionId}/juryAllowedEmails/${emailKey(lowerEmail)}`));
+      const allowedSnap = await get(ref(db, `competition/${CONFIG.competitionId}/juryAllowedEmails/${emailKey(lowerEmail)}`));
       const isAllowedJury = allowedSnap.exists();
 
       if (!isAdmin && !isAllowedJury) {
@@ -1894,6 +1909,6 @@ Mis à jour : ${formatDateTime(juryCorrection.updatedAt)}
       await loadJuryProfile(user.uid);
       startListeners();
     });
-  </script>
+      </script>
 </body>
 </html>
