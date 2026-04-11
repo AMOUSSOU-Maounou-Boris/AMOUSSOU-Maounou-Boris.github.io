@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support Admin | Chem Challenge</title>
+  <style>
+    *{ box-sizing:border-box; }
+
+    :root{
+      --bg:#041126;
+      --bg2:#0a2659;
+      --bg3:#123d84;
+      --card:rgba(255,255,255,.94);
+      --card2:rgba(255,250,240,.95);
+      --text:#0b2340;
+      --muted:#60718b;
+      --line:#d9e6f4;
+      --blue:#2f8cff;
+      --blue-dark:#0f4d92;
+      --green:#17b866;
+      --orange:#ff9f1a;
+      --red:#df4b4b;
+      --gold:#d5a52f;
+      --shadow:0 18px 42px rgba(7,31,66,.14);
+      --radius:24px;
+      --max:1450px;
+    }
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#fff;
+      background:
+        radial-gradient(circle at 14% 18%, rgba(114,214,255,.18) 0%, rgba(114,214,255,.04) 18%, transparent 28%),
+        radial-gradient(circle at 86% 14%, rgba(255,214,138,.14) 0%, rgba(255,214,138,.04) 14%, transparent 25%),
+        radial-gradient(circle at 20% 80%, rgba(74,195,255,.15) 0%, rgba(74,195,255,.05) 12%, transparent 22%),
+        linear-gradient(120deg, var(--bg) 0%, var(--bg2) 42%, var(--bg3) 68%, #081a36 100%);
+      background-attachment:fixed;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.6;
+      background:
+        radial-gradient(circle at 22% 28%, rgba(255,255,255,.14) 0 1.5px, transparent 2.4px),
+        radial-gradient(circle at 74% 22%, rgba(255,255,255,.10) 0 1.6px, transparent 2.5px),
+        radial-gradient(circle at 86% 66%, rgba(255,255,255,.11) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 38% 78%, rgba(255,255,255,.10) 0 1.5px, transparent 2.5px);
+      background-size:300px 300px, 400px 400px, 480px 480px, 260px 260px;
+      animation:stars 10s linear infinite;
+      z-index:0;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:40;
+      background:rgba(8,46,91,.88);
+      backdrop-filter:blur(10px);
+      box-shadow:0 8px 18px rgba(0,0,0,.12);
+    }
+
+    .topbar-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:16px 18px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:12px 20px;
+    }
+
+    .topbar a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+      font-size:15px;
+      opacity:.95;
+    }
+
+    .topbar a.active,
+    .topbar a:hover{
+      color:#a9dcff;
+    }
+
+    .page{
+      position:relative;
+      z-index:2;
+      max-width:var(--max);
+      margin:22px auto 40px;
+      padding:0 18px 24px;
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .sidebar{
+      position:sticky;
+      top:92px;
+    }
+
+    .hero,
+    .card,
+    .admin-card,
+    .msg-card{
+      border-radius:28px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      padding:28px;
+      background:linear-gradient(135deg, rgba(8,41,90,.97) 0%, rgba(20,86,171,.94) 54%, rgba(58,152,255,.90) 100%);
+      overflow:hidden;
+      position:relative;
+      color:#fff;
+      margin-bottom:18px;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      right:-70px;
+      top:-70px;
+      width:240px;
+      height:240px;
+      border-radius:50%;
+      background:rgba(255,255,255,.09);
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.22);
+      font-size:13px;
+      font-weight:900;
+      margin-bottom:14px;
+      position:relative;
+      z-index:2;
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size:38px;
+      line-height:1.08;
+      position:relative;
+      z-index:2;
+    }
+
+    .hero p{
+      margin:0;
+      line-height:1.8;
+      font-size:15px;
+      max-width:880px;
+      color:rgba(255,255,255,.96);
+      position:relative;
+      z-index:2;
+    }
+
+    .card{
+      background:var(--card);
+      color:var(--text);
+      border:1px solid #e3edf7;
+      padding:18px;
+      margin-bottom:18px;
+    }
+
+    .admin-card{
+      background:var(--card2);
+      color:var(--text);
+      border:1px solid #efd9a5;
+      padding:18px;
+      margin-bottom:18px;
+    }
+
+    .title{
+      margin:0 0 10px;
+      color:#082e5b;
+      font-size:20px;
+    }
+
+    .muted{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .mini-line{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:11px 12px;
+      border-radius:16px;
+      background:#f8fbff;
+      border:1px solid var(--line);
+      margin-bottom:10px;
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green);
+      flex:0 0 10px;
+    }
+
+    .main-card{
+      background:rgba(255,255,255,.94);
+      color:var(--text);
+      border:1px solid #e3edf7;
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .section-head h2{
+      margin:0 0 6px;
+      color:#082e5b;
+      font-size:28px;
+    }
+
+    .section-head p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:1.2fr .8fr .8fr .8fr;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    input, select{
+      width:100%;
+      border:1px solid #c9dcec;
+      border-radius:15px;
+      min-height:50px;
+      padding:0 14px;
+      outline:none;
+      font-size:14px;
+      color:var(--text);
+      background:#fff;
+    }
+
+    .btn{
+      min-height:48px;
+      border:none;
+      border-radius:16px;
+      padding:0 18px;
+      font-size:14px;
+      font-weight:900;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .btn:hover{ transform:translateY(-1px); }
+    .btn.blue{ background:#0f4d92; color:#fff; }
+    .btn.green{ background:var(--green); color:#fff; }
+    .btn.orange{ background:var(--orange); color:#fff; }
+    .btn.red{ background:var(--red); color:#fff; }
+    .btn.gold{ background:linear-gradient(135deg,#d5a52f,#b98512); color:#fff; }
+    .btn.ghost{ background:#edf5fd; color:#0b2340; }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-bottom:18px;
+    }
+
+    .stat-box{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+      padding:16px;
+    }
+
+    .stat-box .k{
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .stat-box .v{
+      color:#082e5b;
+      font-size:22px;
+      font-weight:900;
+      line-height:1.35;
+    }
+
+    .messages{
+      display:grid;
+      gap:16px;
+    }
+
+    .msg-card{
+      background:#fff;
+      border:1px solid var(--line);
+      padding:18px;
+    }
+
+    .msg-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+
+    .msg-name{
+      font-size:20px;
+      font-weight:900;
+      color:#082e5b;
+      line-height:1.3;
+    }
+
+    .msg-meta{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      white-space:pre-wrap;
+      margin-top:6px;
+    }
+
+    .badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .tag.new{ background:#fff8e7; color:#8a6200; }
+    .tag.read{ background:#eefcf5; color:#167748; }
+    .tag.done{ background:#edf4ff; color:#0f4d92; }
+
+    .msg-body{
+      border:1px solid #e4edf6;
+      background:#fcfdff;
+      border-radius:18px;
+      padding:16px;
+      color:#0b2340;
+      line-height:1.75;
+      white-space:pre-wrap;
+      word-break:break-word;
+      margin-bottom:14px;
+    }
+
+    .msg-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .empty-box{
+      border:1px dashed #d0ddeb;
+      border-radius:20px;
+      background:#fbfdff;
+      padding:20px;
+      color:var(--muted);
+      line-height:1.7;
+      text-align:center;
+      font-weight:700;
+    }
+
+    .locked{
+      max-width:900px;
+      margin:90px auto 40px;
+      padding:0 18px;
+      position:relative;
+      z-index:2;
+    }
+
+    .locked-card{
+      background:rgba(255,255,255,.94);
+      border:1px solid #e3edf7;
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      padding:30px;
+      text-align:center;
+      color:var(--text);
+    }
+
+    .locked-card h2{
+      margin:0 0 12px;
+      color:#082e5b;
+      font-size:32px;
+    }
+
+    .locked-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:15px;
+    }
+
+    .howto{
+      margin-top:28px;
+      border-top:1px solid #e4edf7;
+      padding-top:18px;
+      text-align:left;
+    }
+
+    .howto h3{
+      margin:0 0 10px;
+      color:#082e5b;
+      font-size:20px;
+    }
+
+    .howto p{
+      margin:0 0 10px;
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    .hidden{ display:none !important; }
+
+    @keyframes stars{
+      0%,100%{ opacity:.58; transform:scale(1); }
+      50%{ opacity:.8; transform:scale(1.01); }
+    }
+
+    @media (max-width:1200px){
+      .page{ grid-template-columns:1fr; }
+      .sidebar{ position:static; }
+      .toolbar,
+      .stats-grid{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media (max-width:850px){
+      .toolbar,
+      .stats-grid{
+        grid-template-columns:1fr;
+      }
+      .hero h1{ font-size:31px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html">Home</a>
+      <a href="insights.html#challenge-pub">Insights</a>
+      <a href="competition.html">Concours</a>
+      <a href="competition-admin.html">Admin concours</a>
+      <a href="competition-jury.html">Jury concours</a>
+      <a href="competition-sponsors.html">Sponsors</a>
+      <a href="competition-support-admin.html" class="active">Messages sponsors</a>
+      <a href="profile.html">Mon compte</a>
+    </div>
+  </header>
+
+  <div id="lockedView" class="locked hidden">
+    <div class="locked-card">
+      <h2>Accès réservé à l’administrateur</h2>
+      <p>
+        Cette page privée de messagerie sponsors/support est visible uniquement pour
+        le compte administrateur officiel connecté avec l’adresse :
+        <strong>borisamoussou01@gmail.com</strong>.
+      </p>
+
+      <div class="howto">
+        <h3>Comment la rendre visible pour toi</h3>
+        <p>1. Connecte-toi sur ton site avec le compte <strong>borisamoussou01@gmail.com</strong>.</p>
+        <p>2. Vérifie que Firebase Auth te reconnaît bien avec cette adresse.</p>
+        <p>3. Ouvre ensuite cette page : <strong>competition-support-admin.html</strong>.</p>
+        <p>4. Le code compare automatiquement l’email connecté à <strong>borisamoussou01@gmail.com</strong>.</p>
+        <p>5. Si les deux correspondent exactement, la page admin s’affiche toute seule.</p>
+        <p>
+          Donc tu n’as rien d’autre à activer : il suffit d’être connecté avec ce mail.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminView" class="hidden">
+    <div class="page">
+      <aside class="sidebar">
+        <div class="admin-card">
+          <h3 class="title">Boîte privée sponsors</h3>
+          <p class="muted">
+            Centre de réception interne du site pour les demandes de soutien, sponsoring,
+            partenariat académique ou institutionnel.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="mini-line"><span class="dot"></span><span id="adminEmailText">Admin connecté</span></div>
+          <div class="mini-line"><span class="dot"></span><span id="miniCountNew">Nouveaux : 0</span></div>
+          <div class="mini-line"><span class="dot"></span><span id="miniCountRead">Lus : 0</span></div>
+          <div class="mini-line"><span class="dot"></span><span id="miniCountDone">Traités : 0</span></div>
+        </div>
+
+        <div class="card">
+          <h3 class="title">Chemin base de données</h3>
+          <p class="muted">
+            Les messages sont lus ici :
+            <br><br>
+            <strong>competitions/chem_challenge_2026/competitionSponsors/supportForms</strong>
+          </p>
+        </div>
+      </aside>
+
+      <main>
+        <section class="hero">
+          <div class="hero-badge">Private Admin Inbox</div>
+          <h1>Messagerie sponsors & soutiens</h1>
+          <p>
+            Cette page centralise les propositions envoyées depuis la section sponsors/support du site.
+            Elle est accessible uniquement à l’administrateur officiel connecté avec
+            <strong>borisamoussou01@gmail.com</strong>.
+          </p>
+        </section>
+
+        <section class="main-card">
+          <div class="section-head">
+            <div>
+              <h2>Réception des demandes</h2>
+              <p>Filtre, consulte, marque comme lu, traite ou supprime les propositions reçues.</p>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <input id="searchInput" type="text" placeholder="Rechercher par nom, organisation, email, type..." />
+            <select id="statusFilter">
+              <option value="all">Tous les statuts</option>
+              <option value="new">Nouveaux</option>
+              <option value="read">Lus</option>
+              <option value="done">Traités</option>
+            </select>
+            <button class="btn gold" id="refreshBtn" type="button">Actualiser</button>
+            <button class="btn ghost" id="markAllReadBtn" type="button">Tout marquer lu</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="k">Total</div>
+              <div class="v" id="statTotal">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="k">Nouveaux</div>
+              <div class="v" id="statNew">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="k">Lus</div>
+              <div class="v" id="statRead">0</div>
+            </div>
+            <div class="stat-box">
+              <div class="k">Traités</div>
+              <div class="v" id="statDone">0</div>
+            </div>
+          </div>
+
+          <div class="messages" id="messagesBox">
+            <div class="empty-box">Chargement des messages...</div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    import {
+      ref,
+      onValue,
+      update,
+      remove,
+      get
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+    const PATH = "competitions/chem_challenge_2026/competitionSponsors/supportForms";
+
+    const lockedView = document.getElementById("lockedView");
+    const adminView = document.getElementById("adminView");
+    const adminEmailText = document.getElementById("adminEmailText");
+
+    const miniCountNew = document.getElementById("miniCountNew");
+    const miniCountRead = document.getElementById("miniCountRead");
+    const miniCountDone = document.getElementById("miniCountDone");
+
+    const statTotal = document.getElementById("statTotal");
+    const statNew = document.getElementById("statNew");
+    const statRead = document.getElementById("statRead");
+    const statDone = document.getElementById("statDone");
+
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const refreshBtn = document.getElementById("refreshBtn");
+    const markAllReadBtn = document.getElementById("markAllReadBtn");
+    const messagesBox = document.getElementById("messagesBox");
+
+    let currentUser = null;
+    let messagesMap = {};
+
+    function sanitizeText(value = "") {
+      return String(value).replace(/[<>"']/g, "").trim();
+    }
+
+    function formatDateTime(ts) {
+      if (!ts) return "-";
+      return new Date(ts).toLocaleString("fr-FR");
+    }
+
+    function setVisibility(isAllowed) {
+      lockedView.classList.toggle("hidden", isAllowed);
+      adminView.classList.toggle("hidden", !isAllowed);
+    }
+
+    function getStatusValue(item = {}) {
+      return sanitizeText(item.status || "new").toLowerCase();
+    }
+
+    function getFilteredMessages() {
+      const search = sanitizeText(searchInput.value).toLowerCase();
+      const filter = sanitizeText(statusFilter.value).toLowerCase();
+
+      return Object.entries(messagesMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}) }))
+        .filter(item => {
+          const status = getStatusValue(item);
+          const haystack = [
+            item.name,
+            item.organization,
+            item.email,
+            item.supportType,
+            item.edition,
+            item.website,
+            item.message
+          ].join(" ").toLowerCase();
+
+          const matchSearch = !search || haystack.includes(search);
+          const matchStatus = filter === "all" || status === filter;
+          return matchSearch && matchStatus;
+        })
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    }
+
+    function computeStats() {
+      const items = Object.values(messagesMap || {});
+      let newCount = 0, readCount = 0, doneCount = 0;
+
+      items.forEach(item => {
+        const status = getStatusValue(item);
+        if (status === "new") newCount++;
+        else if (status === "read") readCount++;
+        else if (status === "done") doneCount++;
+      });
+
+      statTotal.textContent = String(items.length);
+      statNew.textContent = String(newCount);
+      statRead.textContent = String(readCount);
+      statDone.textContent = String(doneCount);
+
+      miniCountNew.textContent = `Nouveaux : ${newCount}`;
+      miniCountRead.textContent = `Lus : ${readCount}`;
+      miniCountDone.textContent = `Traités : ${doneCount}`;
+    }
+
+    async function setMessageStatus(id, status) {
+      await update(ref(db, `${PATH}/${id}`), {
+        status,
+        updatedAt: Date.now(),
+        updatedByEmail: currentUser?.email || ADMIN_EMAIL
+      });
+    }
+
+    async function deleteMessage(id) {
+      const ok = confirm("Supprimer ce message ?");
+      if (!ok) return;
+      await remove(ref(db, `${PATH}/${id}`));
+    }
+
+    async function markAllRead() {
+      const snap = await get(ref(db, PATH));
+      if (!snap.exists()) return;
+      const data = snap.val() || {};
+      const updates = {};
+      Object.entries(data).forEach(([id, item]) => {
+        const status = getStatusValue(item);
+        if (status === "new") {
+          updates[`${id}/status`] = "read";
+          updates[`${id}/updatedAt`] = Date.now();
+          updates[`${id}/updatedByEmail`] = currentUser?.email || ADMIN_EMAIL;
+        }
+      });
+      if (Object.keys(updates).length) {
+        await update(ref(db, PATH), updates);
+      }
+    }
+
+    function renderMessages() {
+      const items = getFilteredMessages();
+      computeStats();
+
+      if (!items.length) {
+        messagesBox.innerHTML = `<div class="empty-box">Aucun message ne correspond au filtre actuel.</div>`;
+        return;
+      }
+
+      messagesBox.innerHTML = items.map(item => {
+        const status = getStatusValue(item);
+        const badgeClass = status === "done" ? "done" : status === "read" ? "read" : "new";
+        const badgeText = status === "done" ? "Traité" : status === "read" ? "Lu" : "Nouveau";
+
+        return `
+          <article class="msg-card">
+            <div class="msg-head">
+              <div>
+                <div class="msg-name">${sanitizeText(item.name || "Sans nom")}</div>
+                <div class="msg-meta">
+Organisation : ${sanitizeText(item.organization || "-")}
+Email : ${sanitizeText(item.email || "-")}
+Type : ${sanitizeText(item.supportType || "-")}
+Édition : ${sanitizeText(item.edition || "-")}
+Lien : ${sanitizeText(item.website || "-")}
+Date : ${sanitizeText(formatDateTime(item.createdAt))}
+                </div>
+              </div>
+
+              <div class="badges">
+                <span class="tag ${badgeClass}">${badgeText}</span>
+              </div>
+            </div>
+
+            <div class="msg-body">${sanitizeText(item.message || "Aucun message.")}</div>
+
+            <div class="msg-actions">
+              <button class="btn blue" type="button" data-mark-read="${item.id}">Marquer lu</button>
+              <button class="btn green" type="button" data-mark-done="${item.id}">Marquer traité</button>
+              <button class="btn orange" type="button" data-mark-new="${item.id}">Remettre nouveau</button>
+              <button class="btn red" type="button" data-delete="${item.id}">Supprimer</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-mark-read]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await setMessageStatus(btn.getAttribute("data-mark-read"), "read");
+        });
+      });
+
+      document.querySelectorAll("[data-mark-done]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await setMessageStatus(btn.getAttribute("data-mark-done"), "done");
+        });
+      });
+
+      document.querySelectorAll("[data-mark-new]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await setMessageStatus(btn.getAttribute("data-mark-new"), "new");
+        });
+      });
+
+      document.querySelectorAll("[data-delete]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await deleteMessage(btn.getAttribute("data-delete"));
+        });
+      });
+    }
+
+    function startRealtimeInbox() {
+      onValue(ref(db, PATH), (snap) => {
+        messagesMap = snap.exists() ? (snap.val() || {}) : {};
+        renderMessages();
+      });
+    }
+
+    refreshBtn.addEventListener("click", renderMessages);
+    searchInput.addEventListener("input", renderMessages);
+    statusFilter.addEventListener("change", renderMessages);
+    markAllReadBtn.addEventListener("click", markAllRead);
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user || null;
+      const email = (user?.email || "").toLowerCase();
+      const allowed = email === ADMIN_EMAIL.toLowerCase();
+
+      setVisibility(allowed);
+
+      if (!allowed) return;
+
+      adminEmailText.textContent = `Admin connecté : ${user.email || ADMIN_EMAIL}`;
+      startRealtimeInbox();
+    });
+  </script>
+</body>
+</html>
