@@ -404,7 +404,9 @@
 
     .quick-search input,
     .admin-input,
-    .admin-textarea{
+    .admin-textarea,
+    .public-input,
+    .public-textarea{
       width:100%;
       border:1px solid #d4dfed;
       border-radius:16px;
@@ -418,7 +420,9 @@
 
     .quick-search input:focus,
     .admin-input:focus,
-    .admin-textarea:focus{
+    .admin-textarea:focus,
+    .public-input:focus,
+    .public-textarea:focus{
       border-color:#7fb5ff;
       box-shadow:0 0 0 3px rgba(47, 140, 255, 0.13);
     }
@@ -674,6 +678,36 @@
       line-height:1.6;
     }
 
+    .public-form{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .public-form-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .public-textarea{
+      min-height:130px;
+      resize:vertical;
+    }
+
+    .public-msg{
+      min-height:22px;
+      font-size:14px;
+      font-weight:800;
+      line-height:1.5;
+      color:#0f4d92;
+      white-space:pre-wrap;
+      margin-top:8px;
+    }
+
+    .public-msg.ok{ color:#15803d; }
+    .public-msg.err{ color:#b42318; }
+
     @keyframes starPulse{
       0%,100%{ opacity:.88; transform:scale(1); }
       50%{ opacity:1; transform:scale(1.012); }
@@ -725,6 +759,8 @@
       .admin-panel h2{ font-size:28px; }
 
       .line-card strong{ font-size:20px; }
+
+      .public-form-row{ grid-template-columns:1fr; }
     }
 
     @media (max-width: 680px){
@@ -875,25 +911,14 @@
         </div>
 
         <div class="admin-subcard">
-          <h3>Bouton mail public</h3>
+          <h3>Bouton de contact public</h3>
           <p class="small-note">
-            L’adresse email réelle reste cachée. Les visiteurs verront seulement un bouton comme
-            “Send a mail”.
+            L’adresse email réelle reste cachée. Les visiteurs voient seulement un bouton et un formulaire interne.
           </p>
 
           <div class="admin-field">
             <label class="admin-label" for="mailButtonLabelInput">Texte du bouton</label>
             <input class="admin-input" id="mailButtonLabelInput" type="text" placeholder="Send a mail" />
-          </div>
-
-          <div class="admin-field">
-            <label class="admin-label" for="mailToInput">Adresse email cachée</label>
-            <input class="admin-input" id="mailToInput" type="email" placeholder="email@exemple.com" />
-          </div>
-
-          <div class="admin-field">
-            <label class="admin-label" for="mailSubjectInput">Sujet par défaut</label>
-            <input class="admin-input" id="mailSubjectInput" type="text" placeholder="Contact from website" />
           </div>
         </div>
 
@@ -927,8 +952,36 @@
         <div class="contact-list" id="contactListView">
           <div class="line-card">
             <strong>Email</strong>
-            <a class="mail-btn" href="#" id="publicMailBtn">Send a mail</a>
+            <button class="mail-btn" type="button" id="openContactFormBtn">Send a mail</button>
           </div>
+        </div>
+      </div>
+
+      <div class="section-card" id="publicContactFormSection">
+        <h2>Send a mail</h2>
+        <p>
+          Utilise ce formulaire pour envoyer directement ton message dans la messagerie interne du site.
+        </p>
+
+        <div class="public-form">
+          <div class="public-form-row">
+            <input class="public-input" id="publicNameInput" type="text" placeholder="Votre nom complet" />
+            <input class="public-input" id="publicEmailInput" type="email" placeholder="Votre adresse email" />
+          </div>
+
+          <div class="public-form-row">
+            <input class="public-input" id="publicOrganizationInput" type="text" placeholder="Organisation / institution" />
+            <input class="public-input" id="publicSubjectInput" type="text" placeholder="Sujet du message" />
+          </div>
+
+          <textarea class="public-textarea" id="publicMessageInput" placeholder="Écrivez votre message ici..."></textarea>
+
+          <div class="admin-row">
+            <button class="primary-btn" type="button" id="sendPublicMessageBtn">Envoyer le message</button>
+            <button class="secondary-btn" type="button" id="clearPublicMessageBtn">Effacer</button>
+          </div>
+
+          <div class="public-msg" id="publicMsg"></div>
         </div>
       </div>
     </section>
@@ -937,17 +990,16 @@
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { ref, get, set, onValue, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const OWNER_EMAIL = "borisamoussou01@gmail.com";
     const PAGE_DB_KEY = "publicPages/contactPage";
+    const INBOX_PATH = "competitions/chem_challenge_2026/competitionSponsors/supportForms";
 
     const adminPanel = document.getElementById("adminPanel");
     const heroTitleInput = document.getElementById("heroTitleInput");
     const heroTextInput = document.getElementById("heroTextInput");
     const mailButtonLabelInput = document.getElementById("mailButtonLabelInput");
-    const mailToInput = document.getElementById("mailToInput");
-    const mailSubjectInput = document.getElementById("mailSubjectInput");
     const adminItemsMount = document.getElementById("adminItemsMount");
     const addItemBtn = document.getElementById("addItemBtn");
     const saveHeroBtn = document.getElementById("saveHeroBtn");
@@ -962,13 +1014,22 @@
     const pageSearchInput = document.getElementById("pageSearchInput");
     const pageSearchBtn = document.getElementById("pageSearchBtn");
 
+    const openContactFormBtn = document.getElementById("openContactFormBtn");
+    const publicContactFormSection = document.getElementById("publicContactFormSection");
+    const publicNameInput = document.getElementById("publicNameInput");
+    const publicEmailInput = document.getElementById("publicEmailInput");
+    const publicOrganizationInput = document.getElementById("publicOrganizationInput");
+    const publicSubjectInput = document.getElementById("publicSubjectInput");
+    const publicMessageInput = document.getElementById("publicMessageInput");
+    const sendPublicMessageBtn = document.getElementById("sendPublicMessageBtn");
+    const clearPublicMessageBtn = document.getElementById("clearPublicMessageBtn");
+    const publicMsg = document.getElementById("publicMsg");
+
     const defaultData = {
       heroTitle: "Contact",
       heroText: "Feel free to contact me for academic exchange, research discussion, scientific collaboration, or professional opportunities.",
       sectionTitle: "Contact details",
       mailButtonLabel: "Send a mail",
-      mailTo: "maounou-boris.amoussou@cnrs.fr",
-      mailSubject: "Contact from website",
       items: [
         {
           title: "Email",
@@ -984,7 +1045,7 @@
         },
         {
           title: "Scientific Contact",
-          text: "Use the public contact methods for general communication, and use Insights / Login for your private network space.",
+          text: "Use the public contact form for general communication, and use Insights / Login for your private network space.",
           isMailButton: false,
           links: []
         }
@@ -1026,8 +1087,6 @@
         heroText: String(data.heroText || defaultData.heroText).trim(),
         sectionTitle: String(data.sectionTitle || defaultData.sectionTitle).trim(),
         mailButtonLabel: String(data.mailButtonLabel || defaultData.mailButtonLabel).trim(),
-        mailTo: String(data.mailTo || defaultData.mailTo).trim(),
-        mailSubject: String(data.mailSubject || defaultData.mailSubject).trim(),
         items: Array.isArray(data.items) && data.items.length
           ? data.items.map(normalizeItem)
           : JSON.parse(JSON.stringify(defaultData.items))
@@ -1039,10 +1098,9 @@
       adminMsg.className = ok ? "admin-msg ok" : "admin-msg err";
     }
 
-    function buildMailtoHref() {
-      const to = currentData.mailTo || defaultData.mailTo;
-      const subject = currentData.mailSubject || defaultData.mailSubject;
-      return `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}`;
+    function showPublicMsg(text, ok = true) {
+      publicMsg.textContent = text;
+      publicMsg.className = ok ? "public-msg ok" : "public-msg err";
     }
 
     function renderPublicView() {
@@ -1068,7 +1126,7 @@
           : "";
 
         const bodyHtml = item.isMailButton
-          ? `<a class="mail-btn" href="${buildMailtoHref()}">${escapeHtml(currentData.mailButtonLabel || "Send a mail")}</a>`
+          ? `<button class="mail-btn dynamic-mail-btn" type="button">${escapeHtml(currentData.mailButtonLabel || "Send a mail")}</button>`
           : `<div class="item-text">${escapeHtml(item.text || "")}</div>`;
 
         return `
@@ -1079,6 +1137,12 @@
           </div>
         `;
       }).join("");
+
+      document.querySelectorAll(".dynamic-mail-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          publicContactFormSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
     }
 
     function renderAdminEditor() {
@@ -1087,8 +1151,6 @@
       heroTitleInput.value = currentData.heroTitle || "";
       heroTextInput.value = currentData.heroText || "";
       mailButtonLabelInput.value = currentData.mailButtonLabel || "";
-      mailToInput.value = currentData.mailTo || "";
-      mailSubjectInput.value = currentData.mailSubject || "";
 
       adminItemsMount.innerHTML = `
         <div class="admin-field">
@@ -1112,7 +1174,7 @@
               <label class="admin-label">Type du bloc</label>
               <select class="admin-input item-type-input">
                 <option value="text" ${item.isMailButton ? "" : "selected"}>Texte normal</option>
-                <option value="mail" ${item.isMailButton ? "selected" : ""}>Bouton mail caché</option>
+                <option value="mail" ${item.isMailButton ? "selected" : ""}>Bouton message interne</option>
               </select>
             </div>
 
@@ -1197,8 +1259,6 @@
         heroText: heroTextInput.value.trim(),
         sectionTitle: sectionTitleInput ? sectionTitleInput.value.trim() : currentData.sectionTitle,
         mailButtonLabel: mailButtonLabelInput.value.trim(),
-        mailTo: mailToInput.value.trim(),
-        mailSubject: mailSubjectInput.value.trim(),
         items
       });
     }
@@ -1226,17 +1286,64 @@
         currentData.heroTitle = heroTitleInput.value.trim() || defaultData.heroTitle;
         currentData.heroText = heroTextInput.value.trim() || defaultData.heroText;
         currentData.mailButtonLabel = mailButtonLabelInput.value.trim() || defaultData.mailButtonLabel;
-        currentData.mailTo = mailToInput.value.trim() || defaultData.mailTo;
-        currentData.mailSubject = mailSubjectInput.value.trim() || defaultData.mailSubject;
         await set(ref(db, PAGE_DB_KEY), normalizeData(currentData));
         currentData = normalizeData(currentData);
         renderPublicView();
         renderAdminEditor();
-        showAdminMsg("En-tête et bouton mail enregistrés avec succès.", true);
+        showAdminMsg("En-tête et bouton enregistrés avec succès.", true);
       } catch (error) {
         console.error(error);
         showAdminMsg("Impossible d’enregistrer l’en-tête.", false);
       }
+    }
+
+    async function sendInternalContactMessage() {
+      const name = publicNameInput.value.trim();
+      const email = publicEmailInput.value.trim();
+      const organization = publicOrganizationInput.value.trim();
+      const subject = publicSubjectInput.value.trim();
+      const message = publicMessageInput.value.trim();
+
+      if (!name || !email || !message) {
+        showPublicMsg("Merci de remplir au minimum le nom, l’email et le message.", false);
+        return;
+      }
+
+      try {
+        const newRef = push(ref(db, INBOX_PATH));
+        await set(newRef, {
+          name,
+          organization,
+          email,
+          edition: "Contact page",
+          supportType: subject || "Contact général",
+          website: "",
+          message,
+          status: "new",
+          sourcePage: "contact.html",
+          createdAt: Date.now()
+        });
+
+        publicNameInput.value = "";
+        publicEmailInput.value = "";
+        publicOrganizationInput.value = "";
+        publicSubjectInput.value = "";
+        publicMessageInput.value = "";
+
+        showPublicMsg("Votre message a bien été envoyé dans la messagerie interne du site.", true);
+      } catch (error) {
+        console.error(error);
+        showPublicMsg("Impossible d’envoyer le message pour le moment.", false);
+      }
+    }
+
+    function clearPublicForm() {
+      publicNameInput.value = "";
+      publicEmailInput.value = "";
+      publicOrganizationInput.value = "";
+      publicSubjectInput.value = "";
+      publicMessageInput.value = "";
+      showPublicMsg("", true);
     }
 
     function bindSearch() {
@@ -1282,6 +1389,13 @@
 
     saveHeroBtn.addEventListener("click", saveHeroOnly);
     saveAllContactBtn.addEventListener("click", saveAllData);
+
+    openContactFormBtn?.addEventListener("click", () => {
+      publicContactFormSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    sendPublicMessageBtn.addEventListener("click", sendInternalContactMessage);
+    clearPublicMessageBtn.addEventListener("click", clearPublicForm);
 
     bindSearch();
     loadPageRealtime();
