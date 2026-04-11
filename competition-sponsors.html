@@ -139,6 +139,16 @@
       color:#a8ddff;
     }
 
+    .nav-online-dot{
+      display:inline-block;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green);
+      margin-right:8px;
+      vertical-align:middle;
+    }
+
     .page{
       position:relative;
       z-index:3;
@@ -631,12 +641,6 @@
       line-height:1.7;
     }
 
-    .mail-box a{
-      color:#0f4d92;
-      font-weight:900;
-      text-decoration:underline;
-    }
-
     .support-list{
       display:grid;
       gap:14px;
@@ -693,6 +697,22 @@
     .tag.visible{ background:#eefcf5; color:#167748; }
     .tag.hidden{ background:#fff3f3; color:#b33e3e; }
     .tag.pending{ background:#fff9e8; color:#8c6400; }
+
+    .success-box{
+      margin-top:14px;
+      padding:14px 16px;
+      border-radius:16px;
+      background:#eefcf5;
+      border:1px solid #c8efd9;
+      color:#167748;
+      line-height:1.6;
+      display:none;
+      font-weight:700;
+    }
+
+    .success-box.show{
+      display:block;
+    }
 
     .modal{
       position:fixed;
@@ -884,11 +904,11 @@
       <a href="insights.html#challenge-pub">Insights</a>
       <a href="messages.html">Messages</a>
       <a href="calls.html">Appels</a>
-      <a href="competition.html" class="active">Concours</a>
+      <a href="competition.html">Concours</a>
       <a href="competition-rules.html">Règlement officiel</a>
       <a href="verify-certificate.html">Vérifier un certificat</a>
       <a href="profile.html"><span class="nav-online-dot"></span>Mon compte</a>
-      <a href="competition-sponsors.html">Sponsors & Soutiens</a>
+      <a href="competition-sponsors.html" class="active">Sponsors & Soutiens</a>
     </div>
   </header>
 
@@ -1201,9 +1221,14 @@
         </div>
 
         <div class="mail-box">
-          <strong style="color:#082e5b;">Send a mail</strong><br>
-          Pour tout soutien, partenariat ou sponsoring, vous pouvez aussi écrire directement via cet onglet à l’adresse officielle :
-          <a href="mailto:borisamoussou01@gmail.com?subject=Chem%20Challenge%20-%20Support%20or%20Sponsorship">borisamoussou01@gmail.com</a>
+          <strong style="color:#082e5b;">Messagerie interne du site</strong><br>
+          Votre proposition est envoyée directement dans la boîte privée interne
+          <strong>competition-support-admin.html</strong>.  
+          Elle n’est plus envoyée vers une adresse Gmail visible publiquement.
+        </div>
+
+        <div class="success-box" id="supportSuccessBox">
+          Votre proposition a bien été envoyée dans la messagerie interne du site. Merci pour votre intérêt.
         </div>
       </section>
 
@@ -1299,6 +1324,7 @@
     const supportMessageInput = document.getElementById("supportMessageInput");
     const submitSupportBtn = document.getElementById("submitSupportBtn");
     const clearSupportBtn = document.getElementById("clearSupportBtn");
+    const supportSuccessBox = document.getElementById("supportSuccessBox");
 
     const supportListAdmin = document.getElementById("supportListAdmin");
 
@@ -1311,6 +1337,7 @@
     let sponsorsMap = {};
     let supportFormsMap = {};
     let pageSettings = null;
+    let realtimeStarted = false;
 
     function sanitizeText(value = "") {
       return String(value).replace(/[<>"']/g, "").trim();
@@ -1320,6 +1347,13 @@
       const div = document.createElement("div");
       div.textContent = text;
       return div.innerHTML;
+    }
+
+    function normalizeUrl(url = "") {
+      const clean = sanitizeText(url);
+      if (!clean) return "";
+      if (/^https?:\/\//i.test(clean)) return clean;
+      return `https://${clean}`;
     }
 
     function linkify(text = "") {
@@ -1425,6 +1459,7 @@
 
       sponsorGrid.innerHTML = items.map(item => {
         const visibility = String(item.visibility || "visible");
+        const normalizedWebsite = normalizeUrl(item.website || "");
         const imageHtml = item.imageUrl
           ? `<img src="${item.imageUrl}" alt="${escapeHtml(item.name || "Sponsor")}">`
           : `<div style="font-weight:900;color:#0f4d92;padding:16px;text-align:center;">${escapeHtml(item.name || "Sponsor")}</div>`;
@@ -1451,7 +1486,7 @@
             ` : ``}
 
             <div class="sponsor-links">
-              ${item.website ? `<a class="mini-btn blue" href="${item.website}" target="_blank" rel="noopener">Visiter le lien</a>` : ``}
+              ${normalizedWebsite ? `<a class="mini-btn blue" href="${normalizedWebsite}" target="_blank" rel="noopener">Visiter le lien</a>` : ``}
               ${item.imageUrl ? `<button class="mini-btn" type="button" data-open-image="${item.imageUrl}">Agrandir</button>` : ``}
               ${isAdmin ? `<button class="mini-btn gold" type="button" data-toggle-visibility="${item.id}">${visibility === "visible" ? "Masquer" : "Afficher"}</button>` : ``}
               ${isAdmin ? `<button class="mini-btn red" type="button" data-delete-sponsor="${item.id}">Supprimer</button>` : ``}
@@ -1506,11 +1541,12 @@ Type : ${escapeHtml(item.supportType || "-")}
 Édition : ${escapeHtml(item.edition || "-")}
 Lien : ${escapeHtml(item.website || "-")}
 Envoyé le : ${escapeHtml(formatDateTime(item.createdAt))}
+Statut : ${escapeHtml(item.status || "new")}
               </div>
             </div>
 
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <span class="tag pending">Proposition reçue</span>
+              <span class="tag pending">${escapeHtml(item.status || "new")}</span>
               <button class="mini-btn red" type="button" data-delete-support="${item.id}">Supprimer</button>
             </div>
           </div>
@@ -1550,7 +1586,7 @@ Envoyé le : ${escapeHtml(formatDateTime(item.createdAt))}
 
       const name = sanitizeText(sponsorNameInput.value);
       const type = sanitizeText(sponsorTypeInput.value);
-      const website = sanitizeText(sponsorWebsiteInput.value);
+      const website = normalizeUrl(sponsorWebsiteInput.value);
       const editionTarget = sanitizeText(sponsorEditionInput.value);
       const visibility = sanitizeText(sponsorVisibilityInput.value);
       const description = sanitizeText(sponsorDescriptionInput.value);
@@ -1576,6 +1612,7 @@ Envoyé le : ${escapeHtml(formatDateTime(item.createdAt))}
         description,
         imageUrl,
         createdAt: Date.now(),
+        updatedAt: Date.now(),
         createdByEmail: currentUser.email || ADMIN_EMAIL
       });
 
@@ -1618,8 +1655,10 @@ Envoyé le : ${escapeHtml(formatDateTime(item.createdAt))}
       const email = sanitizeText(supportEmailInput.value);
       const edition = sanitizeText(supportEditionInput.value);
       const supportType = sanitizeText(supportTypeInput.value);
-      const website = sanitizeText(supportWebsiteInput.value);
+      const website = normalizeUrl(supportWebsiteInput.value);
       const message = sanitizeText(supportMessageInput.value);
+
+      supportSuccessBox.classList.remove("show");
 
       if (!name || !email || !message) {
         alert("Merci de remplir au minimum le nom, l’email et le message.");
@@ -1635,11 +1674,14 @@ Envoyé le : ${escapeHtml(formatDateTime(item.createdAt))}
         supportType,
         website,
         message,
-        createdAt: Date.now()
+        status: "new",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        sourcePage: "competition-sponsors.html"
       });
 
       clearSupportForm();
-      alert("Votre proposition de soutien a bien été envoyée. Merci pour votre intérêt.");
+      supportSuccessBox.classList.add("show");
     }
 
     function clearSupportForm() {
@@ -1660,6 +1702,9 @@ Envoyé le : ${escapeHtml(formatDateTime(item.createdAt))}
     }
 
     function startRealtime() {
+      if (realtimeStarted) return;
+      realtimeStarted = true;
+
       onValue(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/settings`), (snap) => {
         pageSettings = snap.exists() ? (snap.val() || {}) : null;
         renderSettings();
@@ -1682,14 +1727,17 @@ Envoyé le : ${escapeHtml(formatDateTime(item.createdAt))}
     saveSponsorBtn.addEventListener("click", saveSponsor);
     clearSponsorBtn.addEventListener("click", clearSponsorFields);
     submitSupportBtn.addEventListener("click", submitSupportForm);
-    clearSupportBtn.addEventListener("click", clearSupportForm);
+    clearSupportBtn.addEventListener("click", () => {
+      clearSupportForm();
+      supportSuccessBox.classList.remove("show");
+    });
 
     closeImageModal.addEventListener("click", closeModal);
     imageModal.addEventListener("click", (e) => {
       if (e.target === imageModal) closeModal();
     });
 
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, (user) => {
       currentUser = user || null;
       const email = (user?.email || "").toLowerCase();
       setAdminMode(email === ADMIN_EMAIL.toLowerCase());
