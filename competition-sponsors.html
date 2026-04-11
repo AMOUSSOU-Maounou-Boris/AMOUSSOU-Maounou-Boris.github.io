@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sponsors & Soutiens | Chem Challenge</title>
+  <style>
+    *{ box-sizing:border-box; }
+
+    :root{
+      --bg:#041126;
+      --bg-2:#0a2659;
+      --bg-3:#123d84;
+      --card:rgba(255,255,255,.92);
+      --card-2:rgba(255,255,255,.86);
+      --nav:#082e5b;
+      --text:#0b2340;
+      --muted:#627591;
+      --line:#d9e6f4;
+      --blue:#2f8cff;
+      --blue-dark:#0f4d92;
+      --green:#19be69;
+      --gold:#d6a62d;
+      --red:#df4b4b;
+      --soft:#f7fbff;
+      --shadow:0 18px 40px rgba(7,31,66,.14);
+      --radius:22px;
+      --max:1400px;
+    }
+
+    html, body{
+      margin:0;
+      min-height:100%;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#fff;
+      overflow-x:hidden;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(115,213,255,.22) 0%, rgba(115,213,255,.06) 16%, transparent 26%),
+        radial-gradient(circle at 84% 14%, rgba(255,208,112,.17) 0%, rgba(255,208,112,.05) 14%, transparent 24%),
+        radial-gradient(circle at 16% 80%, rgba(88,194,255,.18) 0%, rgba(88,194,255,.05) 12%, transparent 26%),
+        radial-gradient(circle at 84% 76%, rgba(255,210,130,.15) 0%, rgba(255,210,130,.05) 11%, transparent 24%),
+        linear-gradient(120deg, var(--bg) 0%, var(--bg-2) 40%, var(--bg-3) 65%, #071934 100%);
+      background-attachment:fixed;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.7;
+      background:
+        radial-gradient(circle at 20% 28%, rgba(255,255,255,.15) 0 1.6px, transparent 2.6px),
+        radial-gradient(circle at 78% 18%, rgba(255,255,255,.12) 0 1.7px, transparent 2.7px),
+        radial-gradient(circle at 88% 68%, rgba(255,255,255,.10) 0 1.8px, transparent 2.8px),
+        radial-gradient(circle at 36% 78%, rgba(255,255,255,.12) 0 1.5px, transparent 2.4px),
+        radial-gradient(circle at 12% 60%, rgba(255,255,255,.10) 0 1.7px, transparent 2.7px);
+      background-size:320px 320px, 420px 420px, 460px 460px, 260px 260px, 360px 360px;
+      animation:starPulse 10s linear infinite;
+      z-index:0;
+    }
+
+    .science-scene{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:1;
+    }
+
+    .molecule-track,
+    .molecule-track-right{
+      position:absolute;
+      top:0;
+      bottom:0;
+      width:280px;
+      opacity:.34;
+      filter:drop-shadow(0 0 14px rgba(140,225,255,.16));
+    }
+
+    .molecule-track{ left:-20px; }
+    .molecule-track-right{ right:-20px; transform:scaleX(-1); opacity:.28; }
+
+    .molecule-svg{
+      width:100%;
+      height:100%;
+      animation:moleculeDrift 18s ease-in-out infinite;
+    }
+
+    .molecule-track-right .molecule-svg{
+      animation-duration:22s;
+    }
+
+    .particles{
+      position:absolute;
+      inset:0;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,.88) 0 1.8px, transparent 2.4px),
+        radial-gradient(circle, rgba(160,224,255,.65) 0 1.4px, transparent 2.2px),
+        radial-gradient(circle, rgba(255,220,150,.36) 0 3px, transparent 4px);
+      background-size:160px 160px, 120px 120px, 260px 260px;
+      opacity:.36;
+      animation:particleDrift 26s linear infinite;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:40;
+      background:rgba(8,46,91,.88);
+      backdrop-filter:blur(10px);
+      box-shadow:0 8px 20px rgba(0,0,0,.12);
+    }
+
+    .topbar-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:16px 18px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:12px 20px;
+      align-items:center;
+      position:relative;
+      z-index:2;
+    }
+
+    .topbar a{
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+      font-size:15px;
+      opacity:.96;
+      padding-bottom:4px;
+    }
+
+    .topbar a.active,
+    .topbar a:hover{
+      color:#a8ddff;
+    }
+
+    .page{
+      position:relative;
+      z-index:3;
+      max-width:var(--max);
+      margin:22px auto 44px;
+      padding:0 18px 30px;
+      display:grid;
+      grid-template-columns:300px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .sidebar{
+      position:sticky;
+      top:92px;
+    }
+
+    .glass-card,
+    .hero-card,
+    .section-card,
+    .admin-card,
+    .sponsor-card,
+    .support-card,
+    .edition-card{
+      background:var(--card);
+      color:var(--text);
+      border:1px solid rgba(224,236,248,.8);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+    }
+
+    .glass-card{ padding:18px; margin-bottom:18px; }
+    .section-card{ padding:22px; margin-bottom:18px; }
+    .admin-card{ padding:20px; margin-bottom:18px; background:rgba(255,250,238,.95); border-color:#f2ddb4; }
+    .hero-card{
+      padding:28px;
+      overflow:hidden;
+      position:relative;
+      background:
+        linear-gradient(130deg, rgba(8,41,90,.96) 0%, rgba(18,77,156,.93) 48%, rgba(55,153,255,.90) 100%);
+      color:#fff;
+      border:none;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      right:-80px;
+      top:-80px;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:rgba(255,255,255,.10);
+    }
+
+    .hero-card::after{
+      content:"";
+      position:absolute;
+      left:-60px;
+      bottom:-60px;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.20);
+      font-size:13px;
+      font-weight:900;
+      margin-bottom:14px;
+      position:relative;
+      z-index:2;
+    }
+
+    .hero-title{
+      margin:0 0 12px;
+      font-size:40px;
+      line-height:1.08;
+      position:relative;
+      z-index:2;
+    }
+
+    .hero-sub{
+      margin:0;
+      max-width:880px;
+      line-height:1.8;
+      font-size:16px;
+      color:rgba(255,255,255,.96);
+      position:relative;
+      z-index:2;
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:20px;
+      position:relative;
+      z-index:2;
+    }
+
+    .btn,
+    .btn-outline,
+    .btn-green,
+    .btn-red,
+    .btn-gold,
+    .btn-ghost{
+      min-height:46px;
+      border:none;
+      border-radius:16px;
+      padding:0 18px;
+      font-size:14px;
+      font-weight:900;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      transition:.18s ease;
+      font-family:inherit;
+    }
+
+    .btn:hover,
+    .btn-outline:hover,
+    .btn-green:hover,
+    .btn-red:hover,
+    .btn-gold:hover,
+    .btn-ghost:hover{
+      transform:translateY(-1px);
+    }
+
+    .btn{ background:#fff; color:#0f4d92; }
+    .btn-outline{ background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.24); }
+    .btn-green{ background:var(--green); color:#fff; }
+    .btn-red{ background:var(--red); color:#fff; }
+    .btn-gold{ background:linear-gradient(135deg,#d6a62d,#b98512); color:#fff; }
+    .btn-ghost{ background:#eef5fd; color:#0b2340; }
+
+    .sidebar-title{
+      margin:0 0 10px;
+      font-size:19px;
+      color:#082e5b;
+    }
+
+    .muted{
+      color:var(--muted);
+      line-height:1.65;
+      font-size:14px;
+    }
+
+    .mini-line{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:11px 12px;
+      border-radius:16px;
+      background:#f8fbff;
+      border:1px solid var(--line);
+      margin-bottom:10px;
+      color:var(--text);
+      font-weight:800;
+      font-size:14px;
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green);
+      flex:0 0 10px;
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .section-title{
+      margin:0 0 6px;
+      font-size:28px;
+      color:#082e5b;
+    }
+
+    .section-desc{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .stats-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .stat-box{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+      padding:16px;
+    }
+
+    .stat-box .k{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      font-weight:700;
+    }
+
+    .stat-box .v{
+      color:#082e5b;
+      font-size:20px;
+      font-weight:900;
+      line-height:1.35;
+    }
+
+    .edition-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+
+    .edition-card{
+      padding:18px;
+      background:#fbfdff;
+      border-radius:22px;
+    }
+
+    .edition-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      background:#edf5ff;
+      color:#0f4d92;
+      margin-bottom:10px;
+    }
+
+    .edition-name{
+      font-size:24px;
+      font-weight:900;
+      color:#082e5b;
+      margin-bottom:8px;
+      line-height:1.25;
+    }
+
+    .edition-text{
+      color:var(--muted);
+      line-height:1.7;
+      white-space:pre-wrap;
+    }
+
+    .support-highlight{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:16px;
+    }
+
+    .support-card{
+      padding:18px;
+      background:#fbfdff;
+      border-radius:20px;
+    }
+
+    .support-card h3{
+      margin:0 0 8px;
+      color:#082e5b;
+      font-size:18px;
+    }
+
+    .support-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:14px;
+    }
+
+    .admin-toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:900;
+      background:#fff4dd;
+      color:#8a6100;
+      border:1px solid #f2d392;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width:0;
+    }
+
+    .field label{
+      font-size:14px;
+      font-weight:800;
+      color:#082e5b;
+    }
+
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      border:1px solid #cbdced;
+      background:#fff;
+      color:var(--text);
+      border-radius:15px;
+      outline:none;
+      padding:14px 15px;
+      font-size:14px;
+      font-family:inherit;
+    }
+
+    .field textarea{
+      resize:vertical;
+      min-height:100px;
+    }
+
+    .admin-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .full{ grid-column:1 / -1; }
+
+    .small-note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      margin-top:8px;
+    }
+
+    .sponsor-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+    }
+
+    .sponsor-card{
+      padding:16px;
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .sponsor-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, rgba(47,140,255,.04), rgba(214,166,45,.04));
+      pointer-events:none;
+    }
+
+    .sponsor-image-wrap{
+      position:relative;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid #e3edf7;
+      background:#fff;
+      aspect-ratio: 16 / 10;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+    }
+
+    .sponsor-image-wrap img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      background:#fff;
+      padding:12px;
+    }
+
+    .sponsor-type{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 11px;
+      border-radius:999px;
+      background:#edf5ff;
+      color:#0f4d92;
+      font-size:12px;
+      font-weight:900;
+      align-self:flex-start;
+      border:1px solid #d7e7fb;
+      position:relative;
+      z-index:1;
+    }
+
+    .sponsor-name{
+      font-size:20px;
+      font-weight:900;
+      color:#082e5b;
+      line-height:1.3;
+      position:relative;
+      z-index:1;
+    }
+
+    .sponsor-sub{
+      color:#5f738c;
+      font-size:13px;
+      line-height:1.6;
+      white-space:pre-wrap;
+      position:relative;
+      z-index:1;
+    }
+
+    .sponsor-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:auto;
+      position:relative;
+      z-index:1;
+    }
+
+    .mini-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:40px;
+      padding:0 14px;
+      border-radius:12px;
+      text-decoration:none;
+      font-size:13px;
+      font-weight:900;
+      border:none;
+      cursor:pointer;
+      background:#eef5fd;
+      color:#0b2340;
+    }
+
+    .mini-btn.blue{ background:#0f4d92; color:#fff; }
+    .mini-btn.red{ background:#df4b4b; color:#fff; }
+    .mini-btn.gold{ background:linear-gradient(135deg,#d6a62d,#b98512); color:#fff; }
+
+    .empty-box{
+      border:1px dashed #cfdded;
+      border-radius:20px;
+      background:#fbfdff;
+      padding:18px;
+      color:var(--muted);
+      line-height:1.7;
+      text-align:center;
+      font-weight:700;
+    }
+
+    .support-form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .mail-box{
+      margin-top:14px;
+      border:1px solid #dce8f5;
+      border-radius:18px;
+      background:#fbfdff;
+      padding:16px;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .mail-box a{
+      color:#0f4d92;
+      font-weight:900;
+      text-decoration:underline;
+    }
+
+    .support-list{
+      display:grid;
+      gap:14px;
+      margin-top:14px;
+    }
+
+    .support-entry{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+      padding:16px;
+    }
+
+    .support-entry-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+
+    .support-entry-title{
+      font-weight:900;
+      color:#082e5b;
+      font-size:18px;
+      line-height:1.3;
+    }
+
+    .support-entry-meta{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+      white-space:pre-wrap;
+    }
+
+    .support-entry-body{
+      color:var(--text);
+      line-height:1.7;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .tag.visible{ background:#eefcf5; color:#167748; }
+    .tag.hidden{ background:#fff3f3; color:#b33e3e; }
+    .tag.pending{ background:#fff9e8; color:#8c6400; }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(4,16,35,.52);
+      backdrop-filter:blur(7px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      z-index:90;
+    }
+
+    .modal.show{ display:flex; }
+
+    .modal-content{
+      width:min(96vw, 980px);
+      max-height:92vh;
+      overflow:auto;
+      background:#fff;
+      border-radius:24px;
+      padding:18px;
+      position:relative;
+      box-shadow:0 24px 50px rgba(0,0,0,.24);
+    }
+
+    .modal-close{
+      position:absolute;
+      top:12px;
+      right:14px;
+      width:40px;
+      height:40px;
+      border:none;
+      border-radius:50%;
+      cursor:pointer;
+      background:#eef5fd;
+      color:#0b2340;
+      font-size:24px;
+      font-weight:900;
+    }
+
+    .modal-image{
+      width:100%;
+      max-height:78vh;
+      object-fit:contain;
+      border-radius:18px;
+      background:#fff;
+      display:block;
+    }
+
+    .hidden{ display:none !important; }
+
+    @keyframes starPulse{
+      0%,100%{ opacity:.65; transform:scale(1); }
+      50%{ opacity:.85; transform:scale(1.012); }
+    }
+
+    @keyframes moleculeDrift{
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-18px); }
+    }
+
+    @keyframes particleDrift{
+      from{ transform:translateX(0) translateY(0); }
+      to{ transform:translateX(18px) translateY(-24px); }
+    }
+
+    @media (max-width:1250px){
+      .page{ grid-template-columns:1fr; }
+      .sidebar{ position:static; }
+      .sponsor-grid{ grid-template-columns:repeat(2,1fr); }
+      .support-highlight{ grid-template-columns:1fr; }
+      .stats-grid{ grid-template-columns:repeat(2,1fr); }
+    }
+
+    @media (max-width:820px){
+      .hero-title{ font-size:32px; }
+      .edition-grid,
+      .admin-grid,
+      .support-form-grid,
+      .sponsor-grid,
+      .stats-grid{
+        grid-template-columns:1fr;
+      }
+      .topbar-inner{ justify-content:center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="science-scene" aria-hidden="true">
+    <div class="particles"></div>
+
+    <div class="molecule-track">
+      <svg class="molecule-svg" viewBox="0 0 260 1200" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="rgba(214,244,255,.78)" stroke-width="2.2" stroke-linecap="round">
+          <path d="M70 55 L140 110 L84 182 L158 250 L102 326 L176 398 L118 472 L184 548 L128 624 L190 706 L126 788 L194 870 L132 956 L200 1042" />
+          <path d="M140 110 L204 158" />
+          <path d="M84 182 L30 242" />
+          <path d="M158 250 L226 314" />
+          <path d="M102 326 L40 386" />
+          <path d="M176 398 L236 462" />
+          <path d="M118 472 L54 528" />
+          <path d="M184 548 L236 608" />
+          <path d="M128 624 L62 680" />
+          <path d="M190 706 L234 768" />
+          <path d="M126 788 L56 848" />
+          <path d="M194 870 L236 930" />
+        </g>
+        <g fill="rgba(246,252,255,.96)">
+          <circle cx="70" cy="55" r="8"/>
+          <circle cx="140" cy="110" r="10"/>
+          <circle cx="84" cy="182" r="9"/>
+          <circle cx="158" cy="250" r="10"/>
+          <circle cx="102" cy="326" r="9"/>
+          <circle cx="176" cy="398" r="11"/>
+          <circle cx="118" cy="472" r="9"/>
+          <circle cx="184" cy="548" r="10"/>
+          <circle cx="128" cy="624" r="9"/>
+          <circle cx="190" cy="706" r="10"/>
+          <circle cx="126" cy="788" r="9"/>
+          <circle cx="194" cy="870" r="10"/>
+          <circle cx="132" cy="956" r="9"/>
+          <circle cx="200" cy="1042" r="10"/>
+          <circle cx="204" cy="158" r="7"/>
+          <circle cx="30" cy="242" r="7"/>
+          <circle cx="226" cy="314" r="7"/>
+          <circle cx="40" cy="386" r="7"/>
+          <circle cx="236" cy="462" r="7"/>
+          <circle cx="54" cy="528" r="7"/>
+          <circle cx="236" cy="608" r="7"/>
+          <circle cx="62" cy="680" r="7"/>
+          <circle cx="234" cy="768" r="7"/>
+          <circle cx="56" cy="848" r="7"/>
+          <circle cx="236" cy="930" r="7"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="molecule-track-right">
+      <svg class="molecule-svg" viewBox="0 0 260 1200" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="rgba(214,244,255,.78)" stroke-width="2.2" stroke-linecap="round">
+          <path d="M70 55 L140 110 L84 182 L158 250 L102 326 L176 398 L118 472 L184 548 L128 624 L190 706 L126 788 L194 870 L132 956 L200 1042" />
+          <path d="M140 110 L204 158" />
+          <path d="M84 182 L30 242" />
+          <path d="M158 250 L226 314" />
+          <path d="M102 326 L40 386" />
+          <path d="M176 398 L236 462" />
+          <path d="M118 472 L54 528" />
+          <path d="M184 548 L236 608" />
+          <path d="M128 624 L62 680" />
+          <path d="M190 706 L234 768" />
+          <path d="M126 788 L56 848" />
+          <path d="M194 870 L236 930" />
+        </g>
+        <g fill="rgba(246,252,255,.96)">
+          <circle cx="70" cy="55" r="8"/>
+          <circle cx="140" cy="110" r="10"/>
+          <circle cx="84" cy="182" r="9"/>
+          <circle cx="158" cy="250" r="10"/>
+          <circle cx="102" cy="326" r="9"/>
+          <circle cx="176" cy="398" r="11"/>
+          <circle cx="118" cy="472" r="9"/>
+          <circle cx="184" cy="548" r="10"/>
+          <circle cx="128" cy="624" r="9"/>
+          <circle cx="190" cy="706" r="10"/>
+          <circle cx="126" cy="788" r="9"/>
+          <circle cx="194" cy="870" r="10"/>
+          <circle cx="132" cy="956" r="9"/>
+          <circle cx="200" cy="1042" r="10"/>
+          <circle cx="204" cy="158" r="7"/>
+          <circle cx="30" cy="242" r="7"/>
+          <circle cx="226" cy="314" r="7"/>
+          <circle cx="40" cy="386" r="7"/>
+          <circle cx="236" cy="462" r="7"/>
+          <circle cx="54" cy="528" r="7"/>
+          <circle cx="236" cy="608" r="7"/>
+          <circle cx="62" cy="680" r="7"/>
+          <circle cx="234" cy="768" r="7"/>
+          <circle cx="56" cy="848" r="7"/>
+          <circle cx="236" cy="930" r="7"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="research.html">Research</a>
+      <a href="cv.html">Resume</a>
+      <a href="contact.html">Contact</a>
+      <a href="insights.html#challenge-pub">Insights</a>
+      <a href="competition.html">Concours</a>
+      <a href="competition-jury.html">Jury concours</a>
+      <a href="competition-admin.html">Admin concours</a>
+      <a href="competition-rules.html">Règlement</a>
+      <a href="verify-certificate.html">Vérifier certificat</a>
+      <a href="competition-sponsors.html" class="active">Sponsors</a>
+      <a href="profile.html">Mon compte</a>
+    </div>
+  </header>
+
+  <div class="page">
+    <aside class="sidebar">
+      <div class="glass-card">
+        <h3 class="sidebar-title">Chem Challenge Network</h3>
+        <p class="muted">
+          Cette page met en valeur les sponsors, soutiens, universités, instituts, laboratoires,
+          partenaires et personnes qui accompagnent l’édition en cours et les futures éditions.
+        </p>
+      </div>
+
+      <div class="glass-card">
+        <div class="mini-line"><span class="dot"></span><span id="editionCurrentMini">Édition en cours : Chargement...</span></div>
+        <div class="mini-line"><span class="dot"></span><span id="editionNextMini">Prochaine édition : Chargement...</span></div>
+        <div class="mini-line"><span class="dot"></span><span id="sponsorCountMini">Sponsors visibles : 0</span></div>
+        <div class="mini-line"><span class="dot"></span><span id="supportCountMini">Propositions reçues : 0</span></div>
+      </div>
+
+      <div class="glass-card">
+        <h3 class="sidebar-title">Pourquoi soutenir ?</h3>
+        <p class="muted">
+          Renforcer la visibilité scientifique, encourager l’excellence, soutenir les jeunes talents,
+          accompagner les futures éditions et associer votre image à une initiative académique sérieuse.
+        </p>
+      </div>
+
+      <div class="admin-card hidden" id="adminQuickCard">
+        <h3 class="sidebar-title">Mode administrateur</h3>
+        <p class="muted">
+          Vous êtes connecté avec le compte administrateur officiel. Les paramètres de gestion,
+          validation, publication et visibilité sont activés uniquement pour vous.
+        </p>
+      </div>
+    </aside>
+
+    <main>
+      <section class="hero-card">
+        <div class="hero-badge">Sponsors • Supporters • Universities • Institutes</div>
+        <h1 class="hero-title">Chem Challenge Sponsors & Support Network</h1>
+        <p class="hero-sub">
+          Un espace premium pour présenter les organisations, universités, instituts, laboratoires,
+          entreprises, soutiens individuels et partenaires institutionnels qui accompagnent le
+          Chem Challenge. Cette page est conçue pour inspirer confiance, donner une image très haut
+          niveau au concours et accueillir les soutiens de l’édition en cours comme de la prochaine.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn" href="#sponsorsSection">Voir les partenaires</a>
+          <a class="btn-outline" href="#supportFormSection">Proposer un soutien</a>
+          <a class="btn-outline" href="#editionsSection">Voir les éditions</a>
+        </div>
+      </section>
+
+      <section class="section-card" id="editionsSection">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Éditions officielles</h2>
+            <p class="section-desc">
+              Cette section met en avant l’édition en cours et la prochaine édition à soutenir.
+            </p>
+          </div>
+          <div class="admin-toggle hidden" id="adminEditionBadge">Mode admin activé</div>
+        </div>
+
+        <div class="edition-grid">
+          <div class="edition-card">
+            <div class="edition-badge">Édition en cours</div>
+            <div class="edition-name" id="currentEditionTitle">Chargement...</div>
+            <div class="edition-text" id="currentEditionText">Chargement des informations...</div>
+          </div>
+
+          <div class="edition-card">
+            <div class="edition-badge">Prochaine édition</div>
+            <div class="edition-name" id="nextEditionTitle">Chargement...</div>
+            <div class="edition-text" id="nextEditionText">Chargement des informations...</div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="k">Sponsors visibles</div>
+            <div class="v" id="statSponsors">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="k">Soutiens individuels</div>
+            <div class="v" id="statPeople">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="k">Propositions reçues</div>
+            <div class="v" id="statSupportForms">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="k">Mode page</div>
+            <div class="v" id="statPageMode">Public</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-card">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Pourquoi devenir sponsor ?</h2>
+            <p class="section-desc">
+              Associer votre institution à une initiative crédible, ambitieuse et scientifique.
+            </p>
+          </div>
+        </div>
+
+        <div class="support-highlight">
+          <div class="support-card">
+            <h3>Visibilité institutionnelle</h3>
+            <p>Votre logo, votre nom et vos liens officiels peuvent être mis en avant dans une page dédiée, propre et attractive.</p>
+          </div>
+          <div class="support-card">
+            <h3>Soutien à l’excellence</h3>
+            <p>Vous accompagnez une initiative tournée vers la chimie, la rigueur académique et la valorisation des talents.</p>
+          </div>
+          <div class="support-card">
+            <h3>Projection vers l’avenir</h3>
+            <p>Cette page sert aussi à préparer les prochaines éditions et à accueillir de nouveaux partenaires nationaux et internationaux.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-card hidden" id="adminPanel">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Panneau de gestion administrateur</h2>
+            <p class="section-desc">
+              Visible uniquement pour <strong>borisamoussou01@gmail.com</strong>.
+              Vous pouvez modifier les éditions, ajouter des sponsors, gérer la visibilité et consulter les propositions reçues.
+            </p>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <div class="field">
+            <label for="adminCurrentEdition">Nom de l’édition en cours</label>
+            <input id="adminCurrentEdition" type="text" placeholder="Ex. Chem Challenge 2026" />
+          </div>
+
+          <div class="field">
+            <label for="adminNextEdition">Nom de la prochaine édition</label>
+            <input id="adminNextEdition" type="text" placeholder="Ex. Chem Challenge 2027" />
+          </div>
+
+          <div class="field full">
+            <label for="adminCurrentEditionText">Texte édition en cours</label>
+            <textarea id="adminCurrentEditionText" placeholder="Texte de présentation de l’édition en cours..."></textarea>
+          </div>
+
+          <div class="field full">
+            <label for="adminNextEditionText">Texte prochaine édition</label>
+            <textarea id="adminNextEditionText" placeholder="Texte d’appel à soutien pour la prochaine édition..."></textarea>
+          </div>
+        </div>
+
+        <div class="hero-actions" style="margin-top:16px;">
+          <button class="btn-gold" id="saveEditionBtn" type="button">Enregistrer les éditions</button>
+          <button class="btn-ghost" id="loadEditionBtn" type="button">Recharger</button>
+        </div>
+
+        <hr style="border:none;border-top:1px solid #ead9b5;margin:22px 0;">
+
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" style="font-size:24px;">Ajouter un sponsor / partenaire</h2>
+            <p class="section-desc">
+              Ajoutez ici une université, un institut, un laboratoire, une personne de soutien ou un sponsor.
+            </p>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <div class="field">
+            <label for="sponsorNameInput">Nom</label>
+            <input id="sponsorNameInput" type="text" placeholder="Nom de l’organisation ou de la personne" />
+          </div>
+
+          <div class="field">
+            <label for="sponsorTypeInput">Type</label>
+            <select id="sponsorTypeInput">
+              <option value="Sponsor officiel">Sponsor officiel</option>
+              <option value="Université partenaire">Université partenaire</option>
+              <option value="Institut partenaire">Institut partenaire</option>
+              <option value="Laboratoire partenaire">Laboratoire partenaire</option>
+              <option value="Soutien institutionnel">Soutien institutionnel</option>
+              <option value="Soutien individuel">Soutien individuel</option>
+              <option value="Organisation associée">Organisation associée</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="sponsorWebsiteInput">Lien officiel</label>
+            <input id="sponsorWebsiteInput" type="text" placeholder="https://..." />
+          </div>
+
+          <div class="field">
+            <label for="sponsorEditionInput">Édition concernée</label>
+            <select id="sponsorEditionInput">
+              <option value="current">Édition en cours</option>
+              <option value="next">Prochaine édition</option>
+              <option value="both">Les deux</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="sponsorImageInput">Photo / logo</label>
+            <input id="sponsorImageInput" type="file" accept="image/*" />
+          </div>
+
+          <div class="field">
+            <label for="sponsorVisibilityInput">Visibilité</label>
+            <select id="sponsorVisibilityInput">
+              <option value="visible">Visible</option>
+              <option value="hidden">Masqué</option>
+            </select>
+          </div>
+
+          <div class="field full">
+            <label for="sponsorDescriptionInput">Description</label>
+            <textarea id="sponsorDescriptionInput" placeholder="Courte description, rôle, type de soutien, message institutionnel..."></textarea>
+          </div>
+        </div>
+
+        <div class="hero-actions" style="margin-top:16px;">
+          <button class="btn-green" id="saveSponsorBtn" type="button">Ajouter ce sponsor</button>
+          <button class="btn-ghost" id="clearSponsorBtn" type="button">Effacer</button>
+        </div>
+      </section>
+
+      <section class="section-card" id="sponsorsSection">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Sponsors, partenaires et soutiens</h2>
+            <p class="section-desc">
+              Logos, images, noms, liens officiels et soutiens validés pour l’édition en cours et les éditions à venir.
+            </p>
+          </div>
+        </div>
+
+        <div class="sponsor-grid" id="sponsorGrid">
+          <div class="empty-box">Aucun sponsor ou soutien visible pour le moment.</div>
+        </div>
+      </section>
+
+      <section class="section-card" id="supportFormSection">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Proposer un soutien ou devenir sponsor</h2>
+            <p class="section-desc">
+              Vous pouvez nous écrire pour proposer un soutien financier, matériel, institutionnel, scientifique, médiatique ou logistique.
+            </p>
+          </div>
+        </div>
+
+        <div class="support-form-grid">
+          <div class="field">
+            <label for="supportNameInput">Nom complet</label>
+            <input id="supportNameInput" type="text" placeholder="Votre nom" />
+          </div>
+
+          <div class="field">
+            <label for="supportOrgInput">Organisation / institution</label>
+            <input id="supportOrgInput" type="text" placeholder="Université, institut, entreprise..." />
+          </div>
+
+          <div class="field">
+            <label for="supportEmailInput">Adresse e-mail</label>
+            <input id="supportEmailInput" type="email" placeholder="Votre e-mail" />
+          </div>
+
+          <div class="field">
+            <label for="supportEditionInput">Édition concernée</label>
+            <select id="supportEditionInput">
+              <option value="Édition en cours">Édition en cours</option>
+              <option value="Prochaine édition">Prochaine édition</option>
+              <option value="Les deux">Les deux</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="supportTypeInput">Type de soutien</label>
+            <select id="supportTypeInput">
+              <option value="Sponsoring financier">Sponsoring financier</option>
+              <option value="Soutien institutionnel">Soutien institutionnel</option>
+              <option value="Soutien scientifique">Soutien scientifique</option>
+              <option value="Soutien logistique">Soutien logistique</option>
+              <option value="Partenariat académique">Partenariat académique</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="supportWebsiteInput">Site ou lien public</label>
+            <input id="supportWebsiteInput" type="text" placeholder="https://..." />
+          </div>
+
+          <div class="field full">
+            <label for="supportMessageInput">Comment souhaitez-vous aider ?</label>
+            <textarea id="supportMessageInput" placeholder="Décrivez ici la manière dont vous pensez soutenir l’édition à venir ou le projet Chem Challenge."></textarea>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <button class="btn-gold" id="submitSupportBtn" type="button">Envoyer la proposition</button>
+          <button class="btn-ghost" id="clearSupportBtn" type="button">Effacer</button>
+        </div>
+
+        <div class="mail-box">
+          <strong style="color:#082e5b;">Send a mail</strong><br>
+          Pour tout soutien, partenariat ou sponsoring, vous pouvez aussi écrire directement via cet onglet à l’adresse officielle :
+          <a href="mailto:borisamoussou01@gmail.com?subject=Chem%20Challenge%20-%20Support%20or%20Sponsorship">borisamoussou01@gmail.com</a>
+        </div>
+      </section>
+
+      <section class="admin-card hidden" id="adminSupportPanel">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">Propositions de soutien reçues</h2>
+            <p class="section-desc">
+              Cette liste est visible uniquement par l’administrateur officiel.
+            </p>
+          </div>
+        </div>
+
+        <div class="support-list" id="supportListAdmin">
+          <div class="empty-box">Aucune proposition de soutien pour le moment.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="imageModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeImageModal" type="button">×</button>
+      <img id="modalImage" class="modal-image" alt="Sponsor image enlarged" />
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    import {
+      ref,
+      get,
+      set,
+      update,
+      push,
+      remove,
+      onValue
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+    const PAGE_KEY = "competitionSponsors";
+    const COMPETITION_ID = "chem_challenge_2026";
+
+    const currentEditionTitle = document.getElementById("currentEditionTitle");
+    const currentEditionText = document.getElementById("currentEditionText");
+    const nextEditionTitle = document.getElementById("nextEditionTitle");
+    const nextEditionText = document.getElementById("nextEditionText");
+
+    const editionCurrentMini = document.getElementById("editionCurrentMini");
+    const editionNextMini = document.getElementById("editionNextMini");
+    const sponsorCountMini = document.getElementById("sponsorCountMini");
+    const supportCountMini = document.getElementById("supportCountMini");
+
+    const statSponsors = document.getElementById("statSponsors");
+    const statPeople = document.getElementById("statPeople");
+    const statSupportForms = document.getElementById("statSupportForms");
+    const statPageMode = document.getElementById("statPageMode");
+
+    const adminQuickCard = document.getElementById("adminQuickCard");
+    const adminPanel = document.getElementById("adminPanel");
+    const adminSupportPanel = document.getElementById("adminSupportPanel");
+    const adminEditionBadge = document.getElementById("adminEditionBadge");
+
+    const adminCurrentEdition = document.getElementById("adminCurrentEdition");
+    const adminNextEdition = document.getElementById("adminNextEdition");
+    const adminCurrentEditionText = document.getElementById("adminCurrentEditionText");
+    const adminNextEditionText = document.getElementById("adminNextEditionText");
+    const saveEditionBtn = document.getElementById("saveEditionBtn");
+    const loadEditionBtn = document.getElementById("loadEditionBtn");
+
+    const sponsorNameInput = document.getElementById("sponsorNameInput");
+    const sponsorTypeInput = document.getElementById("sponsorTypeInput");
+    const sponsorWebsiteInput = document.getElementById("sponsorWebsiteInput");
+    const sponsorEditionInput = document.getElementById("sponsorEditionInput");
+    const sponsorImageInput = document.getElementById("sponsorImageInput");
+    const sponsorVisibilityInput = document.getElementById("sponsorVisibilityInput");
+    const sponsorDescriptionInput = document.getElementById("sponsorDescriptionInput");
+    const saveSponsorBtn = document.getElementById("saveSponsorBtn");
+    const clearSponsorBtn = document.getElementById("clearSponsorBtn");
+
+    const sponsorGrid = document.getElementById("sponsorGrid");
+
+    const supportNameInput = document.getElementById("supportNameInput");
+    const supportOrgInput = document.getElementById("supportOrgInput");
+    const supportEmailInput = document.getElementById("supportEmailInput");
+    const supportEditionInput = document.getElementById("supportEditionInput");
+    const supportTypeInput = document.getElementById("supportTypeInput");
+    const supportWebsiteInput = document.getElementById("supportWebsiteInput");
+    const supportMessageInput = document.getElementById("supportMessageInput");
+    const submitSupportBtn = document.getElementById("submitSupportBtn");
+    const clearSupportBtn = document.getElementById("clearSupportBtn");
+
+    const supportListAdmin = document.getElementById("supportListAdmin");
+
+    const imageModal = document.getElementById("imageModal");
+    const closeImageModal = document.getElementById("closeImageModal");
+    const modalImage = document.getElementById("modalImage");
+
+    let currentUser = null;
+    let isAdmin = false;
+    let sponsorsMap = {};
+    let supportFormsMap = {};
+    let pageSettings = null;
+
+    function sanitizeText(value = "") {
+      return String(value).replace(/[<>"']/g, "").trim();
+    }
+
+    function escapeHtml(text = "") {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function linkify(text = "") {
+      const safe = escapeHtml(text);
+      return safe.replace(
+        /(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi,
+        (match) => {
+          const href = match.startsWith("http") ? match : `https://${match}`;
+          return `<a href="${href}" target="_blank" rel="noopener" style="color:#0f4d92;font-weight:900;text-decoration:underline;">${match}</a>`;
+        }
+      );
+    }
+
+    function formatDateTime(ts) {
+      if (!ts) return "-";
+      return new Date(ts).toLocaleString("fr-FR");
+    }
+
+    function openImageModal(src) {
+      if (!src) return;
+      modalImage.src = src;
+      imageModal.classList.add("show");
+    }
+
+    function closeModal() {
+      imageModal.classList.remove("show");
+      modalImage.src = "";
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function setAdminMode(enabled) {
+      isAdmin = !!enabled;
+      adminQuickCard.classList.toggle("hidden", !enabled);
+      adminPanel.classList.toggle("hidden", !enabled);
+      adminSupportPanel.classList.toggle("hidden", !enabled);
+      adminEditionBadge.classList.toggle("hidden", !enabled);
+      statPageMode.textContent = enabled ? "Admin" : "Public";
+    }
+
+    function renderSettings() {
+      const currentTitle = sanitizeText(pageSettings?.currentEditionTitle || "Chem Challenge 2026");
+      const currentText = sanitizeText(pageSettings?.currentEditionText || "Édition officielle actuellement mise en avant pour la recherche de sponsors, partenaires et soutiens.");
+      const nextTitle = sanitizeText(pageSettings?.nextEditionTitle || "Chem Challenge 2027");
+      const nextText = sanitizeText(pageSettings?.nextEditionText || "La prochaine édition est ouverte aux propositions de soutien, de sponsoring, de partenariat académique et institutionnel.");
+
+      currentEditionTitle.textContent = currentTitle;
+      currentEditionText.textContent = currentText;
+      nextEditionTitle.textContent = nextTitle;
+      nextEditionText.textContent = nextText;
+
+      editionCurrentMini.textContent = `Édition en cours : ${currentTitle}`;
+      editionNextMini.textContent = `Prochaine édition : ${nextTitle}`;
+
+      adminCurrentEdition.value = currentTitle;
+      adminCurrentEditionText.value = currentText;
+      adminNextEdition.value = nextTitle;
+      adminNextEditionText.value = nextText;
+    }
+
+    function getVisibleSponsors() {
+      return Object.entries(sponsorsMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}) }))
+        .filter(item => String(item.visibility || "visible") === "visible")
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    }
+
+    function getAllSponsorsSorted() {
+      return Object.entries(sponsorsMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}) }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    }
+
+    function renderStats() {
+      const visibleSponsors = getVisibleSponsors();
+      const allSponsors = getAllSponsorsSorted();
+      const peopleCount = allSponsors.filter(item => (item.type || "").toLowerCase().includes("individuel")).length;
+      const supportCount = Object.keys(supportFormsMap || {}).length;
+
+      statSponsors.textContent = String(visibleSponsors.length);
+      statPeople.textContent = String(peopleCount);
+      statSupportForms.textContent = String(supportCount);
+
+      sponsorCountMini.textContent = `Sponsors visibles : ${visibleSponsors.length}`;
+      supportCountMini.textContent = `Propositions reçues : ${supportCount}`;
+    }
+
+    function renderSponsors() {
+      const items = isAdmin ? getAllSponsorsSorted() : getVisibleSponsors();
+
+      if (!items.length) {
+        sponsorGrid.innerHTML = `<div class="empty-box">Aucun sponsor ou soutien visible pour le moment.</div>`;
+        renderStats();
+        return;
+      }
+
+      sponsorGrid.innerHTML = items.map(item => {
+        const visibility = String(item.visibility || "visible");
+        const imageHtml = item.imageUrl
+          ? `<img src="${item.imageUrl}" alt="${escapeHtml(item.name || "Sponsor")}">`
+          : `<div style="font-weight:900;color:#0f4d92;padding:16px;text-align:center;">${escapeHtml(item.name || "Sponsor")}</div>`;
+
+        return `
+          <article class="sponsor-card">
+            <div class="sponsor-image-wrap" ${item.imageUrl ? `data-open-image="${item.imageUrl}"` : ""}>
+              ${imageHtml}
+            </div>
+
+            <div class="sponsor-type">${escapeHtml(item.type || "Soutien")}</div>
+
+            <div class="sponsor-name">${escapeHtml(item.name || "Sans nom")}</div>
+
+            <div class="sponsor-sub">
+              ${escapeHtml(item.description || "Aucune description fournie.")}
+              ${item.editionTarget === "next" ? "\n\nÉdition concernée : prochaine édition." : item.editionTarget === "both" ? "\n\nÉdition concernée : édition en cours + prochaine édition." : "\n\nÉdition concernée : édition en cours."}
+            </div>
+
+            ${isAdmin ? `
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <span class="tag ${visibility === "visible" ? "visible" : "hidden"}">${visibility === "visible" ? "Visible" : "Masqué"}</span>
+              </div>
+            ` : ``}
+
+            <div class="sponsor-links">
+              ${item.website ? `<a class="mini-btn blue" href="${item.website}" target="_blank" rel="noopener">Visiter le lien</a>` : ``}
+              ${item.imageUrl ? `<button class="mini-btn" type="button" data-open-image="${item.imageUrl}">Agrandir</button>` : ``}
+              ${isAdmin ? `<button class="mini-btn gold" type="button" data-toggle-visibility="${item.id}">${visibility === "visible" ? "Masquer" : "Afficher"}</button>` : ``}
+              ${isAdmin ? `<button class="mini-btn red" type="button" data-delete-sponsor="${item.id}">Supprimer</button>` : ``}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      sponsorGrid.querySelectorAll("[data-open-image]").forEach(btn => {
+        btn.addEventListener("click", () => openImageModal(btn.getAttribute("data-open-image")));
+      });
+
+      sponsorGrid.querySelectorAll("[data-toggle-visibility]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-toggle-visibility");
+          await toggleSponsorVisibility(id);
+        });
+      });
+
+      sponsorGrid.querySelectorAll("[data-delete-sponsor]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-delete-sponsor");
+          await deleteSponsor(id);
+        });
+      });
+
+      renderStats();
+    }
+
+    function renderSupportFormsAdmin() {
+      if (!isAdmin) return;
+
+      const items = Object.entries(supportFormsMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}) }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      if (!items.length) {
+        supportListAdmin.innerHTML = `<div class="empty-box">Aucune proposition de soutien pour le moment.</div>`;
+        renderStats();
+        return;
+      }
+
+      supportListAdmin.innerHTML = items.map(item => `
+        <div class="support-entry">
+          <div class="support-entry-head">
+            <div>
+              <div class="support-entry-title">${escapeHtml(item.name || "Sans nom")}</div>
+              <div class="support-entry-meta">
+Organisation : ${escapeHtml(item.organization || "-")}
+Email : ${escapeHtml(item.email || "-")}
+Type : ${escapeHtml(item.supportType || "-")}
+Édition : ${escapeHtml(item.edition || "-")}
+Lien : ${escapeHtml(item.website || "-")}
+Envoyé le : ${escapeHtml(formatDateTime(item.createdAt))}
+              </div>
+            </div>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <span class="tag pending">Proposition reçue</span>
+              <button class="mini-btn red" type="button" data-delete-support="${item.id}">Supprimer</button>
+            </div>
+          </div>
+
+          <div class="support-entry-body">${linkify(item.message || "")}</div>
+        </div>
+      `).join("");
+
+      supportListAdmin.querySelectorAll("[data-delete-support]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-delete-support");
+          await deleteSupportForm(id);
+        });
+      });
+
+      renderStats();
+    }
+
+    async function saveEditions() {
+      if (!isAdmin || !currentUser) return;
+
+      const payload = {
+        currentEditionTitle: sanitizeText(adminCurrentEdition.value) || "Chem Challenge 2026",
+        currentEditionText: sanitizeText(adminCurrentEditionText.value) || "Édition officielle actuellement mise en avant pour la recherche de sponsors, partenaires et soutiens.",
+        nextEditionTitle: sanitizeText(adminNextEdition.value) || "Chem Challenge 2027",
+        nextEditionText: sanitizeText(adminNextEditionText.value) || "La prochaine édition est ouverte aux propositions de soutien, de sponsoring, de partenariat académique et institutionnel.",
+        updatedAt: Date.now(),
+        updatedByEmail: currentUser.email || ADMIN_EMAIL
+      };
+
+      await update(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/settings`), payload);
+      alert("Les paramètres des éditions ont été enregistrés.");
+    }
+
+    async function saveSponsor() {
+      if (!isAdmin || !currentUser) return;
+
+      const name = sanitizeText(sponsorNameInput.value);
+      const type = sanitizeText(sponsorTypeInput.value);
+      const website = sanitizeText(sponsorWebsiteInput.value);
+      const editionTarget = sanitizeText(sponsorEditionInput.value);
+      const visibility = sanitizeText(sponsorVisibilityInput.value);
+      const description = sanitizeText(sponsorDescriptionInput.value);
+      const file = sponsorImageInput.files[0] || null;
+
+      if (!name) {
+        alert("Ajoute au moins un nom pour le sponsor ou le soutien.");
+        return;
+      }
+
+      let imageUrl = "";
+      if (file) {
+        imageUrl = await fileToDataUrl(file);
+      }
+
+      const newRef = push(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/sponsors`));
+      await set(newRef, {
+        name,
+        type,
+        website,
+        editionTarget,
+        visibility,
+        description,
+        imageUrl,
+        createdAt: Date.now(),
+        createdByEmail: currentUser.email || ADMIN_EMAIL
+      });
+
+      clearSponsorFields();
+      alert("Le sponsor a été ajouté.");
+    }
+
+    function clearSponsorFields() {
+      sponsorNameInput.value = "";
+      sponsorTypeInput.value = "Sponsor officiel";
+      sponsorWebsiteInput.value = "";
+      sponsorEditionInput.value = "current";
+      sponsorVisibilityInput.value = "visible";
+      sponsorDescriptionInput.value = "";
+      sponsorImageInput.value = "";
+    }
+
+    async function toggleSponsorVisibility(id) {
+      if (!isAdmin || !id) return;
+      const current = sponsorsMap?.[id] || {};
+      const currentVisibility = String(current.visibility || "visible");
+      const newVisibility = currentVisibility === "visible" ? "hidden" : "visible";
+      await update(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/sponsors/${id}`), {
+        visibility: newVisibility,
+        updatedAt: Date.now(),
+        updatedByEmail: currentUser?.email || ADMIN_EMAIL
+      });
+    }
+
+    async function deleteSponsor(id) {
+      if (!isAdmin || !id) return;
+      const ok = confirm("Supprimer ce sponsor / soutien ?");
+      if (!ok) return;
+      await remove(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/sponsors/${id}`));
+    }
+
+    async function submitSupportForm() {
+      const name = sanitizeText(supportNameInput.value);
+      const organization = sanitizeText(supportOrgInput.value);
+      const email = sanitizeText(supportEmailInput.value);
+      const edition = sanitizeText(supportEditionInput.value);
+      const supportType = sanitizeText(supportTypeInput.value);
+      const website = sanitizeText(supportWebsiteInput.value);
+      const message = sanitizeText(supportMessageInput.value);
+
+      if (!name || !email || !message) {
+        alert("Merci de remplir au minimum le nom, l’email et le message.");
+        return;
+      }
+
+      const newRef = push(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/supportForms`));
+      await set(newRef, {
+        name,
+        organization,
+        email,
+        edition,
+        supportType,
+        website,
+        message,
+        createdAt: Date.now()
+      });
+
+      clearSupportForm();
+      alert("Votre proposition de soutien a bien été envoyée. Merci pour votre intérêt.");
+    }
+
+    function clearSupportForm() {
+      supportNameInput.value = "";
+      supportOrgInput.value = "";
+      supportEmailInput.value = "";
+      supportEditionInput.value = "Édition en cours";
+      supportTypeInput.value = "Sponsoring financier";
+      supportWebsiteInput.value = "";
+      supportMessageInput.value = "";
+    }
+
+    async function deleteSupportForm(id) {
+      if (!isAdmin || !id) return;
+      const ok = confirm("Supprimer cette proposition de soutien ?");
+      if (!ok) return;
+      await remove(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/supportForms/${id}`));
+    }
+
+    function startRealtime() {
+      onValue(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/settings`), (snap) => {
+        pageSettings = snap.exists() ? (snap.val() || {}) : null;
+        renderSettings();
+      });
+
+      onValue(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/sponsors`), (snap) => {
+        sponsorsMap = snap.exists() ? (snap.val() || {}) : {};
+        renderSponsors();
+      });
+
+      onValue(ref(db, `competitions/${COMPETITION_ID}/${PAGE_KEY}/supportForms`), (snap) => {
+        supportFormsMap = snap.exists() ? (snap.val() || {}) : {};
+        renderSupportFormsAdmin();
+        renderStats();
+      });
+    }
+
+    saveEditionBtn.addEventListener("click", saveEditions);
+    loadEditionBtn.addEventListener("click", renderSettings);
+    saveSponsorBtn.addEventListener("click", saveSponsor);
+    clearSponsorBtn.addEventListener("click", clearSponsorFields);
+    submitSupportBtn.addEventListener("click", submitSupportForm);
+    clearSupportBtn.addEventListener("click", clearSupportForm);
+
+    closeImageModal.addEventListener("click", closeModal);
+    imageModal.addEventListener("click", (e) => {
+      if (e.target === imageModal) closeModal();
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user || null;
+      const email = (user?.email || "").toLowerCase();
+      setAdminMode(email === ADMIN_EMAIL.toLowerCase());
+      startRealtime();
+    });
+  </script>
+</body>
+</html>
