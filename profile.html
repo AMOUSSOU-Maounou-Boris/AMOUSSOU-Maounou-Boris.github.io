@@ -1343,7 +1343,7 @@
     <div class="modal-content">
       <button class="modal-close" type="button" id="closeSupportModal">×</button>
       <h3>Besoin d'aide / Support</h3>
-      <p class="modal-note">Remplis ces champs. Ton message sera préparé automatiquement pour l’adresse de support.</p>
+      <p class="modal-note">Remplis ces champs. Ton message sera envoyé directement à l’espace administrateur support du site.</p>
 
       <div class="support-form">
         <input id="supportName" type="text" placeholder="Nom complet" />
@@ -1413,6 +1413,7 @@
     const JPEG_QUALITY = 0.72;
     const ONLINE_STALE_LIMIT = 75 * 1000;
     const COOKIE_DB_PATH = "siteSecurity/cookieConsents";
+    const SUPPORT_FORMS_PATH = "competitions/chem_challenge_2026/competitionSponsors/supportForms";
 
     const params = new URLSearchParams(window.location.search);
     const requestedUid = params.get("uid");
@@ -1776,32 +1777,86 @@
       supportEmail.value = viewedUser?.email || currentUser?.email || "";
       supportSubject.value = supportSubject.value || "Demande d'aide - Profil";
       supportFeedback.textContent = "";
+      supportFeedback.style.color = "#0f4d92";
     }
 
-    function sendSupportRequest() {
+    function randomSupportId(length = 20) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+      let out = "";
+      const arr = new Uint32Array(length);
+      window.crypto.getRandomValues(arr);
+      for (let i = 0; i < length; i++) {
+        out += chars[arr[i] % chars.length];
+      }
+      return out;
+    }
+
+    async function sendSupportRequest() {
       const name = supportName.value.trim();
-      const email = supportEmail.value.trim();
+      const email = supportEmail.value.trim().toLowerCase();
       const subject = supportSubject.value.trim();
       const message = supportMessage.value.trim();
 
       if (!name || !email || !subject || !message) {
         supportFeedback.textContent = "Merci de remplir tous les champs du support.";
+        supportFeedback.style.color = "#b42318";
         return;
       }
 
-      const fullSubject = `[Profile Support] ${subject}`;
-      const body =
-`Nom : ${name}
-Email : ${email}
-Page : profile.html
-Date : ${new Date().toLocaleString("fr-FR")}
+      const basicMailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!basicMailPattern.test(email)) {
+        supportFeedback.textContent = "Adresse e-mail invalide.";
+        supportFeedback.style.color = "#b42318";
+        return;
+      }
 
-Message :
-${message}`;
+      sendSupportBtn.disabled = true;
+      supportFeedback.textContent = "Envoi du message en cours...";
+      supportFeedback.style.color = "#0f4d92";
 
-      const mailto = `mailto:maounou-boris.amoussou@cnrs.fr?subject=${encodeURIComponent(fullSubject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailto;
-      supportFeedback.textContent = "Le message est prêt à être envoyé depuis votre messagerie.";
+      try {
+        const messageId = randomSupportId(24);
+        const now = Date.now();
+
+        await set(ref(db, `${SUPPORT_FORMS_PATH}/${messageId}`), {
+          id: messageId,
+          name,
+          email,
+          organization: viewedUser?.institution || currentUser?.institution || "",
+          supportType: "support_profil",
+          edition: "Chem Excellence Challenge 2026",
+          website: viewedUser?.website || "",
+          message,
+          subject,
+          pageContext: "profile.html",
+          sourcePage: "profile.html",
+          status: "new",
+          createdAt: now,
+          updatedAt: now,
+          senderUid: currentUser?.uid || "",
+          senderDisplayName: currentUser?.displayName || viewedUser?.displayName || "",
+          handledBy: "",
+          adminNote: ""
+        });
+
+        supportFeedback.textContent = "Message envoyé avec succès à l’espace administrateur support.";
+        supportFeedback.style.color = "#15803d";
+
+        supportSubject.value = "Demande d'aide - Profil";
+        supportMessage.value = "";
+
+        setTimeout(() => {
+          closeModal(supportModal);
+          supportFeedback.textContent = "";
+          supportFeedback.style.color = "#0f4d92";
+        }, 900);
+      } catch (error) {
+        console.error(error);
+        supportFeedback.textContent = "Impossible d’envoyer le message au support pour le moment.";
+        supportFeedback.style.color = "#b42318";
+      } finally {
+        sendSupportBtn.disabled = false;
+      }
     }
 
     function renderInviteResult(link) {
@@ -2719,7 +2774,8 @@ ${message}`;
       const postsData = postsSnap.val() || {};
       const commentsData = commentsSnap.val() || {};
       const likesData = likesSnap.val() || {};
-            for (const [postId, post] of Object.entries(postsData)) {
+
+      for (const [postId, post] of Object.entries(postsData)) {
         if ((post || {}).authorId === uid) {
           await remove(ref(db, `posts/${postId}`));
           await remove(ref(db, `comments/${postId}`));
