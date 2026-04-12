@@ -322,6 +322,7 @@
       display:inline-flex;
       align-items:center;
       gap:8px;
+      position:relative;
     }
 
     .topbar a.active{
@@ -335,6 +336,26 @@
       background:var(--green);
       display:inline-block;
       box-shadow:0 0 8px rgba(24,195,74,0.7);
+    }
+
+    .nav-badge{
+      min-width:20px;
+      height:20px;
+      padding:0 6px;
+      border-radius:999px;
+      background:#ff4d4f;
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      line-height:20px;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 6px 16px rgba(223,75,75,0.32);
+    }
+
+    .nav-badge.show{
+      display:inline-flex;
     }
 
     .hidden{ display:none !important; }
@@ -1879,9 +1900,9 @@
       <a href="research.html">Research</a>
       <a href="cv.html">Resume</a>
       <a href="contact.html">Contact</a>
-      <a href="insights.html" class="active">Insights</a>
-      <a href="messages.html">Messages</a>
-      <a href="calls.html">Appels</a>
+      <a href="insights.html" class="active">Insights <span class="nav-badge" id="insightsInviteBadge"></span></a>
+      <a href="messages.html">Messages <span class="nav-badge" id="messagesBadge"></span></a>
+      <a href="calls.html">Appels <span class="nav-badge" id="callsBadge"></span></a>
       <a href="meeting-room.html" id="meetingNavLink" class="hidden">Salle de réunion</a>
       <a href="profile.html"><span class="nav-online-dot" id="navOnlineDot"></span> Mon compte</a>
       <a href="competition.html">Concours</a>
@@ -2081,7 +2102,9 @@
 
         <div class="panel-card hidden" id="privacyPanel" style="margin-top:14px;margin-bottom:0;">
           <h3 class="mini-title" style="font-size:18px;">Paramètres de confidentialité</h3>
-          <p class="side-note" style="margin-bottom:14px;">Choisis quelles informations de ton profil restent visibles.</p>
+          <p class="side-note" style="margin-bottom:14px;">
+            Ces réglages doivent suivre exactement ceux du profil. L’admin garde la visibilité complète.
+          </p>
           <div class="quick-actions">
             <button class="secondary-btn" id="toggleHideEmailBtn" type="button">Masquer / afficher l’email</button>
             <button class="secondary-btn" id="toggleHideBioBtn" type="button">Masquer / afficher la bio</button>
@@ -2268,6 +2291,9 @@ Cette zone est liée à :
     const meetingNavLink = document.getElementById("meetingNavLink");
     const authOverlay = document.getElementById("authOverlay");
     const privatePage = document.getElementById("privatePage");
+    const insightsInviteBadge = document.getElementById("insightsInviteBadge");
+    const messagesBadge = document.getElementById("messagesBadge");
+    const callsBadge = document.getElementById("callsBadge");
 
     const loginView = document.getElementById("loginView");
     const signupView = document.getElementById("signupView");
@@ -2371,8 +2397,13 @@ Cette zone est liée à :
     let renderOnlineFrame = null;
     let renderRecentFrame = null;
     let prefetchBound = false;
-
-    function scheduleFrameRender(refHolderName, callback) {
+    let unreadCountsMap = {};
+    let missedCallsMap = {};
+    let contactInvitesMap = {};
+    let userPrivacyCache = {};
+    let publicProfileCache = {};
+    let globalPresenceCache = {};
+        function scheduleFrameRender(refHolderName, callback) {
       if (window[refHolderName]) cancelAnimationFrame(window[refHolderName]);
       window[refHolderName] = requestAnimationFrame(() => {
         window[refHolderName] = null;
@@ -2428,17 +2459,61 @@ Cette zone est liée à :
       });
     }
 
+    function isAdminEmail(mail = "") {
+      return String(mail).trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
+    }
+
+    function currentViewerIsAdmin() {
+      return !!currentUser && isAdminEmail(currentUser.email || "");
+    }
+
+    function setBadgeValue(el, count) {
+      if (!el) return;
+      const n = Number(count || 0);
+      if (n > 0) {
+        el.textContent = n > 99 ? "99+" : String(n);
+        el.classList.add("show");
+      } else {
+        el.textContent = "";
+        el.classList.remove("show");
+      }
+    }
+
+    function recomputeGlobalBadges() {
+      const totalUnreadMessages = Object.values(unreadCountsMap || {}).reduce((sum, v) => sum + Number(v || 0), 0);
+
+      const totalMissedCalls = Object.values(missedCallsMap || {}).reduce((sum, item) => {
+        if (typeof item === "number") return sum + Number(item || 0);
+        if (item && typeof item === "object") {
+          return sum + Number(item.count || item.missed || 0);
+        }
+        return sum;
+      }, 0);
+
+      const pendingInvites = Object.values(contactInvitesMap || {}).reduce((sum, item) => {
+        const status = item?.status || "";
+        return sum + (status === "pending_received" ? 1 : 0);
+      }, 0);
+
+      setBadgeValue(messagesBadge, totalUnreadMessages);
+      setBadgeValue(callsBadge, totalMissedCalls);
+      setBadgeValue(insightsInviteBadge, pendingInvites);
+    }
+
     function setUIConnected(isConnected) {
       publicTopbar.classList.toggle("hidden", isConnected);
       privateTopbar.classList.toggle("hidden", !isConnected);
       authOverlay.classList.toggle("hidden", isConnected);
       privatePage.classList.toggle("hidden", !isConnected);
+
       if (currentUser && isAdminEmail(currentUser.email || "")) meetingNavLink.classList.remove("hidden");
       else meetingNavLink.classList.add("hidden");
-    }
 
-    function isAdminEmail(mail = "") {
-      return String(mail).trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
+      if (!isConnected) {
+        setBadgeValue(messagesBadge, 0);
+        setBadgeValue(callsBadge, 0);
+        setBadgeValue(insightsInviteBadge, 0);
+      }
     }
 
     function goToSelfInsights() {
@@ -2592,7 +2667,7 @@ Cette zone est liée à :
 
       supportName.value = fullName;
       supportEmail.value = emailValue;
-      supportOrganization.value = "";
+      supportOrganization.value = currentUserData?.institution || "";
       supportSubject.value = supportSubject.value || "Demande d'aide - Insights";
       supportFeedback.textContent = "";
     }
@@ -2720,10 +2795,11 @@ Cette zone est liée à :
     }
 
     function ensurePrivacy(userData = {}) {
-      return userData.privacy || {
-        hideEmail: true,
-        hideBio: false,
-        hidePresence: false
+      const privacy = userData.privacy || {};
+      return {
+        hideEmail: !!privacy.hideEmail,
+        hideBio: !!privacy.hideBio,
+        hidePresence: !!privacy.hidePresence
       };
     }
 
@@ -2738,7 +2814,7 @@ Cette zone est liée à :
     function visibleEmail(viewerUid, userData = {}) {
       const privacy = ensurePrivacy(userData);
       const viewerIsOwner = viewerUid && viewerUid === userData.uid;
-      const viewerIsAdmin = currentUser && isAdminEmail(currentUser.email || "");
+      const viewerIsAdmin = currentViewerIsAdmin();
       if (viewerIsOwner || viewerIsAdmin) return userData.email || "";
       return privacy.hideEmail ? "Email masqué" : (userData.email || "");
     }
@@ -2746,9 +2822,17 @@ Cette zone est liée à :
     function canSeePresence(viewerUid, userData = {}) {
       const privacy = ensurePrivacy(userData);
       const viewerIsOwner = viewerUid && viewerUid === userData.uid;
-      const viewerIsAdmin = currentUser && isAdminEmail(currentUser.email || "");
+      const viewerIsAdmin = currentViewerIsAdmin();
       if (viewerIsOwner || viewerIsAdmin) return true;
       return !privacy.hidePresence;
+    }
+
+    function visibleBio(viewerUid, userData = {}) {
+      const privacy = ensurePrivacy(userData);
+      const viewerIsOwner = viewerUid && viewerUid === userData.uid;
+      const viewerIsAdmin = currentViewerIsAdmin();
+      if (viewerIsOwner || viewerIsAdmin) return userData.bio || "";
+      return privacy.hideBio ? "Bio masquée" : (userData.bio || "");
     }
 
     function drawResizedCanvas(img, maxWidth, maxHeight) {
@@ -2878,7 +2962,7 @@ Cette zone est liée à :
 
     function renderChallengePub(data = null) {
       if (!data || String(data.visibility || "visible") === "hidden") {
-        challengePubTopBadge.textContent = "Publication concours";
+        challengePubTopBadge.textContent = data ? "Publication concours masquée" : "Publication concours";
         challengePubStatus.textContent = data ? "Publication masquée" : "Aucune publication";
         challengePubUpdatedAt.textContent = data ? formatDate(data.updatedAt || data.createdAt) : "-";
         challengePubBy.textContent = data ? escapeHtml(data.updatedByEmail || data.createdByEmail || "-") : "-";
@@ -3078,7 +3162,7 @@ Mis à jour : ${updated}
             </span>
           </div>
           <div class="side-item-sub">
-            Actif maintenant
+            ${escapeHtml(visibleEmail(currentUser?.uid, user) || "")}
           </div>
         </div>
       `).join("");
@@ -3231,7 +3315,8 @@ Mis à jour : ${updated}
           </article>
         `;
       }).join("");
-            bindPostActions();
+
+      bindPostActions();
     }
 
     function requestRenderPosts() {
@@ -3625,6 +3710,25 @@ Mis à jour : ${updated}
       });
     }
 
+    function listenGlobalUnreadBadges() {
+      if (!currentUser) return;
+
+      onValue(ref(db, `unreadCountsByUser/${currentUser.uid}`), (snap) => {
+        unreadCountsMap = snap.val() || {};
+        recomputeGlobalBadges();
+      });
+
+      onValue(ref(db, `contactInvites/${currentUser.uid}`), (snap) => {
+        contactInvitesMap = snap.val() || {};
+        recomputeGlobalBadges();
+      });
+
+      onValue(ref(db, `missedCallsByUser/${currentUser.uid}`), (snap) => {
+        missedCallsMap = snap.val() || {};
+        recomputeGlobalBadges();
+      });
+    }
+
     function startAllRealtimeListeners() {
       if (listenersStarted) return;
       listenersStarted = true;
@@ -3633,6 +3737,7 @@ Mis à jour : ${updated}
       listenLikes();
       listenComments();
       listenChallengePub();
+      listenGlobalUnreadBadges();
     }
 
     async function ensureAdminProfile(user) {
@@ -3871,6 +3976,9 @@ Mis à jour : ${updated}
       if (!user) {
         currentUser = null;
         currentUserData = null;
+        unreadCountsMap = {};
+        missedCallsMap = {};
+        contactInvitesMap = {};
         clearTimeout(activityTimeout);
         setUIConnected(false);
         showView("login");
@@ -3900,6 +4008,7 @@ Mis à jour : ${updated}
         resetInactivityTimer();
         await updatePresenceOnline();
         startAllRealtimeListeners();
+        recomputeGlobalBadges();
         parseInviteToken();
         document.body.classList.remove("auth-checking");
         return;
@@ -3963,6 +4072,7 @@ Mis à jour : ${updated}
       await loadCurrentUserData();
 
       startAllRealtimeListeners();
+      recomputeGlobalBadges();
 
       parseInviteToken();
       document.body.classList.remove("auth-checking");
