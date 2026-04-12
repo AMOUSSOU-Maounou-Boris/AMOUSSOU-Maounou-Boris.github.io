@@ -1062,7 +1062,7 @@
     <div class="modal-content">
       <button class="modal-close" type="button" id="closeSupportModal">×</button>
       <h3>Support</h3>
-      <p class="modal-note">Décris ton problème. Le message sera enregistré pour Boris sans afficher son adresse e-mail à l’écran.</p>
+      <p class="modal-note">Décris ton problème. Le message sera envoyé vers l’espace administrateur interne du site.</p>
 
       <div class="support-grid">
         <div class="support-box">
@@ -1111,6 +1111,7 @@
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
     const LAST_ACTIVITY_KEY = "insights_last_activity";
+    const SUPPORT_PATH = "competitions/chem_challenge_2026/competitionSponsors/supportForms";
 
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
@@ -1406,17 +1407,21 @@
       showSupportStatus("Envoi du message...", true);
 
       try {
-        const supportRef = push(ref(db, "supportMessages"));
+        const supportRef = push(ref(db, SUPPORT_PATH));
         await set(supportRef, {
           name,
           email,
           subject,
           message,
-          destinationEmail: ADMIN_EMAIL,
-          createdAt: Date.now(),
+          supportType: "login_support",
+          organization: "",
+          website: "",
+          edition: "Chem Excellence Challenge 2026",
           sourcePage: "login.html",
           inviteToken: inviteToken || "",
           inviteEmail: inviteEmail || "",
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
           status: "new"
         });
 
