@@ -1315,37 +1315,41 @@
 
     .modal-content{
       width:100%;
-      max-width:520px;
-      background:#fff;
-      border-radius:24px;
+      max-width:610px;
+      background:#f7f8fb;
+      border-radius:30px;
       box-shadow:0 20px 50px rgba(0,0,0,0.22);
-      padding:22px;
+      padding:28px 28px 24px;
       position:relative;
+      border:1px solid #e4ebf4;
     }
 
     .modal-close{
       position:absolute;
-      top:12px;
-      right:14px;
+      top:14px;
+      right:18px;
       border:none;
       background:transparent;
-      font-size:28px;
+      font-size:40px;
       cursor:pointer;
-      color:#0b2340;
+      color:#183962;
       line-height:1;
+      font-weight:400;
     }
 
     .modal h3{
       margin:0 0 10px;
-      font-size:24px;
-      color:#082e5b;
+      font-size:28px;
+      color:#123d74;
+      font-weight:900;
     }
 
     .modal-note{
-      color:var(--muted);
-      line-height:1.6;
-      margin:0 0 16px;
+      color:#6f829a;
+      line-height:1.65;
+      margin:0 0 18px;
       font-size:14px;
+      max-width:500px;
     }
 
     .report-reasons{
@@ -1541,50 +1545,84 @@
 
     .support-form{
       display:grid;
-      gap:12px;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
       margin-top:10px;
     }
 
     .support-input,
     .support-textarea{
       width:100%;
-      border:1px solid #d4dfed;
-      border-radius:14px;
-      padding:12px 14px;
-      font-size:15px;
+      border:1px solid #d4deec;
+      border-radius:20px;
+      padding:16px 18px;
+      font-size:16px;
       outline:none;
       font-family:inherit;
-      background:#fcfdff;
+      background:#f5f7fb;
       color:#0b2340;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+
+    .support-input::placeholder,
+    .support-textarea::placeholder{
+      color:#7a7a7a;
+      opacity:1;
     }
 
     .support-textarea{
-      min-height:130px;
+      grid-column:1 / -1;
+      min-height:165px;
       resize:vertical;
+      border-radius:22px;
     }
 
     .support-actions{
       display:flex;
-      gap:10px;
+      gap:12px;
       flex-wrap:wrap;
       justify-content:flex-end;
-      margin-top:4px;
+      margin-top:8px;
     }
 
     .support-note{
-      color:var(--muted);
+      color:#70839b;
       line-height:1.6;
       font-size:14px;
-      margin-top:2px;
+      margin-top:10px;
     }
 
     .support-feedback{
-      margin-top:8px;
+      margin-top:10px;
       font-size:14px;
       font-weight:800;
       line-height:1.5;
       color:#0f4d92;
       white-space:pre-wrap;
+      min-height:22px;
+    }
+
+    .support-btn-cancel,
+    .support-btn-send{
+      border:none;
+      border-radius:18px;
+      min-width:110px;
+      min-height:54px;
+      padding:0 24px;
+      font-size:15px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .support-btn-cancel{
+      background:#e6ebf2;
+      color:#163a63;
+    }
+
+    .support-btn-send{
+      background:#0f4d92;
+      color:#fff;
+      box-shadow:0 10px 22px rgba(15,77,146,0.20);
     }
 
     @keyframes starPulse{
@@ -1692,6 +1730,10 @@
         max-width:100%;
       }
 
+      .support-form{
+        grid-template-columns:1fr;
+      }
+
       .chem-label.h2o{ left:20vw; top:23vh; font-size:1.6rem; }
       .chem-label.nh2{ left:17vw; top:41vh; font-size:1.8rem; }
       .chem-label.ch3{ right:18vw; bottom:19vh; font-size:1.8rem; }
@@ -1744,6 +1786,16 @@
 
       .auth-links{
         justify-content:center;
+      }
+
+      .modal-content{
+        padding:24px 18px 20px;
+        border-radius:24px;
+      }
+
+      .support-input,
+      .support-textarea{
+        border-radius:18px;
       }
 
       .chem-orbit{
@@ -2153,24 +2205,25 @@ Cette zone est liée à :
     <div class="modal-content">
       <button class="modal-close" type="button" id="closeSupportModal">×</button>
       <h3>Besoin d'aide / Support</h3>
-      <p class="modal-note">Remplis ces champs. Ton message sera préparé automatiquement pour l’adresse de support.</p>
+      <p class="modal-note">Utilise ce formulaire pour envoyer directement ton message dans la messagerie interne du site.</p>
 
       <div class="support-form">
-        <input class="support-input" id="supportName" type="text" placeholder="Nom complet" />
-        <input class="support-input" id="supportEmail" type="email" placeholder="Adresse e-mail" />
-        <input class="support-input" id="supportSubject" type="text" placeholder="Sujet" />
-        <textarea class="support-textarea" id="supportMessage" placeholder="Décris ton problème, ta question ou la difficulté rencontrée..."></textarea>
+        <input class="support-input" id="supportName" type="text" placeholder="Votre nom complet" />
+        <input class="support-input" id="supportEmail" type="email" placeholder="Votre adresse email" />
+        <input class="support-input" id="supportOrganization" type="text" placeholder="Organisation / institution" />
+        <input class="support-input" id="supportSubject" type="text" placeholder="Sujet du message" />
+        <textarea class="support-textarea" id="supportMessage" placeholder="Écrivez votre message ici..."></textarea>
       </div>
 
       <div class="support-note">
-        Adresse de support : maounou-boris.amoussou@cnrs.fr
+        Le message sera envoyé vers la messagerie interne d’administration du site.
       </div>
 
       <div class="support-feedback" id="supportFeedback"></div>
 
       <div class="support-actions">
-        <button class="ghost-btn" id="cancelSupportBtn" type="button">Annuler</button>
-        <button class="primary-btn" id="sendSupportBtn" type="button">Envoyer</button>
+        <button class="support-btn-cancel" id="cancelSupportBtn" type="button">Effacer</button>
+        <button class="support-btn-send" id="sendSupportBtn" type="button">Envoyer le message</button>
       </div>
     </div>
   </div>
@@ -2208,6 +2261,7 @@ Cette zone est liée à :
     const JPEG_QUALITY = 0.78;
     const COMPETITION_ID = "chem_challenge_2026";
     const ONLINE_STALE_LIMIT = 75 * 1000;
+    const SUPPORT_PATH = `competitions/${COMPETITION_ID}/competitionSponsors/supportForms`;
 
     const publicTopbar = document.getElementById("publicTopbar");
     const privateTopbar = document.getElementById("privateTopbar");
@@ -2263,7 +2317,7 @@ Cette zone est liée à :
     const attachmentPreview = document.getElementById("attachmentPreview");
     const postInfoText = document.getElementById("postInfoText");
     const publishBtn = document.getElementById("publishBtn");
-        const postGrid = document.getElementById("postGrid");
+    const postGrid = document.getElementById("postGrid");
     const onlineMembersList = document.getElementById("onlineMembersList");
     const recentActivityList = document.getElementById("recentActivityList");
 
@@ -2279,6 +2333,7 @@ Cette zone est liée à :
     const sendSupportBtn = document.getElementById("sendSupportBtn");
     const supportName = document.getElementById("supportName");
     const supportEmail = document.getElementById("supportEmail");
+    const supportOrganization = document.getElementById("supportOrganization");
     const supportSubject = document.getElementById("supportSubject");
     const supportMessage = document.getElementById("supportMessage");
     const supportFeedback = document.getElementById("supportFeedback");
@@ -2537,6 +2592,7 @@ Cette zone est liée à :
 
       supportName.value = fullName;
       supportEmail.value = emailValue;
+      supportOrganization.value = "";
       supportSubject.value = supportSubject.value || "Demande d'aide - Insights";
       supportFeedback.textContent = "";
     }
@@ -2546,30 +2602,60 @@ Cette zone est liée à :
       openModal(supportModal);
     }
 
-    function sendSupportRequest() {
-      const name = supportName.value.trim();
-      const email = supportEmail.value.trim();
-      const subject = supportSubject.value.trim();
-      const message = supportMessage.value.trim();
+    function sanitizeText(value = "") {
+      return String(value).replace(/[<>"']/g, "").trim();
+    }
+
+    async function sendSupportRequest() {
+      const name = sanitizeText(supportName.value);
+      const email = sanitizeText(supportEmail.value).toLowerCase();
+      const organization = sanitizeText(supportOrganization.value);
+      const subject = sanitizeText(supportSubject.value);
+      const message = sanitizeText(supportMessage.value);
 
       if (!name || !email || !subject || !message) {
-        supportFeedback.textContent = "Merci de remplir tous les champs du support.";
+        supportFeedback.textContent = "Merci de remplir tous les champs obligatoires du formulaire.";
         return;
       }
 
-      const fullSubject = `[Insights Support] ${subject}`;
-      const body =
-`Nom : ${name}
-Email : ${email}
-Page : insights.html
-Date : ${new Date().toLocaleString("fr-FR")}
+      sendSupportBtn.disabled = true;
+      supportFeedback.textContent = "Envoi en cours...";
 
-Message :
-${message}`;
+      try {
+        const newRef = push(ref(db, SUPPORT_PATH));
+        await set(newRef, {
+          name,
+          email,
+          organization,
+          subject,
+          supportType: "login_help",
+          edition: COMPETITION_ID,
+          website: "",
+          message,
+          status: "new",
+          sourcePage: "insights.html",
+          sourceContext: currentUser ? "private_or_connected" : "public_login_support",
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          createdByUid: currentUser?.uid || "",
+          createdByEmail: currentUser?.email || email
+        });
 
-      const mailto = `mailto:maounou-boris.amoussou@cnrs.fr?subject=${encodeURIComponent(fullSubject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailto;
-      supportFeedback.textContent = "Le message est prêt à être envoyé depuis votre messagerie.";
+        supportFeedback.textContent = "Message envoyé dans la messagerie interne du site.";
+        supportMessage.value = "";
+        supportSubject.value = "Demande d'aide - Insights";
+        supportOrganization.value = "";
+
+        setTimeout(() => {
+          closeModal(supportModal);
+          supportFeedback.textContent = "";
+        }, 900);
+      } catch (e) {
+        console.error(e);
+        supportFeedback.textContent = "Impossible d’envoyer le message pour le moment.";
+      } finally {
+        sendSupportBtn.disabled = false;
+      }
     }
 
     function parseInviteToken() {
@@ -3145,8 +3231,7 @@ Mis à jour : ${updated}
           </article>
         `;
       }).join("");
-
-      bindPostActions();
+            bindPostActions();
     }
 
     function requestRenderPosts() {
@@ -3375,7 +3460,7 @@ Mis à jour : ${updated}
         postAuthorId: post.authorId || "",
         reportedByUid: currentUser.uid,
         reportedByName: currentUserData?.displayName || currentUser.displayName || "",
-        destinationEmail: "maounou-boris.amoussou@cnrs.fr",
+        destination: "internal_admin_reports",
         reason,
         comment: reportText.value.trim(),
         createdAt: Date.now()
@@ -3768,7 +3853,14 @@ Mis à jour : ${updated}
     if (openSupportBtnPrivate) openSupportBtnPrivate.addEventListener("click", openSupportModalBox);
 
     if (closeSupportModal) closeSupportModal.addEventListener("click", () => closeModal(supportModal));
-    if (cancelSupportBtn) cancelSupportBtn.addEventListener("click", () => closeModal(supportModal));
+    if (cancelSupportBtn) cancelSupportBtn.addEventListener("click", () => {
+      supportName.value = "";
+      supportEmail.value = "";
+      supportOrganization.value = "";
+      supportSubject.value = "";
+      supportMessage.value = "";
+      supportFeedback.textContent = "";
+    });
     if (sendSupportBtn) sendSupportBtn.addEventListener("click", sendSupportRequest);
 
     supportModal.addEventListener("click", (e) => {
