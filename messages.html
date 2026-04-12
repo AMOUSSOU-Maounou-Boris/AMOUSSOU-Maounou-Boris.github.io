@@ -25,6 +25,8 @@
       --orange:#f7a600;
       --panel:#f5f9fe;
       --panel-2:#edf4fb;
+      --purple:#6d5efc;
+      --purple-soft:#f1efff;
     }
 
     .hidden{ display:none !important; }
@@ -75,7 +77,8 @@
       box-shadow:0 0 0 2px rgba(255,255,255,0.18);
     }
     .top-unread-badge,
-    .top-missed-badge{
+    .top-missed-badge,
+    .top-invites-badge{
       min-width:20px;
       height:20px;
       padding:0 6px;
@@ -132,6 +135,13 @@
       margin-bottom:18px;
     }
 
+    .sidebar-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
     .avatar{
       width:52px;
       height:52px;
@@ -150,6 +160,9 @@
       height:72px;
       font-size:26px;
     }
+    .avatar.group{
+      background:linear-gradient(135deg,var(--purple),#4a84ff);
+    }
     .avatar img{
       width:100%;
       height:100%;
@@ -164,7 +177,8 @@
     .danger-btn,
     .send-btn,
     .attach-btn,
-    .sticker-btn{
+    .sticker-btn,
+    .group-btn{
       border:none;
       border-radius:16px;
       padding:13px 16px;
@@ -185,6 +199,12 @@
       margin-bottom:14px;
     }
 
+    .group-btn{
+      background:var(--purple-soft);
+      color:#4034c7;
+      flex:1 1 140px;
+    }
+
     .search-input{
       width:100%;
       border:1px solid #d3ddea;
@@ -198,7 +218,8 @@
     .search-input:focus,
     .message-input:focus,
     .modal-input:focus,
-    .modal-textarea:focus{
+    .modal-textarea:focus,
+    .modal-select:focus{
       border-color:#7fb5ff;
       box-shadow:0 0 0 3px rgba(47, 140, 255, 0.13);
     }
@@ -244,6 +265,10 @@
       box-shadow:0 0 0 3px rgba(47,140,255,0.10);
       background:#eef6ff;
     }
+    .member-card.group-card{
+      border-color:#e1dcff;
+      background:linear-gradient(180deg, #ffffff 0%, #f6f2ff 100%);
+    }
 
     .member-head{
       display:flex;
@@ -288,6 +313,10 @@
       background:#eef4fb;
       color:#5f738a;
     }
+    .presence-pill.group{
+      background:#f1efff;
+      color:#4c3dcf;
+    }
     .presence-dot{
       width:10px;
       height:10px;
@@ -298,6 +327,9 @@
     }
     .presence-dot.online{
       background:var(--green);
+    }
+    .presence-dot.group{
+      background:var(--purple);
     }
 
     .member-meta-row{
@@ -546,7 +578,7 @@
       position:absolute;
       top:40px;
       right:0;
-      min-width:150px;
+      min-width:170px;
       background:#fff;
       border:1px solid #dce8f3;
       border-radius:14px;
@@ -652,6 +684,7 @@
     .call-tag.green{ background:#e7faee; color:#0f7a31; }
     .call-tag.blue{ background:#eaf2ff; color:#0f4d92; }
     .call-tag.gray{ background:#eef4fb; color:#5f738a; }
+    .call-tag.purple{ background:#f1efff; color:#4c3dcf; }
 
     .sticker-box{
       margin-top:6px;
@@ -927,7 +960,7 @@
     }
     .modal-content{
       width:100%;
-      max-width:500px;
+      max-width:540px;
       padding:22px;
       position:relative;
       background:linear-gradient(180deg,#ffffff 0%, #f4f9ff 100%);
@@ -954,7 +987,8 @@
       color:var(--muted);
     }
     .modal-input,
-    .modal-textarea{
+    .modal-textarea,
+    .modal-select{
       width:100%;
       border:1px solid #d3ddea;
       border-radius:16px;
@@ -973,6 +1007,48 @@
       display:flex;
       gap:10px;
       flex-wrap:wrap;
+    }
+
+    .group-members-box{
+      max-height:220px;
+      overflow:auto;
+      border:1px solid #dce8f5;
+      border-radius:16px;
+      background:#fff;
+      padding:10px;
+      display:grid;
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .group-member-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border:1px solid #e8eef8;
+      background:#f9fcff;
+      border-radius:14px;
+      padding:10px 12px;
+    }
+
+    .group-member-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .group-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      background:#f1efff;
+      color:#4c3dcf;
+      padding:7px 10px;
+      font-size:12px;
+      font-weight:800;
     }
 
     @media (max-width: 1100px){
@@ -1008,6 +1084,12 @@
       .topbar nav{
         justify-content:flex-start;
       }
+      .sidebar-actions{
+        flex-direction:column;
+      }
+      .group-btn{
+        width:100%;
+      }
     }
   </style>
 </head>
@@ -1021,7 +1103,7 @@
       <a href="meeting-room.html" id="meetingNavLink" class="hidden">Salle de réunion</a>
       <a href="profile.html"><span class="nav-online-dot"></span> Mon compte</a>
       <a href="competition.html">Concours</a>
-      <a href="competition-support-admin.html">Messages sponsors</a>
+      <a href="competition-support-admin.html">Messages sponsors <span class="top-invites-badge" id="topInvitesBadge"></span></a>
     </nav>
   </header>
 
@@ -1038,11 +1120,17 @@
 
         <button class="logout-btn" id="logoutBtn" type="button">Déconnexion</button>
 
-        <input type="text" id="memberSearch" class="search-input" placeholder="Rechercher un membre ou contact...">
+        <div class="sidebar-actions">
+          <button class="group-btn" id="createGroupBtn" type="button">Créer un groupe</button>
+          <button class="group-btn" id="discoverGroupsBtn" type="button">Mes groupes</button>
+        </div>
+
+        <input type="text" id="memberSearch" class="search-input" placeholder="Rechercher un membre, contact ou groupe...">
 
         <div class="tabs">
-          <button class="tab-btn active" type="button" data-tab="all">Tous les membres</button>
+          <button class="tab-btn active" type="button" data-tab="all">Tous</button>
           <button class="tab-btn" type="button" data-tab="contacts">Contacts</button>
+          <button class="tab-btn" type="button" data-tab="groups">Groupes</button>
           <button class="tab-btn" type="button" data-tab="online">En ligne</button>
           <button class="tab-btn" type="button" data-tab="invites">Invitations</button>
         </div>
@@ -1069,13 +1157,14 @@
             <button class="action-btn hidden" id="refuseInviteBtn" type="button">Refuser</button>
             <button class="action-btn hidden" id="audioCallBtn" type="button">Audio</button>
             <button class="action-btn hidden" id="videoCallBtn" type="button">Vidéo</button>
+            <button class="action-btn hidden" id="groupManageBtn" type="button">Gérer groupe</button>
             <button class="action-btn hidden" id="chatOptionsBtn" type="button">Options</button>
           </div>
         </div>
 
         <div class="chat-messages" id="chatMessages">
           <div class="empty-state">
-            Sélectionne un membre à gauche.<br>
+            Sélectionne un membre, un contact ou un groupe à gauche.<br>
             Quand une invitation est acceptée, vous pouvez discuter ici avec les mêmes fonctionnalités.
           </div>
         </div>
@@ -1119,7 +1208,7 @@
           </div>
 
           <div class="composer-note" id="composerNote">
-            Les messages, réponses, transferts, suppressions et pièces jointes restent réservés aux contacts autorisés.
+            Les messages, réponses, transferts, suppressions et pièces jointes restent réservés aux contacts autorisés ou à tes groupes.
           </div>
         </div>
       </section>
@@ -1138,12 +1227,54 @@
     </div>
   </div>
 
+  <div class="modal" id="groupCreateModal">
+    <div class="modal-content">
+      <button class="modal-close" type="button" id="closeGroupCreateModal">×</button>
+      <h3>Créer un groupe</h3>
+      <p>Crée un groupe de discussion comme dans WhatsApp avec tes contacts déjà acceptés.</p>
+
+      <input type="text" id="groupNameInput" class="modal-input" placeholder="Nom du groupe">
+      <textarea id="groupDescriptionInput" class="modal-textarea" placeholder="Description du groupe (optionnelle)"></textarea>
+
+      <div class="group-members-box" id="groupMembersPicker">
+        <div class="empty-note">Chargement des contacts...</div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="primary-btn" id="confirmCreateGroupBtn" type="button">Créer le groupe</button>
+        <button class="secondary-btn" id="cancelCreateGroupBtn" type="button">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="groupManageModal">
+    <div class="modal-content">
+      <button class="modal-close" type="button" id="closeGroupManageModal">×</button>
+      <h3>Gérer le groupe</h3>
+      <p id="groupManageText">Ajoute ou retire des membres, ou quitte le groupe.</p>
+
+      <div class="group-members-box" id="groupManageMembersBox">
+        <div class="empty-note">Aucun membre.</div>
+      </div>
+
+      <select id="groupAddMemberSelect" class="modal-select">
+        <option value="">Ajouter un contact au groupe...</option>
+      </select>
+
+      <div class="modal-actions">
+        <button class="primary-btn" id="confirmAddMemberToGroupBtn" type="button">Ajouter</button>
+        <button class="danger-btn" id="leaveGroupBtn" type="button">Quitter le groupe</button>
+        <button class="secondary-btn" id="cancelGroupManageBtn" type="button">Fermer</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal" id="forwardModal">
     <div class="modal-content">
       <button class="modal-close" type="button" id="closeForwardModal">×</button>
       <h3>Transférer le message</h3>
-      <p>Choisis l’identifiant du membre ou du contact qui recevra ce transfert.</p>
-      <input type="text" id="forwardTargetInput" class="modal-input" placeholder="UID du destinataire ou identifiant prévu">
+      <p>Choisis l’identifiant du membre, contact ou groupe qui recevra ce transfert.</p>
+      <input type="text" id="forwardTargetInput" class="modal-input" placeholder="UID du destinataire ou identifiant du groupe">
       <textarea id="forwardNoteInput" class="modal-textarea" placeholder="Note facultative à ajouter..."></textarea>
       <div class="modal-actions">
         <button class="primary-btn" id="confirmForwardBtn" type="button">Transférer</button>
@@ -1158,7 +1289,7 @@
       <h3>Signaler un message</h3>
       <p>Choisis une raison puis ajoute un commentaire si nécessaire.</p>
 
-      <select id="reportReasonInput" class="modal-input">
+      <select id="reportReasonInput" class="modal-select">
         <option value="Contenu inapproprié">Contenu inapproprié</option>
         <option value="Harcèlement">Harcèlement</option>
         <option value="Spam">Spam</option>
@@ -1227,6 +1358,7 @@
     const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
     const MAX_PDF_SIZE = 450 * 1024;
     const LAST_MESSAGES_LIMIT = 30;
+    const LAST_GROUP_MESSAGES_LIMIT = 40;
 
     const STICKERS = [
       "😀","😁","😂","🤣","😊","😍","🥰","😘",
@@ -1242,7 +1374,11 @@
     const membersList = document.getElementById("membersList");
     const topUnreadBadge = document.getElementById("topUnreadBadge");
     const topMissedCallsBadge = document.getElementById("topMissedCallsBadge");
+    const topInvitesBadge = document.getElementById("topInvitesBadge");
     const meetingNavLink = document.getElementById("meetingNavLink");
+
+    const createGroupBtn = document.getElementById("createGroupBtn");
+    const discoverGroupsBtn = document.getElementById("discoverGroupsBtn");
 
     const chatAvatar = document.getElementById("chatAvatar");
     const chatTitle = document.getElementById("chatTitle");
@@ -1251,6 +1387,7 @@
     const refuseInviteBtn = document.getElementById("refuseInviteBtn");
     const audioCallBtn = document.getElementById("audioCallBtn");
     const videoCallBtn = document.getElementById("videoCallBtn");
+    const groupManageBtn = document.getElementById("groupManageBtn");
     const chatOptionsBtn = document.getElementById("chatOptionsBtn");
 
     const typingMount = document.getElementById("typingMount");
@@ -1277,6 +1414,23 @@
     const closeInviteModal = document.getElementById("closeInviteModal");
     const sendInviteConfirmBtn = document.getElementById("sendInviteConfirmBtn");
     const cancelInviteBtn = document.getElementById("cancelInviteBtn");
+
+    const groupCreateModal = document.getElementById("groupCreateModal");
+    const closeGroupCreateModal = document.getElementById("closeGroupCreateModal");
+    const groupNameInput = document.getElementById("groupNameInput");
+    const groupDescriptionInput = document.getElementById("groupDescriptionInput");
+    const groupMembersPicker = document.getElementById("groupMembersPicker");
+    const confirmCreateGroupBtn = document.getElementById("confirmCreateGroupBtn");
+    const cancelCreateGroupBtn = document.getElementById("cancelCreateGroupBtn");
+
+    const groupManageModal = document.getElementById("groupManageModal");
+    const closeGroupManageModal = document.getElementById("closeGroupManageModal");
+    const groupManageText = document.getElementById("groupManageText");
+    const groupManageMembersBox = document.getElementById("groupManageMembersBox");
+    const groupAddMemberSelect = document.getElementById("groupAddMemberSelect");
+    const confirmAddMemberToGroupBtn = document.getElementById("confirmAddMemberToGroupBtn");
+    const leaveGroupBtn = document.getElementById("leaveGroupBtn");
+    const cancelGroupManageBtn = document.getElementById("cancelGroupManageBtn");
 
     const forwardModal = document.getElementById("forwardModal");
     const closeForwardModal = document.getElementById("closeForwardModal");
@@ -1319,12 +1473,18 @@
     let unreadCounts = {};
     let missedCallsMap = {};
     let callsHistoryMap = {};
+    let groupsMap = {};
+    let groupUnreadCounts = {};
+    let selectedGroupCreationMembers = new Set();
 
     let currentTab = "all";
     let selectedUserId = null;
     let selectedUserProfile = null;
     let selectedUserInviteState = "";
     let currentChatId = null;
+    let currentConversationType = "direct"; // direct | group
+    let selectedGroupId = "";
+    let selectedGroupData = null;
 
     let messagesCache = [];
     let replyTarget = null;
@@ -1337,6 +1497,7 @@
     let detachMissedCallsListener = null;
     let detachCallsHistoryListener = null;
     let detachIncomingCallsListener = null;
+    let detachGroupsListener = null;
     let typingTimer = null;
     let isCurrentlyTyping = false;
 
@@ -1425,6 +1586,11 @@
       return escapeHtml(initials(user.displayName || "", user.email || ""));
     }
 
+    function groupAvatarMarkup(group = {}) {
+      if (group.photoURL) return `<img src="${group.photoURL}" alt="avatar groupe">`;
+      return escapeHtml(initials(group.name || "Groupe", ""));
+    }
+
     function escapeHtml(text = "") {
       const div = document.createElement("div");
       div.textContent = text;
@@ -1497,6 +1663,37 @@
       return areContacts(uid);
     }
 
+    function isGroupMember(group = {}, uid = "") {
+      const members = group.members || {};
+      return !!(uid && members && members[uid]);
+    }
+
+    function isGroupAdmin(group = {}, uid = "") {
+      const members = group.members || {};
+      const member = members[uid] || {};
+      return member.role === "admin" || group.createdBy === uid;
+    }
+
+    function canChatInSelectedContext() {
+      if (currentConversationType === "group") {
+        return !!(selectedGroupData && currentUser && isGroupMember(selectedGroupData, currentUser.uid));
+      }
+      return canChatWith(selectedUserId);
+    }
+
+    function getGroupUnreadCount(groupId) {
+      return Number(groupUnreadCounts[groupId] || 0);
+    }
+
+    function getMissedCountForUser(uid) {
+      return Object.values(missedCallsMap || {}).filter(item =>
+        item &&
+        item.unread &&
+        ((item.fromUid === uid && item.toUid === currentUser?.uid) ||
+         (item.toUid === uid && item.fromUid === currentUser?.uid))
+      ).length;
+    }
+
     function canDeleteMessage(msg) {
       if (!currentUser || !msg) return false;
       if (msg.senderId !== currentUser.uid) return false;
@@ -1555,7 +1752,10 @@
         messageType: val.messageType || "text",
         callMode: val.callMode || "",
         callStatus: val.callStatus || "",
-        callDirection: val.callDirection || ""
+        callDirection: val.callDirection || "",
+        conversationType: val.conversationType || "direct",
+        groupId: val.groupId || "",
+        groupName: val.groupName || ""
       };
     }
 
@@ -1654,6 +1854,14 @@
     function getReadStateLabel(msg) {
       if (!currentUser) return "";
       if (msg.senderId !== currentUser.uid) return "";
+
+      if (currentConversationType === "group" || msg.conversationType === "group") {
+        const reads = Object.keys(msg.readBy || {}).filter(uid => uid !== currentUser.uid);
+        return reads.length
+          ? `<span class="message-read-state seen">✔ Vu par ${reads.length}</span>`
+          : `<span class="message-read-state">✔ Envoyé</span>`;
+      }
+
       const seen = !!(msg.readBy && selectedUserId && msg.readBy[selectedUserId]);
       return seen
         ? `<span class="message-read-state seen">✔✔ Vu</span>`
@@ -1713,7 +1921,914 @@
       `;
     }
 
+    function getConversationPlaceholder() {
+      if (currentConversationType === "group") {
+        return "Écris ton message au groupe...";
+      }
+      return "Écris ton message ici...";
+    }
+
+    function renderGroupMembersPicker() {
+      const contacts = Object.entries(usersCache || {})
+        .map(([uid, val]) => ({ uid, ...(val || {}) }))
+        .filter(user => user.uid !== currentUser?.uid)
+        .filter(user => areContacts(user.uid))
+        .filter(user => !isBlockedByMe(user.uid) && !hasBlockedMe(user.uid))
+        .sort((a,b) => ((a.displayName || a.email || "").toLowerCase()).localeCompare((b.displayName || b.email || "").toLowerCase()));
+
+      if (!contacts.length) {
+        groupMembersPicker.innerHTML = `<div class="empty-note">Aucun contact accepté disponible pour créer un groupe.</div>`;
+        return;
+      }
+
+      groupMembersPicker.innerHTML = contacts.map(user => `
+        <label class="group-member-item">
+          <div class="group-member-left">
+            <div class="avatar">${avatarMarkup(user)}</div>
+            <div>
+              <div class="member-title">${escapeHtml(user.displayName || "Sans nom")}</div>
+              <div class="member-sub">${escapeHtml(user.email || "")}</div>
+            </div>
+          </div>
+          <input type="checkbox" data-group-pick="${user.uid}" ${selectedGroupCreationMembers.has(user.uid) ? "checked" : ""}>
+        </label>
+      `).join("");
+
+      document.querySelectorAll("[data-group-pick]").forEach(input => {
+        input.addEventListener("change", () => {
+          const uid = input.dataset.groupPick;
+          if (input.checked) selectedGroupCreationMembers.add(uid);
+          else selectedGroupCreationMembers.delete(uid);
+        });
+      });
+    }
+
+    function renderGroupManageBox() {
+      if (!selectedGroupData) {
+        groupManageMembersBox.innerHTML = `<div class="empty-note">Aucun groupe sélectionné.</div>`;
+        groupAddMemberSelect.innerHTML = `<option value="">Ajouter un contact au groupe...</option>`;
+        return;
+      }
+
+      const members = Object.entries(selectedGroupData.members || {})
+        .map(([uid, val]) => {
+          const user = usersCache[uid] || {};
+          return { uid, ...(val || {}), user };
+        });
+
+      groupManageMembersBox.innerHTML = members.map(member => `
+        <div class="group-member-item">
+          <div class="group-member-left">
+            <div class="avatar">${avatarMarkup(member.user)}</div>
+            <div>
+              <div class="member-title">${escapeHtml(member.user.displayName || member.user.email || "Membre")}</div>
+              <div class="member-sub">${escapeHtml(member.user.email || "")}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span class="group-chip">${member.role === "admin" ? "Admin" : "Membre"}</span>
+            ${isGroupAdmin(selectedGroupData, currentUser?.uid) && member.uid !== currentUser?.uid && member.role !== "admin"
+              ? `<button class="danger-btn" style="padding:8px 10px;border-radius:12px;" type="button" data-remove-group-member="${member.uid}">Retirer</button>`
+              : ""}
+          </div>
+        </div>
+      `).join("");
+
+      const availableContacts = Object.entries(usersCache || {})
+        .map(([uid, val]) => ({ uid, ...(val || {}) }))
+        .filter(user => user.uid !== currentUser?.uid)
+        .filter(user => areContacts(user.uid))
+        .filter(user => !isGroupMember(selectedGroupData, user.uid))
+        .sort((a,b) => ((a.displayName || a.email || "").toLowerCase()).localeCompare((b.displayName || b.email || "").toLowerCase()));
+
+      groupAddMemberSelect.innerHTML = `
+        <option value="">Ajouter un contact au groupe...</option>
+        ${availableContacts.map(user => `<option value="${user.uid}">${escapeHtml(user.displayName || user.email || "Contact")}</option>`).join("")}
+      `;
+
+      document.querySelectorAll("[data-remove-group-member]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          await removeMemberFromCurrentGroup(btn.dataset.removeGroupMember);
+        });
+      });
+    }
+
+    function getAllVisibleMembers() {
+      const userEntries = Object.entries(usersCache || {})
+        .map(([uid, val]) => ({ uid, ...(val || {}), entityType:"user" }))
+        .filter(user => user.uid !== currentUser.uid);
+
+      const groupEntries = Object.entries(groupsMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}), entityType:"group" }))
+        .filter(group => isGroupMember(group, currentUser?.uid));
+
+      let filteredUsers = userEntries;
+      let filteredGroups = groupEntries;
+
+      if (currentTab === "contacts") {
+        filteredUsers = filteredUsers.filter(user => areContacts(user.uid));
+        filteredGroups = [];
+      } else if (currentTab === "groups") {
+        filteredUsers = [];
+      } else if (currentTab === "online") {
+        filteredUsers = filteredUsers.filter(user => getPresenceInfo(user).online);
+        filteredGroups = [];
+      } else if (currentTab === "invites") {
+        filteredUsers = filteredUsers.filter(user => {
+          const inv = invitesMap[user.uid];
+          return !!inv && (inv.status === "pending_received" || inv.status === "pending_sent" || inv.status === "refused");
+        });
+        filteredGroups = [];
+      }
+
+      const q = memberSearch.value.trim().toLowerCase();
+      if (q) {
+        filteredUsers = filteredUsers.filter(user => {
+          const hay = `${user.displayName || ""} ${user.email || ""}`.toLowerCase();
+          return hay.includes(q);
+        });
+
+        filteredGroups = filteredGroups.filter(group => {
+          const hay = `${group.name || ""} ${group.description || ""}`.toLowerCase();
+          return hay.includes(q);
+        });
+      }
+
+      filteredUsers.sort((a, b) => {
+        const unreadA = Number(unreadCounts[a.uid] || 0);
+        const unreadB = Number(unreadCounts[b.uid] || 0);
+        if (unreadA !== unreadB) return unreadB - unreadA;
+
+        const missedA = getMissedCountForUser(a.uid);
+        const missedB = getMissedCountForUser(b.uid);
+        if (missedA !== missedB) return missedB - missedA;
+
+        const aAccepted = areContacts(a.uid) ? 1 : 0;
+        const bAccepted = areContacts(b.uid) ? 1 : 0;
+        if (aAccepted !== bAccepted) return bAccepted - aAccepted;
+
+        const nameA = (a.displayName || a.email || "").toLowerCase();
+        const nameB = (b.displayName || b.email || "").toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
+      filteredGroups.sort((a, b) => {
+        const unreadA = getGroupUnreadCount(a.id);
+        const unreadB = getGroupUnreadCount(b.id);
+        if (unreadA !== unreadB) return unreadB - unreadA;
+        return (a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase());
+      });
+
+      return [...filteredGroups, ...filteredUsers];
+    }
+
+    function renderMembersList() {
+      const items = getAllVisibleMembers();
+
+      if (!items.length) {
+        membersList.innerHTML = `<div class="empty-note">Aucun membre ou groupe trouvé.</div>`;
+        return;
+      }
+
+      membersList.innerHTML = items.map(item => {
+        if (item.entityType === "group") {
+          const unread = getGroupUnreadCount(item.id);
+          const membersCount = Object.keys(item.members || {}).length;
+          const isActive = currentConversationType === "group" && selectedGroupId === item.id;
+
+          return `
+            <div class="member-card group-card ${isActive ? "active" : ""}" data-group="${item.id}">
+              <div class="member-head">
+                <div class="member-main">
+                  <div class="avatar group">${groupAvatarMarkup(item)}</div>
+                  <div>
+                    <div class="member-title">${escapeHtml(item.name || "Groupe")}</div>
+                    <div class="member-sub">${escapeHtml(item.description || "Discussion de groupe")}</div>
+                  </div>
+                </div>
+                <span class="presence-pill group">
+                  <span class="presence-dot group"></span>
+                  Groupe
+                </span>
+              </div>
+              <div class="member-sub">${membersCount} membre(s)</div>
+              <div class="member-meta-row">
+                <span class="member-sub">${isGroupAdmin(item, currentUser?.uid) ? "Tu es admin" : "Tu es membre"}</span>
+                ${unread > 0 ? `<span class="unread-badge">${unread > 99 ? "99+" : unread}</span>` : ""}
+              </div>
+            </div>
+          `;
+        }
+
+        const user = item;
+        const presence = getPresenceInfo(user);
+        const unread = Number(unreadCounts[user.uid] || 0);
+        const missed = getMissedCountForUser(user.uid);
+        const inviteState = getInviteState(user.uid);
+        const accepted = areContacts(user.uid);
+        const blocked = isBlockedByMe(user.uid) || hasBlockedMe(user.uid);
+        const isActive = currentConversationType === "direct" && selectedUserId === user.uid;
+
+        let statusHtml = `
+          <span class="presence-pill ${presence.online ? "online" : "offline"}">
+            <span class="presence-dot ${presence.online ? "online" : ""}"></span>
+            ${presence.online ? "En ligne" : "Hors ligne"}
+          </span>
+        `;
+
+        if (inviteState && !accepted) {
+          const label = inviteState === "pending_sent"
+            ? "Invitation envoyée"
+            : inviteState === "pending_received"
+            ? "À accepter"
+            : inviteState === "accepted"
+            ? "Contact"
+            : inviteState === "refused"
+            ? "Refusée"
+            : inviteState;
+          statusHtml = `<span class="invite-pill">${escapeHtml(label)}</span>`;
+        }
+
+        if (blocked) {
+          statusHtml = `<span class="invite-pill" style="background:#fff1f2;color:#b42318;">Bloqué</span>`;
+        }
+
+        return `
+          <div class="member-card ${isActive ? "active" : ""}" data-member="${user.uid}">
+            <div class="member-head">
+              <div class="member-main">
+                <div class="avatar">${avatarMarkup(user)}</div>
+                <div>
+                  <div class="member-title">${escapeHtml(user.displayName || "Sans nom")}</div>
+                  <div class="member-sub">${escapeHtml(user.email || "")}</div>
+                </div>
+              </div>
+              ${statusHtml}
+            </div>
+            <div class="member-sub">${escapeHtml(presence.text)}</div>
+            <div class="member-meta-row">
+              <span class="member-sub">${accepted ? "Contact autorisé" : "Accès privé contrôlé"}</span>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                ${missed > 0 ? `<span class="unread-badge" title="Appels manqués">${missed > 99 ? "99+" : missed}</span>` : ""}
+                ${unread > 0 ? `<span class="unread-badge">${unread > 99 ? "99+" : unread}</span>` : ""}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      document.querySelectorAll("[data-member]").forEach(card => {
+        card.addEventListener("click", () => {
+          selectUser(card.dataset.member);
+        });
+      });
+
+      document.querySelectorAll("[data-group]").forEach(card => {
+        card.addEventListener("click", () => {
+          selectGroup(card.dataset.group);
+        });
+      });
+    }
+
+    async function selectUser(uid) {
+      currentConversationType = "direct";
+      selectedGroupId = "";
+      selectedGroupData = null;
+      selectedUserId = uid;
+      selectedUserProfile = usersCache[uid] ? { uid, ...usersCache[uid] } : null;
+      selectedUserInviteState = getInviteState(uid);
+      currentChatId = getChatId(currentUser.uid, uid);
+
+      replyTarget = null;
+      stickerPanel.classList.add("hidden");
+      renderReplyPreview();
+      clearSelection();
+
+      updateSelectedHeader();
+      updateComposerState();
+      renderMessages();
+
+      listenChatMessages();
+      listenTypingState();
+      await markChatAsRead();
+      await markMissedCallsAsReadForUser(uid);
+      renderMembersList();
+    }
+
+    async function selectGroup(groupId) {
+      currentConversationType = "group";
+      selectedUserId = null;
+      selectedUserProfile = null;
+      selectedUserInviteState = "";
+      selectedGroupId = groupId;
+      selectedGroupData = groupsMap[groupId] ? { id: groupId, ...groupsMap[groupId] } : null;
+      currentChatId = groupId;
+
+      replyTarget = null;
+      stickerPanel.classList.add("hidden");
+      renderReplyPreview();
+      clearSelection();
+
+      updateSelectedHeader();
+      updateComposerState();
+      renderMessages();
+
+      listenChatMessages();
+      listenTypingState();
+      await markGroupAsRead(groupId);
+      renderMembersList();
+    }
+
+    function updateSelectedHeader() {
+      if (currentConversationType === "group" && selectedGroupData) {
+        chatAvatar.className = "avatar group";
+        chatAvatar.innerHTML = groupAvatarMarkup(selectedGroupData);
+        chatTitle.textContent = selectedGroupData.name || "Groupe";
+
+        const membersCount = Object.keys(selectedGroupData.members || {}).length;
+        chatSubtitle.textContent = `${membersCount} membre(s) • ${selectedGroupData.description || "Discussion de groupe"}`;
+
+        inviteBtn.classList.add("hidden");
+        refuseInviteBtn.classList.add("hidden");
+        audioCallBtn.classList.add("hidden");
+        videoCallBtn.classList.add("hidden");
+        groupManageBtn.classList.remove("hidden");
+        chatOptionsBtn.classList.add("hidden");
+        messageInput.placeholder = getConversationPlaceholder();
+        return;
+      }
+
+      if (!selectedUserProfile) {
+        chatAvatar.className = "avatar";
+        chatAvatar.textContent = "MB";
+        chatTitle.textContent = "Choisis une personne";
+        chatSubtitle.textContent = "Les messages sont autorisés seulement entre contacts acceptés.";
+        inviteBtn.classList.remove("hidden");
+        inviteBtn.textContent = "Inviter";
+        inviteBtn.disabled = false;
+        refuseInviteBtn.classList.add("hidden");
+        audioCallBtn.classList.add("hidden");
+        videoCallBtn.classList.add("hidden");
+        groupManageBtn.classList.add("hidden");
+        chatOptionsBtn.classList.add("hidden");
+        blockUserBtn.textContent = "Bloquer";
+        messageInput.placeholder = getConversationPlaceholder();
+        return;
+      }
+
+      chatAvatar.className = "avatar";
+      if (selectedUserProfile.photoURL) {
+        chatAvatar.innerHTML = `<img src="${selectedUserProfile.photoURL}" alt="avatar">`;
+      } else {
+        chatAvatar.textContent = initials(selectedUserProfile.displayName, selectedUserProfile.email);
+      }
+
+      const presence = getPresenceInfo(selectedUserProfile);
+      const accepted = areContacts(selectedUserId);
+      const blocked = isBlockedByMe(selectedUserId) || hasBlockedMe(selectedUserId);
+      const inviteState = getInviteState(selectedUserId);
+
+      chatTitle.textContent = selectedUserProfile.displayName || "Sans nom";
+
+      inviteBtn.classList.remove("hidden");
+      chatOptionsBtn.classList.remove("hidden");
+      groupManageBtn.classList.add("hidden");
+      blockUserBtn.textContent = isBlockedByMe(selectedUserId) ? "Débloquer" : "Bloquer";
+
+      if (blocked) {
+        chatSubtitle.textContent = "Discussion bloquée : l’un d’entre vous a bloqué l’autre.";
+        inviteBtn.textContent = "Indisponible";
+        inviteBtn.disabled = true;
+        refuseInviteBtn.classList.add("hidden");
+      } else if (accepted) {
+        const missed = getMissedCountForUser(selectedUserId);
+        chatSubtitle.textContent = missed > 0
+          ? `${presence.text} • ${missed} appel(s) manqué(s)`
+          : presence.text;
+        inviteBtn.textContent = "Contact";
+        inviteBtn.disabled = true;
+        refuseInviteBtn.classList.add("hidden");
+      } else if (inviteState === "pending_sent") {
+        chatSubtitle.textContent = "Invitation envoyée. En attente de réponse.";
+        inviteBtn.textContent = "Invitation envoyée";
+        inviteBtn.disabled = true;
+        refuseInviteBtn.classList.add("hidden");
+      } else if (inviteState === "pending_received") {
+        chatSubtitle.textContent = "Cette personne t’a envoyé une invitation. Tu peux l’accepter ou la refuser.";
+        inviteBtn.textContent = "Accepter";
+        inviteBtn.disabled = false;
+        refuseInviteBtn.classList.remove("hidden");
+      } else if (inviteState === "refused") {
+        chatSubtitle.textContent = "Invitation refusée précédemment.";
+        inviteBtn.textContent = "Inviter à nouveau";
+        inviteBtn.disabled = false;
+        refuseInviteBtn.classList.add("hidden");
+      } else {
+        chatSubtitle.textContent = "Envoie d’abord une invitation avant de discuter.";
+        inviteBtn.textContent = "Inviter";
+        inviteBtn.disabled = false;
+        refuseInviteBtn.classList.add("hidden");
+      }
+
+      audioCallBtn.classList.toggle("hidden", !accepted || blocked);
+      videoCallBtn.classList.toggle("hidden", !accepted || blocked);
+      messageInput.placeholder = getConversationPlaceholder();
+    }
+
+    function updateComposerState() {
+      if (currentConversationType === "group") {
+        if (!selectedGroupData) {
+          messageInput.disabled = true;
+          sendBtn.disabled = true;
+          attachBtn.disabled = true;
+          stickerBtn.disabled = true;
+          voiceNoteBtn.disabled = true;
+          composerNote.textContent = "Choisis d’abord un groupe.";
+          clearTypingLine();
+          return;
+        }
+
+        const allowed = !!(currentUser && isGroupMember(selectedGroupData, currentUser.uid));
+        messageInput.disabled = !allowed;
+        sendBtn.disabled = !allowed;
+        attachBtn.disabled = !allowed;
+        stickerBtn.disabled = !allowed;
+        voiceNoteBtn.disabled = !allowed;
+        composerNote.textContent = allowed
+          ? "Discussion de groupe active. Messages, réponses, transferts, vocaux et pièces jointes sont autorisés."
+          : "Tu n’es plus membre de ce groupe.";
+        return;
+      }
+
+      if (!selectedUserId || !selectedUserProfile) {
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        attachBtn.disabled = true;
+        stickerBtn.disabled = true;
+        voiceNoteBtn.disabled = true;
+        composerNote.textContent = "Choisis d’abord une personne.";
+        clearTypingLine();
+        return;
+      }
+
+      const accepted = areContacts(selectedUserId);
+      const blocked = isBlockedByMe(selectedUserId) || hasBlockedMe(selectedUserId);
+
+      if (blocked) {
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        attachBtn.disabled = true;
+        stickerBtn.disabled = true;
+        voiceNoteBtn.disabled = true;
+        composerNote.textContent = "Message impossible : l’un d’entre vous a bloqué l’autre.";
+        return;
+      }
+
+      if (!accepted) {
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        attachBtn.disabled = true;
+        stickerBtn.disabled = true;
+        voiceNoteBtn.disabled = true;
+
+        const inviteState = getInviteState(selectedUserId);
+        if (inviteState === "pending_sent") {
+          composerNote.textContent = "Invitation envoyée. Tu pourras écrire dès qu’elle sera acceptée.";
+        } else if (inviteState === "pending_received") {
+          composerNote.textContent = "Invitation reçue. Clique sur Accepter pour commencer à discuter.";
+        } else {
+          composerNote.textContent = "La discussion sera disponible après acceptation de l’invitation.";
+        }
+        return;
+      }
+
+      messageInput.disabled = false;
+      sendBtn.disabled = false;
+      attachBtn.disabled = false;
+      stickerBtn.disabled = false;
+      voiceNoteBtn.disabled = false;
+      composerNote.textContent = "Réponses, transferts, suppressions, pièces jointes, vocaux et événements d’appel sont disponibles pour ce contact.";
+    }
+
+    function stopChatListener() {
+      if (typeof detachChatListener === "function") detachChatListener();
+      detachChatListener = null;
+    }
+
+    function stopTypingListener() {
+      if (typeof detachTypingListener === "function") detachTypingListener();
+      detachTypingListener = null;
+    }
+
+    function listenGroups() {
+      if (detachGroupsListener) detachGroupsListener();
+      detachGroupsListener = onValue(ref(db, "messageGroups"), (snap) => {
+        groupsMap = snap.val() || {};
+        if (selectedGroupId && groupsMap[selectedGroupId]) {
+          selectedGroupData = { id:selectedGroupId, ...groupsMap[selectedGroupId] };
+          updateSelectedHeader();
+          updateComposerState();
+        }
+        updateTopInvitesBadge();
+        renderMembersList();
+      });
+    }
+
+    function updateTopInvitesBadge() {
+      const pendingInvites = Object.values(invitesMap || {}).filter(inv => inv && inv.status === "pending_received").length;
+      if (pendingInvites > 0) {
+        topInvitesBadge.style.display = "inline-flex";
+        topInvitesBadge.textContent = pendingInvites > 99 ? "99+" : String(pendingInvites);
+      } else {
+        topInvitesBadge.style.display = "none";
+        topInvitesBadge.textContent = "";
+      }
+    }
+
+    async function createGroupChat() {
+      if (!currentUser) return;
+
+      const name = groupNameInput.value.trim();
+      const description = groupDescriptionInput.value.trim();
+
+      if (!name) {
+        alert("Le nom du groupe est obligatoire.");
+        return;
+      }
+
+      if (selectedGroupCreationMembers.size < 1) {
+        alert("Choisis au moins un contact pour créer le groupe.");
+        return;
+      }
+
+      const groupId = push(ref(db, "messageGroups")).key;
+      const now = Date.now();
+
+      const members = {
+        [currentUser.uid]: {
+          role: "admin",
+          joinedAt: now
+        }
+      };
+
+      [...selectedGroupCreationMembers].forEach(uid => {
+        members[uid] = {
+          role: "member",
+          joinedAt: now
+        };
+      });
+
+      await set(ref(db, `messageGroups/${groupId}`), {
+        id: groupId,
+        name,
+        description,
+        createdBy: currentUser.uid,
+        createdAt: now,
+        updatedAt: now,
+        members
+      });
+
+      Object.keys(members).forEach(uid => {
+        update(ref(db, `groupUnreadCountsByUser/${uid}`), { [groupId]: uid === currentUser.uid ? 0 : 1 }).catch(() => {});
+      });
+
+      closeModal(groupCreateModal);
+      groupNameInput.value = "";
+      groupDescriptionInput.value = "";
+      selectedGroupCreationMembers = new Set();
+      renderGroupMembersPicker();
+    }
+
+    async function addMemberToCurrentGroup() {
+      if (!selectedGroupData || !selectedGroupId || !currentUser) return;
+      if (!isGroupAdmin(selectedGroupData, currentUser.uid)) {
+        alert("Seul l’admin du groupe peut ajouter des membres.");
+        return;
+      }
+
+      const uid = groupAddMemberSelect.value;
+      if (!uid) return;
+
+      await update(ref(db, `messageGroups/${selectedGroupId}/members/${uid}`), {
+        role: "member",
+        joinedAt: Date.now()
+      });
+
+      await update(ref(db, `messageGroups/${selectedGroupId}`), {
+        updatedAt: Date.now()
+      });
+
+      await update(ref(db, `groupUnreadCountsByUser/${uid}`), {
+        [selectedGroupId]: 1
+      }).catch(() => {});
+
+      renderGroupManageBox();
+    }
+
+    async function removeMemberFromCurrentGroup(uid) {
+      if (!selectedGroupData || !selectedGroupId || !currentUser) return;
+      if (!isGroupAdmin(selectedGroupData, currentUser.uid)) {
+        alert("Seul l’admin du groupe peut retirer des membres.");
+        return;
+      }
+      if (!uid) return;
+
+      await remove(ref(db, `messageGroups/${selectedGroupId}/members/${uid}`));
+      await update(ref(db, `messageGroups/${selectedGroupId}`), {
+        updatedAt: Date.now()
+      });
+      await remove(ref(db, `groupUnreadCountsByUser/${uid}/${selectedGroupId}`)).catch(() => {});
+      renderGroupManageBox();
+    }
+
+    async function leaveCurrentGroup() {
+      if (!selectedGroupData || !selectedGroupId || !currentUser) return;
+
+      const members = selectedGroupData.members || {};
+      const memberIds = Object.keys(members);
+      const amAdmin = isGroupAdmin(selectedGroupData, currentUser.uid);
+
+      if (amAdmin && memberIds.length > 1) {
+        alert("Comme admin, retire d’abord les autres membres ou transfère la gestion avant de quitter.");
+        return;
+      }
+
+      await remove(ref(db, `messageGroups/${selectedGroupId}/members/${currentUser.uid}`));
+      await remove(ref(db, `groupUnreadCountsByUser/${currentUser.uid}/${selectedGroupId}`)).catch(() => {});
+      closeModal(groupManageModal);
+
+      currentConversationType = "direct";
+      selectedGroupId = "";
+      selectedGroupData = null;
+      currentChatId = "";
+      messagesCache = [];
+      updateSelectedHeader();
+      updateComposerState();
+      renderMessages();
+      renderMembersList();
+    }
+
+    async function markGroupAsRead(groupId) {
+      if (!currentUser || !groupId) return;
+      await update(ref(db, `groupUnreadCountsByUser/${currentUser.uid}`), {
+        [groupId]: 0
+      }).catch(() => {});
+    }
+        function listenChatMessages() {
+      stopChatListener();
+      if (!currentChatId) {
+        messagesCache = [];
+        renderMessages();
+        return;
+      }
+
+      if (currentConversationType === "group") {
+        const groupRef = query(
+          ref(db, `groupMessages/${currentChatId}`),
+          orderByChild("createdAt"),
+          limitToLast(LAST_GROUP_MESSAGES_LIMIT)
+        );
+
+        detachChatListener = onValue(groupRef, async (snap) => {
+          const data = snap.val() || {};
+          messagesCache = Object.entries(data)
+            .map(([id, val]) => normalizeMessageData(id, val))
+            .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+          renderMessages();
+          await markGroupMessagesRead();
+        });
+        return;
+      }
+
+      const chatRef = query(
+        ref(db, `privateMessages/${currentChatId}`),
+        orderByChild("createdAt"),
+        limitToLast(LAST_MESSAGES_LIMIT)
+      );
+
+      detachChatListener = onValue(chatRef, async (snap) => {
+        const data = snap.val() || {};
+        messagesCache = Object.entries(data)
+          .map(([id, val]) => normalizeMessageData(id, val))
+          .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+        mergeCallEventsIntoMessages();
+        await markChatAsRead();
+      });
+    }
+
+    function listenTypingState() {
+      stopTypingListener();
+      clearTypingLine();
+
+      if (!currentChatId || !currentUser) return;
+
+      if (currentConversationType === "group") {
+        const typingRef = ref(db, `groupTyping/${currentChatId}`);
+        detachTypingListener = onValue(typingRef, (snap) => {
+          const data = snap.val() || {};
+          const otherTyping = Object.entries(data).find(([uid, val]) => uid !== currentUser.uid && val && val.typing);
+
+          if (otherTyping) {
+            const [uid, val] = otherTyping;
+            const user = usersCache[uid] || {};
+            const name = user.displayName || "Quelqu’un";
+            if (val.mode === "voice") {
+              renderTypingLine(`${name} enregistre un vocal`);
+            } else {
+              renderTypingLine(`${name} écrit dans le groupe`);
+            }
+          } else {
+            clearTypingLine();
+          }
+        });
+        return;
+      }
+
+      if (!selectedUserId) return;
+
+      const typingRef = ref(db, `messageTyping/${currentChatId}/${selectedUserId}`);
+      detachTypingListener = onValue(typingRef, (snap) => {
+        const val = snap.val() || {};
+        if (val.typing) {
+          const name = selectedUserProfile?.displayName || "Cette personne";
+          if (val.mode === "voice") {
+            renderTypingLine(`${name} enregistre un vocal`);
+          } else {
+            renderTypingLine(`${name} est en train d’écrire`);
+          }
+        } else {
+          clearTypingLine();
+        }
+      });
+    }
+
+    async function setTypingState(isTyping, mode = "text") {
+      if (!currentUser || !currentChatId) return;
+
+      try {
+        if (currentConversationType === "group") {
+          if (!selectedGroupData || !isGroupMember(selectedGroupData, currentUser.uid)) return;
+          await update(ref(db, `groupTyping/${currentChatId}/${currentUser.uid}`), {
+            typing: isTyping,
+            mode: isTyping ? mode : "",
+            updatedAt: Date.now()
+          });
+          return;
+        }
+
+        if (!selectedUserId || !canChatWith(selectedUserId)) return;
+        await update(ref(db, `messageTyping/${currentChatId}/${currentUser.uid}`), {
+          typing: isTyping,
+          mode: isTyping ? mode : "",
+          updatedAt: Date.now()
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function markGroupMessagesRead() {
+      if (!currentUser || !currentChatId || currentConversationType !== "group") return;
+
+      const updates = {};
+      let hasUpdates = false;
+
+      messagesCache.forEach(msg => {
+        if (isDeletedForMe(msg)) return;
+        if (msg.senderId !== currentUser.uid && !(msg.readBy && msg.readBy[currentUser.uid])) {
+          updates[`groupMessages/${currentChatId}/${msg.id}/readBy/${currentUser.uid}`] = Date.now();
+          hasUpdates = true;
+        }
+      });
+
+      updates[`groupUnreadCountsByUser/${currentUser.uid}/${currentChatId}`] = 0;
+
+      try {
+        if (hasUpdates || updates[`groupUnreadCountsByUser/${currentUser.uid}/${currentChatId}`] === 0) {
+          await update(ref(db), updates);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function markChatAsRead() {
+      if (!currentChatId || !selectedUserId || !currentUser || !canChatWith(selectedUserId)) return;
+
+      const updates = {};
+      let hasUpdates = false;
+
+      messagesCache.forEach(msg => {
+        if (isDeletedForMe(msg)) return;
+        if (msg.messageType === "call_event") return;
+        if (msg.senderId === selectedUserId && !(msg.readBy && msg.readBy[currentUser.uid])) {
+          updates[`privateMessages/${currentChatId}/${msg.id}/readBy/${currentUser.uid}`] = Date.now();
+          hasUpdates = true;
+        }
+      });
+
+      updates[`unreadCountsByUser/${currentUser.uid}/${selectedUserId}`] = 0;
+
+      try {
+        if (hasUpdates || updates[`unreadCountsByUser/${currentUser.uid}/${selectedUserId}`] === 0) {
+          await update(ref(db), updates);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     function renderMessages() {
+      if (currentConversationType === "group") {
+        if (!selectedGroupData || !currentUser) {
+          chatMessages.innerHTML = `
+            <div class="empty-state">
+              Sélectionne un groupe à gauche.
+            </div>
+          `;
+          return;
+        }
+
+        if (!isGroupMember(selectedGroupData, currentUser.uid)) {
+          chatMessages.innerHTML = `
+            <div class="empty-state">
+              Tu ne fais plus partie de ce groupe.
+            </div>
+          `;
+          return;
+        }
+
+        const visibleMessages = messagesCache.filter(msg => !isDeletedForMe(msg));
+
+        if (!visibleMessages.length) {
+          chatMessages.innerHTML = `
+            <div class="empty-state">
+              Aucun message récent dans ce groupe.
+            </div>
+          `;
+          return;
+        }
+
+        chatMessages.innerHTML = visibleMessages.map(msg => {
+          const isMe = msg.senderId === currentUser.uid;
+          const sender = usersCache[msg.senderId] || {};
+          const replyHtml = msg.replyTo && msg.replyTo.text
+            ? `<div class="reply-box">${escapeHtml(msg.replyTo.text)}</div>`
+            : "";
+
+          const textHtml = msg.deletedForAll
+            ? `<div class="message-text" style="color:#6b7d93;font-style:italic;">Message supprimé.</div>`
+            : `<div class="message-text">${escapeHtml(msg.text || "")}</div>`;
+
+          const stickerHtml = msg.sticker && !msg.deletedForAll
+            ? `<div class="sticker-box">${escapeHtml(msg.sticker)}</div>`
+            : "";
+
+          const attachmentHtml = !msg.deletedForAll ? renderAttachment(msg) : "";
+          const canDelete = canDeleteMessage(msg);
+          const isSelected = selectedMessageIds.has(msg.id);
+
+          return `
+            <div class="message-row ${isMe ? "me" : ""}">
+              <div class="message-wrap">
+                <div class="message-card" data-message-id="${msg.id}" style="${isSelected ? 'box-shadow:0 0 0 3px rgba(47,140,255,0.18);' : ''}">
+                  <div class="message-head">
+                    <div class="message-author">${escapeHtml(sender.displayName || (isMe ? "Toi" : "Membre"))}</div>
+                    <div class="message-menu-wrap">
+                      <button class="message-menu-btn" type="button" data-menu-btn="${msg.id}">⋯</button>
+                      <div class="message-menu" data-menu="${msg.id}">
+                        <button type="button" data-reply="${msg.id}">Répondre</button>
+                        <button type="button" data-forward="${msg.id}">Transférer</button>
+                        <button type="button" data-select="${msg.id}">${isSelected ? "Décocher" : "Sélectionner"}</button>
+                        <button type="button" data-delete-me="${msg.id}">Supprimer de ma boîte</button>
+                        ${!isMe ? `<button type="button" data-report="${msg.id}">Signaler</button>` : ""}
+                        ${canDelete ? `<button type="button" class="danger" data-delete="${msg.id}">Supprimer pour tous</button>` : ""}
+                      </div>
+                    </div>
+                  </div>
+
+                  ${replyHtml}
+                  ${textHtml}
+                  ${stickerHtml}
+                  ${attachmentHtml}
+
+                  <div class="message-meta-row">
+                    <span class="message-time">${escapeHtml(formatDate(msg.createdAt))}</span>
+                    ${getReadStateLabel(msg)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        bindMessageMenus();
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return;
+      }
+
       if (!selectedUserId || !currentUser) {
         chatMessages.innerHTML = `
           <div class="empty-state">
@@ -1940,6 +3055,9 @@
           selectedUserProfile = { uid:selectedUserId, ...usersCache[selectedUserId] };
           updateSelectedHeader();
         }
+        if (selectedGroupId && groupsMap[selectedGroupId]) {
+          renderGroupManageBox();
+        }
         renderMembersList();
       });
     }
@@ -1959,6 +3077,8 @@
         contactsMap = snap.val() || {};
         renderMembersList();
         updateComposerState();
+        renderGroupMembersPicker();
+        if (selectedGroupId) renderGroupManageBox();
       });
     }
 
@@ -1968,13 +3088,33 @@
         renderMembersList();
         updateSelectedHeader();
         updateComposerState();
+        updateTopInvitesBadge();
       });
     }
 
     function listenUnreadTotals() {
       onValue(ref(db, `unreadCountsByUser/${currentUser.uid}`), (snap) => {
         unreadCounts = snap.val() || {};
-        const total = Object.values(unreadCounts).reduce((sum, val) => sum + Number(val || 0), 0);
+        const directTotal = Object.values(unreadCounts).reduce((sum, val) => sum + Number(val || 0), 0);
+        const groupTotal = Object.values(groupUnreadCounts).reduce((sum, val) => sum + Number(val || 0), 0);
+        const total = directTotal + groupTotal;
+
+        if (total > 0) {
+          topUnreadBadge.style.display = "inline-flex";
+          topUnreadBadge.textContent = total > 99 ? "99+" : String(total);
+        } else {
+          topUnreadBadge.style.display = "none";
+          topUnreadBadge.textContent = "";
+        }
+        renderMembersList();
+      });
+
+      onValue(ref(db, `groupUnreadCountsByUser/${currentUser.uid}`), (snap) => {
+        groupUnreadCounts = snap.val() || {};
+        const directTotal = Object.values(unreadCounts).reduce((sum, val) => sum + Number(val || 0), 0);
+        const groupTotal = Object.values(groupUnreadCounts).reduce((sum, val) => sum + Number(val || 0), 0);
+        const total = directTotal + groupTotal;
+
         if (total > 0) {
           topUnreadBadge.style.display = "inline-flex";
           topUnreadBadge.textContent = total > 99 ? "99+" : String(total);
@@ -1998,6 +3138,8 @@
           topMissedCallsBadge.style.display = "none";
           topMissedCallsBadge.textContent = "";
         }
+        renderMembersList();
+        updateSelectedHeader();
       });
     }
 
@@ -2005,12 +3147,14 @@
       if (detachCallsHistoryListener) detachCallsHistoryListener();
       detachCallsHistoryListener = onValue(ref(db, `callHistory/${currentUser.uid}`), (snap) => {
         callsHistoryMap = snap.val() || {};
-        mergeCallEventsIntoMessages();
+        if (currentConversationType === "direct") {
+          mergeCallEventsIntoMessages();
+        }
       });
     }
 
     function mergeCallEventsIntoMessages() {
-      if (!selectedUserId || !currentUser || !currentChatId) return;
+      if (!selectedUserId || !currentUser || !currentChatId || currentConversationType !== "direct") return;
 
       const baseMessages = [...messagesCache];
       const relatedCallEvents = Object.entries(callsHistoryMap || {})
@@ -2021,6 +3165,7 @@
             (item.fromUid === selectedUserId && item.toUid === currentUser.uid);
           return isBetweenUsers;
         })
+        .filter(item => !(item.deletedForUsers && item.deletedForUsers[currentUser.uid]))
         .map(item => ({
           id: `call_event_${item.callId || item.id}`,
           senderId: item.fromUid || "",
@@ -2036,7 +3181,7 @@
           attachmentUrl: "",
           attachmentName: "",
           deletedForAll: false,
-          deletedForUsers: {},
+          deletedForUsers: item.deletedForUsers || {},
           messageType: "call_event",
           callMode: item.mode || "audio",
           callStatus: item.status || "missed",
@@ -2120,380 +3265,6 @@
       currentIncomingCall = null;
     }
 
-    function getAllVisibleMembers() {
-      const entries = Object.entries(usersCache || {})
-        .map(([uid, val]) => ({ uid, ...(val || {}) }))
-        .filter(user => user.uid !== currentUser.uid);
-
-      let filtered = entries;
-
-      if (currentTab === "contacts") {
-        filtered = filtered.filter(user => areContacts(user.uid));
-      } else if (currentTab === "online") {
-        filtered = filtered.filter(user => getPresenceInfo(user).online);
-      } else if (currentTab === "invites") {
-        filtered = filtered.filter(user => {
-          const inv = invitesMap[user.uid];
-          return !!inv && (inv.status === "pending_received" || inv.status === "pending_sent" || inv.status === "refused");
-        });
-      }
-
-      const q = memberSearch.value.trim().toLowerCase();
-      if (q) {
-        filtered = filtered.filter(user => {
-          const hay = `${user.displayName || ""} ${user.email || ""}`.toLowerCase();
-          return hay.includes(q);
-        });
-      }
-
-      filtered.sort((a, b) => {
-        const unreadA = Number(unreadCounts[a.uid] || 0);
-        const unreadB = Number(unreadCounts[b.uid] || 0);
-        if (unreadA !== unreadB) return unreadB - unreadA;
-
-        const missedA = Object.values(missedCallsMap || {}).filter(item => item && item.unread && (item.fromUid === a.uid || item.toUid === a.uid)).length;
-        const missedB = Object.values(missedCallsMap || {}).filter(item => item && item.unread && (item.fromUid === b.uid || item.toUid === b.uid)).length;
-        if (missedA !== missedB) return missedB - missedA;
-
-        const aAccepted = areContacts(a.uid) ? 1 : 0;
-        const bAccepted = areContacts(b.uid) ? 1 : 0;
-        if (aAccepted !== bAccepted) return bAccepted - aAccepted;
-
-        const nameA = (a.displayName || a.email || "").toLowerCase();
-        const nameB = (b.displayName || b.email || "").toLowerCase();
-        return nameA.localeCompare(nameB);
-      });
-
-      return filtered;
-    }
-
-    function getMissedCountForUser(uid) {
-      return Object.values(missedCallsMap || {}).filter(item =>
-        item &&
-        item.unread &&
-        ((item.fromUid === uid && item.toUid === currentUser?.uid) ||
-         (item.toUid === uid && item.fromUid === currentUser?.uid))
-      ).length;
-    }
-
-    function renderMembersList() {
-      const members = getAllVisibleMembers();
-
-      if (!members.length) {
-        membersList.innerHTML = `<div class="empty-note">Aucun membre trouvé.</div>`;
-        return;
-      }
-
-      membersList.innerHTML = members.map(user => {
-        const presence = getPresenceInfo(user);
-        const unread = Number(unreadCounts[user.uid] || 0);
-        const missed = getMissedCountForUser(user.uid);
-        const inviteState = getInviteState(user.uid);
-        const accepted = areContacts(user.uid);
-        const blocked = isBlockedByMe(user.uid) || hasBlockedMe(user.uid);
-
-        let statusHtml = `
-          <span class="presence-pill ${presence.online ? "online" : "offline"}">
-            <span class="presence-dot ${presence.online ? "online" : ""}"></span>
-            ${presence.online ? "En ligne" : "Hors ligne"}
-          </span>
-        `;
-
-        if (inviteState && !accepted) {
-          const label = inviteState === "pending_sent"
-            ? "Invitation envoyée"
-            : inviteState === "pending_received"
-            ? "À accepter"
-            : inviteState === "accepted"
-            ? "Contact"
-            : inviteState === "refused"
-            ? "Refusée"
-            : inviteState;
-          statusHtml = `<span class="invite-pill">${escapeHtml(label)}</span>`;
-        }
-
-        if (blocked) {
-          statusHtml = `<span class="invite-pill" style="background:#fff1f2;color:#b42318;">Bloqué</span>`;
-        }
-
-        return `
-          <div class="member-card ${selectedUserId === user.uid ? "active" : ""}" data-member="${user.uid}">
-            <div class="member-head">
-              <div class="member-main">
-                <div class="avatar">${avatarMarkup(user)}</div>
-                <div>
-                  <div class="member-title">${escapeHtml(user.displayName || "Sans nom")}</div>
-                  <div class="member-sub">${escapeHtml(user.email || "")}</div>
-                </div>
-              </div>
-              ${statusHtml}
-            </div>
-            <div class="member-sub">${escapeHtml(presence.text)}</div>
-            <div class="member-meta-row">
-              <span class="member-sub">${accepted ? "Contact autorisé" : "Accès privé contrôlé"}</span>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                ${missed > 0 ? `<span class="unread-badge" title="Appels manqués">${missed > 99 ? "99+" : missed}</span>` : ""}
-                ${unread > 0 ? `<span class="unread-badge">${unread > 99 ? "99+" : unread}</span>` : ""}
-              </div>
-            </div>
-          </div>
-        `;
-
-      }).join("");
-
-      document.querySelectorAll("[data-member]").forEach(card => {
-        card.addEventListener("click", () => {
-          const uid = card.dataset.member;
-          selectUser(uid);
-        });
-      });
-    }
-
-    async function selectUser(uid) {
-      selectedUserId = uid;
-      selectedUserProfile = usersCache[uid] ? { uid, ...usersCache[uid] } : null;
-      selectedUserInviteState = getInviteState(uid);
-      currentChatId = getChatId(currentUser.uid, uid);
-
-      replyTarget = null;
-      stickerPanel.classList.add("hidden");
-      renderReplyPreview();
-      clearSelection();
-
-      updateSelectedHeader();
-      updateComposerState();
-      renderMessages();
-
-      listenChatMessages();
-      listenTypingState();
-      await markChatAsRead();
-      await markMissedCallsAsReadForUser(uid);
-      renderMembersList();
-    }
-
-    function updateSelectedHeader() {
-      if (!selectedUserProfile) {
-        if (chatAvatar) chatAvatar.textContent = "MB";
-        chatTitle.textContent = "Choisis une personne";
-        chatSubtitle.textContent = "Les messages sont autorisés seulement entre contacts acceptés.";
-        inviteBtn.classList.remove("hidden");
-        inviteBtn.textContent = "Inviter";
-        inviteBtn.disabled = false;
-        refuseInviteBtn.classList.add("hidden");
-        audioCallBtn.classList.add("hidden");
-        videoCallBtn.classList.add("hidden");
-        chatOptionsBtn.classList.add("hidden");
-        blockUserBtn.textContent = "Bloquer";
-        return;
-      }
-
-      if (selectedUserProfile.photoURL) {
-        chatAvatar.innerHTML = `<img src="${selectedUserProfile.photoURL}" alt="avatar">`;
-      } else {
-        chatAvatar.textContent = initials(selectedUserProfile.displayName, selectedUserProfile.email);
-      }
-
-      const presence = getPresenceInfo(selectedUserProfile);
-      const accepted = areContacts(selectedUserId);
-      const blocked = isBlockedByMe(selectedUserId) || hasBlockedMe(selectedUserId);
-      const inviteState = getInviteState(selectedUserId);
-
-      chatTitle.textContent = selectedUserProfile.displayName || "Sans nom";
-
-      inviteBtn.classList.remove("hidden");
-      chatOptionsBtn.classList.remove("hidden");
-      blockUserBtn.textContent = isBlockedByMe(selectedUserId) ? "Débloquer" : "Bloquer";
-
-      if (blocked) {
-        chatSubtitle.textContent = "Discussion bloquée : l’un d’entre vous a bloqué l’autre.";
-        inviteBtn.textContent = "Indisponible";
-        inviteBtn.disabled = true;
-        refuseInviteBtn.classList.add("hidden");
-      } else if (accepted) {
-        const missed = getMissedCountForUser(selectedUserId);
-        chatSubtitle.textContent = missed > 0
-          ? `${presence.text} • ${missed} appel(s) manqué(s)`
-          : presence.text;
-        inviteBtn.textContent = "Contact";
-        inviteBtn.disabled = true;
-        refuseInviteBtn.classList.add("hidden");
-      } else if (inviteState === "pending_sent") {
-        chatSubtitle.textContent = "Invitation envoyée. En attente de réponse.";
-        inviteBtn.textContent = "Invitation envoyée";
-        inviteBtn.disabled = true;
-        refuseInviteBtn.classList.add("hidden");
-      } else if (inviteState === "pending_received") {
-        chatSubtitle.textContent = "Cette personne t’a envoyé une invitation. Tu peux l’accepter ou la refuser.";
-        inviteBtn.textContent = "Accepter";
-        inviteBtn.disabled = false;
-        refuseInviteBtn.classList.remove("hidden");
-      } else if (inviteState === "refused") {
-        chatSubtitle.textContent = "Invitation refusée précédemment.";
-        inviteBtn.textContent = "Inviter à nouveau";
-        inviteBtn.disabled = false;
-        refuseInviteBtn.classList.add("hidden");
-      } else {
-        chatSubtitle.textContent = "Envoie d’abord une invitation avant de discuter.";
-        inviteBtn.textContent = "Inviter";
-        inviteBtn.disabled = false;
-        refuseInviteBtn.classList.add("hidden");
-      }
-
-      audioCallBtn.classList.toggle("hidden", !accepted || blocked);
-      videoCallBtn.classList.toggle("hidden", !accepted || blocked);
-    }
-
-    function updateComposerState() {
-      if (!selectedUserId || !selectedUserProfile) {
-        messageInput.disabled = true;
-        sendBtn.disabled = true;
-        attachBtn.disabled = true;
-        stickerBtn.disabled = true;
-        voiceNoteBtn.disabled = true;
-        composerNote.textContent = "Choisis d’abord une personne.";
-        clearTypingLine();
-        return;
-      }
-
-      const accepted = areContacts(selectedUserId);
-      const blocked = isBlockedByMe(selectedUserId) || hasBlockedMe(selectedUserId);
-
-      if (blocked) {
-        messageInput.disabled = true;
-        sendBtn.disabled = true;
-        attachBtn.disabled = true;
-        stickerBtn.disabled = true;
-        voiceNoteBtn.disabled = true;
-        composerNote.textContent = "Message impossible : l’un d’entre vous a bloqué l’autre.";
-        return;
-      }
-
-      if (!accepted) {
-        messageInput.disabled = true;
-        sendBtn.disabled = true;
-        attachBtn.disabled = true;
-        stickerBtn.disabled = true;
-        voiceNoteBtn.disabled = true;
-
-        const inviteState = getInviteState(selectedUserId);
-        if (inviteState === "pending_sent") {
-          composerNote.textContent = "Invitation envoyée. Tu pourras écrire dès qu’elle sera acceptée.";
-        } else if (inviteState === "pending_received") {
-          composerNote.textContent = "Invitation reçue. Clique sur Accepter pour commencer à discuter.";
-        } else {
-          composerNote.textContent = "La discussion sera disponible après acceptation de l’invitation.";
-        }
-        return;
-      }
-
-      messageInput.disabled = false;
-      sendBtn.disabled = false;
-      attachBtn.disabled = false;
-      stickerBtn.disabled = false;
-      voiceNoteBtn.disabled = false;
-      composerNote.textContent = "Réponses, transferts, suppressions, pièces jointes, vocaux et événements d’appel sont disponibles pour ce contact.";
-    }
-
-    function stopChatListener() {
-      if (typeof detachChatListener === "function") {
-        detachChatListener();
-      }
-      detachChatListener = null;
-    }
-
-    function stopTypingListener() {
-      if (typeof detachTypingListener === "function") {
-        detachTypingListener();
-      }
-      detachTypingListener = null;
-    }
-
-    function listenChatMessages() {
-      stopChatListener();
-      if (!currentChatId) {
-        messagesCache = [];
-        renderMessages();
-        return;
-      }
-
-      const chatRef = query(
-        ref(db, `privateMessages/${currentChatId}`),
-        orderByChild("createdAt"),
-        limitToLast(LAST_MESSAGES_LIMIT)
-      );
-
-      detachChatListener = onValue(chatRef, async (snap) => {
-        const data = snap.val() || {};
-        messagesCache = Object.entries(data)
-          .map(([id, val]) => normalizeMessageData(id, val))
-          .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-
-        mergeCallEventsIntoMessages();
-        await markChatAsRead();
-      });
-    }
-
-    function listenTypingState() {
-      stopTypingListener();
-      clearTypingLine();
-
-      if (!currentChatId || !selectedUserId) return;
-
-      const typingRef = ref(db, `messageTyping/${currentChatId}/${selectedUserId}`);
-      detachTypingListener = onValue(typingRef, (snap) => {
-        const val = snap.val() || {};
-        if (val.typing) {
-          const name = selectedUserProfile?.displayName || "Cette personne";
-          if (val.mode === "voice") {
-            renderTypingLine(`${name} enregistre un vocal`);
-          } else {
-            renderTypingLine(`${name} est en train d’écrire`);
-          }
-        } else {
-          clearTypingLine();
-        }
-      });
-    }
-
-    async function setTypingState(isTyping, mode = "text") {
-      if (!currentChatId || !currentUser || !selectedUserId || !canChatWith(selectedUserId)) return;
-      try {
-        await update(ref(db, `messageTyping/${currentChatId}/${currentUser.uid}`), {
-          typing: isTyping,
-          mode: isTyping ? mode : "",
-          updatedAt: Date.now()
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    async function markChatAsRead() {
-      if (!currentChatId || !selectedUserId || !currentUser || !canChatWith(selectedUserId)) return;
-
-      const updates = {};
-      let hasUpdates = false;
-
-      messagesCache.forEach(msg => {
-        if (isDeletedForMe(msg)) return;
-        if (msg.messageType === "call_event") return;
-        if (msg.senderId === selectedUserId && !(msg.readBy && msg.readBy[currentUser.uid])) {
-          updates[`privateMessages/${currentChatId}/${msg.id}/readBy/${currentUser.uid}`] = Date.now();
-          hasUpdates = true;
-        }
-      });
-
-      updates[`unreadCountsByUser/${currentUser.uid}/${selectedUserId}`] = 0;
-
-      try {
-        if (hasUpdates || updates[`unreadCountsByUser/${currentUser.uid}/${selectedUserId}`] === 0) {
-          await update(ref(db), updates);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
     async function ensureInviteRecord(targetUid, statusForMe, statusForOther) {
       const updates = {};
       updates[`contactInvites/${currentUser.uid}/${targetUid}`] = {
@@ -2524,6 +3295,7 @@
       closeModal(inviteModal);
       updateSelectedHeader();
       updateComposerState();
+      updateTopInvitesBadge();
       alert("Invitation envoyée.");
     }
 
@@ -2556,6 +3328,8 @@
       await update(ref(db), updates);
       updateSelectedHeader();
       updateComposerState();
+      updateTopInvitesBadge();
+      renderGroupMembersPicker();
       alert("Invitation acceptée.");
     }
 
@@ -2564,11 +3338,12 @@
       await ensureInviteRecord(fromUid, "refused", "refused");
       updateSelectedHeader();
       updateComposerState();
+      updateTopInvitesBadge();
       alert("Invitation refusée.");
     }
 
     async function toggleBlockSelectedUser() {
-      if (!selectedUserId || !currentUser) return;
+      if (!selectedUserId || !currentUser || currentConversationType !== "direct") return;
       const blockRef = ref(db, `blocks/${currentUser.uid}/${selectedUserId}`);
       const snap = await get(blockRef);
 
@@ -2587,10 +3362,24 @@
     }
 
     async function deleteMessageForAll(messageId) {
-      if (!currentChatId || !messageId) return;
       const msg = messagesCache.find(m => m.id === messageId);
       if (!msg || !canDeleteMessage(msg) || msg.messageType === "call_event") return;
 
+      if (currentConversationType === "group") {
+        if (!currentChatId) return;
+        await update(ref(db, `groupMessages/${currentChatId}/${messageId}`), {
+          text: "",
+          sticker: "",
+          attachmentType: "",
+          attachmentUrl: "",
+          attachmentName: "",
+          deletedForAll: true,
+          replyTo: null
+        });
+        return;
+      }
+
+      if (!currentChatId) return;
       await update(ref(db, `privateMessages/${currentChatId}/${messageId}`), {
         text: "",
         sticker: "",
@@ -2616,6 +3405,14 @@
       }
 
       if (!currentChatId) return;
+
+      if (currentConversationType === "group") {
+        await update(ref(db, `groupMessages/${currentChatId}/${messageId}/deletedForUsers`), {
+          [currentUser.uid]: Date.now()
+        });
+        return;
+      }
+
       await update(ref(db, `privateMessages/${currentChatId}/${messageId}/deletedForUsers`), {
         [currentUser.uid]: Date.now()
       });
@@ -2631,23 +3428,19 @@
       await Promise.all(promises);
       clearSelection();
       toggleSelectionBar();
-      mergeCallEventsIntoMessages();
+      if (currentConversationType === "direct") mergeCallEventsIntoMessages();
+      else renderMessages();
     }
 
     async function forwardMessage() {
       if (!forwardMessageTarget || !currentUser) return;
 
-      const targetUid = forwardTargetInput.value.trim();
-      if (!targetUid || !usersCache[targetUid]) {
+      const targetId = forwardTargetInput.value.trim();
+      if (!targetId) {
         alert("Destinataire introuvable.");
         return;
       }
-      if (!areContacts(targetUid)) {
-        alert("Le transfert est réservé à un contact déjà accepté.");
-        return;
-      }
 
-      const forwardChatId = getChatId(currentUser.uid, targetUid);
       const note = forwardNoteInput.value.trim();
       const forwardedCore = forwardMessageTarget.messageType === "call_event"
         ? getCallEventLabel(forwardMessageTarget)
@@ -2655,30 +3448,72 @@
 
       const body = `${note ? note + "\n\n" : ""}[Transféré]\n${forwardedCore}`;
 
-      const msgRef = push(ref(db, `privateMessages/${forwardChatId}`));
-      await set(msgRef, {
-        senderId: currentUser.uid,
-        receiverId: targetUid,
-        text: body,
-        sticker: "",
-        createdAt: Date.now(),
-        readBy: {
-          [currentUser.uid]: Date.now()
+      if (groupsMap[targetId] && isGroupMember(groupsMap[targetId], currentUser.uid)) {
+        const msgRef = push(ref(db, `groupMessages/${targetId}`));
+        await set(msgRef, {
+          senderId: currentUser.uid,
+          receiverId: "",
+          text: body,
+          sticker: "",
+          createdAt: Date.now(),
+          readBy: {
+            [currentUser.uid]: Date.now()
+          },
+          conversationType: "group",
+          groupId: targetId,
+          groupName: groupsMap[targetId].name || ""
+        });
+
+        const members = Object.keys(groupsMap[targetId].members || {}).filter(uid => uid !== currentUser.uid);
+        const updates = {};
+        members.forEach(uid => {
+          updates[`groupUnreadCountsByUser/${uid}/${targetId}`] = Number(groupUnreadCounts[targetId] || 0) + 1;
+        });
+        if (Object.keys(updates).length) await update(ref(db), updates);
+      } else {
+        if (!usersCache[targetId]) {
+          alert("Destinataire introuvable.");
+          return;
         }
-      });
+        if (!areContacts(targetId)) {
+          alert("Le transfert direct est réservé à un contact déjà accepté.");
+          return;
+        }
+
+        const forwardChatId = getChatId(currentUser.uid, targetId);
+        const msgRef = push(ref(db, `privateMessages/${forwardChatId}`));
+        await set(msgRef, {
+          senderId: currentUser.uid,
+          receiverId: targetId,
+          text: body,
+          sticker: "",
+          createdAt: Date.now(),
+          readBy: {
+            [currentUser.uid]: Date.now()
+          }
+        });
+
+        const unreadSnap = await get(ref(db, `unreadCountsByUser/${targetId}/${currentUser.uid}`));
+        const currentUnread = Number(unreadSnap.val() || 0);
+        await update(ref(db, {
+          [`unreadCountsByUser/${targetId}/${currentUser.uid}`]: currentUnread + 1
+        }));
+      }
 
       closeModal(forwardModal);
       forwardMessageTarget = null;
     }
 
     async function sendReport() {
-      if (!reportMessageTarget || !selectedUserProfile || !currentUser) return;
+      if (!reportMessageTarget || !currentUser) return;
 
       const reportRef = push(ref(db, "reports"));
       await set(reportRef, {
         targetMessageId: reportMessageTarget.id,
-        targetUserId: selectedUserId,
-        targetUserName: selectedUserProfile.displayName || "",
+        targetUserId: currentConversationType === "direct" ? selectedUserId : "",
+        targetGroupId: currentConversationType === "group" ? selectedGroupId : "",
+        targetUserName: currentConversationType === "direct" ? (selectedUserProfile?.displayName || "") : "",
+        targetGroupName: currentConversationType === "group" ? (selectedGroupData?.name || "") : "",
         reportedByUid: currentUser.uid,
         reportedByName: currentUserProfile?.displayName || currentUser.displayName || "",
         reason: reportReasonInput.value,
@@ -2764,7 +3599,7 @@
     }
 
     async function handleVoiceNoteRecording() {
-      if (!canChatWith(selectedUserId)) return;
+      if (!canChatInSelectedContext()) return;
 
       if (!navigator.mediaDevices || !window.MediaRecorder) {
         alert("L’enregistrement vocal n’est pas supporté sur cet appareil.");
@@ -2799,9 +3634,7 @@
             : new MediaRecorder(voiceStream);
 
           voiceMediaRecorder.ondataavailable = (event) => {
-            if (event.data && event.data.size > 0) {
-              voiceChunks.push(event.data);
-            }
+            if (event.data && event.data.size > 0) voiceChunks.push(event.data);
           };
 
           voiceMediaRecorder.onstop = async () => {
@@ -2848,7 +3681,6 @@
           } catch (err) {}
           await cleanupVoiceRecorderState(false);
         }
-
         return;
       }
 
@@ -2858,8 +3690,8 @@
     }
 
     async function sendMessage({ text = "", sticker = "", attachment = null } = {}) {
-      if (!selectedUserId || !currentChatId || !currentUser) return;
-      if (!canChatWith(selectedUserId)) return;
+      if (!currentUser || !currentChatId) return;
+      if (!canChatInSelectedContext()) return;
 
       const finalText = text.trim();
       if (!finalText && !sticker && !attachment) return;
@@ -2867,51 +3699,92 @@
       sendBtn.disabled = true;
 
       try {
-        const msgRef = push(ref(db, `privateMessages/${currentChatId}`));
-        const payload = {
-          senderId: currentUser.uid,
-          receiverId: selectedUserId,
-          text: finalText,
-          sticker: sticker || "",
-          createdAt: Date.now(),
-          readBy: {
-            [currentUser.uid]: Date.now()
-          }
-        };
-
-        if (replyTarget) {
-          payload.replyTo = {
-            id: replyTarget.id,
-            text: replyTarget.text || ""
+        if (currentConversationType === "group") {
+          const msgRef = push(ref(db, `groupMessages/${currentChatId}`));
+          const payload = {
+            senderId: currentUser.uid,
+            receiverId: "",
+            text: finalText,
+            sticker: sticker || "",
+            createdAt: Date.now(),
+            readBy: {
+              [currentUser.uid]: Date.now()
+            },
+            conversationType: "group",
+            groupId: currentChatId,
+            groupName: selectedGroupData?.name || ""
           };
+
+          if (replyTarget) {
+            payload.replyTo = {
+              id: replyTarget.id,
+              text: replyTarget.text || ""
+            };
+          }
+
+          if (attachment) {
+            payload.attachmentType = attachment.type;
+            payload.attachmentUrl = attachment.url;
+            payload.attachmentName = attachment.name || "";
+          }
+
+          await set(msgRef, payload);
+
+          const updates = {};
+          const members = Object.keys(selectedGroupData?.members || {}).filter(uid => uid !== currentUser.uid);
+          members.forEach(uid => {
+            const currentUnread = Number(groupUnreadCounts[currentChatId] || 0);
+            updates[`groupUnreadCountsByUser/${uid}/${currentChatId}`] = currentUnread + 1;
+          });
+          updates[`messageGroups/${currentChatId}/updatedAt`] = Date.now();
+          if (Object.keys(updates).length) await update(ref(db), updates);
+        } else {
+          const msgRef = push(ref(db, `privateMessages/${currentChatId}`));
+          const payload = {
+            senderId: currentUser.uid,
+            receiverId: selectedUserId,
+            text: finalText,
+            sticker: sticker || "",
+            createdAt: Date.now(),
+            readBy: {
+              [currentUser.uid]: Date.now()
+            }
+          };
+
+          if (replyTarget) {
+            payload.replyTo = {
+              id: replyTarget.id,
+              text: replyTarget.text || ""
+            };
+          }
+
+          if (attachment) {
+            payload.attachmentType = attachment.type;
+            payload.attachmentUrl = attachment.url;
+            payload.attachmentName = attachment.name || "";
+          }
+
+          await set(msgRef, payload);
+
+          const unreadSnap = await get(ref(db, `unreadCountsByUser/${selectedUserId}/${currentUser.uid}`));
+          const currentUnread = Number(unreadSnap.val() || 0);
+
+          await update(ref(db), {
+            [`privateThreads/${currentUser.uid}/${selectedUserId}`]: {
+              uid: selectedUserId,
+              lastMessage: finalText || sticker || attachment?.name || "Pièce jointe",
+              lastSenderId: currentUser.uid,
+              updatedAt: Date.now()
+            },
+            [`privateThreads/${selectedUserId}/${currentUser.uid}`]: {
+              uid: currentUser.uid,
+              lastMessage: finalText || sticker || attachment?.name || "Pièce jointe",
+              lastSenderId: currentUser.uid,
+              updatedAt: Date.now()
+            },
+            [`unreadCountsByUser/${selectedUserId}/${currentUser.uid}`]: currentUnread + 1
+          });
         }
-
-        if (attachment) {
-          payload.attachmentType = attachment.type;
-          payload.attachmentUrl = attachment.url;
-          payload.attachmentName = attachment.name || "";
-        }
-
-        await set(msgRef, payload);
-
-        const unreadSnap = await get(ref(db, `unreadCountsByUser/${selectedUserId}/${currentUser.uid}`));
-        const currentUnread = Number(unreadSnap.val() || 0);
-
-        await update(ref(db), {
-          [`privateThreads/${currentUser.uid}/${selectedUserId}`]: {
-            uid: selectedUserId,
-            lastMessage: finalText || sticker || attachment?.name || "Pièce jointe",
-            lastSenderId: currentUser.uid,
-            updatedAt: Date.now()
-          },
-          [`privateThreads/${selectedUserId}/${currentUser.uid}`]: {
-            uid: currentUser.uid,
-            lastMessage: finalText || sticker || attachment?.name || "Pièce jointe",
-            lastSenderId: currentUser.uid,
-            updatedAt: Date.now()
-          },
-          [`unreadCountsByUser/${selectedUserId}/${currentUser.uid}`]: currentUnread + 1
-        });
 
         messageInput.value = "";
         replyTarget = null;
@@ -2950,7 +3823,8 @@
         callDirection: item.fromUid === currentUser?.uid ? "outgoing" : "incoming"
       }).catch(() => {});
     }
-        logoutBtn.addEventListener("click", async () => {
+
+    logoutBtn.addEventListener("click", async () => {
       try { await signOut(auth); } catch (e) {}
       window.location.href = "insights.html";
     });
@@ -2967,6 +3841,36 @@
     memberSearch.addEventListener("input", () => {
       renderMembersList();
     });
+
+    createGroupBtn.addEventListener("click", () => {
+      selectedGroupCreationMembers = new Set();
+      groupNameInput.value = "";
+      groupDescriptionInput.value = "";
+      renderGroupMembersPicker();
+      openModal(groupCreateModal);
+    });
+
+    discoverGroupsBtn.addEventListener("click", () => {
+      currentTab = "groups";
+      tabButtons.forEach(b => b.classList.toggle("active", b.dataset.tab === "groups"));
+      renderMembersList();
+    });
+
+    closeGroupCreateModal.addEventListener("click", () => closeModal(groupCreateModal));
+    cancelCreateGroupBtn.addEventListener("click", () => closeModal(groupCreateModal));
+    confirmCreateGroupBtn.addEventListener("click", createGroupChat);
+
+    groupManageBtn.addEventListener("click", () => {
+      if (!selectedGroupData) return;
+      groupManageText.textContent = `Gestion du groupe ${selectedGroupData.name || ""}.`;
+      renderGroupManageBox();
+      openModal(groupManageModal);
+    });
+
+    closeGroupManageModal.addEventListener("click", () => closeModal(groupManageModal));
+    cancelGroupManageBtn.addEventListener("click", () => closeModal(groupManageModal));
+    confirmAddMemberToGroupBtn.addEventListener("click", addMemberToCurrentGroup);
+    leaveGroupBtn.addEventListener("click", leaveCurrentGroup);
 
     inviteBtn.addEventListener("click", async () => {
       if (!selectedUserId) return;
@@ -3009,7 +3913,10 @@
       if (!selectedUserId) return;
       window.location.href = `profile.html?uid=${encodeURIComponent(selectedUserId)}`;
     });
-    markReadBtn.addEventListener("click", markChatAsRead);
+    markReadBtn.addEventListener("click", async () => {
+      if (currentConversationType === "group") await markGroupMessagesRead();
+      else await markChatAsRead();
+    });
     blockUserBtn.addEventListener("click", toggleBlockSelectedUser);
 
     audioCallBtn.addEventListener("click", () => {
@@ -3023,7 +3930,7 @@
     });
 
     chatOptionsBtn.addEventListener("click", () => {
-      if (!selectedUserId || !selectedUserProfile) return;
+      if (!selectedUserId || !selectedUserProfile || currentConversationType !== "direct") return;
       optionsModalText.textContent = `Discussion avec ${selectedUserProfile.displayName || "ce contact"}.`;
       blockUserBtn.textContent = isBlockedByMe(selectedUserId) ? "Débloquer" : "Bloquer";
       openModal(optionsModal);
@@ -3037,13 +3944,14 @@
     cancelSelectionBtn.addEventListener("click", () => {
       clearSelection();
       toggleSelectionBar();
-      mergeCallEventsIntoMessages();
+      if (currentConversationType === "direct") mergeCallEventsIntoMessages();
+      else renderMessages();
     });
 
     deleteSelectedBtn.addEventListener("click", deleteSelectedMessages);
 
     stickerBtn.addEventListener("click", async () => {
-      if (!canChatWith(selectedUserId)) return;
+      if (!canChatInSelectedContext()) return;
       toggleStickerPanel();
     });
 
@@ -3064,7 +3972,7 @@
     });
 
     attachBtn.addEventListener("click", () => {
-      if (!canChatWith(selectedUserId)) return;
+      if (!canChatInSelectedContext()) return;
       attachmentInput.click();
     });
 
@@ -3109,7 +4017,7 @@
     });
 
     messageInput.addEventListener("input", async () => {
-      if (!canChatWith(selectedUserId)) return;
+      if (!canChatInSelectedContext()) return;
       if (!isCurrentlyTyping) {
         isCurrentlyTyping = true;
         await setTypingState(true, "text");
@@ -3136,7 +4044,7 @@
       window.location.href = `calls.html?user=${encodeURIComponent(currentIncomingCall.fromUid || "")}`;
     });
 
-    [inviteModal, forwardModal, reportModal, optionsModal, incomingCallModal].forEach(modal => {
+    [inviteModal, groupCreateModal, groupManageModal, forwardModal, reportModal, optionsModal, incomingCallModal].forEach(modal => {
       modal.addEventListener("click", (e) => {
         if (e.target === modal) closeModal(modal);
       });
@@ -3179,10 +4087,19 @@
       listenMissedCallsTotals();
       listenCallsHistory();
       listenIncomingCalls();
+      listenGroups();
 
       const params = new URLSearchParams(window.location.search);
       const preselectedUid = params.get("user");
-      if (preselectedUid) {
+      const preselectedGroup = params.get("group");
+
+      if (preselectedGroup) {
+        setTimeout(() => {
+          if (groupsMap[preselectedGroup]) {
+            selectGroup(preselectedGroup);
+          }
+        }, 500);
+      } else if (preselectedUid) {
         setTimeout(() => {
           if (usersCache[preselectedUid]) {
             selectUser(preselectedUid);
@@ -3192,6 +4109,7 @@
 
       updateComposerState();
       updateSelectedHeader();
+      renderGroupMembersPicker();
     });
 
     window.addEventListener("beforeunload", async () => {
