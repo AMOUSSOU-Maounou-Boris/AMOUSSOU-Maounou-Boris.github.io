@@ -825,6 +825,78 @@
       padding:12px 0 4px;
     }
 
+    .approval-cookie-box{
+      border:1px solid #dce7f5;
+      background:linear-gradient(180deg,#f8fbff 0%,#f3f8ff 100%);
+      border-radius:16px;
+      padding:12px 14px;
+      display:grid;
+      gap:8px;
+    }
+
+    .approval-cookie-title{
+      font-size:13px;
+      font-weight:900;
+      color:#082e5b;
+      letter-spacing:.2px;
+    }
+
+    .approval-cookie-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:8px 12px;
+    }
+
+    .approval-cookie-item{
+      font-size:12px;
+      color:#41566f;
+      line-height:1.5;
+      word-break:break-word;
+    }
+
+    .approval-cookie-item strong{
+      color:#082e5b;
+      display:block;
+      margin-bottom:2px;
+      font-size:12px;
+    }
+
+    .approval-cookie-accepted{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:#ecfdf3;
+      color:#166534;
+      border-radius:999px;
+      padding:7px 11px;
+      font-weight:800;
+      font-size:12px;
+      width:max-content;
+      max-width:100%;
+    }
+
+    .approval-cookie-rejected{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:#fff1f2;
+      color:#b42318;
+      border-radius:999px;
+      padding:7px 11px;
+      font-weight:800;
+      font-size:12px;
+      width:max-content;
+      max-width:100%;
+    }
+
+    .approval-cookie-note{
+      font-size:12px;
+      color:#6b7d93;
+      line-height:1.55;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
     .modal{
       position:fixed;
       inset:0;
@@ -914,7 +986,8 @@
 
     @media (max-width: 900px){
       .grid-2,
-      .field-grid{
+      .field-grid,
+      .approval-cookie-grid{
         grid-template-columns:1fr;
       }
       .hero-top{
@@ -1752,6 +1825,208 @@ ${message}`;
       return out;
     }
 
+    function normalizeCookieInfo(item = {}) {
+      const cookieInfo =
+        item.cookieConsent ||
+        item.cookies ||
+        item.cookieData ||
+        item.cookiesData ||
+        item.cookiesInfo ||
+        item.cookieSnapshot ||
+        item.cookiePreferences ||
+        null;
+
+      const accepted =
+        typeof item.cookieAccepted === "boolean" ? item.cookieAccepted :
+        typeof item.cookiesAccepted === "boolean" ? item.cookiesAccepted :
+        typeof cookieInfo?.accepted === "boolean" ? cookieInfo.accepted :
+        typeof cookieInfo?.consentGiven === "boolean" ? cookieInfo.consentGiven :
+        typeof cookieInfo?.granted === "boolean" ? cookieInfo.granted :
+        null;
+
+      const acceptedAt =
+        item.cookieAcceptedAt ||
+        item.cookiesAcceptedAt ||
+        cookieInfo?.acceptedAt ||
+        cookieInfo?.consentAt ||
+        cookieInfo?.savedAt ||
+        0;
+
+      const name =
+        item.cookieName ||
+        item.cookiesName ||
+        cookieInfo?.name ||
+        cookieInfo?.fullName ||
+        cookieInfo?.displayName ||
+        item.displayName ||
+        "";
+
+      const email =
+        item.cookieEmail ||
+        item.cookiesEmail ||
+        cookieInfo?.email ||
+        item.email ||
+        "";
+
+      const browser =
+        item.cookieBrowser ||
+        item.cookiesBrowser ||
+        cookieInfo?.browser ||
+        cookieInfo?.userAgent ||
+        "";
+
+      const ip =
+        item.cookieIp ||
+        item.cookiesIp ||
+        cookieInfo?.ip ||
+        "";
+
+      const device =
+        item.cookieDevice ||
+        item.cookiesDevice ||
+        cookieInfo?.device ||
+        "";
+
+      const platform =
+        item.cookiePlatform ||
+        item.cookiesPlatform ||
+        cookieInfo?.platform ||
+        "";
+
+      const language =
+        item.cookieLanguage ||
+        item.cookiesLanguage ||
+        cookieInfo?.language ||
+        "";
+
+      const sourcePage =
+        item.cookieSourcePage ||
+        item.cookiesSourcePage ||
+        cookieInfo?.sourcePage ||
+        cookieInfo?.page ||
+        "";
+
+      const invitationEmail =
+        item.invitedEmail ||
+        item.inviteEmail ||
+        item.expectedEmail ||
+        item.email ||
+        "";
+
+      const rawPreferences =
+        cookieInfo?.preferences ||
+        cookieInfo?.choices ||
+        cookieInfo?.categories ||
+        item.cookiePreferencesRaw ||
+        null;
+
+      let preferencesText = "";
+      if (typeof rawPreferences === "string") {
+        preferencesText = rawPreferences;
+      } else if (rawPreferences && typeof rawPreferences === "object") {
+        preferencesText = Object.entries(rawPreferences)
+          .map(([k, v]) => `${k}: ${typeof v === "boolean" ? (v ? "oui" : "non") : String(v)}`)
+          .join(" • ");
+      }
+
+      return {
+        accepted,
+        acceptedAt,
+        name,
+        email,
+        browser,
+        ip,
+        device,
+        platform,
+        language,
+        sourcePage,
+        invitationEmail,
+        preferencesText
+      };
+    }
+
+    function renderCookieAdminBlock(item = {}) {
+      const cookie = normalizeCookieInfo(item);
+      const hasCookieData =
+        cookie.accepted !== null ||
+        !!cookie.acceptedAt ||
+        !!cookie.name ||
+        !!cookie.email ||
+        !!cookie.browser ||
+        !!cookie.ip ||
+        !!cookie.device ||
+        !!cookie.platform ||
+        !!cookie.language ||
+        !!cookie.sourcePage ||
+        !!cookie.preferencesText;
+
+      if (!hasCookieData) {
+        return `
+          <div class="approval-cookie-box">
+            <div class="approval-cookie-title">Cookies liés à cette demande</div>
+            <div class="approval-cookie-note">Aucune information cookies enregistrée pour cette demande pour le moment.</div>
+          </div>
+        `;
+      }
+
+      const consentBadge = cookie.accepted === true
+        ? `<div class="approval-cookie-accepted">Cookies acceptés</div>`
+        : cookie.accepted === false
+          ? `<div class="approval-cookie-rejected">Cookies refusés</div>`
+          : `<span class="pill info">État cookies non précisé</span>`;
+
+      return `
+        <div class="approval-cookie-box">
+          <div class="approval-cookie-title">Cookies liés à cette demande</div>
+          ${consentBadge}
+          <div class="approval-cookie-grid">
+            <div class="approval-cookie-item">
+              <strong>Nom associé</strong>
+              <span>${escapeHtml(cookie.name || item.displayName || "Non renseigné")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Email associé</strong>
+              <span>${escapeHtml(cookie.email || cookie.invitationEmail || item.email || "Non renseigné")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Date consentement</strong>
+              <span>${escapeHtml(formatDate(cookie.acceptedAt) || "Non renseignée")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Page source</strong>
+              <span>${escapeHtml(cookie.sourcePage || "Non renseignée")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Appareil</strong>
+              <span>${escapeHtml(cookie.device || "Non renseigné")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Plateforme</strong>
+              <span>${escapeHtml(cookie.platform || "Non renseignée")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Navigateur</strong>
+              <span>${escapeHtml(cookie.browser || "Non renseigné")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Langue</strong>
+              <span>${escapeHtml(cookie.language || "Non renseignée")}</span>
+            </div>
+            <div class="approval-cookie-item" style="grid-column:1 / -1;">
+              <strong>IP / identifiant réseau</strong>
+              <span>${escapeHtml(cookie.ip || "Non renseigné")}</span>
+            </div>
+          </div>
+          ${cookie.preferencesText ? `
+            <div class="approval-cookie-note">
+              <strong style="color:#082e5b;">Préférences cookies :</strong><br>
+              ${escapeHtml(cookie.preferencesText)}
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }
+
     async function createSignupInvite() {
       if (!isRealAdminContext()) return;
 
@@ -1890,6 +2165,8 @@ ${message}`;
               ${item.approvedAt ? `Approuvé le : ${escapeHtml(formatDate(item.approvedAt))}<br>` : ""}
               ${item.rejectedAt ? `Refusé le : ${escapeHtml(formatDate(item.rejectedAt))}<br>` : ""}
             </div>
+
+            ${renderCookieAdminBlock(item)}
 
             ${status === "pending_admin_approval" ? `
               <div class="approval-actions">
@@ -2307,8 +2584,7 @@ ${message}`;
       const postsData = postsSnap.val() || {};
       const commentsData = commentsSnap.val() || {};
       const likesData = likesSnap.val() || {};
-
-      for (const [postId, post] of Object.entries(postsData)) {
+            for (const [postId, post] of Object.entries(postsData)) {
         if ((post || {}).authorId === uid) {
           await remove(ref(db, `posts/${postId}`));
           await remove(ref(db, `comments/${postId}`));
