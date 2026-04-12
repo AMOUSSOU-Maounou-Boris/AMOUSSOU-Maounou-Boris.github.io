@@ -107,6 +107,46 @@
       font-weight:700;
       line-height:1.5;
       color:#5e738b;
+      white-space:pre-wrap;
+    }
+
+    .cookie-details-toggle{
+      margin-top:12px;
+      border:1px solid #dce7f3;
+      background:#ffffff;
+      border-radius:12px;
+      overflow:hidden;
+    }
+
+    .cookie-details-summary{
+      list-style:none;
+      cursor:pointer;
+      padding:12px 14px;
+      font-weight:800;
+      color:#0b2f57;
+      user-select:none;
+    }
+
+    .cookie-details-summary::-webkit-details-marker{
+      display:none;
+    }
+
+    .cookie-details-content{
+      border-top:1px solid #e4edf6;
+      padding:12px 14px 14px;
+      color:#5e738b;
+      line-height:1.65;
+      font-size:13px;
+      background:#fbfdff;
+    }
+
+    .cookie-details-content ul{
+      margin:8px 0 0 18px;
+      padding:0;
+    }
+
+    .cookie-details-content li{
+      margin-bottom:6px;
     }
 
     .field{ margin-bottom:14px; }
@@ -194,12 +234,41 @@
 
     <div class="cookie-box" id="cookieBox">
       <strong>Consentement cookies</strong>
-      Ce site utilise des cookies et le stockage local du navigateur pour garder la session, sécuriser l’accès et améliorer l’expérience utilisateur.  
+      Ce site utilise des cookies et le stockage local du navigateur pour garder la session, sécuriser l’accès et améliorer l’expérience utilisateur.
       Tu dois accepter ces cookies pour créer un compte et accéder aux espaces privés du site.
+
+      <details class="cookie-details-toggle">
+        <summary class="cookie-details-summary">Voir les cookies et données techniques utilisés</summary>
+        <div class="cookie-details-content">
+          Nous utilisons uniquement des informations techniques et administratives raisonnables pour :
+          <ul>
+            <li>sécuriser l’accès au site</li>
+            <li>lier une demande d’invitation à une création de compte</li>
+            <li>suivre le consentement cookies</li>
+            <li>aider l’administrateur à vérifier les demandes</li>
+            <li>diagnostiquer certains problèmes techniques de connexion</li>
+          </ul>
+          <br>
+          Les informations pouvant être enregistrées après consentement sont par exemple :
+          <ul>
+            <li>nom et email saisis</li>
+            <li>date et statut du consentement</li>
+            <li>navigateur / userAgent</li>
+            <li>langue du navigateur</li>
+            <li>plateforme déclarée par le navigateur</li>
+            <li>dimensions écran et fenêtre</li>
+            <li>fuseau horaire</li>
+            <li>page d’origine et contexte de création</li>
+          </ul>
+          Aucune adresse IP réelle n’est collectée ici côté client seul, et aucune collecte agressive cachée n’est effectuée dans ce code.
+        </div>
+      </details>
+
       <div class="cookie-actions">
         <button class="cookie-btn accept" id="acceptCookiesBtn" type="button">Accepter</button>
         <button class="cookie-btn reject" id="rejectCookiesBtn" type="button">Refuser</button>
       </div>
+
       <div class="cookie-status" id="cookieStatus">
         En attente de ta décision.
       </div>
@@ -234,7 +303,7 @@
     </div>
 
     <div class="small-note">
-      Certaines informations techniques de contexte navigateur peuvent être enregistrées au moment de la création du compte pour l’administration et la sécurité du site.
+      Certaines informations techniques de contexte navigateur peuvent être enregistrées au moment de la création du compte pour l’administration, la sécurité du site et le suivi du consentement cookies.
     </div>
   </div>
 
@@ -254,6 +323,7 @@
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
     const COOKIE_KEY = "brh_cookie_consent";
+    const COOKIE_DB_PATH = "siteSecurity/cookieConsents";
 
     const displayName = document.getElementById("displayName");
     const email = document.getElementById("email");
@@ -274,6 +344,7 @@
     let inviteOk = false;
     let inviteData = null;
     let cookieConsentAccepted = false;
+    let cookieConsentRecordId = "";
 
     const nowTs = () => Date.now();
 
@@ -287,14 +358,6 @@
       inviteStatus.className = "invite-box" + (type ? " " + type : "");
     }
 
-    function setCookieConsentState(accepted) {
-      cookieConsentAccepted = !!accepted;
-      signupBtn.disabled = !cookieConsentAccepted || !inviteOkReady();
-      cookieStatus.textContent = accepted
-        ? "Cookies acceptés. Tu peux continuer."
-        : "Tu dois accepter les cookies pour créer un compte.";
-    }
-
     function inviteOkReady() {
       const mail = email.value.trim().toLowerCase();
       const isAdmin = mail === ADMIN_EMAIL.toLowerCase();
@@ -305,6 +368,24 @@
       signupBtn.disabled = !(cookieConsentAccepted && inviteOkReady());
     }
 
+    function setCookieConsentState(accepted) {
+      cookieConsentAccepted = !!accepted;
+      signupBtn.disabled = !cookieConsentAccepted || !inviteOkReady();
+      cookieStatus.textContent = accepted
+        ? "Cookies acceptés. Tu peux continuer."
+        : "Tu dois accepter les cookies pour créer un compte.";
+    }
+
+    function sanitizeEmail(mail = ""){
+      return String(mail || "").trim().toLowerCase();
+    }
+
+    function makeConsentId(mail = "", token = ""){
+      const cleanMail = sanitizeEmail(mail).replace(/[^a-z0-9]/gi, "_") || "unknown";
+      const cleanToken = String(token || "noinvite").replace(/[^a-z0-9]/gi, "_");
+      return `${cleanMail}__${cleanToken}`;
+    }
+
     function getBrowserFingerprintInfo() {
       let timezone = "";
       try {
@@ -313,30 +394,113 @@
         timezone = "";
       }
 
+      let deviceMemory = null;
+      try {
+        deviceMemory = typeof navigator.deviceMemory !== "undefined" ? navigator.deviceMemory : null;
+      } catch(e){
+        deviceMemory = null;
+      }
+
+      let hardwareConcurrency = null;
+      try {
+        hardwareConcurrency = typeof navigator.hardwareConcurrency !== "undefined" ? navigator.hardwareConcurrency : null;
+      } catch(e){
+        hardwareConcurrency = null;
+      }
+
       return {
         userAgent: navigator.userAgent || "",
         language: navigator.language || "",
         languages: Array.isArray(navigator.languages) ? navigator.languages : [],
         platform: navigator.platform || "",
+        vendor: navigator.vendor || "",
         cookieEnabled: navigator.cookieEnabled === true,
         screenWidth: window.screen?.width || null,
         screenHeight: window.screen?.height || null,
+        colorDepth: window.screen?.colorDepth || null,
+        pixelDepth: window.screen?.pixelDepth || null,
         viewportWidth: window.innerWidth || null,
         viewportHeight: window.innerHeight || null,
         timezone,
         referrer: document.referrer || "",
         pageUrl: window.location.href || "",
         hostname: window.location.hostname || "",
+        deviceMemory,
+        hardwareConcurrency,
         createdFromPage: "signup.html",
         createdAtISO: new Date().toISOString(),
-        ipNote: "Adresse IP non collectée ici sans backend ou service externe."
+        ipNote: "Adresse IP non collectée ici sans backend ou service externe.",
+        deviceBrandNote: "Marque téléphone non déduite explicitement ici pour rester dans une collecte technique raisonnable."
+      };
+    }
+
+    async function saveCookieConsentRecord({ accepted, rejected = false, explicitEmail = "", explicitName = "" } = {}) {
+      const mail = sanitizeEmail(explicitEmail || email.value);
+      const name = (explicitName || displayName.value || "").trim();
+      const consentId = makeConsentId(mail, inviteToken);
+      const browserInfo = getBrowserFingerprintInfo();
+      const status = accepted ? "accepted" : (rejected ? "rejected" : "pending");
+      const timestamp = nowTs();
+
+      cookieConsentRecordId = consentId;
+
+      const payload = {
+        id: consentId,
+        inviteToken: inviteToken || "",
+        email: mail || "",
+        name: name || "",
+        status,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        acceptedAt: accepted ? timestamp : 0,
+        rejectedAt: rejected ? timestamp : 0,
+        linkedToUid: "",
+        sourcePage: "signup.html",
+        consentVersion: "v1",
+        policyNote: "Consentement cookies recueilli avant création du compte.",
+        ...browserInfo
+      };
+
+      try {
+        const existingSnap = await get(ref(db, COOKIE_DB_PATH + "/" + consentId));
+        if (existingSnap.exists()) {
+          const oldData = existingSnap.val() || {};
+          await update(ref(db, COOKIE_DB_PATH + "/" + consentId), {
+            ...oldData,
+            email: mail || oldData.email || "",
+            name: name || oldData.name || "",
+            status,
+            updatedAt: timestamp,
+            acceptedAt: accepted ? timestamp : (oldData.acceptedAt || 0),
+            rejectedAt: rejected ? timestamp : (oldData.rejectedAt || 0),
+            inviteToken: inviteToken || oldData.inviteToken || "",
+            sourcePage: "signup.html",
+            consentVersion: "v1",
+            policyNote: "Consentement cookies recueilli avant création du compte.",
+            ...browserInfo
+          });
+        } else {
+          await set(ref(db, COOKIE_DB_PATH + "/" + consentId), payload);
+        }
+      } catch (e) {
+        console.error("COOKIE CONSENT SAVE ERROR:", e);
+      }
+
+      return {
+        id: consentId,
+        status,
+        acceptedAt: accepted ? timestamp : 0,
+        rejectedAt: rejected ? timestamp : 0,
+        email: mail || "",
+        name: name || "",
+        ...browserInfo
       };
     }
 
     async function checkInvite(){
-      const mail = email.value.trim().toLowerCase();
+      const mail = sanitizeEmail(email.value);
 
-      if(mail === ADMIN_EMAIL){
+      if(mail === ADMIN_EMAIL.toLowerCase()){
         inviteOk = true;
         inviteData = null;
         showInvite("Compte administrateur : accès libre. S’il existe déjà, connecte-toi simplement.", "ok");
@@ -405,30 +569,68 @@
       }
     }
 
-    acceptCookiesBtn.addEventListener("click", () => {
+    acceptCookiesBtn.addEventListener("click", async () => {
       localStorage.setItem(COOKIE_KEY, "accepted");
       setCookieConsentState(true);
+
+      const consent = await saveCookieConsentRecord({
+        accepted: true,
+        explicitEmail: email.value,
+        explicitName: displayName.value
+      });
+
+      cookieStatus.textContent =
+        "Cookies acceptés. Tu peux continuer.\n" +
+        "Un enregistrement administratif du consentement a été préparé.";
     });
 
-    rejectCookiesBtn.addEventListener("click", () => {
+    rejectCookiesBtn.addEventListener("click", async () => {
       localStorage.removeItem(COOKIE_KEY);
       cookieConsentAccepted = false;
-      cookieStatus.textContent = "Tu as refusé les cookies. Retour vers la page publique...";
       signupBtn.disabled = true;
+
+      await saveCookieConsentRecord({
+        accepted: false,
+        rejected: true,
+        explicitEmail: email.value,
+        explicitName: displayName.value
+      });
+
+      cookieStatus.textContent = "Tu as refusé les cookies. Retour vers la page publique...";
       setTimeout(() => {
         window.location.replace("./index.html");
       }, 900);
     });
 
-    email.addEventListener("input", checkInvite);
+    email.addEventListener("input", async () => {
+      await checkInvite();
+      if (cookieConsentAccepted) {
+        await saveCookieConsentRecord({
+          accepted: true,
+          explicitEmail: email.value,
+          explicitName: displayName.value
+        });
+      }
+    });
+
+    displayName.addEventListener("input", async () => {
+      if (cookieConsentAccepted) {
+        await saveCookieConsentRecord({
+          accepted: true,
+          explicitEmail: email.value,
+          explicitName: displayName.value
+        });
+      }
+    });
 
     signupBtn.addEventListener("click", async () => {
       const name = displayName.value.trim();
-      const mail = email.value.trim().toLowerCase();
+      const mail = sanitizeEmail(email.value);
       const pass = password.value;
       const confirm = confirmPassword.value;
-      const isAdmin = mail === ADMIN_EMAIL;
+      const isAdmin = mail === ADMIN_EMAIL.toLowerCase();
       const browserInfo = getBrowserFingerprintInfo();
+      const actionTs = nowTs();
 
       if (!cookieConsentAccepted) {
         showMsg("Tu dois accepter les cookies pour créer un compte.");
@@ -455,7 +657,7 @@
         return;
       }
 
-      if(!isAdmin && inviteData?.email && mail !== String(inviteData.email).toLowerCase()){
+      if(!isAdmin && inviteData?.email && mail !== sanitizeEmail(inviteData.email)){
         showMsg("Tu dois utiliser l’adresse email prévue dans l’invitation.");
         return;
       }
@@ -464,6 +666,12 @@
       showMsg("Création du compte en cours...", true);
 
       try{
+        const consentRecord = await saveCookieConsentRecord({
+          accepted: true,
+          explicitEmail: mail,
+          explicitName: name
+        });
+
         const cred = await createUserWithEmailAndPassword(auth, mail, pass);
         const user = cred.user;
 
@@ -492,15 +700,28 @@
           role: isAdmin ? "admin" : "member",
           accountStatus: isAdmin ? "approved" : "pending_admin_approval",
           approvedBy: isAdmin ? ADMIN_EMAIL : "",
-          approvedAt: isAdmin ? nowTs() : 0,
+          approvedAt: isAdmin ? actionTs : 0,
           rejectedAt: 0,
           emailVerifiedAtSignup: isAdmin,
-          createdAt: nowTs(),
-          updatedAt: nowTs(),
+          createdAt: actionTs,
+          updatedAt: actionTs,
           signupInviteToken: isAdmin ? "" : inviteToken,
           cookiesConsentAccepted: true,
-          cookiesConsentAcceptedAt: nowTs(),
+          cookiesConsentAcceptedAt: actionTs,
+          cookiesConsentRecordId: consentRecord.id,
           signupContext: browserInfo,
+          cookieConsent: {
+            accepted: true,
+            acceptedAt: actionTs,
+            id: consentRecord.id,
+            name: name,
+            email: mail,
+            userAgent: browserInfo.userAgent || "",
+            language: browserInfo.language || "",
+            timezone: browserInfo.timezone || "",
+            platform: browserInfo.platform || "",
+            sourcePage: "signup.html"
+          },
           privacy: {
             hideEmail: true,
             hideBio: false,
@@ -508,8 +729,18 @@
           },
           presence: {
             online: false,
-            lastSeen: nowTs()
+            lastSeen: actionTs
           }
+        });
+
+        await update(ref(db, COOKIE_DB_PATH + "/" + consentRecord.id), {
+          linkedToUid: user.uid,
+          linkedAt: actionTs,
+          email: mail,
+          name: name,
+          status: "accepted",
+          acceptedAt: actionTs,
+          updatedAt: actionTs
         });
 
         if(!isAdmin){
@@ -517,7 +748,7 @@
             used: true,
             usedByUid: user.uid,
             usedByEmail: mail,
-            usedAt: nowTs()
+            usedAt: actionTs
           });
 
           await set(ref(db, "accountApprovals/" + user.uid), {
@@ -525,13 +756,27 @@
             displayName: name,
             email: mail,
             status: "pending_admin_approval",
-            createdAt: nowTs(),
+            createdAt: actionTs,
             inviteToken: inviteToken,
             inviteCreatedBy: inviteData?.createdBy || "",
             emailVerified: false,
             cookiesConsentAccepted: true,
-            cookiesConsentAcceptedAt: nowTs(),
+            cookiesConsentAcceptedAt: actionTs,
+            cookiesConsentRecordId: consentRecord.id,
             signupContext: browserInfo,
+            cookieConsent: {
+              accepted: true,
+              acceptedAt: actionTs,
+              id: consentRecord.id,
+              name: name,
+              email: mail,
+              userAgent: browserInfo.userAgent || "",
+              language: browserInfo.language || "",
+              timezone: browserInfo.timezone || "",
+              platform: browserInfo.platform || "",
+              sourcePage: "signup.html",
+              linkedToUid: user.uid
+            },
             verificationMailSent,
             verificationMailErrorCode: verificationMailErrorCode || "",
             adminNote:
@@ -557,6 +802,35 @@
             );
           }
         } else {
+          await set(ref(db, "accountApprovals/" + user.uid), {
+            uid: user.uid,
+            displayName: name,
+            email: mail,
+            status: "approved",
+            createdAt: actionTs,
+            approvedAt: actionTs,
+            approvedBy: ADMIN_EMAIL,
+            emailVerified: true,
+            cookiesConsentAccepted: true,
+            cookiesConsentAcceptedAt: actionTs,
+            cookiesConsentRecordId: consentRecord.id,
+            signupContext: browserInfo,
+            cookieConsent: {
+              accepted: true,
+              acceptedAt: actionTs,
+              id: consentRecord.id,
+              name: name,
+              email: mail,
+              userAgent: browserInfo.userAgent || "",
+              language: browserInfo.language || "",
+              timezone: browserInfo.timezone || "",
+              platform: browserInfo.platform || "",
+              sourcePage: "signup.html",
+              linkedToUid: user.uid
+            },
+            adminNote: "Compte administrateur créé."
+          });
+
           showMsg("Compte admin créé avec succès. Tu peux maintenant te connecter.", true);
         }
 
