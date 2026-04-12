@@ -1031,11 +1031,16 @@
       <a href="cv.html">Resume</a>
       <a href="contact.html">Contact</a>
       <a href="insights.html">Insights</a>
-      <a href="messages.html">Messages</a>
+      <a href="messages.html" class="nav-link-with-badge">
+        <span>Messages</span>
+        <span id="messagesBadge" class="nav-badge" style="display:none;">0</span>
+      </a>
       <a href="calls.html" class="active nav-link-with-badge">
         <span>Appels</span>
         <span id="missedCallsBadge" class="nav-badge" style="display:none;">0</span>
       </a>
+      <a href="meeting-room.html" id="meetingNavLink" style="display:none;">Salle de réunion</a>
+      <a href="gestion-groupe.html" id="groupAdminLink" style="display:none;">Gestion groupes</a>
       <a href="profile.html"><span class="nav-online-dot"></span> Mon compte</a>
       <a href="competition.html">Concours</a>
     </nav>
@@ -1182,6 +1187,7 @@
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
     const CALL_CLEANUP_DELAY = 3500;
     const MISSED_CALL_TIMEOUT = 45000;
+    const OWNER_EMAIL = "borisamoussou01@gmail.com";
 
     const myAvatar = document.getElementById("myAvatar");
     const myName = document.getElementById("myName");
@@ -1190,6 +1196,9 @@
     const contactsList = document.getElementById("contactsList");
     const tabButtons = document.querySelectorAll(".tab-btn");
     const missedCallsBadge = document.getElementById("missedCallsBadge");
+    const messagesBadge = document.getElementById("messagesBadge");
+    const meetingNavLink = document.getElementById("meetingNavLink");
+    const groupAdminLink = document.getElementById("groupAdminLink");
     const callHistoryList = document.getElementById("callHistoryList");
     const markMissedReadBtn = document.getElementById("markMissedReadBtn");
     const clearHistoryBtn = document.getElementById("clearHistoryBtn");
@@ -1257,6 +1266,7 @@
     let contactsListenerStarted = false;
     let missedCallsListenerStarted = false;
     let callHistoryListenerStarted = false;
+    let unreadMessagesListenerStarted = false;
     let muted = false;
     let cameraEnabled = true;
     let callEnding = false;
@@ -1265,6 +1275,7 @@
     let ringtoneArmed = false;
     let currentMissedCallsMap = {};
     let currentHistoryMap = {};
+    let currentUnreadMessagesMap = {};
 
     let localVideoEl = null;
     let remoteVideoEl = null;
@@ -1293,6 +1304,16 @@
       rtcpMuxPolicy: "require",
       iceCandidatePoolSize: 4
     };
+
+    function isAdminEmail(mail = "") {
+      return String(mail).trim().toLowerCase() === OWNER_EMAIL.toLowerCase();
+    }
+
+    function updateAdminNavLinks() {
+      const isAdmin = isAdminEmail(currentUser?.email || "");
+      if (meetingNavLink) meetingNavLink.style.display = isAdmin ? "inline-flex" : "none";
+      if (groupAdminLink) groupAdminLink.style.display = isAdmin ? "inline-flex" : "none";
+    }
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
@@ -1480,6 +1501,21 @@
       }
     }
 
+    function updateMessagesBadge(data = {}) {
+      currentUnreadMessagesMap = data || {};
+      const total = Object.values(currentUnreadMessagesMap).reduce((sum, val) => sum + Number(val || 0), 0);
+
+      if (!messagesBadge) return;
+
+      if (total > 0) {
+        messagesBadge.style.display = "inline-flex";
+        messagesBadge.textContent = total > 99 ? "99+" : String(total);
+      } else {
+        messagesBadge.style.display = "none";
+        messagesBadge.textContent = "0";
+      }
+    }
+
     function renderCallHistory() {
       const entries = Object.entries(currentHistoryMap || {})
         .map(([id, item]) => ({ id, ...(item || {}) }))
@@ -1548,6 +1584,24 @@
           ...base,
           unread: base.status === "missed"
         });
+
+        const chatId = getConversationKey(item.fromUid, item.toUid);
+        const callEventPayload = {
+          senderId: item.fromUid,
+          receiverId: item.toUid,
+          text: "",
+          sticker: "",
+          createdAt: item.createdAt || Date.now(),
+          readBy: {
+            [item.fromUid]: Date.now()
+          },
+          messageType: "call_event",
+          callMode: item.mode || "audio",
+          callStatus: item.status || "ended",
+          callDirection: "outgoing"
+        };
+
+        await set(ref(db, `privateMessages/${chatId}/call_event_${item.callId}`), callEventPayload).catch(() => {});
       } catch (e) {
         console.error("Erreur historique appel :", e);
       }
@@ -1668,6 +1722,7 @@
       };
       setAvatar(myAvatar, myProfile.photoURL, myProfile.displayName, myProfile.email);
       myName.textContent = myProfile.displayName || "Utilisateur";
+      updateAdminNavLinks();
     }
 
     async function bindPresence() {
@@ -1734,6 +1789,15 @@
 
       onValue(ref(db, `missedCalls/${currentUser.uid}`), (snap) => {
         updateMissedCallsBadge(snap.val() || {});
+      });
+    }
+
+    function listenUnreadMessagesBadge() {
+      if (unreadMessagesListenerStarted || !currentUser) return;
+      unreadMessagesListenerStarted = true;
+
+      onValue(ref(db, `unreadCountsByUser/${currentUser.uid}`), (snap) => {
+        updateMessagesBadge(snap.val() || {});
       });
     }
 
@@ -2436,7 +2500,8 @@ Heure : ${formatDate(Date.now())}`;
         setStatus("Erreur d’appel.", true);
       }
     }
-        function listenForCalls() {
+
+    function listenForCalls() {
       if (incomingCallsListenerStarted) return;
       incomingCallsListenerStarted = true;
 
@@ -2601,7 +2666,6 @@ Heure : ${formatDate(Date.now())}`;
         if (e.target === modal) closeModal(modal);
       });
     });
-
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "insights.html";
@@ -2625,6 +2689,7 @@ Heure : ${formatDate(Date.now())}`;
       loadContacts();
       listenForCalls();
       listenMissedCallsBadge();
+      listenUnreadMessagesBadge();
       listenCallHistory();
       setupSelectedContactUI();
 
