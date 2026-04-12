@@ -1412,6 +1412,7 @@
     const MAX_HEIGHT = 900;
     const JPEG_QUALITY = 0.72;
     const ONLINE_STALE_LIMIT = 75 * 1000;
+    const COOKIE_DB_PATH = "siteSecurity/cookieConsents";
 
     const params = new URLSearchParams(window.location.search);
     const requestedUid = params.get("uid");
@@ -1836,9 +1837,18 @@ ${message}`;
         item.cookiePreferences ||
         null;
 
+      const signupContext = item.signupContext || {};
+      const cookieRecordId =
+        item.cookiesConsentRecordId ||
+        item.cookieConsentRecordId ||
+        cookieInfo?.id ||
+        item.cookieRecordId ||
+        "";
+
       const accepted =
         typeof item.cookieAccepted === "boolean" ? item.cookieAccepted :
         typeof item.cookiesAccepted === "boolean" ? item.cookiesAccepted :
+        typeof item.cookiesConsentAccepted === "boolean" ? item.cookiesConsentAccepted :
         typeof cookieInfo?.accepted === "boolean" ? cookieInfo.accepted :
         typeof cookieInfo?.consentGiven === "boolean" ? cookieInfo.consentGiven :
         typeof cookieInfo?.granted === "boolean" ? cookieInfo.granted :
@@ -1847,6 +1857,7 @@ ${message}`;
       const acceptedAt =
         item.cookieAcceptedAt ||
         item.cookiesAcceptedAt ||
+        item.cookiesConsentAcceptedAt ||
         cookieInfo?.acceptedAt ||
         cookieInfo?.consentAt ||
         cookieInfo?.savedAt ||
@@ -1873,30 +1884,37 @@ ${message}`;
         item.cookiesBrowser ||
         cookieInfo?.browser ||
         cookieInfo?.userAgent ||
+        signupContext.userAgent ||
         "";
 
       const ip =
         item.cookieIp ||
         item.cookiesIp ||
         cookieInfo?.ip ||
+        signupContext.ip ||
         "";
 
       const device =
         item.cookieDevice ||
         item.cookiesDevice ||
         cookieInfo?.device ||
+        cookieInfo?.deviceBrand ||
+        signupContext.device ||
+        signupContext.deviceBrandNote ||
         "";
 
       const platform =
         item.cookiePlatform ||
         item.cookiesPlatform ||
         cookieInfo?.platform ||
+        signupContext.platform ||
         "";
 
       const language =
         item.cookieLanguage ||
         item.cookiesLanguage ||
         cookieInfo?.language ||
+        signupContext.language ||
         "";
 
       const sourcePage =
@@ -1904,6 +1922,57 @@ ${message}`;
         item.cookiesSourcePage ||
         cookieInfo?.sourcePage ||
         cookieInfo?.page ||
+        signupContext.createdFromPage ||
+        signupContext.pageUrl ||
+        "";
+
+      const timezone =
+        item.cookieTimezone ||
+        item.cookiesTimezone ||
+        cookieInfo?.timezone ||
+        signupContext.timezone ||
+        "";
+
+      const vendor =
+        item.cookieVendor ||
+        item.cookiesVendor ||
+        cookieInfo?.vendor ||
+        signupContext.vendor ||
+        "";
+
+      const hostname =
+        item.cookieHostname ||
+        item.cookiesHostname ||
+        cookieInfo?.hostname ||
+        signupContext.hostname ||
+        "";
+
+      const screenWidth =
+        item.cookieScreenWidth ||
+        item.cookiesScreenWidth ||
+        cookieInfo?.screenWidth ||
+        signupContext.screenWidth ||
+        "";
+
+      const screenHeight =
+        item.cookieScreenHeight ||
+        item.cookiesScreenHeight ||
+        cookieInfo?.screenHeight ||
+        signupContext.screenHeight ||
+        "";
+
+      const viewportWidth =
+        item.cookieViewportWidth ||
+        item.cookiesViewportWidth ||
+        cookieInfo?.viewportWidth ||
+        signupContext.viewportWidth ||
+        "";
+
+      const viewportHeight =
+        item.cookieViewportHeight ||
+        item.cookiesViewportHeight ||
+        cookieInfo?.viewportHeight ||
+        signupContext.viewportHeight ||
         "";
 
       const invitationEmail =
@@ -1911,6 +1980,13 @@ ${message}`;
         item.inviteEmail ||
         item.expectedEmail ||
         item.email ||
+        "";
+
+      const linkedToUid =
+        item.cookieLinkedToUid ||
+        item.cookiesLinkedToUid ||
+        cookieInfo?.linkedToUid ||
+        item.uid ||
         "";
 
       const rawPreferences =
@@ -1930,6 +2006,7 @@ ${message}`;
       }
 
       return {
+        recordId: cookieRecordId,
         accepted,
         acceptedAt,
         name,
@@ -1940,7 +2017,15 @@ ${message}`;
         platform,
         language,
         sourcePage,
+        timezone,
+        vendor,
+        hostname,
+        screenWidth,
+        screenHeight,
+        viewportWidth,
+        viewportHeight,
         invitationEmail,
+        linkedToUid,
         preferencesText
       };
     }
@@ -1958,6 +2043,15 @@ ${message}`;
         !!cookie.platform ||
         !!cookie.language ||
         !!cookie.sourcePage ||
+        !!cookie.timezone ||
+        !!cookie.vendor ||
+        !!cookie.hostname ||
+        !!cookie.screenWidth ||
+        !!cookie.screenHeight ||
+        !!cookie.viewportWidth ||
+        !!cookie.viewportHeight ||
+        !!cookie.recordId ||
+        !!cookie.linkedToUid ||
         !!cookie.preferencesText;
 
       if (!hasCookieData) {
@@ -1974,6 +2068,14 @@ ${message}`;
         : cookie.accepted === false
           ? `<div class="approval-cookie-rejected">Cookies refusés</div>`
           : `<span class="pill info">État cookies non précisé</span>`;
+
+      const screenText = (cookie.screenWidth && cookie.screenHeight)
+        ? `${cookie.screenWidth} × ${cookie.screenHeight}`
+        : "Non renseigné";
+
+      const viewportText = (cookie.viewportWidth && cookie.viewportHeight)
+        ? `${cookie.viewportWidth} × ${cookie.viewportHeight}`
+        : "Non renseigné";
 
       return `
         <div class="approval-cookie-box">
@@ -2012,6 +2114,34 @@ ${message}`;
               <strong>Langue</strong>
               <span>${escapeHtml(cookie.language || "Non renseignée")}</span>
             </div>
+            <div class="approval-cookie-item">
+              <strong>Fuseau horaire</strong>
+              <span>${escapeHtml(cookie.timezone || "Non renseigné")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Vendor navigateur</strong>
+              <span>${escapeHtml(cookie.vendor || "Non renseigné")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Hostname</strong>
+              <span>${escapeHtml(cookie.hostname || "Non renseigné")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Taille écran</strong>
+              <span>${escapeHtml(screenText)}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Taille fenêtre</strong>
+              <span>${escapeHtml(viewportText)}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>Record ID cookies</strong>
+              <span>${escapeHtml(cookie.recordId || "Non renseigné")}</span>
+            </div>
+            <div class="approval-cookie-item">
+              <strong>UID lié</strong>
+              <span>${escapeHtml(cookie.linkedToUid || item.uid || "Non renseigné")}</span>
+            </div>
             <div class="approval-cookie-item" style="grid-column:1 / -1;">
               <strong>IP / identifiant réseau</strong>
               <span>${escapeHtml(cookie.ip || "Non renseigné")}</span>
@@ -2021,6 +2151,11 @@ ${message}`;
             <div class="approval-cookie-note">
               <strong style="color:#082e5b;">Préférences cookies :</strong><br>
               ${escapeHtml(cookie.preferencesText)}
+            </div>
+          ` : ""}
+          ${cookie.recordId ? `
+            <div class="approval-cookie-note">
+              Enregistrement lié à cookies-admin.html via : <strong>${escapeHtml(COOKIE_DB_PATH + "/" + cookie.recordId)}</strong>
             </div>
           ` : ""}
         </div>
@@ -2608,6 +2743,25 @@ ${message}`;
 
       await remove(ref(db, `users/${uid}`));
       await remove(ref(db, `accountApprovals/${uid}`));
+
+      try {
+        const cookieSnap = await get(ref(db, COOKIE_DB_PATH));
+        if (cookieSnap.exists()) {
+          const cookieData = cookieSnap.val() || {};
+          for (const [cookieId, cookieVal] of Object.entries(cookieData)) {
+            const row = cookieVal || {};
+            if (
+              row.linkedToUid === uid ||
+              row.uid === uid ||
+              row.userUid === uid
+            ) {
+              await remove(ref(db, `${COOKIE_DB_PATH}/${cookieId}`));
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Cookie cleanup error:", e);
+      }
     }
 
     async function deleteOwnAccount() {
