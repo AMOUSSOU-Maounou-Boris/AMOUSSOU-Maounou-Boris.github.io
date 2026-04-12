@@ -605,7 +605,7 @@
             </div>
           </div>
 
-          <div class="notice">Conseil : au moment d’intégrer cette page, fais enregistrer depuis signup.html au moins ces données : statut du consentement, date, email saisi, nom, userAgent, langue, fuseau horaire, page source, adresse IP si tu as déjà un système légal et conforme pour la stocker côté serveur.</div>
+          <div class="notice">Ce tableau lit les consentements dans siteSecurity/cookieConsents. Il est aligné avec signup.html et permet aussi de voir si le consentement est lié à un compte créé sur le site.</div>
 
           <div class="toolbar">
             <input id="searchInput" type="text" placeholder="Rechercher par nom, email, UID, appareil, navigateur..." />
@@ -651,7 +651,7 @@
             <div class="empty-box">Chargement des consentements cookies...</div>
           </div>
         </section>
-              </main>
+      </main>
     </div>
   </div>
 
@@ -689,6 +689,7 @@
 
     let allCookies = [];
     let currentUser = null;
+    let cookiesBound = false;
 
     function isAdmin(user){
       return user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
@@ -703,7 +704,7 @@
     function formatDate(ts){
       if(!ts) return "—";
       try{
-        return new Date(ts).toLocaleString();
+        return new Date(ts).toLocaleString("fr-FR");
       }catch{
         return "—";
       }
@@ -721,12 +722,52 @@
         : `<span class="tag pending">Non lié</span>`;
     }
 
+    function normalizeCookieItem(id, raw = {}){
+      return {
+        id,
+        email: raw.email || "",
+        name: raw.name || "",
+        status: raw.status || "pending",
+        createdAt: Number(raw.createdAt || 0),
+        updatedAt: Number(raw.updatedAt || 0),
+        acceptedAt: Number(raw.acceptedAt || 0),
+        rejectedAt: Number(raw.rejectedAt || 0),
+        linkedToUid: raw.linkedToUid || "",
+        linkedAt: Number(raw.linkedAt || 0),
+        inviteToken: raw.inviteToken || "",
+        sourcePage: raw.sourcePage || raw.createdFromPage || "",
+        userAgent: raw.userAgent || "",
+        language: raw.language || "",
+        languages: Array.isArray(raw.languages) ? raw.languages : [],
+        timezone: raw.timezone || "",
+        platform: raw.platform || "",
+        vendor: raw.vendor || "",
+        cookieEnabled: raw.cookieEnabled === true,
+        screenWidth: raw.screenWidth ?? null,
+        screenHeight: raw.screenHeight ?? null,
+        viewportWidth: raw.viewportWidth ?? null,
+        viewportHeight: raw.viewportHeight ?? null,
+        colorDepth: raw.colorDepth ?? null,
+        pixelDepth: raw.pixelDepth ?? null,
+        hostname: raw.hostname || "",
+        referrer: raw.referrer || "",
+        pageUrl: raw.pageUrl || "",
+        deviceMemory: raw.deviceMemory ?? null,
+        hardwareConcurrency: raw.hardwareConcurrency ?? null,
+        createdAtISO: raw.createdAtISO || "",
+        policyNote: raw.policyNote || "",
+        consentVersion: raw.consentVersion || "",
+        ipNote: raw.ipNote || "",
+        deviceBrandNote: raw.deviceBrandNote || ""
+      };
+    }
+
     function computeStats(list){
-      let total = list.length;
-      let accepted = list.filter(c => c.status === "accepted").length;
-      let rejected = list.filter(c => c.status === "rejected").length;
-      let pending = total - accepted - rejected;
-      let linked = list.filter(c => c.linkedToUid).length;
+      const total = list.length;
+      const accepted = list.filter(c => c.status === "accepted").length;
+      const rejected = list.filter(c => c.status === "rejected").length;
+      const pending = total - accepted - rejected;
+      const linked = list.filter(c => c.linkedToUid).length;
 
       statTotal.textContent = total;
       statAccepted.textContent = accepted;
@@ -740,21 +781,66 @@
       miniCountLinked.textContent = "Liés à un compte : " + linked;
     }
 
+    function matchesSearch(item, q){
+      if(!q) return true;
+      const values = [
+        item.id,
+        item.email,
+        item.name,
+        item.status,
+        item.linkedToUid,
+        item.inviteToken,
+        item.userAgent,
+        item.language,
+        (item.languages || []).join(" "),
+        item.timezone,
+        item.platform,
+        item.vendor,
+        item.hostname,
+        item.referrer,
+        item.pageUrl,
+        item.sourcePage,
+        item.policyNote,
+        item.consentVersion,
+        item.ipNote,
+        item.deviceBrandNote,
+        String(item.screenWidth ?? ""),
+        String(item.screenHeight ?? ""),
+        String(item.viewportWidth ?? ""),
+        String(item.viewportHeight ?? ""),
+        String(item.deviceMemory ?? ""),
+        String(item.hardwareConcurrency ?? "")
+      ].join(" ").toLowerCase();
+
+      return values.includes(q);
+    }
+
+    function renderInfo(label, value){
+      return `
+        <div class="info-box">
+          <div class="label">${escapeHtml(label)}</div>
+          <div class="value">${escapeHtml(value || "—")}</div>
+        </div>
+      `;
+    }
+
     function renderList(){
       const q = (searchInput.value || "").toLowerCase().trim();
       const status = statusFilter.value;
       const link = linkFilter.value;
 
       let list = allCookies.filter(item => {
-        const text = JSON.stringify(item).toLowerCase();
-
-        if(q && !text.includes(q)) return false;
+        if(!matchesSearch(item, q)) return false;
         if(status !== "all" && item.status !== status) return false;
-
         if(link === "linked" && !item.linkedToUid) return false;
         if(link === "unlinked" && item.linkedToUid) return false;
-
         return true;
+      });
+
+      list.sort((a, b) => {
+        const da = Number(a.updatedAt || a.createdAt || 0);
+        const db = Number(b.updatedAt || b.createdAt || 0);
+        return db - da;
       });
 
       computeStats(list);
@@ -765,6 +851,14 @@
       }
 
       cookiesBox.innerHTML = list.map(item => {
+        const createdText = formatDate(item.createdAt);
+        const acceptedText = formatDate(item.acceptedAt);
+        const rejectedText = formatDate(item.rejectedAt);
+        const linkedText = formatDate(item.linkedAt);
+        const languagesText = item.languages && item.languages.length ? item.languages.join(", ") : "—";
+        const screenText = (item.screenWidth && item.screenHeight) ? `${item.screenWidth} × ${item.screenHeight}` : "—";
+        const viewportText = (item.viewportWidth && item.viewportHeight) ? `${item.viewportWidth} × ${item.viewportHeight}` : "—";
+
         return `
           <div class="cookie-card">
             <div class="cookie-top">
@@ -772,8 +866,10 @@
                 <div class="cookie-name">${escapeHtml(item.email || "Utilisateur inconnu")}</div>
                 <div class="cookie-meta">
 Nom : ${escapeHtml(item.name || "—")}
-UID : ${escapeHtml(item.linkedToUid || "—")}
-Créé le : ${formatDate(item.createdAt)}
+UID lié : ${escapeHtml(item.linkedToUid || "—")}
+Créé le : ${escapeHtml(createdText)}
+Accepté le : ${escapeHtml(acceptedText)}
+Refusé le : ${escapeHtml(rejectedText)}
                 </div>
               </div>
 
@@ -784,24 +880,32 @@ Créé le : ${formatDate(item.createdAt)}
             </div>
 
             <div class="cookie-grid">
-              <div class="info-box">
-                <div class="label">Appareil / Navigateur</div>
-                <div class="value">${escapeHtml(item.userAgent || "—")}</div>
-              </div>
-
-              <div class="info-box">
-                <div class="label">Langue / Pays</div>
-                <div class="value">${escapeHtml(item.language || "—")}</div>
-              </div>
-
-              <div class="info-box">
-                <div class="label">Fuseau horaire</div>
-                <div class="value">${escapeHtml(item.timezone || "—")}</div>
-              </div>
+              ${renderInfo("Appareil / Navigateur", item.userAgent || "—")}
+              ${renderInfo("Langue principale", item.language || "—")}
+              ${renderInfo("Langues navigateur", languagesText)}
+              ${renderInfo("Fuseau horaire", item.timezone || "—")}
+              ${renderInfo("Plateforme", item.platform || "—")}
+              ${renderInfo("Vendor", item.vendor || "—")}
+              ${renderInfo("Écran", screenText)}
+              ${renderInfo("Fenêtre", viewportText)}
+              ${renderInfo("Cookies navigateur", item.cookieEnabled ? "Activés" : "Non précisé / désactivés")}
+              ${renderInfo("Mémoire appareil", item.deviceMemory !== null ? String(item.deviceMemory) : "—")}
+              ${renderInfo("Cœurs logiques", item.hardwareConcurrency !== null ? String(item.hardwareConcurrency) : "—")}
+              ${renderInfo("Source page", item.sourcePage || "—")}
+              ${renderInfo("Hostname", item.hostname || "—")}
+              ${renderInfo("Referrer", item.referrer || "—")}
+              ${renderInfo("Page URL", item.pageUrl || "—")}
+              ${renderInfo("Invite token", item.inviteToken || "—")}
+              ${renderInfo("Compte lié le", linkedText)}
+              ${renderInfo("Consent version", item.consentVersion || "—")}
+              ${renderInfo("CreatedAt ISO", item.createdAtISO || "—")}
+              ${renderInfo("IP note", item.ipNote || "—")}
+              ${renderInfo("Note appareil", item.deviceBrandNote || "—")}
+              ${renderInfo("Policy note", item.policyNote || "—")}
             </div>
 
             <div class="cookie-actions">
-              <button class="btn red delete-btn" data-id="${item.id}">Supprimer</button>
+              <button class="btn red delete-btn" data-id="${escapeHtml(item.id)}">Supprimer</button>
             </div>
           </div>
         `;
@@ -811,18 +915,23 @@ Créé le : ${formatDate(item.createdAt)}
         btn.addEventListener("click", async () => {
           if(!confirm("Supprimer ce consentement ?")) return;
           const id = btn.dataset.id;
-          await remove(ref(db, COOKIE_DB_PATH + "/" + id));
+          try{
+            await remove(ref(db, COOKIE_DB_PATH + "/" + id));
+          }catch(e){
+            console.error(e);
+            alert("Impossible de supprimer ce consentement.");
+          }
         });
       });
     }
 
-    function loadCookies(){
+    function bindCookiesRealtime(){
+      if(cookiesBound) return;
+      cookiesBound = true;
+
       onValue(ref(db, COOKIE_DB_PATH), snap => {
         const data = snap.val() || {};
-        allCookies = Object.entries(data).map(([id, val]) => ({
-          id,
-          ...val
-        }));
+        allCookies = Object.entries(data).map(([id, val]) => normalizeCookieItem(id, val || {}));
         renderList();
       });
     }
@@ -833,7 +942,13 @@ Créé le : ${formatDate(item.createdAt)}
         return;
       }
 
-      const blob = new Blob([JSON.stringify(allCookies, null, 2)], { type:"application/json" });
+      const sorted = [...allCookies].sort((a, b) => {
+        const da = Number(a.updatedAt || a.createdAt || 0);
+        const db = Number(b.updatedAt || b.createdAt || 0);
+        return db - da;
+      });
+
+      const blob = new Blob([JSON.stringify(sorted, null, 2)], { type:"application/json" });
       const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
@@ -841,7 +956,7 @@ Créé le : ${formatDate(item.createdAt)}
       a.download = "cookies-consents.json";
       a.click();
 
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 800);
     }
 
     searchInput.addEventListener("input", renderList);
@@ -863,7 +978,7 @@ Créé le : ${formatDate(item.createdAt)}
       adminView.classList.remove("hidden");
 
       adminEmailText.textContent = "Admin connecté : " + (user.email || "");
-      loadCookies();
+      bindCookiesRealtime();
     });
   </script>
 </body>
