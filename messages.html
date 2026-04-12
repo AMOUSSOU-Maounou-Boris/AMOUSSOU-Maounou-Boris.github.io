@@ -74,7 +74,8 @@
       display:inline-block;
       box-shadow:0 0 0 2px rgba(255,255,255,0.18);
     }
-    .top-unread-badge{
+    .top-unread-badge,
+    .top-missed-badge{
       min-width:20px;
       height:20px;
       padding:0 6px;
@@ -495,6 +496,21 @@
       border-color:#cfe3fb;
     }
 
+    .message-card.call-event{
+      background:#fff8f8;
+      border-color:#ffd2d2;
+    }
+
+    .message-card.call-event.accepted{
+      background:#f3fff6;
+      border-color:#cdeed6;
+    }
+
+    .message-card.call-event.ended{
+      background:#f4f9ff;
+      border-color:#d6e8ff;
+    }
+
     .message-head{
       display:flex;
       justify-content:space-between;
@@ -580,6 +596,62 @@
       word-break:break-word;
       color:#0b2340;
     }
+
+    .call-event-line{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      color:#082e5b;
+      line-height:1.6;
+      flex-wrap:wrap;
+    }
+
+    .call-event-icon{
+      width:36px;
+      height:36px;
+      border-radius:12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      background:#ffe5e5;
+      color:#b42318;
+      flex:0 0 36px;
+    }
+
+    .call-event.accepted .call-event-icon{
+      background:#e7faee;
+      color:#0f7a31;
+    }
+
+    .call-event.ended .call-event-icon{
+      background:#eaf2ff;
+      color:#0f4d92;
+    }
+
+    .call-event-tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .call-tag{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:7px 10px;
+      font-size:12px;
+      font-weight:800;
+      line-height:1;
+    }
+
+    .call-tag.red{ background:#ffe5e5; color:#b42318; }
+    .call-tag.green{ background:#e7faee; color:#0f7a31; }
+    .call-tag.blue{ background:#eaf2ff; color:#0f4d92; }
+    .call-tag.gray{ background:#eef4fb; color:#5f738a; }
 
     .sticker-box{
       margin-top:6px;
@@ -945,7 +1017,7 @@
       <a href="index.html">Home</a>
       <a href="insights.html">Insights</a>
       <a href="messages.html" class="active">Messages <span class="top-unread-badge" id="topUnreadBadge"></span></a>
-      <a href="calls.html">Appels</a>
+      <a href="calls.html">Appels <span class="top-missed-badge" id="topMissedCallsBadge"></span></a>
       <a href="meeting-room.html" id="meetingNavLink" class="hidden">Salle de réunion</a>
       <a href="profile.html"><span class="nav-online-dot"></span> Mon compte</a>
       <a href="competition.html">Concours</a>
@@ -1115,6 +1187,18 @@
     </div>
   </div>
 
+  <div class="modal" id="incomingCallModal">
+    <div class="modal-content">
+      <button class="modal-close" type="button" id="closeIncomingCallModal">×</button>
+      <h3>Appel entrant</h3>
+      <p id="incomingCallText">Quelqu’un essaie de te joindre.</p>
+      <div class="modal-actions">
+        <button class="primary-btn" id="openIncomingCallBtn" type="button">Ouvrir l’appel</button>
+        <button class="danger-btn" id="rejectIncomingCallBtn" type="button">Refuser</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import {
@@ -1157,6 +1241,7 @@
     const memberSearch = document.getElementById("memberSearch");
     const membersList = document.getElementById("membersList");
     const topUnreadBadge = document.getElementById("topUnreadBadge");
+    const topMissedCallsBadge = document.getElementById("topMissedCallsBadge");
     const meetingNavLink = document.getElementById("meetingNavLink");
 
     const chatAvatar = document.getElementById("chatAvatar");
@@ -1214,6 +1299,12 @@
     const markReadBtn = document.getElementById("markReadBtn");
     const blockUserBtn = document.getElementById("blockUserBtn");
 
+    const incomingCallModal = document.getElementById("incomingCallModal");
+    const closeIncomingCallModal = document.getElementById("closeIncomingCallModal");
+    const incomingCallText = document.getElementById("incomingCallText");
+    const openIncomingCallBtn = document.getElementById("openIncomingCallBtn");
+    const rejectIncomingCallBtn = document.getElementById("rejectIncomingCallBtn");
+
     const tabButtons = document.querySelectorAll("[data-tab]");
 
     let currentUser = null;
@@ -1226,6 +1317,8 @@
     let contactsMap = {};
     let invitesMap = {};
     let unreadCounts = {};
+    let missedCallsMap = {};
+    let callsHistoryMap = {};
 
     let currentTab = "all";
     let selectedUserId = null;
@@ -1241,6 +1334,9 @@
 
     let detachChatListener = null;
     let detachTypingListener = null;
+    let detachMissedCallsListener = null;
+    let detachCallsHistoryListener = null;
+    let detachIncomingCallsListener = null;
     let typingTimer = null;
     let isCurrentlyTyping = false;
 
@@ -1250,6 +1346,10 @@
     let isRecordingVoice = false;
     let voiceStartTime = 0;
     let voiceTimerInterval = null;
+
+    let ringtoneAudio = null;
+    let ringtoneUnlocked = false;
+    let currentIncomingCall = null;
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
@@ -1266,6 +1366,51 @@
           if (auth.currentUser) resetActivityTimer();
         }, { passive: true });
       });
+    }
+
+    function initRingtoneUnlock() {
+      const unlock = async () => {
+        if (ringtoneUnlocked) return;
+        ringtoneUnlocked = true;
+        try {
+          const audio = getRingtoneAudio();
+          audio.volume = 0;
+          await audio.play().catch(() => {});
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = 1;
+        } catch (_) {}
+      };
+
+      ["click","keydown","touchstart"].forEach(evt => {
+        window.addEventListener(evt, unlock, { passive:true, once:true });
+      });
+    }
+
+    function getRingtoneAudio() {
+      if (!ringtoneAudio) {
+        ringtoneAudio = new Audio("incoming-call.mp3");
+        ringtoneAudio.loop = true;
+        ringtoneAudio.preload = "auto";
+      }
+      return ringtoneAudio;
+    }
+
+    async function startIncomingRingtone() {
+      try {
+        const audio = getRingtoneAudio();
+        audio.loop = true;
+        audio.volume = 1;
+        await audio.play().catch(() => {});
+      } catch (_) {}
+    }
+
+    function stopIncomingRingtone() {
+      try {
+        if (!ringtoneAudio) return;
+        ringtoneAudio.pause();
+        ringtoneAudio.currentTime = 0;
+      } catch (_) {}
     }
 
     function initials(name = "", email = "") {
@@ -1406,7 +1551,11 @@
         attachmentUrl: val.attachmentUrl || "",
         attachmentName: val.attachmentName || "",
         deletedForAll: !!val.deletedForAll,
-        deletedForUsers: val.deletedForUsers || {}
+        deletedForUsers: val.deletedForUsers || {},
+        messageType: val.messageType || "text",
+        callMode: val.callMode || "",
+        callStatus: val.callStatus || "",
+        callDirection: val.callDirection || ""
       };
     }
 
@@ -1511,6 +1660,59 @@
         : `<span class="message-read-state">✔ Envoyé</span>`;
     }
 
+    function getCallEventLabel(msg) {
+      const mode = msg.callMode === "video" ? "vidéo" : "audio";
+      const status = msg.callStatus || "missed";
+      if (status === "missed") return `Appel ${mode} manqué`;
+      if (status === "accepted") return `Appel ${mode} accepté`;
+      if (status === "ended") return `Appel ${mode} terminé`;
+      if (status === "rejected") return `Appel ${mode} refusé`;
+      return `Appel ${mode}`;
+    }
+
+    function getCallEventIcon(msg) {
+      const status = msg.callStatus || "";
+      if (status === "accepted") return "✅";
+      if (status === "ended") return "📞";
+      if (status === "rejected") return "🚫";
+      return "📵";
+    }
+
+    function getCallEventClass(msg) {
+      const status = msg.callStatus || "";
+      if (status === "accepted") return "accepted";
+      if (status === "ended") return "ended";
+      return "";
+    }
+
+    function getCallEventTags(msg) {
+      const modeTag = msg.callMode === "video"
+        ? `<span class="call-tag blue">Vidéo</span>`
+        : `<span class="call-tag gray">Audio</span>`;
+
+      let statusTag = `<span class="call-tag red">Manqué</span>`;
+      if (msg.callStatus === "accepted") statusTag = `<span class="call-tag green">Accepté</span>`;
+      if (msg.callStatus === "ended") statusTag = `<span class="call-tag blue">Terminé</span>`;
+      if (msg.callStatus === "rejected") statusTag = `<span class="call-tag red">Refusé</span>`;
+
+      const directionText = msg.callDirection === "outgoing" ? "Sortant" : "Entrant";
+      const directionTag = `<span class="call-tag gray">${directionText}</span>`;
+
+      return `${statusTag}${modeTag}${directionTag}`;
+    }
+
+    function renderCallEventMessage(msg) {
+      return `
+        <div class="call-event-line">
+          <span class="call-event-icon">${getCallEventIcon(msg)}</span>
+          <span>${escapeHtml(getCallEventLabel(msg))}</span>
+        </div>
+        <div class="call-event-tags">
+          ${getCallEventTags(msg)}
+        </div>
+      `;
+    }
+
     function renderMessages() {
       if (!selectedUserId || !currentUser) {
         chatMessages.innerHTML = `
@@ -1556,21 +1758,24 @@
 
         const textHtml = msg.deletedForAll
           ? `<div class="message-text" style="color:#6b7d93;font-style:italic;">Message supprimé.</div>`
+          : msg.messageType === "call_event"
+          ? renderCallEventMessage(msg)
           : `<div class="message-text">${escapeHtml(msg.text || "")}</div>`;
 
-        const stickerHtml = msg.sticker && !msg.deletedForAll
+        const stickerHtml = msg.sticker && !msg.deletedForAll && msg.messageType !== "call_event"
           ? `<div class="sticker-box">${escapeHtml(msg.sticker)}</div>`
           : "";
 
-        const attachmentHtml = !msg.deletedForAll ? renderAttachment(msg) : "";
+        const attachmentHtml = !msg.deletedForAll && msg.messageType !== "call_event" ? renderAttachment(msg) : "";
 
         const canDelete = canDeleteMessage(msg);
         const isSelected = selectedMessageIds.has(msg.id);
+        const callEventClass = msg.messageType === "call_event" ? `call-event ${getCallEventClass(msg)}` : "";
 
         return `
           <div class="message-row ${isMe ? "me" : ""}">
             <div class="message-wrap">
-              <div class="message-card" data-message-id="${msg.id}" style="${isSelected ? 'box-shadow:0 0 0 3px rgba(47,140,255,0.18);' : ''}">
+              <div class="message-card ${callEventClass}" data-message-id="${msg.id}" style="${isSelected ? 'box-shadow:0 0 0 3px rgba(47,140,255,0.18);' : ''}">
                 <div class="message-head">
                   <div class="message-author">${escapeHtml(sender.displayName || (isMe ? "Toi" : "Utilisateur"))}</div>
                   <div class="message-menu-wrap">
@@ -1627,7 +1832,9 @@
           if (!msg) return;
           replyTarget = {
             id: msg.id,
-            text: msg.text || msg.sticker || msg.attachmentName || "Message"
+            text: msg.messageType === "call_event"
+              ? getCallEventLabel(msg)
+              : (msg.text || msg.sticker || msg.attachmentName || "Message")
           };
           renderReplyPreview();
           closeAllMenus();
@@ -1779,6 +1986,140 @@
       });
     }
 
+    function listenMissedCallsTotals() {
+      if (detachMissedCallsListener) detachMissedCallsListener();
+      detachMissedCallsListener = onValue(ref(db, `missedCalls/${currentUser.uid}`), (snap) => {
+        missedCallsMap = snap.val() || {};
+        const total = Object.values(missedCallsMap).filter(item => item && item.unread).length;
+        if (total > 0) {
+          topMissedCallsBadge.style.display = "inline-flex";
+          topMissedCallsBadge.textContent = total > 99 ? "99+" : String(total);
+        } else {
+          topMissedCallsBadge.style.display = "none";
+          topMissedCallsBadge.textContent = "";
+        }
+      });
+    }
+
+    function listenCallsHistory() {
+      if (detachCallsHistoryListener) detachCallsHistoryListener();
+      detachCallsHistoryListener = onValue(ref(db, `callHistory/${currentUser.uid}`), (snap) => {
+        callsHistoryMap = snap.val() || {};
+        mergeCallEventsIntoMessages();
+      });
+    }
+
+    function mergeCallEventsIntoMessages() {
+      if (!selectedUserId || !currentUser || !currentChatId) return;
+
+      const baseMessages = [...messagesCache];
+      const relatedCallEvents = Object.entries(callsHistoryMap || {})
+        .map(([id, val]) => ({ id, ...(val || {}) }))
+        .filter(item => {
+          const isBetweenUsers =
+            (item.fromUid === currentUser.uid && item.toUid === selectedUserId) ||
+            (item.fromUid === selectedUserId && item.toUid === currentUser.uid);
+          return isBetweenUsers;
+        })
+        .map(item => ({
+          id: `call_event_${item.callId || item.id}`,
+          senderId: item.fromUid || "",
+          receiverId: item.toUid || "",
+          text: "",
+          sticker: "",
+          createdAt: item.createdAt || item.updatedAt || 0,
+          readBy: item.fromUid === currentUser.uid
+            ? { [currentUser.uid]: item.createdAt || Date.now(), [selectedUserId]: item.readAt || item.updatedAt || Date.now() }
+            : { [currentUser.uid]: item.readAt || item.updatedAt || Date.now() },
+          replyTo: null,
+          attachmentType: "",
+          attachmentUrl: "",
+          attachmentName: "",
+          deletedForAll: false,
+          deletedForUsers: {},
+          messageType: "call_event",
+          callMode: item.mode || "audio",
+          callStatus: item.status || "missed",
+          callDirection: item.fromUid === currentUser.uid ? "outgoing" : "incoming"
+        }));
+
+      const nonDuplicatedBase = baseMessages.filter(msg => !String(msg.id || "").startsWith("call_event_"));
+      const merged = [...nonDuplicatedBase, ...relatedCallEvents]
+        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
+      messagesCache = merged;
+      renderMessages();
+    }
+
+    async function markMissedCallsAsReadForUser(otherUid) {
+      if (!currentUser || !otherUid) return;
+
+      const updates = {};
+      Object.entries(missedCallsMap || {}).forEach(([callId, item]) => {
+        const belongs =
+          item &&
+          ((item.fromUid === otherUid && item.toUid === currentUser.uid) ||
+           (item.toUid === otherUid && item.fromUid === currentUser.uid));
+
+        if (belongs && item.unread) {
+          updates[`missedCalls/${currentUser.uid}/${callId}/unread`] = false;
+          updates[`missedCalls/${currentUser.uid}/${callId}/readAt`] = Date.now();
+        }
+      });
+
+      if (Object.keys(updates).length) {
+        await update(ref(db), updates);
+      }
+    }
+
+    function listenIncomingCalls() {
+      if (detachIncomingCallsListener) detachIncomingCallsListener();
+
+      detachIncomingCallsListener = onValue(ref(db, "calls"), async (snap) => {
+        const data = snap.val() || {};
+        const values = Object.values(data);
+
+        const incoming = values.find(call =>
+          call &&
+          call.toUid === currentUser.uid &&
+          call.status === "ringing"
+        );
+
+        if (incoming && (!currentIncomingCall || currentIncomingCall.callId !== incoming.callId)) {
+          currentIncomingCall = incoming;
+          incomingCallText.textContent = `${incoming.fromName || "Quelqu’un"} essaie de te joindre en ${incoming.mode === "video" ? "vidéo" : "audio"}.`;
+          openModal(incomingCallModal);
+          await startIncomingRingtone();
+        } else if (!incoming) {
+          currentIncomingCall = null;
+          closeModal(incomingCallModal);
+          stopIncomingRingtone();
+        }
+      });
+    }
+
+    async function rejectIncomingCallFromMessages() {
+      if (!currentIncomingCall) {
+        closeModal(incomingCallModal);
+        stopIncomingRingtone();
+        return;
+      }
+
+      try {
+        await update(ref(db, `calls/${currentIncomingCall.callId}`), {
+          status: "rejected",
+          rejectedAt: Date.now(),
+          updatedAt: Date.now()
+        });
+      } catch (e) {
+        console.error(e);
+      }
+
+      stopIncomingRingtone();
+      closeModal(incomingCallModal);
+      currentIncomingCall = null;
+    }
+
     function getAllVisibleMembers() {
       const entries = Object.entries(usersCache || {})
         .map(([uid, val]) => ({ uid, ...(val || {}) }))
@@ -1810,6 +2151,10 @@
         const unreadB = Number(unreadCounts[b.uid] || 0);
         if (unreadA !== unreadB) return unreadB - unreadA;
 
+        const missedA = Object.values(missedCallsMap || {}).filter(item => item && item.unread && (item.fromUid === a.uid || item.toUid === a.uid)).length;
+        const missedB = Object.values(missedCallsMap || {}).filter(item => item && item.unread && (item.fromUid === b.uid || item.toUid === b.uid)).length;
+        if (missedA !== missedB) return missedB - missedA;
+
         const aAccepted = areContacts(a.uid) ? 1 : 0;
         const bAccepted = areContacts(b.uid) ? 1 : 0;
         if (aAccepted !== bAccepted) return bAccepted - aAccepted;
@@ -1820,6 +2165,15 @@
       });
 
       return filtered;
+    }
+
+    function getMissedCountForUser(uid) {
+      return Object.values(missedCallsMap || {}).filter(item =>
+        item &&
+        item.unread &&
+        ((item.fromUid === uid && item.toUid === currentUser?.uid) ||
+         (item.toUid === uid && item.fromUid === currentUser?.uid))
+      ).length;
     }
 
     function renderMembersList() {
@@ -1833,6 +2187,7 @@
       membersList.innerHTML = members.map(user => {
         const presence = getPresenceInfo(user);
         const unread = Number(unreadCounts[user.uid] || 0);
+        const missed = getMissedCountForUser(user.uid);
         const inviteState = getInviteState(user.uid);
         const accepted = areContacts(user.uid);
         const blocked = isBlockedByMe(user.uid) || hasBlockedMe(user.uid);
@@ -1876,7 +2231,10 @@
             <div class="member-sub">${escapeHtml(presence.text)}</div>
             <div class="member-meta-row">
               <span class="member-sub">${accepted ? "Contact autorisé" : "Accès privé contrôlé"}</span>
-              ${unread > 0 ? `<span class="unread-badge">${unread > 99 ? "99+" : unread}</span>` : ""}
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                ${missed > 0 ? `<span class="unread-badge" title="Appels manqués">${missed > 99 ? "99+" : missed}</span>` : ""}
+                ${unread > 0 ? `<span class="unread-badge">${unread > 99 ? "99+" : unread}</span>` : ""}
+              </div>
             </div>
           </div>
         `;
@@ -1909,6 +2267,7 @@
       listenChatMessages();
       listenTypingState();
       await markChatAsRead();
+      await markMissedCallsAsReadForUser(uid);
       renderMembersList();
     }
 
@@ -1951,7 +2310,10 @@
         inviteBtn.disabled = true;
         refuseInviteBtn.classList.add("hidden");
       } else if (accepted) {
-        chatSubtitle.textContent = presence.text;
+        const missed = getMissedCountForUser(selectedUserId);
+        chatSubtitle.textContent = missed > 0
+          ? `${presence.text} • ${missed} appel(s) manqué(s)`
+          : presence.text;
         inviteBtn.textContent = "Contact";
         inviteBtn.disabled = true;
         refuseInviteBtn.classList.add("hidden");
@@ -2029,7 +2391,7 @@
       attachBtn.disabled = false;
       stickerBtn.disabled = false;
       voiceNoteBtn.disabled = false;
-      composerNote.textContent = "Réponses, transferts, suppressions, pièces jointes et vocaux sont disponibles pour ce contact.";
+      composerNote.textContent = "Réponses, transferts, suppressions, pièces jointes, vocaux et événements d’appel sont disponibles pour ce contact.";
     }
 
     function stopChatListener() {
@@ -2066,7 +2428,7 @@
           .map(([id, val]) => normalizeMessageData(id, val))
           .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
-        renderMessages();
+        mergeCallEventsIntoMessages();
         await markChatAsRead();
       });
     }
@@ -2114,6 +2476,7 @@
 
       messagesCache.forEach(msg => {
         if (isDeletedForMe(msg)) return;
+        if (msg.messageType === "call_event") return;
         if (msg.senderId === selectedUserId && !(msg.readBy && msg.readBy[currentUser.uid])) {
           updates[`privateMessages/${currentChatId}/${msg.id}/readBy/${currentUser.uid}`] = Date.now();
           hasUpdates = true;
@@ -2226,7 +2589,7 @@
     async function deleteMessageForAll(messageId) {
       if (!currentChatId || !messageId) return;
       const msg = messagesCache.find(m => m.id === messageId);
-      if (!msg || !canDeleteMessage(msg)) return;
+      if (!msg || !canDeleteMessage(msg) || msg.messageType === "call_event") return;
 
       await update(ref(db, `privateMessages/${currentChatId}/${messageId}`), {
         text: "",
@@ -2240,14 +2603,26 @@
     }
 
     async function deleteMessageForMe(messageId) {
-      if (!currentChatId || !messageId || !currentUser) return;
+      if (!messageId || !currentUser) return;
+
+      if (String(messageId).startsWith("call_event_")) {
+        const callId = String(messageId).replace("call_event_", "");
+        await update(ref(db, `callHistory/${currentUser.uid}/${callId}`), {
+          deletedForUsers: {
+            [currentUser.uid]: Date.now()
+          }
+        }).catch(() => {});
+        return;
+      }
+
+      if (!currentChatId) return;
       await update(ref(db, `privateMessages/${currentChatId}/${messageId}/deletedForUsers`), {
         [currentUser.uid]: Date.now()
       });
     }
 
     async function deleteSelectedMessages() {
-      if (!currentChatId || selectedMessageIds.size === 0 || !currentUser) return;
+      if (selectedMessageIds.size === 0 || !currentUser) return;
 
       const promises = [...selectedMessageIds].map(async (id) => {
         await deleteMessageForMe(id);
@@ -2256,7 +2631,7 @@
       await Promise.all(promises);
       clearSelection();
       toggleSelectionBar();
-      renderMessages();
+      mergeCallEventsIntoMessages();
     }
 
     async function forwardMessage() {
@@ -2274,7 +2649,11 @@
 
       const forwardChatId = getChatId(currentUser.uid, targetUid);
       const note = forwardNoteInput.value.trim();
-      const body = `${note ? note + "\n\n" : ""}[Transféré]\n${forwardMessageTarget.text || forwardMessageTarget.sticker || forwardMessageTarget.attachmentName || "Message"}`;
+      const forwardedCore = forwardMessageTarget.messageType === "call_event"
+        ? getCallEventLabel(forwardMessageTarget)
+        : (forwardMessageTarget.text || forwardMessageTarget.sticker || forwardMessageTarget.attachmentName || "Message");
+
+      const body = `${note ? note + "\n\n" : ""}[Transféré]\n${forwardedCore}`;
 
       const msgRef = push(ref(db, `privateMessages/${forwardChatId}`));
       await set(msgRef, {
@@ -2383,7 +2762,8 @@
       if (voiceNoteBtn) voiceNoteBtn.textContent = "Vocal";
       stopVoiceTimer();
     }
-        async function handleVoiceNoteRecording() {
+
+    async function handleVoiceNoteRecording() {
       if (!canChatWith(selectedUserId)) return;
 
       if (!navigator.mediaDevices || !window.MediaRecorder) {
@@ -2546,7 +2926,31 @@
       }
     }
 
-    logoutBtn.addEventListener("click", async () => {
+    async function createCallEventMessageForThread(item = {}) {
+      if (!item || !item.callId || !item.fromUid || !item.toUid) return;
+
+      const chatId = getChatId(item.fromUid, item.toUid);
+      const eventId = `call_event_${item.callId}`;
+
+      const existingSnap = await get(ref(db, `privateMessages/${chatId}/${eventId}`));
+      if (existingSnap.exists()) return;
+
+      await set(ref(db, `privateMessages/${chatId}/${eventId}`), {
+        senderId: item.fromUid,
+        receiverId: item.toUid,
+        text: "",
+        sticker: "",
+        createdAt: item.createdAt || Date.now(),
+        readBy: item.fromUid === currentUser?.uid
+          ? { [item.fromUid]: Date.now() }
+          : { [currentUser?.uid || item.toUid]: Date.now() },
+        messageType: "call_event",
+        callMode: item.mode || "audio",
+        callStatus: item.status || "missed",
+        callDirection: item.fromUid === currentUser?.uid ? "outgoing" : "incoming"
+      }).catch(() => {});
+    }
+        logoutBtn.addEventListener("click", async () => {
       try { await signOut(auth); } catch (e) {}
       window.location.href = "insights.html";
     });
@@ -2633,7 +3037,7 @@
     cancelSelectionBtn.addEventListener("click", () => {
       clearSelection();
       toggleSelectionBar();
-      renderMessages();
+      mergeCallEventsIntoMessages();
     });
 
     deleteSelectedBtn.addEventListener("click", deleteSelectedMessages);
@@ -2724,7 +3128,15 @@
       }
     });
 
-    [inviteModal, forwardModal, reportModal, optionsModal].forEach(modal => {
+    closeIncomingCallModal.addEventListener("click", rejectIncomingCallFromMessages);
+    rejectIncomingCallBtn.addEventListener("click", rejectIncomingCallFromMessages);
+    openIncomingCallBtn.addEventListener("click", () => {
+      if (!currentIncomingCall) return;
+      stopIncomingRingtone();
+      window.location.href = `calls.html?user=${encodeURIComponent(currentIncomingCall.fromUid || "")}`;
+    });
+
+    [inviteModal, forwardModal, reportModal, optionsModal, incomingCallModal].forEach(modal => {
       modal.addEventListener("click", (e) => {
         if (e.target === modal) closeModal(modal);
       });
@@ -2736,6 +3148,7 @@
           await setTypingState(false);
         } catch (e) {}
         await cleanupVoiceRecorderState(false);
+        stopIncomingRingtone();
         window.location.href = "insights.html";
         return;
       }
@@ -2747,12 +3160,14 @@
           await setTypingState(false);
         } catch (err) {}
         await cleanupVoiceRecorderState(false);
+        stopIncomingRingtone();
         window.location.href = "insights.html";
         return;
       }
 
       currentUser = user;
       bindActivityEvents();
+      initRingtoneUnlock();
       resetActivityTimer();
 
       await loadCurrentUserProfile();
@@ -2761,6 +3176,9 @@
       listenContacts();
       listenInvites();
       listenUnreadTotals();
+      listenMissedCallsTotals();
+      listenCallsHistory();
+      listenIncomingCalls();
 
       const params = new URLSearchParams(window.location.search);
       const preselectedUid = params.get("user");
@@ -2782,6 +3200,9 @@
       } catch (e) {}
       try {
         await cleanupVoiceRecorderState(false);
+      } catch (e) {}
+      try {
+        stopIncomingRingtone();
       } catch (e) {}
     });
   </script>
