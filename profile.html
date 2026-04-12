@@ -118,6 +118,7 @@
       display:inline-flex;
       align-items:center;
       gap:8px;
+      position:relative;
     }
 
     .topbar a.active{
@@ -131,6 +132,26 @@
       background:var(--green);
       display:inline-block;
       box-shadow:0 0 8px rgba(24,195,74,0.7);
+    }
+
+    .nav-badge{
+      min-width:20px;
+      height:20px;
+      padding:0 6px;
+      border-radius:999px;
+      background:#ff4d4f;
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+      line-height:20px;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 6px 16px rgba(223,75,75,0.32);
+    }
+
+    .nav-badge.show{
+      display:inline-flex;
     }
 
     .hidden{ display:none !important; }
@@ -897,6 +918,34 @@
       word-break:break-word;
     }
 
+    .admin-alerts-list{
+      display:grid;
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .admin-alert-card{
+      border:1px solid #e1ebf7;
+      border-radius:18px;
+      padding:14px;
+      background:#fff;
+      display:grid;
+      gap:6px;
+    }
+
+    .admin-alert-title{
+      font-weight:900;
+      color:#082e5b;
+      font-size:15px;
+    }
+
+    .admin-alert-meta{
+      color:#6b7d93;
+      font-size:13px;
+      line-height:1.5;
+      word-break:break-word;
+    }
+
     .modal{
       position:fixed;
       inset:0;
@@ -1019,9 +1068,9 @@
       <a href="research.html">Research</a>
       <a href="cv.html">Resume</a>
       <a href="contact.html">Contact</a>
-      <a href="insights.html" class="active">Insights</a>
-      <a href="messages.html">Messages</a>
-      <a href="calls.html">Appels</a>
+      <a href="insights.html" class="active">Insights <span class="nav-badge" id="insightsInviteBadge"></span></a>
+      <a href="messages.html">Messages <span class="nav-badge" id="messagesBadge"></span></a>
+      <a href="calls.html">Appels <span class="nav-badge" id="callsBadge"></span></a>
       <a href="meeting-room.html" id="meetingNavLink" class="hidden">Salle de réunion</a>
       <a href="profile.html"><span class="nav-online-dot" id="navOnlineDot"></span> Mon compte</a>
       <a href="competition.html">Concours</a>
@@ -1093,7 +1142,7 @@
         </div>
 
         <div class="visitor-banner hidden" id="visitorBanner">
-          Tu consultes ce profil en mode visiteur. Les modifications du compte restent réservées uniquement à son propriétaire connecté.
+          Tu consultes ce profil en mode visiteur. Les paramètres privés, la sécurité et les actions sensibles sont réservés uniquement au propriétaire connecté.
         </div>
 
         <div class="editor-block" id="editorBlock">
@@ -1154,10 +1203,10 @@
           <div class="profile-msg" id="profileMsg"></div>
         </div>
 
-        <div class="grid-2">
-          <div class="card">
+        <div class="grid-2 hidden" id="ownerControlsGrid">
+          <div class="card" id="privacyCard">
             <h2 class="section-title">Confidentialité</h2>
-            <p class="section-note">Ces réglages utilisent la même logique que celle d’Insights.</p>
+            <p class="section-note">Ces réglages servent de référence centrale pour le profil et les autres sections connectées du site.</p>
 
             <div class="privacy-list">
               <div class="toggle-item">
@@ -1216,7 +1265,7 @@
             <div class="profile-msg" id="privacyMsg"></div>
           </div>
 
-          <div class="card">
+          <div class="card" id="securityCard">
             <h2 class="section-title">Compte & sécurité</h2>
             <p class="section-note">Gère ton mot de passe, ta vérification email et ta session.</p>
 
@@ -1252,7 +1301,7 @@
           </div>
         </div>
 
-        <div class="card danger-zone" id="dangerZone">
+        <div class="card danger-zone hidden" id="dangerZone">
           <h2 class="section-title">Zone sensible</h2>
           <p class="section-note">
             Ces actions sont importantes. La suppression du compte est irréversible.
@@ -1316,6 +1365,14 @@
           <div class="approval-msg" id="approvalAdminMsg"></div>
         </div>
       </div>
+
+      <div class="admin-subcard">
+        <h3 style="margin:0 0 14px; color:#082e5b;">Notifications administrateur</h3>
+        <p class="section-note">Les suppressions de comptes et autres alertes critiques remontent ici.</p>
+        <div class="admin-alerts-list" id="adminAlertsList">
+          <div class="approval-empty">Chargement...</div>
+        </div>
+      </div>
     </section>
 
     <section class="posts-section">
@@ -1367,6 +1424,7 @@
       <h3>Supprimer mon compte</h3>
       <p class="modal-note">
         Cette action est irréversible. Ton compte Firebase sera supprimé ainsi que tes données principales du site.
+        Les enregistrements cookies déjà archivés côté administrateur resteront visibles pour l’admin.
       </p>
 
       <label for="deletePasswordInput">Confirme avec ton mot de passe</label>
@@ -1414,12 +1472,16 @@
     const ONLINE_STALE_LIMIT = 75 * 1000;
     const COOKIE_DB_PATH = "siteSecurity/cookieConsents";
     const SUPPORT_FORMS_PATH = "competitions/chem_challenge_2026/competitionSponsors/supportForms";
+    const ADMIN_ALERTS_PATH = "adminNotifications";
 
     const params = new URLSearchParams(window.location.search);
     const requestedUid = params.get("uid");
 
     const meetingNavLink = document.getElementById("meetingNavLink");
     const navOnlineDot = document.getElementById("navOnlineDot");
+    const insightsInviteBadge = document.getElementById("insightsInviteBadge");
+    const messagesBadge = document.getElementById("messagesBadge");
+    const callsBadge = document.getElementById("callsBadge");
 
     const bigAvatar = document.getElementById("bigAvatar");
     const changeAvatarBtn = document.getElementById("changeAvatarBtn");
@@ -1439,6 +1501,9 @@
     const visitorBanner = document.getElementById("visitorBanner");
 
     const editorBlock = document.getElementById("editorBlock");
+    const ownerControlsGrid = document.getElementById("ownerControlsGrid");
+    const privacyCard = document.getElementById("privacyCard");
+    const securityCard = document.getElementById("securityCard");
     const dangerZone = document.getElementById("dangerZone");
 
     const nameInput = document.getElementById("nameInput");
@@ -1489,6 +1554,7 @@
     const inviteAdminMsg = document.getElementById("inviteAdminMsg");
     const approvalsList = document.getElementById("approvalsList");
     const approvalAdminMsg = document.getElementById("approvalAdminMsg");
+    const adminAlertsList = document.getElementById("adminAlertsList");
 
     const supportModal = document.getElementById("supportModal");
     const openSupportBtn = document.getElementById("openSupportBtn");
@@ -1513,11 +1579,15 @@
     let viewedUser = null;
     let activityTimeout = null;
     let approvalsBound = false;
+    let adminAlertsBound = false;
     let lastInviteLink = "";
 
     let postsMap = {};
     let commentsMap = {};
     let likesMap = {};
+    let unreadCountsMap = {};
+    let missedCallsMap = {};
+    let invitesMap = {};
 
     function resetActivityTimer() {
       localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
@@ -1538,6 +1608,28 @@
 
     function openModal(modal){ modal.classList.add("show"); }
     function closeModal(modal){ modal.classList.remove("show"); }
+
+    function setBadge(el, count) {
+      const val = Number(count || 0);
+      if (!el) return;
+      if (val > 0) {
+        el.textContent = val > 99 ? "99+" : String(val);
+        el.classList.add("show");
+      } else {
+        el.textContent = "";
+        el.classList.remove("show");
+      }
+    }
+
+    function refreshGlobalBadges() {
+      const unreadMessages = Object.values(unreadCountsMap || {}).reduce((sum, v) => sum + Number(v || 0), 0);
+      const unreadMissedCalls = Object.values(missedCallsMap || {}).filter(item => item && item.unread).length;
+      const pendingInvites = Object.values(invitesMap || {}).filter(item => item && item.status === "pending_received").length;
+
+      setBadge(messagesBadge, unreadMessages + pendingInvites);
+      setBadge(callsBadge, unreadMissedCalls);
+      setBadge(insightsInviteBadge, pendingInvites);
+    }
 
     function initials(name = "", email = "") {
       const s = (name || email || "U").trim();
@@ -1588,13 +1680,17 @@
       return isAdminUser(currentUser) && isViewingOwnProfile();
     }
 
-    function userPrivacy(userData = {}) {
-      return userData.privacy || {
+    function defaultPrivacy() {
+      return {
         hidePresence: false,
         hideEmail: true,
         hideBio: false,
         allowMessages: "all"
       };
+    }
+
+    function userPrivacy(userData = {}) {
+      return { ...defaultPrivacy(), ...(userData.privacy || {}) };
     }
 
     function canSeeEmail(userData = {}) {
@@ -1640,6 +1736,39 @@
       if (userData.specialty) parts.push(userData.specialty);
       if (userData.country) parts.push(userData.country);
       return parts.join(" • ");
+    }
+
+    function buildPublicProfileSnapshot(userData = {}) {
+      const privacy = userPrivacy(userData);
+      const publicData = {
+        uid: userData.uid || viewedUid || "",
+        displayName: userData.displayName || "",
+        photoURL: userData.photoURL || "",
+        institution: userData.institution || "",
+        specialty: userData.specialty || "",
+        country: userData.country || "",
+        allowMessages: privacy.allowMessages || "all",
+        privacy: {
+          hidePresence: !!privacy.hidePresence,
+          hideEmail: !!privacy.hideEmail,
+          hideBio: !!privacy.hideBio
+        },
+        emailPublic: privacy.hideEmail ? "" : (userData.email || ""),
+        bioPublic: privacy.hideBio ? "" : (userData.bio || ""),
+        updatedAt: Date.now()
+      };
+      return publicData;
+    }
+
+    async function syncPublicProfileSnapshot(uid, userData = {}) {
+      if (!uid) return;
+      try {
+        await update(ref(db, `users/${uid}`), {
+          publicProfile: buildPublicProfileSnapshot({ uid, ...userData })
+        });
+      } catch (e) {
+        console.error("Public profile sync error:", e);
+      }
     }
 
     function normalizePostImages(post = {}) {
@@ -1751,6 +1880,9 @@
     function setVisitorMode(isVisitor) {
       visitorBanner.classList.toggle("hidden", !isVisitor);
       editorBlock.classList.toggle("hidden", isVisitor);
+      ownerControlsGrid.classList.toggle("hidden", isVisitor);
+      privacyCard.classList.toggle("hidden", isVisitor);
+      securityCard.classList.toggle("hidden", isVisitor);
       dangerZone.classList.toggle("hidden", isVisitor);
       changeAvatarBtn.classList.toggle("hidden", isVisitor);
 
@@ -1879,6 +2011,22 @@
       window.crypto.getRandomValues(arr);
       for (let i = 0; i < length; i++) out += chars[arr[i] % chars.length];
       return out;
+    }
+
+    async function createAdminNotification(type, payload = {}) {
+      try {
+        const id = `n_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+        await set(ref(db, `${ADMIN_ALERTS_PATH}/${id}`), {
+          id,
+          type,
+          createdAt: Date.now(),
+          createdByUid: currentUser?.uid || "",
+          createdByEmail: currentUser?.email || "",
+          ...payload
+        });
+      } catch (e) {
+        console.error("Admin notification error:", e);
+      }
     }
 
     function normalizeCookieInfo(item = {}) {
@@ -2217,6 +2365,29 @@
       `;
     }
 
+    function renderAdminAlerts(data = {}) {
+      const entries = Object.values(data || {})
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+        .slice(0, 30);
+
+      if (!entries.length) {
+        adminAlertsList.innerHTML = `<div class="approval-empty">Aucune alerte administrateur pour le moment.</div>`;
+        return;
+      }
+
+      adminAlertsList.innerHTML = entries.map(item => `
+        <div class="admin-alert-card">
+          <div class="admin-alert-title">${escapeHtml(item.title || "Notification administrateur")}</div>
+          <div class="admin-alert-meta">${escapeHtml(item.message || "")}</div>
+          <div class="admin-alert-meta">
+            Date : ${escapeHtml(formatDate(item.createdAt) || "-")}<br>
+            UID : ${escapeHtml(item.targetUid || item.createdByUid || "-")}<br>
+            Email : ${escapeHtml(item.targetEmail || item.createdByEmail || "-")}
+          </div>
+        </div>
+      `).join("");
+    }
+
     async function createSignupInvite() {
       if (!isRealAdminContext()) return;
 
@@ -2385,10 +2556,19 @@
       });
     }
 
+    function bindAdminAlertsRealtime() {
+      if (!isRealAdminContext() || adminAlertsBound) return;
+      adminAlertsBound = true;
+      onValue(ref(db, ADMIN_ALERTS_PATH), (snap) => {
+        renderAdminAlerts(snap.val() || {});
+      });
+    }
+
     function updateAdminVisibility() {
       if (isRealAdminContext()) {
         adminSection.classList.remove("hidden");
         bindAdminRealtime();
+        bindAdminAlertsRealtime();
       } else {
         adminSection.classList.add("hidden");
       }
@@ -2485,6 +2665,7 @@
         bioText.textContent = "Ce profil n'existe pas.";
         visitorBanner.classList.add("hidden");
         editorBlock.classList.add("hidden");
+        ownerControlsGrid.classList.add("hidden");
         dangerZone.classList.add("hidden");
         changeAvatarBtn.classList.add("hidden");
         adminSection.classList.add("hidden");
@@ -2497,6 +2678,30 @@
       onValue(ref(db, "users/" + uid), (snap) => {
         if (!snap.exists()) return;
         updateProfileView(snap.val() || {});
+      });
+    }
+
+    function listenUnreadCounts() {
+      if (!currentUser) return;
+      onValue(ref(db, `unreadCountsByUser/${currentUser.uid}`), (snap) => {
+        unreadCountsMap = snap.val() || {};
+        refreshGlobalBadges();
+      });
+    }
+
+    function listenMissedCalls() {
+      if (!currentUser) return;
+      onValue(ref(db, `missedCalls/${currentUser.uid}`), (snap) => {
+        missedCallsMap = snap.val() || {};
+        refreshGlobalBadges();
+      });
+    }
+
+    function listenInvites() {
+      if (!currentUser) return;
+      onValue(ref(db, `contactInvites/${currentUser.uid}`), (snap) => {
+        invitesMap = snap.val() || {};
+        refreshGlobalBadges();
       });
     }
 
@@ -2657,8 +2862,7 @@
       }
 
       try {
-        await updateProfile(currentUser, { displayName: newName });
-        await update(ref(db, "users/" + currentUser.uid), {
+        const nextData = {
           displayName: newName,
           firstName: firstNameInput.value.trim(),
           lastName: lastNameInput.value.trim(),
@@ -2669,6 +2873,15 @@
           phone: phoneInput.value.trim(),
           bio: newBio,
           updatedAt: Date.now()
+        };
+
+        await updateProfile(currentUser, { displayName: newName });
+        await update(ref(db, "users/" + currentUser.uid), nextData);
+
+        await syncPublicProfileSnapshot(currentUser.uid, {
+          ...viewedUser,
+          ...nextData,
+          email: currentUser.email || viewedUser?.email || ""
         });
 
         profileMsg.textContent = "Profil mis à jour avec succès.";
@@ -2684,12 +2897,23 @@
       if (!currentUser || !isViewingOwnProfile()) return;
       const privacy = userPrivacy(viewedUser);
       const nextValue = !privacy[field];
+      const nextPrivacy = {
+        ...privacy,
+        [field]: nextValue
+      };
 
       try {
-        await update(ref(db, `users/${currentUser.uid}/privacy`), {
-          ...privacy,
-          [field]: nextValue
+        await update(ref(db, `users/${currentUser.uid}`), {
+          privacy: nextPrivacy,
+          updatedAt: Date.now()
         });
+
+        await syncPublicProfileSnapshot(currentUser.uid, {
+          ...viewedUser,
+          privacy: nextPrivacy,
+          email: currentUser.email || viewedUser?.email || ""
+        });
+
         privacyMsg.textContent = "Paramètre de confidentialité mis à jour.";
         privacyMsg.className = "profile-msg msg-ok";
       } catch (error) {
@@ -2702,12 +2926,23 @@
     async function setAllowMessagesRule() {
       if (!currentUser || !isViewingOwnProfile()) return;
       const privacy = userPrivacy(viewedUser);
+      const nextPrivacy = {
+        ...privacy,
+        allowMessages: allowMessagesSelect.value
+      };
 
       try {
-        await update(ref(db, `users/${currentUser.uid}/privacy`), {
-          ...privacy,
-          allowMessages: allowMessagesSelect.value
+        await update(ref(db, `users/${currentUser.uid}`), {
+          privacy: nextPrivacy,
+          updatedAt: Date.now()
         });
+
+        await syncPublicProfileSnapshot(currentUser.uid, {
+          ...viewedUser,
+          privacy: nextPrivacy,
+          email: currentUser.email || viewedUser?.email || ""
+        });
+
         privacyMsg.textContent = "Règle de messagerie mise à jour.";
         privacyMsg.className = "profile-msg msg-ok";
       } catch (error) {
@@ -2766,6 +3001,139 @@
       }
     }
 
+    async function removeUserFromContacts(uid) {
+      try {
+        const contactsSnap = await get(ref(db, "contacts"));
+        const contactsData = contactsSnap.val() || {};
+        const updates = {};
+        Object.keys(contactsData).forEach(ownerUid => {
+          if (contactsData[ownerUid] && contactsData[ownerUid][uid]) {
+            updates[`contacts/${ownerUid}/${uid}`] = null;
+          }
+        });
+        if (Object.keys(updates).length) {
+          await update(ref(db), updates);
+        }
+      } catch (e) {
+        console.error("Contacts cleanup error:", e);
+      }
+    }
+
+    async function removeUserFromInvites(uid) {
+      try {
+        const invitesSnap = await get(ref(db, "contactInvites"));
+        const invitesData = invitesSnap.val() || {};
+        const updates = {};
+        Object.keys(invitesData).forEach(ownerUid => {
+          if (invitesData[ownerUid] && invitesData[ownerUid][uid]) {
+            updates[`contactInvites/${ownerUid}/${uid}`] = null;
+          }
+        });
+        updates[`contactInvites/${uid}`] = null;
+        if (Object.keys(updates).length) {
+          await update(ref(db), updates);
+        }
+      } catch (e) {
+        console.error("Invites cleanup error:", e);
+      }
+    }
+
+    async function removeUserFromBlocks(uid) {
+      try {
+        const blocksSnap = await get(ref(db, "blocks"));
+        const blocksData = blocksSnap.val() || {};
+        const updates = {};
+        Object.keys(blocksData).forEach(ownerUid => {
+          if (blocksData[ownerUid] && blocksData[ownerUid][uid]) {
+            updates[`blocks/${ownerUid}/${uid}`] = null;
+          }
+        });
+        updates[`blocks/${uid}`] = null;
+        if (Object.keys(updates).length) {
+          await update(ref(db), updates);
+        }
+      } catch (e) {
+        console.error("Blocks cleanup error:", e);
+      }
+    }
+
+    async function removeUserFromUnreadCounts(uid) {
+      try {
+        const unreadSnap = await get(ref(db, "unreadCountsByUser"));
+        const unreadData = unreadSnap.val() || {};
+        const updates = {};
+        Object.keys(unreadData).forEach(ownerUid => {
+          if (unreadData[ownerUid] && unreadData[ownerUid][uid] !== undefined) {
+            updates[`unreadCountsByUser/${ownerUid}/${uid}`] = null;
+          }
+        });
+        updates[`unreadCountsByUser/${uid}`] = null;
+        if (Object.keys(updates).length) {
+          await update(ref(db), updates);
+        }
+      } catch (e) {
+        console.error("Unread cleanup error:", e);
+      }
+    }
+
+    async function removeUserFromMissedCalls(uid) {
+      try {
+        await remove(ref(db, `missedCalls/${uid}`));
+      } catch (e) {
+        console.error("Missed calls cleanup error:", e);
+      }
+    }
+
+    async function removeUserFromCallHistory(uid) {
+      try {
+        await remove(ref(db, `callHistory/${uid}`));
+      } catch (e) {
+        console.error("Call history cleanup error:", e);
+      }
+    }
+
+    async function removeUserThreadsAndMessages(uid) {
+      try {
+        const threadsSnap = await get(ref(db, "privateThreads"));
+        const threadData = threadsSnap.val() || {};
+        const updates = {};
+
+        Object.keys(threadData).forEach(ownerUid => {
+          if (threadData[ownerUid] && threadData[ownerUid][uid]) {
+            updates[`privateThreads/${ownerUid}/${uid}`] = null;
+          }
+        });
+
+        const messagesSnap = await get(ref(db, "privateMessages"));
+        const messagesData = messagesSnap.val() || {};
+        Object.keys(messagesData).forEach(chatId => {
+          const parts = chatId.split("_");
+          if (parts.includes(uid)) {
+            updates[`privateMessages/${chatId}`] = null;
+            updates[`messageTyping/${chatId}`] = null;
+          }
+        });
+
+        const callsSnap = await get(ref(db, "calls"));
+        const callsData = callsSnap.val() || {};
+        Object.keys(callsData).forEach(callId => {
+          const row = callsData[callId] || {};
+          if (row.fromUid === uid || row.toUid === uid) {
+            updates[`calls/${callId}`] = null;
+            updates[`callOffers/${callId}`] = null;
+            updates[`callAnswers/${callId}`] = null;
+            updates[`callCandidates/${callId}`] = null;
+          }
+        });
+
+        if (Object.keys(updates).length) {
+          await update(ref(db), updates);
+        }
+      } catch (e) {
+        console.error("Threads/messages cleanup error:", e);
+      }
+    }
+
     async function deleteAllUserData(uid) {
       const postsSnap = await get(ref(db, "posts"));
       const commentsSnap = await get(ref(db, "comments"));
@@ -2797,10 +3165,17 @@
         }
       }
 
+      await removeUserFromContacts(uid);
+      await removeUserFromInvites(uid);
+      await removeUserFromBlocks(uid);
+      await removeUserFromUnreadCounts(uid);
+      await removeUserFromMissedCalls(uid);
+      await removeUserFromCallHistory(uid);
+      await removeUserThreadsAndMessages(uid);
+
       await remove(ref(db, `users/${uid}`));
       await remove(ref(db, `accountApprovals/${uid}`));
-
-      try {
+            try {
         const cookieSnap = await get(ref(db, COOKIE_DB_PATH));
         if (cookieSnap.exists()) {
           const cookieData = cookieSnap.val() || {};
@@ -2811,7 +3186,17 @@
               row.uid === uid ||
               row.userUid === uid
             ) {
-              await remove(ref(db, `${COOKIE_DB_PATH}/${cookieId}`));
+              try {
+                await update(ref(db, `${COOKIE_DB_PATH}/${cookieId}`), {
+                  deletedAccountUid: uid,
+                  deletedAccountAt: Date.now(),
+                  deletedAccountEmail: currentUser?.email || "",
+                  deletedAccountDisplayName: viewedUser?.displayName || currentUser?.displayName || "",
+                  accountStillInArchive: true
+                });
+              } catch (archiveErr) {
+                console.error("Cookie archive mark error:", archiveErr);
+              }
             }
           }
         }
@@ -2834,10 +3219,23 @@
       deleteModalMsg.textContent = "Suppression du compte en cours...";
       deleteModalMsg.className = "security-msg msg-ok";
 
+      const deletedUid = currentUser.uid;
+      const deletedEmail = currentUser.email || "";
+      const deletedName = viewedUser?.displayName || currentUser.displayName || "Utilisateur";
+
       try {
         const credential = EmailAuthProvider.credential(currentUser.email, password);
         await reauthenticateWithCredential(currentUser, credential);
-        await deleteAllUserData(currentUser.uid);
+
+        await createAdminNotification("account_deleted", {
+          title: "Suppression d’un compte",
+          message: `${deletedName} a supprimé son compte depuis profile.html.`,
+          targetUid: deletedUid,
+          targetEmail: deletedEmail,
+          targetDisplayName: deletedName
+        });
+
+        await deleteAllUserData(deletedUid);
         await deleteUser(currentUser);
         window.location.replace("insights.html");
       } catch (error) {
@@ -2893,6 +3291,12 @@
         await update(ref(db, "users/" + currentUser.uid), {
           photoURL: result.dataUrl,
           updatedAt: Date.now()
+        });
+
+        await syncPublicProfileSnapshot(currentUser.uid, {
+          ...viewedUser,
+          photoURL: result.dataUrl,
+          email: currentUser.email || viewedUser?.email || ""
         });
 
         showAvatar(result.dataUrl, nameInput.value, currentUser.email);
@@ -3004,6 +3408,20 @@
       await loadUserProfile(viewedUid);
       listenPresence(viewedUid);
       bindRealtimeData();
+      listenUnreadCounts();
+      listenMissedCalls();
+      listenInvites();
+
+      if (isViewingOwnProfile()) {
+        try {
+          await syncPublicProfileSnapshot(currentUser.uid, {
+            ...viewedUser,
+            email: currentUser.email || viewedUser?.email || ""
+          });
+        } catch (e) {
+          console.error("Initial public profile sync error:", e);
+        }
+      }
 
       updateEmailVerifiedUI();
       document.body.classList.remove("auth-checking");
