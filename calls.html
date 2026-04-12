@@ -302,6 +302,26 @@
       box-shadow:0 0 8px rgba(24,195,74,.7);
     }
 
+    .nav-link-with-badge{
+      position:relative;
+    }
+
+    .nav-badge{
+      min-width:20px;
+      height:20px;
+      padding:0 6px;
+      border-radius:999px;
+      background:var(--red);
+      color:#fff;
+      font-size:12px;
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1;
+      box-shadow:0 6px 14px rgba(223,75,75,.35);
+    }
+
     .page{
       max-width:1450px;
       margin:24px auto;
@@ -322,7 +342,7 @@
 
     .main{min-width:0}
 
-    .sidebar-card,.hero,.stage{
+    .sidebar-card,.hero,.stage,.history-card{
       background:rgba(255,255,255,.98);
       border-radius:28px;
       box-shadow:var(--shadow);
@@ -331,7 +351,7 @@
       overflow:hidden;
     }
 
-    .sidebar-card::before,.hero::before,.stage::before{
+    .sidebar-card::before,.hero::before,.stage::before,.history-card::before{
       content:"";
       position:absolute;
       top:-44px;
@@ -345,7 +365,8 @@
 
     .sidebar-card{padding:20px}
     .hero{padding:20px 22px;margin-bottom:18px;display:flex;gap:16px;align-items:flex-start}
-    .stage{padding:22px;min-height:540px;display:flex;flex-direction:column;gap:16px}
+    .stage{padding:22px;min-height:360px;display:flex;flex-direction:column;gap:16px;margin-bottom:18px}
+    .history-card{padding:22px}
 
     .sidebar-top{
       display:flex;
@@ -380,7 +401,7 @@
       object-fit:cover;
     }
 
-    .logout-btn,.call-btn,.option-btn,.main-btn,.secondary-btn,.danger-btn,.mini-btn{
+    .logout-btn,.call-btn,.option-btn,.main-btn,.secondary-btn,.danger-btn,.mini-btn,.history-chip{
       border:none;
       border-radius:16px;
       padding:13px 16px;
@@ -395,7 +416,7 @@
       font-family:inherit;
     }
 
-    .logout-btn,.option-btn,.secondary-btn,.mini-btn{
+    .logout-btn,.option-btn,.secondary-btn,.mini-btn,.history-chip{
       background:#eef4fb;
       color:var(--text);
     }
@@ -437,7 +458,7 @@
       box-shadow:0 0 0 3px rgba(47,140,255,.13);
     }
 
-    .tabs{
+    .tabs,.history-tabs{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
@@ -626,6 +647,109 @@
       font-weight:700;
       padding:20px;
     }
+
+    .history-head{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .history-title{
+      margin:0;
+      color:#082e5b;
+      font-size:24px;
+    }
+
+    .history-sub{
+      margin:6px 0 0;
+      color:var(--muted);
+      line-height:1.55;
+    }
+
+    .history-chip{
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:13px;
+    }
+
+    .history-chip.unread{
+      background:rgba(223,75,75,.12);
+      color:#b42318;
+    }
+
+    .history-list{
+      display:grid;
+      gap:12px;
+      position:relative;
+      z-index:1;
+    }
+
+    .history-item{
+      border:1px solid #e0eaf6;
+      border-radius:18px;
+      background:#fbfdff;
+      padding:14px;
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+
+    .history-item.unread{
+      border-color:#ffb5b5;
+      box-shadow:0 0 0 3px rgba(223,75,75,.08);
+      background:#fff8f8;
+    }
+
+    .history-item-main{
+      min-width:0;
+      flex:1;
+    }
+
+    .history-item-title{
+      margin:0 0 6px;
+      color:#082e5b;
+      font-weight:800;
+      line-height:1.4;
+    }
+
+    .history-item-sub{
+      margin:0;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:14px;
+      word-break:break-word;
+    }
+
+    .history-badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      line-height:1;
+    }
+
+    .pill.red{background:rgba(223,75,75,.12);color:#b42318}
+    .pill.green{background:rgba(24,195,74,.12);color:#0f7a31}
+    .pill.blue{background:rgba(47,140,255,.12);color:#0f4d92}
+    .pill.gray{background:#eef4fb;color:#5a6d84}
+    .pill.orange{background:rgba(247,166,0,.12);color:#a96a00}
 
     .modal{
       position:fixed;
@@ -846,7 +970,7 @@
       .topbar nav{gap:10px}
       .topbar a{font-size:14px}
       .page{padding:0 12px 24px}
-      .sidebar-card,.hero,.stage{border-radius:22px;padding:18px}
+      .sidebar-card,.hero,.stage,.history-card{border-radius:22px;padding:18px}
       .chem-orbit{width:54vw;height:54vw;left:-16vw;bottom:9vh}
       .chem-dna{width:28vw;min-width:120px}
       .chem-label.h2o{left:20vw;top:23vh;font-size:1.6rem}
@@ -908,7 +1032,10 @@
       <a href="contact.html">Contact</a>
       <a href="insights.html">Insights</a>
       <a href="messages.html">Messages</a>
-      <a href="calls.html" class="active">Appels</a>
+      <a href="calls.html" class="active nav-link-with-badge">
+        <span>Appels</span>
+        <span id="missedCallsBadge" class="nav-badge" style="display:none;">0</span>
+      </a>
       <a href="profile.html"><span class="nav-online-dot"></span> Mon compte</a>
       <a href="competition.html">Concours</a>
     </nav>
@@ -962,6 +1089,23 @@
           <div class="empty-state">
             Choisis un contact accepté pour lancer un appel audio ou vidéo.
           </div>
+        </div>
+      </section>
+
+      <section class="history-card">
+        <div class="history-head">
+          <div>
+            <h3 class="history-title">Historique des appels</h3>
+            <p class="history-sub">Retrouve ici les appels récents, les appels manqués et les statuts importants.</p>
+          </div>
+          <div class="history-tabs">
+            <button class="history-chip" id="markMissedReadBtn" type="button">Marquer manqués comme lus</button>
+            <button class="history-chip unread" id="clearHistoryBtn" type="button">Vider l’historique</button>
+          </div>
+        </div>
+
+        <div class="history-list" id="callHistoryList">
+          <div class="empty-sidebar">Aucun appel pour le moment.</div>
         </div>
       </section>
     </main>
@@ -1037,6 +1181,7 @@
     const LAST_ACTIVITY_KEY = "insights_last_activity";
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
     const CALL_CLEANUP_DELAY = 3500;
+    const MISSED_CALL_TIMEOUT = 45000;
 
     const myAvatar = document.getElementById("myAvatar");
     const myName = document.getElementById("myName");
@@ -1044,6 +1189,10 @@
     const contactSearch = document.getElementById("contactSearch");
     const contactsList = document.getElementById("contactsList");
     const tabButtons = document.querySelectorAll(".tab-btn");
+    const missedCallsBadge = document.getElementById("missedCallsBadge");
+    const callHistoryList = document.getElementById("callHistoryList");
+    const markMissedReadBtn = document.getElementById("markMissedReadBtn");
+    const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
     const selectedAvatar = document.getElementById("selectedAvatar");
     const selectedTitle = document.getElementById("selectedTitle");
@@ -1106,9 +1255,16 @@
     let unsubscribeSession = null;
     let incomingCallsListenerStarted = false;
     let contactsListenerStarted = false;
+    let missedCallsListenerStarted = false;
+    let callHistoryListenerStarted = false;
     let muted = false;
     let cameraEnabled = true;
     let callEnding = false;
+    let ringingTimeout = null;
+    let ringtoneAudio = null;
+    let ringtoneArmed = false;
+    let currentMissedCallsMap = {};
+    let currentHistoryMap = {};
 
     let localVideoEl = null;
     let remoteVideoEl = null;
@@ -1153,6 +1309,50 @@
           if (auth.currentUser) resetActivityTimer();
         }, { passive:true });
       });
+    }
+
+    function armRingtoneOnFirstInteraction() {
+      if (ringtoneArmed) return;
+      ringtoneArmed = true;
+      const unlock = async () => {
+        try {
+          const audio = getRingtoneAudio();
+          audio.volume = 0;
+          await audio.play().catch(() => {});
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = 1;
+        } catch (_) {}
+      };
+      ["click","keydown","touchstart"].forEach(evt => {
+        window.addEventListener(evt, unlock, { passive:true, once:true });
+      });
+    }
+
+    function getRingtoneAudio() {
+      if (!ringtoneAudio) {
+        ringtoneAudio = new Audio("incoming-call.mp3");
+        ringtoneAudio.loop = true;
+        ringtoneAudio.preload = "auto";
+      }
+      return ringtoneAudio;
+    }
+
+    async function startIncomingRingtone() {
+      try {
+        const audio = getRingtoneAudio();
+        audio.loop = true;
+        audio.volume = 1;
+        await audio.play().catch(() => {});
+      } catch (_) {}
+    }
+
+    function stopIncomingRingtone() {
+      try {
+        if (!ringtoneAudio) return;
+        ringtoneAudio.pause();
+        ringtoneAudio.currentTime = 0;
+      } catch (_) {}
     }
 
     function initials(name = "", email = "") {
@@ -1235,6 +1435,188 @@
         online:false,
         text: presence.lastSeen ? `Dernière activité : ${formatDate(presence.lastSeen)}` : "Hors ligne"
       };
+    }
+
+    function formatCallMode(mode = "") {
+      return mode === "video" ? "vidéo" : "audio";
+    }
+
+    function clearRingingTimeout() {
+      if (ringingTimeout) {
+        clearTimeout(ringingTimeout);
+        ringingTimeout = null;
+      }
+    }
+
+    function getHistoryDirectionLabel(item = {}) {
+      if (!currentUser) return "";
+      if (item.fromUid === currentUser.uid) return "Sortant";
+      if (item.toUid === currentUser.uid) return "Entrant";
+      return "";
+    }
+
+    function getHistoryStatusPill(item = {}) {
+      const status = item.status || "";
+      if (status === "missed") return `<span class="pill red">Manqué</span>`;
+      if (status === "accepted") return `<span class="pill green">Accepté</span>`;
+      if (status === "rejected") return `<span class="pill orange">Refusé</span>`;
+      if (status === "ended") return `<span class="pill blue">Terminé</span>`;
+      if (status === "ringing") return `<span class="pill gray">En cours</span>`;
+      return `<span class="pill gray">${escapeHtml(status || "Appel")}</span>`;
+    }
+
+    function updateMissedCallsBadge(data = {}) {
+      currentMissedCallsMap = data || {};
+      const unreadCount = Object.values(currentMissedCallsMap).filter(item => item && item.unread).length;
+
+      if (!missedCallsBadge) return;
+
+      if (unreadCount > 0) {
+        missedCallsBadge.style.display = "inline-flex";
+        missedCallsBadge.textContent = unreadCount > 99 ? "99+" : String(unreadCount);
+      } else {
+        missedCallsBadge.style.display = "none";
+        missedCallsBadge.textContent = "0";
+      }
+    }
+
+    function renderCallHistory() {
+      const entries = Object.entries(currentHistoryMap || {})
+        .map(([id, item]) => ({ id, ...(item || {}) }))
+        .sort((a, b) => (b.createdAt || b.updatedAt || 0) - (a.createdAt || a.updatedAt || 0));
+
+      if (!entries.length) {
+        callHistoryList.innerHTML = `<div class="empty-sidebar">Aucun appel pour le moment.</div>`;
+        return;
+      }
+
+      callHistoryList.innerHTML = entries.map(item => {
+        const otherName =
+          item.fromUid === currentUser?.uid
+            ? (item.toName || item.toEmail || "Contact")
+            : (item.fromName || item.fromEmail || "Contact");
+
+        const unreadMissed = item.status === "missed" && item.toUid === currentUser?.uid && !!item.unread;
+        const when = formatDate(item.createdAt || item.updatedAt || Date.now());
+        const direction = getHistoryDirectionLabel(item);
+
+        return `
+          <div class="history-item ${unreadMissed ? "unread" : ""}">
+            <div class="history-item-main">
+              <p class="history-item-title">
+                ${escapeHtml(otherName)} — appel ${escapeHtml(formatCallMode(item.mode))}
+              </p>
+              <p class="history-item-sub">
+                ${escapeHtml(direction)} • ${escapeHtml(when)}
+              </p>
+            </div>
+            <div class="history-badges">
+              ${getHistoryStatusPill(item)}
+              ${item.mode === "video" ? `<span class="pill blue">Vidéo</span>` : `<span class="pill gray">Audio</span>`}
+              ${unreadMissed ? `<span class="pill red">Non lu</span>` : ``}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function writeCallHistory(item = {}) {
+      if (!item.callId || !item.fromUid || !item.toUid) return;
+
+      const base = {
+        callId: item.callId,
+        fromUid: item.fromUid || "",
+        fromName: item.fromName || "",
+        fromEmail: item.fromEmail || "",
+        toUid: item.toUid || "",
+        toName: item.toName || "",
+        toEmail: item.toEmail || "",
+        mode: item.mode || "audio",
+        status: item.status || "ended",
+        unread: !!item.unread,
+        createdAt: item.createdAt || Date.now(),
+        updatedAt: Date.now()
+      };
+
+      try {
+        await set(ref(db, `callHistory/${item.fromUid}/${item.callId}`), {
+          ...base,
+          unread: false
+        });
+
+        await set(ref(db, `callHistory/${item.toUid}/${item.callId}`), {
+          ...base,
+          unread: base.status === "missed"
+        });
+      } catch (e) {
+        console.error("Erreur historique appel :", e);
+      }
+    }
+
+    async function createMissedCallEntry(callData = {}) {
+      if (!callData.toUid || !callData.callId) return;
+
+      try {
+        await set(ref(db, `missedCalls/${callData.toUid}/${callData.callId}`), {
+          callId: callData.callId,
+          fromUid: callData.fromUid || "",
+          fromName: callData.fromName || "Utilisateur",
+          fromEmail: callData.fromEmail || "",
+          toUid: callData.toUid || "",
+          toName: callData.toName || "",
+          toEmail: callData.toEmail || "",
+          mode: callData.mode || "audio",
+          status: "missed",
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          unread: true
+        });
+      } catch (e) {
+        console.error("Erreur création appel manqué :", e);
+      }
+    }
+
+    async function markAllMissedCallsAsRead() {
+      if (!currentUser) return;
+      try {
+        const snap = await get(ref(db, `missedCalls/${currentUser.uid}`));
+        if (!snap.exists()) return;
+
+        const data = snap.val() || {};
+        const updates = {};
+
+        Object.keys(data).forEach(callId => {
+          updates[`missedCalls/${currentUser.uid}/${callId}/unread`] = false;
+          updates[`missedCalls/${currentUser.uid}/${callId}/readAt`] = Date.now();
+        });
+
+        const historySnap = await get(ref(db, `callHistory/${currentUser.uid}`));
+        if (historySnap.exists()) {
+          const historyData = historySnap.val() || {};
+          Object.keys(historyData).forEach(callId => {
+            if (historyData[callId] && historyData[callId].status === "missed") {
+              updates[`callHistory/${currentUser.uid}/${callId}/unread`] = false;
+              updates[`callHistory/${currentUser.uid}/${callId}/readAt`] = Date.now();
+            }
+          });
+        }
+
+        if (Object.keys(updates).length) {
+          await update(ref(db), updates);
+        }
+      } catch (e) {
+        console.error("Erreur lecture appels manqués :", e);
+      }
+    }
+
+    async function clearCallHistory() {
+      if (!currentUser) return;
+      try {
+        await remove(ref(db, `callHistory/${currentUser.uid}`));
+        await remove(ref(db, `missedCalls/${currentUser.uid}`));
+      } catch (e) {
+        console.error("Erreur suppression historique :", e);
+      }
     }
 
     function setupSelectedContactUI() {
@@ -1343,6 +1725,25 @@
       onValue(ref(db, "blocks"), (snap) => {
         allBlocks = snap.val() || {};
         rebuildContacts();
+      });
+    }
+
+    function listenMissedCallsBadge() {
+      if (missedCallsListenerStarted || !currentUser) return;
+      missedCallsListenerStarted = true;
+
+      onValue(ref(db, `missedCalls/${currentUser.uid}`), (snap) => {
+        updateMissedCallsBadge(snap.val() || {});
+      });
+    }
+
+    function listenCallHistory() {
+      if (callHistoryListenerStarted || !currentUser) return;
+      callHistoryListenerStarted = true;
+
+      onValue(ref(db, `callHistory/${currentUser.uid}`), (snap) => {
+        currentHistoryMap = snap.val() || {};
+        renderCallHistory();
       });
     }
 
@@ -1493,11 +1894,66 @@
       if (callEnding) return;
       callEnding = true;
 
+      clearRingingTimeout();
+      stopIncomingRingtone();
+
       const closingCallId = currentCallId;
+      let existingCallData = null;
+
+      if (closingCallId) {
+        try {
+          const snap = await get(ref(db, `calls/${closingCallId}`));
+          if (snap.exists()) {
+            existingCallData = snap.val();
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      if (
+        existingCallData &&
+        reason === "missed" &&
+        existingCallData.status === "ringing" &&
+        existingCallData.fromUid === currentUser?.uid &&
+        existingCallData.toUid
+      ) {
+        existingCallData.status = "missed";
+        existingCallData.updatedAt = Date.now();
+        await createMissedCallEntry(existingCallData);
+        await writeCallHistory({
+          ...existingCallData,
+          status: "missed",
+          unread: true
+        });
+      }
+
+      if (
+        existingCallData &&
+        reason === "rejected"
+      ) {
+        await writeCallHistory({
+          ...existingCallData,
+          status: "rejected",
+          unread: false
+        });
+      }
+
+      if (
+        existingCallData &&
+        reason === "ended" &&
+        (existingCallData.status === "accepted" || existingCallData.status === "ended")
+      ) {
+        await writeCallHistory({
+          ...existingCallData,
+          status: "ended",
+          unread: false
+        });
+      }
 
       if (closingCallId) {
         await safeSetCallStatus(closingCallId, {
-          status: reason === "rejected" ? "rejected" : "ended",
+          status: reason === "rejected" ? "rejected" : (reason === "missed" ? "missed" : "ended"),
           endedBy: currentUser?.uid || "",
           endedAt: Date.now()
         });
@@ -1514,10 +1970,17 @@
       cameraEnabled = true;
 
       if (!silent) {
-        setStatus(reason === "rejected" ? "Appel refusé." : "Appel terminé.");
+        if (reason === "rejected") {
+          setStatus("Appel refusé.");
+        } else if (reason === "missed") {
+          setStatus("Appel manqué.");
+        } else {
+          setStatus("Appel terminé.");
+        }
       }
 
       closeModal(callModal);
+      closeModal(incomingCallModal);
 
       if (selectedContact) renderContactStage();
       else setupSelectedContactUI();
@@ -1630,6 +2093,8 @@
 
         if (state === "connecting") callModalStatus.textContent = "Connexion en cours...";
         if (state === "connected") {
+          clearRingingTimeout();
+          stopIncomingRingtone();
           callModalStatus.textContent = "Connexion établie ✅";
           setStatus("Appel en cours.");
           appendCallLog("Connexion WebRTC établie.");
@@ -1762,6 +2227,7 @@ Heure : ${formatDate(Date.now())}`;
           toEmail: selectedContact.email || "",
           mode,
           status: "ringing",
+          recipientOnlineAtStart: !!((selectedContact.presence || {}).online),
           createdAt: Date.now(),
           updatedAt: Date.now()
         });
@@ -1808,12 +2274,14 @@ Heure : ${formatDate(Date.now())}`;
           if (!callData) return;
 
           if (callData.status === "ended") {
+            stopIncomingRingtone();
             callModalStatus.textContent = "Appel terminé";
             appendCallLog("L’appel a été terminé.");
             setTimeout(() => endCurrentCall(true, "ended"), 500);
           }
 
           if (callData.status === "rejected") {
+            stopIncomingRingtone();
             callModalStatus.textContent = "Appel refusé";
             appendCallLog("Le destinataire a refusé l’appel.");
             setStatus("Appel refusé.", true);
@@ -1821,10 +2289,36 @@ Heure : ${formatDate(Date.now())}`;
           }
 
           if (callData.status === "accepted") {
+            clearRingingTimeout();
+            stopIncomingRingtone();
             callModalStatus.textContent = "Connexion en cours...";
             appendCallLog("Le destinataire a accepté l’appel.");
           }
+
+          if (callData.status === "missed") {
+            stopIncomingRingtone();
+            callModalStatus.textContent = "Appel manqué";
+            appendCallLog("Aucune réponse reçue.");
+            setStatus("Appel manqué.", true);
+            setTimeout(() => endCurrentCall(true, "missed"), 700);
+          }
         });
+
+        clearRingingTimeout();
+        ringingTimeout = setTimeout(async () => {
+          try {
+            const snap = await get(ref(db, `calls/${currentCallId}`));
+            if (!snap.exists()) return;
+
+            const callData = snap.val();
+            if (callData && callData.status === "ringing") {
+              appendCallLog("Aucune réponse dans le délai imparti.");
+              await endCurrentCall(false, "missed");
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }, MISSED_CALL_TIMEOUT);
 
         setStatus(`Appel ${mode === "video" ? "vidéo" : "audio"} lancé vers ${selectedContact.displayName || "le contact"}.`);
       } catch (error) {
@@ -1843,6 +2337,8 @@ Heure : ${formatDate(Date.now())}`;
       currentCallId = incoming.callId;
       currentCallMode = incoming.mode;
       callEnding = false;
+      clearRingingTimeout();
+      stopIncomingRingtone();
 
       const mediaOk = await prepareLocalMedia(incoming.mode);
       if (!mediaOk) {
@@ -1890,6 +2386,20 @@ Heure : ${formatDate(Date.now())}`;
           acceptedAt: Date.now()
         });
 
+        await writeCallHistory({
+          callId: currentCallId,
+          fromUid: incoming.fromUid,
+          fromName: incoming.fromName || "",
+          fromEmail: incoming.fromEmail || "",
+          toUid: currentUser.uid,
+          toName: myProfile?.displayName || currentUser.displayName || "",
+          toEmail: currentUser.email || "",
+          mode: incoming.mode,
+          status: "accepted",
+          createdAt: incoming.createdAt || Date.now(),
+          unread: false
+        });
+
         unsubscribeSession = onValue(ref(db, `calls/${currentCallId}`), (snap) => {
           const callData = snap.val();
           if (!callData) return;
@@ -1903,6 +2413,11 @@ Heure : ${formatDate(Date.now())}`;
           if (callData.status === "rejected") {
             callModalStatus.textContent = "Appel refusé";
             setTimeout(() => endCurrentCall(true, "rejected"), 500);
+          }
+
+          if (callData.status === "missed") {
+            callModalStatus.textContent = "Appel manqué";
+            setTimeout(() => endCurrentCall(true, "missed"), 500);
           }
         });
 
@@ -1921,12 +2436,11 @@ Heure : ${formatDate(Date.now())}`;
         setStatus("Erreur d’appel.", true);
       }
     }
-
-    function listenForCalls() {
+        function listenForCalls() {
       if (incomingCallsListenerStarted) return;
       incomingCallsListenerStarted = true;
 
-      onValue(ref(db, "calls"), (snap) => {
+      onValue(ref(db, "calls"), async (snap) => {
         const data = snap.val() || {};
         const values = Object.values(data);
 
@@ -1939,9 +2453,11 @@ Heure : ${formatDate(Date.now())}`;
           currentIncomingCall = incoming;
           incomingCallText.textContent = `${incoming.fromName || "Quelqu’un"} essaie de te joindre en ${incoming.mode === "video" ? "vidéo" : "audio"}.`;
           openModal(incomingCallModal);
+          await startIncomingRingtone();
         } else if (!incoming) {
           if (!currentCallId) closeModal(incomingCallModal);
           currentIncomingCall = null;
+          stopIncomingRingtone();
         }
       });
     }
@@ -1949,6 +2465,7 @@ Heure : ${formatDate(Date.now())}`;
     async function rejectIncomingCall() {
       if (!currentIncomingCall) {
         closeModal(incomingCallModal);
+        stopIncomingRingtone();
         return;
       }
 
@@ -1957,12 +2474,27 @@ Heure : ${formatDate(Date.now())}`;
           status: "rejected",
           rejectedAt: Date.now()
         });
+
+        await writeCallHistory({
+          callId: currentIncomingCall.callId,
+          fromUid: currentIncomingCall.fromUid || "",
+          fromName: currentIncomingCall.fromName || "",
+          fromEmail: currentIncomingCall.fromEmail || "",
+          toUid: currentIncomingCall.toUid || currentUser.uid,
+          toName: currentIncomingCall.toName || myProfile?.displayName || currentUser.displayName || "",
+          toEmail: currentIncomingCall.toEmail || currentUser.email || "",
+          mode: currentIncomingCall.mode || "audio",
+          status: "rejected",
+          createdAt: currentIncomingCall.createdAt || Date.now(),
+          unread: false
+        });
       } catch (e) {
         console.error(e);
       }
 
       currentIncomingCall = null;
       closeModal(incomingCallModal);
+      stopIncomingRingtone();
       setStatus("Appel refusé.");
     }
 
@@ -2028,6 +2560,16 @@ Heure : ${formatDate(Date.now())}`;
 
     blockToggleBtn.addEventListener("click", toggleBlockSelectedUser);
 
+    markMissedReadBtn.addEventListener("click", async () => {
+      await markAllMissedCallsAsRead();
+    });
+
+    clearHistoryBtn.addEventListener("click", async () => {
+      const ok = window.confirm("Voulez-vous vraiment vider l’historique des appels ?");
+      if (!ok) return;
+      await clearCallHistory();
+    });
+
     closeOptionsModal.addEventListener("click", () => closeModal(optionsModal));
     cancelOptionsBtn.addEventListener("click", () => closeModal(optionsModal));
 
@@ -2075,13 +2617,20 @@ Heure : ${formatDate(Date.now())}`;
 
       currentUser = user;
       bindActivityEvents();
+      armRingtoneOnFirstInteraction();
       resetActivityTimer();
 
       await loadMyProfile();
       await bindPresence();
       loadContacts();
       listenForCalls();
+      listenMissedCallsBadge();
+      listenCallHistory();
       setupSelectedContactUI();
+
+      setTimeout(() => {
+        markAllMissedCallsAsRead().catch(() => {});
+      }, 1200);
 
       if (preselectedCallUid) {
         const trySelect = () => {
@@ -2102,6 +2651,7 @@ Heure : ${formatDate(Date.now())}`;
 
     window.addEventListener("beforeunload", async () => {
       try {
+        stopIncomingRingtone();
         if (currentLocalStream) currentLocalStream.getTracks().forEach(track => track.stop());
       } catch (_) {}
 
