@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact | Championnat de Chimie</title>
+  <meta name="description" content="Contacter l'organisation du Championnat de Chimie." />
+  <style>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    :root{
+      --bg1:#eef7ff;
+      --bg2:#fff8f8;
+      --bg3:#f8fffb;
+
+      --nav:#082e5b;
+      --text:#0b2340;
+      --muted:#627791;
+      --line:#dce7f3;
+
+      --blue:#2f8cff;
+      --blue-dark:#145bd6;
+
+      --red:#ff4b4b;
+      --red-dark:#d82e2e;
+
+      --green:#18c34a;
+      --green-dark:#0f9b3a;
+
+      --purple:#7b61ff;
+      --purple-dark:#5a3fe0;
+
+      --card:rgba(255,255,255,.88);
+      --card-strong:rgba(255,255,255,.94);
+
+      --shadow:0 18px 45px rgba(9,45,92,.10);
+      --shadow-soft:0 10px 24px rgba(10,37,73,.07);
+
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
+
+      --max:1240px;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(47,140,255,.14), transparent 24%),
+        radial-gradient(circle at top right, rgba(255,75,75,.10), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(24,195,74,.08), transparent 22%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 44%, var(--bg3) 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      width:360px;
+      height:360px;
+      border-radius:50%;
+      filter:blur(55px);
+      z-index:-2;
+      pointer-events:none;
+    }
+
+    body::before{
+      top:-120px;
+      left:-120px;
+      background:rgba(47,140,255,.14);
+    }
+
+    body::after{
+      right:-120px;
+      top:140px;
+      background:rgba(255,75,75,.10);
+    }
+
+    .page-wrap{
+      position:relative;
+      min-height:100vh;
+    }
+
+    .bg-soft{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .orb{
+      position:absolute;
+      border-radius:50%;
+      animation:floatOrb 9s ease-in-out infinite;
+      opacity:.9;
+    }
+
+    .o1{
+      width:110px;height:110px;top:100px;left:6%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(47,140,255,.28) 45%, transparent 74%);
+    }
+    .o2{
+      width:88px;height:88px;top:260px;right:10%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(255,75,75,.24) 45%, transparent 74%);
+      animation-delay:1.2s;
+    }
+    .o3{
+      width:142px;height:142px;bottom:140px;left:10%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(24,195,74,.20) 45%, transparent 74%);
+      animation-delay:2s;
+    }
+    .o4{
+      width:96px;height:96px;bottom:80px;right:8%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(123,97,255,.18) 45%, transparent 74%);
+      animation-delay:3s;
+    }
+
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(255,255,255,.72);
+      border-bottom:1px solid rgba(220,231,243,.92);
+      box-shadow:0 6px 24px rgba(8,46,91,.05);
+    }
+
+    .header-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:inherit;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      background:
+        radial-gradient(circle at 30% 30%, #fff 0%, #d8e9ff 22%, #7ab7ff 48%, #1a5ec4 100%);
+      box-shadow:
+        0 10px 24px rgba(47,140,255,.20),
+        inset 0 1px 8px rgba(255,255,255,.75);
+      position:relative;
+      flex:0 0 auto;
+    }
+
+    .brand-mark::before,
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.84);
+      inset:10px;
+    }
+
+    .brand-mark::after{
+      inset:6px 14px;
+      border-color:rgba(255,255,255,.56);
+      transform:rotate(55deg);
+    }
+
+    .brand-title{
+      font-size:1.06rem;
+      font-weight:800;
+      color:var(--nav);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .brand-sub{
+      font-size:.79rem;
+      color:#667b96;
+      margin-top:2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .nav-main{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .nav-main a{
+      text-decoration:none;
+      color:var(--text);
+      font-weight:700;
+      font-size:.94rem;
+      padding:10px 14px;
+      border-radius:999px;
+      transition:.2s ease;
+    }
+
+    .nav-main a:hover,
+    .nav-main a.active{
+      background:rgba(47,140,255,.10);
+      color:var(--blue-dark);
+    }
+
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn,
+    .btn-outline{
+      border:none;
+      cursor:pointer;
+      transition:.22s ease;
+      font-weight:800;
+      font-family:inherit;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border-radius:999px;
+      padding:12px 18px;
+    }
+
+    .btn{
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+      box-shadow:0 14px 30px rgba(47,140,255,.20);
+    }
+
+    .btn-outline{
+      color:var(--red-dark);
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(255,75,75,.16);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      max-width:var(--max);
+      margin:0 auto;
+      padding:30px 18px 54px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:22px;
+      align-items:stretch;
+      margin-bottom:24px;
+    }
+
+    .hero-card,
+    .hero-side,
+    .section-card,
+    .cta-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+      border:1px solid rgba(220,231,243,.95);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero-card{
+      padding:34px 28px 28px;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      left:-100px;
+      top:-110px;
+      background:radial-gradient(circle, rgba(47,140,255,.12), transparent 72%);
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(255,75,75,.10);
+      color:var(--red-dark);
+      border:1px solid rgba(255,75,75,.12);
+      font-weight:800;
+      font-size:.85rem;
+      margin-bottom:18px;
+    }
+
+    h1{
+      margin:0 0 14px;
+      font-size:clamp(2rem, 4vw, 3.7rem);
+      line-height:1.04;
+      letter-spacing:-1.2px;
+      color:var(--nav);
+    }
+
+    .lead{
+      margin:0;
+      color:#5d728d;
+      font-size:1.04rem;
+      line-height:1.8;
+      max-width:760px;
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:24px;
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+      margin-top:26px;
+    }
+
+    .stat{
+      border-radius:22px;
+      padding:18px 16px;
+      color:#fff;
+      box-shadow:var(--shadow-soft);
+      min-height:112px;
+    }
+
+    .stat.blue{background:linear-gradient(135deg,var(--blue),var(--blue-dark))}
+    .stat.red{background:linear-gradient(135deg,var(--red),var(--red-dark))}
+    .stat.green{background:linear-gradient(135deg,var(--green),var(--green-dark))}
+
+    .stat strong{
+      display:block;
+      font-size:1.55rem;
+      margin-bottom:8px;
+    }
+
+    .stat span{
+      display:block;
+      font-size:.92rem;
+      line-height:1.45;
+      opacity:.96;
+      font-weight:700;
+    }
+
+    .hero-side{
+      padding:22px;
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+
+    .side-box{
+      border-radius:22px;
+      padding:18px 16px;
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(220,231,243,.95);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .side-box h3{
+      margin:0 0 8px;
+      font-size:1.03rem;
+      color:var(--nav);
+    }
+
+    .side-box p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:.94rem;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:22px;
+      margin-top:6px;
+    }
+
+    .section-card{
+      padding:24px 22px;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:1.35rem;
+      color:var(--nav);
+      letter-spacing:-.3px;
+    }
+
+    .section-head p{
+      margin:6px 0 0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:700px;
+      font-size:.95rem;
+    }
+
+    .cards{
+      display:grid;
+      gap:14px;
+    }
+
+    .mini-card{
+      border-radius:22px;
+      padding:18px 18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,251,255,.88));
+      border:1px solid rgba(220,231,243,.95);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .mini-card h3{
+      margin:0 0 8px;
+      font-size:1.02rem;
+      color:var(--nav);
+    }
+
+    .mini-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.72;
+      font-size:.95rem;
+    }
+
+    .contact-form{
+      display:grid;
+      gap:14px;
+    }
+
+    .field label{
+      display:block;
+      margin-bottom:7px;
+      font-weight:700;
+      color:#21466f;
+      font-size:.92rem;
+    }
+
+    input, select, textarea{
+      width:100%;
+      border-radius:16px;
+      border:1px solid rgba(220,231,243,.95);
+      background:#fff;
+      outline:none;
+      padding:14px 14px;
+      font-size:.96rem;
+      font-family:inherit;
+      color:var(--text);
+      transition:.18s ease;
+    }
+
+    textarea{
+      min-height:140px;
+      resize:vertical;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color:#8bbcff;
+      box-shadow:0 0 0 4px rgba(47,140,255,.10);
+    }
+
+    .msg{
+      display:none;
+      padding:13px 14px;
+      border-radius:14px;
+      font-size:.93rem;
+      line-height:1.55;
+    }
+
+    .msg.show{display:block}
+    .msg.ok{
+      background:rgba(24,195,74,.10);
+      color:#0f7b33;
+      border:1px solid rgba(24,195,74,.16);
+    }
+
+    .cta{
+      margin-top:22px;
+    }
+
+    .cta-card{
+      padding:34px 28px;
+      text-align:center;
+    }
+
+    .cta-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      left:-110px;
+      bottom:-130px;
+      background:radial-gradient(circle, rgba(255,75,75,.12), transparent 72%);
+    }
+
+    .cta-card h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.4rem);
+      color:var(--nav);
+    }
+
+    .cta-card p{
+      margin:0 auto;
+      max-width:760px;
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    .cta-actions{
+      margin-top:24px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    footer{
+      border-top:1px solid rgba(220,231,243,.92);
+      background:rgba(255,255,255,.68);
+      backdrop-filter:blur(10px);
+      margin-top:30px;
+    }
+
+    .footer-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:22px 18px 28px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      color:#61758f;
+      font-size:.94rem;
+    }
+
+    .footer-links{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .footer-links a{
+      color:#1559bf;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    @keyframes floatOrb{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-12px)}
+    }
+
+    @media (max-width:1120px){
+      .hero, .grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:820px){
+      .nav-main{
+        display:none;
+      }
+
+      .header-inner{
+        padding:12px 14px;
+      }
+
+      .page{
+        padding:22px 14px 44px;
+      }
+
+      .hero-card,
+      .hero-side,
+      .section-card,
+      .cta-card{
+        border-radius:24px;
+      }
+
+      .hero-card{
+        padding:26px 20px 22px;
+      }
+    }
+
+    @media (max-width:520px){
+      .brand-sub{
+        display:none;
+      }
+
+      .hero-stats{
+        grid-template-columns:1fr;
+      }
+
+      .btn,
+      .btn-outline{
+        width:100%;
+      }
+
+      .hero-actions,
+      .cta-actions{
+        flex-direction:column;
+      }
+
+      .header-actions{
+        width:100%;
+      }
+
+      .footer-inner{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="bg-soft">
+      <div class="orb o1"></div>
+      <div class="orb o2"></div>
+      <div class="orb o3"></div>
+      <div class="orb o4"></div>
+    </div>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-mark"></div>
+          <div>
+            <div class="brand-title">Championnat de Chimie</div>
+            <div class="brand-sub">Contact & assistance</div>
+          </div>
+        </a>
+
+        <nav class="nav-main">
+          <a href="index.html">Accueil</a>
+          <a href="about.html">À propos</a>
+          <a href="competition.html">Championnat</a>
+          <a href="rules.html">Règlement</a>
+          <a href="results.html">Résultats</a>
+          <a href="login.html">Connexion</a>
+          <a href="jury.html">Jury</a>
+          <a href="announcements.html">Annonces</a>
+          <a href="contact.html" class="active">Contact</a>
+          <a href="admin.html">Admin</a>
+        </nav>
+
+        <div class="header-actions">
+          <a class="btn" href="competition.html">Participer</a>
+          <a class="btn-outline" href="announcements.html">Annonces</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <div class="hero-card">
+          <div class="eyebrow">✉️ Assistance • Informations • Organisation</div>
+          <h1>Contacter l’organisation du championnat.</h1>
+          <p class="lead">
+            Cette page permet de centraliser les demandes d’information, les questions des candidats et les messages liés à l’organisation du Championnat de Chimie. Elle complète naturellement la vitrine académique du site et renforce son sérieux.
+          </p>
+
+          <div class="hero-actions">
+            <a href="competition.html" class="btn">Aller au championnat</a>
+            <a href="rules.html" class="btn-outline">Voir le règlement</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat blue">
+              <strong>Info</strong>
+              <span>Questions générales sur la compétition</span>
+            </div>
+            <div class="stat red">
+              <strong>Aide</strong>
+              <span>Assistance pour inscription ou accès</span>
+            </div>
+            <div class="stat green">
+              <strong>Suivi</strong>
+              <span>Canal clair pour l’organisation</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="hero-side">
+          <div class="side-box">
+            <h3>Quand utiliser cette page</h3>
+            <p>
+              Pour poser une question sur le championnat, signaler un problème d’accès, demander une précision sur les résultats ou contacter l’organisation dans un cadre plus formel.
+            </p>
+          </div>
+
+          <div class="side-box">
+            <h3>Usage futur</h3>
+            <p>
+              Cette page pourra être reliée plus tard à Firebase ou à une messagerie interne, sans casser la structure actuelle du mini-site.
+            </p>
+          </div>
+
+          <div class="side-box">
+            <h3>Pages liées</h3>
+            <p>
+              Accueil, annonces, règlement, résultats, jury et administration restent directement accessibles pour permettre un parcours clair et cohérent.
+            </p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid">
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Envoyer un message</h2>
+              <p>
+                Ce formulaire est prêt pour une intégration plus avancée. Pour l’instant, il donne une base propre, lisible et professionnelle à l’espace de contact.
+              </p>
+            </div>
+          </div>
+
+          <form class="contact-form" id="contactForm">
+            <div class="field">
+              <label for="fullName">Nom complet</label>
+              <input id="fullName" type="text" placeholder="Nom et prénom" required />
+            </div>
+
+            <div class="field">
+              <label for="email">Adresse email</label>
+              <input id="email" type="email" placeholder="exemple@email.com" required />
+            </div>
+
+            <div class="field">
+              <label for="subject">Sujet</label>
+              <select id="subject" required>
+                <option value="">Choisir un sujet</option>
+                <option>Information générale</option>
+                <option>Inscription au championnat</option>
+                <option>Question sur le règlement</option>
+                <option>Question sur les résultats</option>
+                <option>Problème technique</option>
+                <option>Autre demande</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="message">Message</label>
+              <textarea id="message" placeholder="Écris ton message ici..." required></textarea>
+            </div>
+
+            <button class="btn" type="submit">Envoyer le message</button>
+            <div id="contactMsg" class="msg"></div>
+          </form>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Informations utiles</h2>
+              <p>
+                Cette partie sert à cadrer l’expérience utilisateur et à rassurer les visiteurs sur la façon de contacter l’organisation.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <div class="mini-card">
+              <h3>Demandes d’information</h3>
+              <p>
+                Tu peux utiliser cette page pour obtenir des précisions sur le fonctionnement du championnat, le calendrier, les modalités de participation ou la logique générale du site.
+              </p>
+            </div>
+
+            <div class="mini-card">
+              <h3>Questions sur les résultats</h3>
+              <p>
+                Les candidats peuvent utiliser ce canal pour demander des précisions générales sur la publication, la consultation ou le calendrier des résultats.
+              </p>
+            </div>
+
+            <div class="mini-card">
+              <h3>Signalement technique</h3>
+              <p>
+                En cas de difficulté d’accès, de problème d’affichage ou d’anomalie observée sur une page, ce canal peut servir de point de départ pour un suivi.
+              </p>
+            </div>
+
+            <div class="mini-card">
+              <h3>Coordination future</h3>
+              <p>
+                Cette page est déjà en place pour préparer une future intégration à une boîte de réception admin, une base Firebase ou une messagerie interne.
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="cta">
+        <div class="cta-card">
+          <h2>Besoin d’aller plus loin ?</h2>
+          <p>
+            Cette page “Contact” complète maintenant l’écosystème du mini-site. Elle renforce l’image professionnelle du championnat tout en préparant une future gestion plus avancée des messages et demandes.
+          </p>
+          <div class="cta-actions">
+            <a href="announcements.html" class="btn">Voir les annonces</a>
+            <a href="about.html" class="btn-outline">À propos</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <div>© 2026 Championnat de Chimie — Contact & assistance.</div>
+        <div class="footer-links">
+          <a href="index.html">Accueil</a>
+          <a href="about.html">À propos</a>
+          <a href="competition.html">Championnat</a>
+          <a href="rules.html">Règlement</a>
+          <a href="results.html">Résultats</a>
+          <a href="login.html">Connexion</a>
+          <a href="jury.html">Jury</a>
+          <a href="announcements.html">Annonces</a>
+          <a href="contact.html">Contact</a>
+          <a href="admin.html">Admin</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const form = document.getElementById("contactForm");
+    const msg = document.getElementById("contactMsg");
+
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      msg.textContent = "Message préparé avec succès. La liaison technique pourra être ajoutée ensuite.";
+      msg.className = "msg show ok";
+      form.reset();
+    });
+  </script>
+</body>
+</html>
