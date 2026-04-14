@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Épreuve</title>
+
+<style>
+body{font-family:Arial;margin:0;background:#eef7ff}
+.container{max-width:1100px;margin:auto;padding:20px}
+.card{background:#fff;padding:15px;margin-bottom:15px;border-radius:12px}
+.btn{padding:12px;border:none;background:#2f8cff;color:#fff;font-weight:800;border-radius:999px;cursor:pointer}
+.badge{padding:4px 8px;border-radius:999px;color:#fff;font-size:.8rem}
+.green{background:#18c34a}
+.red{background:#ff4b4b}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+⏱ Temps : <span id="timer">50:00</span>
+</div>
+
+<!-- CODE EXAM -->
+<div class="card">
+<h3>Code d’accès</h3>
+<input id="examCodeInput" placeholder="Coller le code ici">
+<button class="btn" onclick="verifyCode()">Valider</button>
+</div>
+
+<!-- INFOS -->
+<div class="card" id="candidateInfo" style="display:none">
+<h3>Informations candidat</h3>
+Numéro examen : <strong id="examId"></strong>
+</div>
+
+<!-- EXAM -->
+<div class="card" id="examSection" style="display:none">
+
+<details>
+<summary>Question 1</summary>
+<label><input type="radio" name="q1" value="1"> H2O</label><br>
+<label><input type="radio" name="q1" value="0"> CO2</label>
+</details>
+
+<textarea id="q2" placeholder="Réponse"></textarea>
+
+<button class="btn" onclick="submitExam()">Soumettre</button>
+
+</div>
+
+<!-- ADMIN -->
+<div class="card" id="adminPanel" style="display:none">
+<h3>ADMIN</h3>
+
+<input id="newCode" placeholder="Définir code examen">
+<button onclick="setCode()">Définir</button>
+
+<div id="logs"></div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, set, get, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey:"YOUR_KEY",
+  authDomain:"YOUR_DOMAIN",
+  databaseURL:"YOUR_DB",
+  projectId:"YOUR_PROJECT"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const ADMIN = "borisamoussou01@gmail.com";
+
+let user;
+let examId;
+
+/* AUTH */
+onAuthStateChanged(auth,(u)=>{
+  if(!u){location.href="login.html"}
+  user=u;
+
+  if(user.email===ADMIN){
+    document.getElementById("adminPanel").style.display="block";
+    loadLogs();
+  }
+});
+
+/* CODE EXAM */
+async function verifyCode(){
+  const code = document.getElementById("examCodeInput").value;
+
+  const snap = await get(ref(db,"examConfig/code"));
+
+  if(!snap.exists() || snap.val()!==code){
+    alert("Code incorrect");
+    return;
+  }
+
+  startExam();
+}
+
+/* GENERATE ID */
+function generateExamId(){
+  return "EX-"+Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+/* START */
+function startExam(){
+  examId = generateExamId();
+
+  document.getElementById("examId").textContent = examId;
+  document.getElementById("candidateInfo").style.display="block";
+  document.getElementById("examSection").style.display="block";
+
+  set(ref(db,"candidates/"+user.uid),{
+    email:user.email,
+    examId,
+    lastActive:Date.now()
+  });
+}
+
+/* TIMER */
+let t=3000;
+setInterval(()=>{
+  let m=Math.floor(t/60),s=t%60;
+  document.getElementById("timer").textContent=`${m}:${s<10?'0'+s:s}`;
+  t--;
+},1000);
+
+/* ANTI-TRICHE */
+document.addEventListener("copy",e=>e.preventDefault());
+document.addEventListener("paste",e=>e.preventDefault());
+
+window.addEventListener("blur",()=>{
+  log("Changement onglet");
+});
+
+window.addEventListener("beforeunload",()=>{
+  log("Tentative refresh");
+});
+
+function log(msg){
+  push(ref(db,"logs"),{
+    user:user.email,
+    msg,
+    time:Date.now()
+  });
+}
+
+/* ADMIN SET CODE */
+function setCode(){
+  const code=document.getElementById("newCode").value;
+  set(ref(db,"examConfig/code"),code);
+  alert("Code défini");
+}
+
+/* LOAD LOGS */
+function loadLogs(){
+  onValue(ref(db,"logs"),snap=>{
+    let html="";
+    snap.forEach(c=>{
+      let d=c.val();
+      html+=`<div>${d.user} - ${d.msg}</div>`;
+    });
+    document.getElementById("logs").innerHTML=html;
+  });
+}
+
+/* SUBMIT */
+function submitExam(){
+  const q1=document.querySelector('input[name="q1"]:checked')?.value || 0;
+  const q2=document.getElementById("q2").value;
+
+  const score = Number(q1);
+
+  push(ref(db,"answers"),{
+    user:user.email,
+    examId,
+    score,
+    q2,
+    time:Date.now()
+  });
+
+  alert("Envoyé");
+}
+
+window.verifyCode=verifyCode;
+window.submitExam=submitExam;
+window.setCode=setCode;
+
+</script>
+
+</body>
+</html>
