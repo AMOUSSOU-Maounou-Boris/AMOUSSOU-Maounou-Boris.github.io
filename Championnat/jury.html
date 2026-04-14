@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jury | Championnat de Chimie</title>
+  <meta name="description" content="Jury et encadrement académique du Championnat de Chimie." />
+  <style>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#0b2340;
+      background:
+        radial-gradient(circle at top left, rgba(255,75,75,.16), transparent 26%),
+        radial-gradient(circle at top right, rgba(255,170,170,.14), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(47,140,255,.10), transparent 24%),
+        linear-gradient(180deg,#fff5f5 0%,#fffafb 36%,#f9fbff 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    :root{
+      --nav:#082e5b;
+      --text:#0b2340;
+      --muted:#61748d;
+      --red:#ff4b4b;
+      --red-dark:#d92f2f;
+      --red-soft:#fff0f0;
+      --blue:#2f8cff;
+      --line:#e8edf5;
+      --card:rgba(255,255,255,.84);
+      --card-strong:rgba(255,255,255,.92);
+      --shadow:0 18px 45px rgba(9,45,92,.10);
+      --shadow-soft:0 10px 25px rgba(10,37,73,.08);
+      --radius-xl:28px;
+      --radius-lg:22px;
+      --radius-md:16px;
+      --max:1220px;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      width:380px;
+      height:380px;
+      border-radius:50%;
+      filter:blur(55px);
+      z-index:-2;
+      pointer-events:none;
+    }
+    body::before{
+      top:-120px;
+      left:-120px;
+      background:rgba(255,75,75,.15);
+    }
+    body::after{
+      right:-120px;
+      top:160px;
+      background:rgba(47,140,255,.10);
+    }
+
+    .page-wrap{
+      position:relative;
+      min-height:100vh;
+    }
+
+    .soft-bg{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .orb{
+      position:absolute;
+      border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.96), rgba(255,75,75,.28) 46%, rgba(255,75,75,.08) 70%, transparent 74%);
+      box-shadow:0 0 40px rgba(255,75,75,.12);
+      animation:floatOrb 8s ease-in-out infinite;
+    }
+    .orb.o1{width:120px;height:120px;top:90px;left:6%}
+    .orb.o2{width:86px;height:86px;top:210px;right:10%;animation-delay:1.2s}
+    .orb.o3{width:150px;height:150px;bottom:120px;left:11%;animation-delay:2.1s}
+    .orb.o4{width:98px;height:98px;bottom:80px;right:8%;animation-delay:3s}
+
+    .line{
+      position:absolute;
+      height:2px;
+      border-radius:999px;
+      background:linear-gradient(90deg, rgba(255,75,75,.05), rgba(255,75,75,.28), rgba(47,140,255,.14));
+      opacity:.55;
+      transform-origin:left center;
+    }
+    .l1{width:180px;top:142px;left:10%;transform:rotate(24deg)}
+    .l2{width:210px;top:250px;right:9%;transform:rotate(-18deg)}
+    .l3{width:220px;bottom:210px;left:12%;transform:rotate(-22deg)}
+    .l4{width:160px;bottom:140px;right:12%;transform:rotate(18deg)}
+
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(255,255,255,.72);
+      border-bottom:1px solid rgba(232,237,245,.92);
+      box-shadow:0 6px 24px rgba(8,46,91,.05);
+    }
+
+    .header-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:inherit;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:46px;
+      height:46px;
+      border-radius:15px;
+      position:relative;
+      background:
+        radial-gradient(circle at 30% 30%, #ffffff 0%, #ffd8d8 22%, #ff7a7a 52%, #cf2f2f 100%);
+      box-shadow:
+        0 10px 28px rgba(255,75,75,.20),
+        inset 0 1px 8px rgba(255,255,255,.75);
+      flex:0 0 auto;
+    }
+    .brand-mark::before,
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.85);
+      inset:10px;
+    }
+    .brand-mark::after{
+      inset:5px 14px;
+      border-color:rgba(255,255,255,.56);
+      transform:rotate(55deg);
+    }
+
+    .brand-title{
+      margin:0;
+      font-size:1.06rem;
+      font-weight:800;
+      letter-spacing:.2px;
+      color:#082e5b;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .brand-sub{
+      margin-top:2px;
+      font-size:.78rem;
+      color:#6b7f97;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .nav-main{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+
+    .nav-main a{
+      text-decoration:none;
+      color:#0b2340;
+      font-weight:700;
+      font-size:.95rem;
+      padding:10px 14px;
+      border-radius:999px;
+      transition:.22s ease;
+    }
+
+    .nav-main a:hover,
+    .nav-main a.active{
+      background:rgba(255,75,75,.10);
+      color:#c72f2f;
+    }
+
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+
+    .btn,
+    .btn-outline,
+    .menu-btn{
+      border:none;
+      cursor:pointer;
+      transition:.25s ease;
+      font-weight:800;
+      font-family:inherit;
+    }
+
+    .btn{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:13px 20px;
+      border-radius:999px;
+      color:#fff;
+      background:linear-gradient(135deg, var(--red), var(--red-dark));
+      box-shadow:0 14px 34px rgba(255,75,75,.20);
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 18px 36px rgba(255,75,75,.26);
+    }
+
+    .btn-outline{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      color:#c72f2f;
+      background:rgba(255,255,255,.80);
+      border:1px solid rgba(255,75,75,.16);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .btn-outline:hover{
+      transform:translateY(-2px);
+      background:#fff;
+    }
+
+    .menu-btn{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.90);
+      border:1px solid rgba(255,75,75,.12);
+      box-shadow:var(--shadow-soft);
+      position:relative;
+    }
+
+    .menu-btn span,
+    .menu-btn::before,
+    .menu-btn::after{
+      content:"";
+      position:absolute;
+      width:21px;
+      height:2.4px;
+      border-radius:999px;
+      background:#c72f2f;
+      transition:.22s ease;
+    }
+    .menu-btn span{transform:translateY(0)}
+    .menu-btn::before{transform:translateY(-7px)}
+    .menu-btn::after{transform:translateY(7px)}
+
+    #menuToggle{display:none}
+
+    .side-menu{
+      position:fixed;
+      top:0;
+      right:-360px;
+      width:min(88vw, 330px);
+      height:100vh;
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(22px);
+      border-left:1px solid rgba(232,237,245,.96);
+      box-shadow:-18px 0 40px rgba(8,46,91,.12);
+      padding:24px 18px 24px;
+      z-index:80;
+      transition:right .28s ease;
+      overflow-y:auto;
+    }
+
+    #menuToggle:checked ~ .side-menu{
+      right:0;
+    }
+
+    #menuToggle:checked + label.menu-btn::before{
+      transform:translateY(0) rotate(45deg);
+    }
+    #menuToggle:checked + label.menu-btn::after{
+      transform:translateY(0) rotate(-45deg);
+    }
+    #menuToggle:checked + label.menu-btn span{
+      opacity:0;
+      transform:scaleX(.5);
+    }
+
+    .side-menu h3{
+      margin:6px 4px 18px;
+      font-size:1.18rem;
+      color:#082e5b;
+    }
+
+    .side-menu .menu-group{
+      display:grid;
+      gap:10px;
+    }
+
+    .side-menu a{
+      text-decoration:none;
+      color:#0f2747;
+      background:rgba(255,255,255,.80);
+      border:1px solid rgba(255,75,75,.10);
+      border-radius:16px;
+      padding:14px 14px;
+      font-weight:700;
+      box-shadow:0 8px 22px rgba(10,37,73,.05);
+      transition:.22s ease;
+    }
+
+    .side-menu a:hover{
+      transform:translateX(-2px);
+      background:#fff;
+      color:#c72f2f;
+    }
+
+    .menu-note{
+      margin:18px 4px 0;
+      padding:14px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,75,75,.08), rgba(47,140,255,.06));
+      border:1px solid rgba(255,75,75,.12);
+      color:#556b86;
+      font-size:.92rem;
+      line-height:1.55;
+    }
+
+    .menu-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(2,18,38,.24);
+      opacity:0;
+      visibility:hidden;
+      z-index:70;
+      transition:.22s ease;
+    }
+
+    #menuToggle:checked ~ .menu-overlay{
+      opacity:1;
+      visibility:visible;
+    }
+
+    main{
+      position:relative;
+      z-index:1;
+    }
+
+    .container{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:0 18px;
+    }
+
+    .hero{
+      padding:64px 0 30px;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:28px;
+      align-items:stretch;
+    }
+
+    .hero-card,
+    .glass-box,
+    .cta-card{
+      position:relative;
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+      border:1px solid rgba(232,237,245,.96);
+      border-radius:34px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .hero-card{
+      padding:34px 30px 30px;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      inset:-120px auto auto -100px;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,75,75,.12), transparent 70%);
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(255,75,75,.10);
+      color:#c72f2f;
+      font-weight:800;
+      font-size:.86rem;
+      margin-bottom:18px;
+      border:1px solid rgba(255,75,75,.12);
+    }
+
+    .hero h1{
+      margin:0 0 14px;
+      font-size:clamp(2rem, 4vw, 4rem);
+      line-height:1.05;
+      letter-spacing:-1.2px;
+      color:#082e5b;
+    }
+
+    .hero p.lead{
+      margin:0;
+      max-width:700px;
+      font-size:1.06rem;
+      line-height:1.8;
+      color:#556b86;
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:26px;
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+      margin-top:28px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(255,75,75,.08);
+      border-radius:20px;
+      padding:18px 16px;
+      box-shadow:0 10px 20px rgba(8,46,91,.05);
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      color:#082e5b;
+      margin-bottom:5px;
+    }
+
+    .stat span{
+      color:#667b96;
+      font-size:.93rem;
+      font-weight:700;
+    }
+
+    .glass-box{
+      padding:24px;
+    }
+
+    .glass-box::after{
+      content:"";
+      position:absolute;
+      inset:auto -40px -40px auto;
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,75,75,.12), transparent 68%);
+      pointer-events:none;
+    }
+
+    .panel-title{
+      margin:0 0 14px;
+      font-size:1.18rem;
+      color:#082e5b;
+    }
+
+    .announcement{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      padding:16px;
+      border-radius:20px;
+      background:linear-gradient(135deg, rgba(255,75,75,.10), rgba(255,255,255,.40));
+      border:1px solid rgba(255,75,75,.12);
+    }
+
+    .badge-dot{
+      width:14px;
+      height:14px;
+      border-radius:50%;
+      background:linear-gradient(135deg, #ff4b4b, #d92f2f);
+      box-shadow:0 0 0 6px rgba(255,75,75,.12);
+      margin-top:5px;
+      flex:0 0 auto;
+    }
+
+    .announcement strong{
+      display:block;
+      margin-bottom:5px;
+      color:#082e5b;
+      font-size:1rem;
+    }
+
+    .announcement p{
+      margin:0;
+      color:#60758f;
+      line-height:1.6;
+      font-size:.95rem;
+    }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:12px;
+      margin-top:16px;
+    }
+
+    .mini-card{
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(255,75,75,.08);
+      box-shadow:0 10px 22px rgba(8,46,91,.05);
+    }
+
+    .mini-card strong{
+      display:block;
+      color:#082e5b;
+      margin-bottom:6px;
+      font-size:.98rem;
+    }
+
+    .mini-card p{
+      margin:0;
+      color:#657a95;
+      font-size:.92rem;
+      line-height:1.55;
+    }
+
+    section{
+      padding:26px 0;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:clamp(1.5rem, 2.3vw, 2.2rem);
+      color:#082e5b;
+      letter-spacing:-.4px;
+    }
+
+    .section-head p{
+      margin:8px 0 0;
+      color:#61758f;
+      max-width:760px;
+      line-height:1.75;
+    }
+
+    .cards-3{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+    }
+
+    .cards-4{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:16px;
+    }
+
+    .card{
+      position:relative;
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+      border:1px solid rgba(232,237,245,.96);
+      border-radius:26px;
+      padding:22px 20px;
+      box-shadow:var(--shadow-soft);
+      overflow:hidden;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0 auto auto 0;
+      width:100%;
+      height:4px;
+      background:linear-gradient(90deg, var(--red), #ff9d9d);
+      opacity:.9;
+    }
+
+    .icon-bubble{
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      font-size:1.35rem;
+      background:linear-gradient(135deg, rgba(255,75,75,.12), rgba(255,180,180,.12));
+      box-shadow:inset 0 1px 6px rgba(255,255,255,.6);
+      margin-bottom:14px;
+    }
+
+    .card h3{
+      margin:0 0 10px;
+      color:#082e5b;
+      font-size:1.08rem;
+    }
+
+    .card p{
+      margin:0;
+      color:#647891;
+      line-height:1.7;
+      font-size:.95rem;
+    }
+
+    .highlight{
+      background:linear-gradient(135deg, rgba(125,18,18,.98), rgba(214,47,47,.92));
+      border-radius:34px;
+      padding:34px 28px;
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 22px 48px rgba(146,25,25,.22);
+    }
+
+    .highlight::before{
+      content:"";
+      position:absolute;
+      width:220px;
+      height:220px;
+      right:-80px;
+      top:-80px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.14), transparent 70%);
+    }
+
+    .highlight-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:24px;
+      align-items:center;
+      position:relative;
+      z-index:1;
+    }
+
+    .highlight h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.5rem);
+      letter-spacing:-.6px;
+    }
+
+    .highlight p{
+      margin:0;
+      color:rgba(255,255,255,.88);
+      line-height:1.8;
+      max-width:760px;
+    }
+
+    .highlight-boxes{
+      display:grid;
+      gap:12px;
+    }
+
+    .highlight-box{
+      padding:16px 18px;
+      border-radius:20px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter:blur(8px);
+      font-weight:700;
+      line-height:1.55;
+      color:#fff6f6;
+    }
+
+    .member-grid{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+    }
+
+    .member-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+      border:1px solid rgba(232,237,245,.96);
+      border-radius:28px;
+      padding:24px 20px;
+      box-shadow:var(--shadow-soft);
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .member-card::before{
+      content:"";
+      position:absolute;
+      inset:0 auto auto 0;
+      width:100%;
+      height:4px;
+      background:linear-gradient(90deg, var(--red), #ffb0b0);
+    }
+
+    .avatar{
+      width:76px;
+      height:76px;
+      margin:0 auto 14px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      font-size:1.9rem;
+      background:linear-gradient(135deg, rgba(255,75,75,.12), rgba(255,255,255,.60));
+      border:1px solid rgba(255,75,75,.12);
+      box-shadow:0 10px 22px rgba(8,46,91,.05);
+    }
+
+    .member-card h3{
+      margin:0 0 6px;
+      color:#082e5b;
+      font-size:1.05rem;
+    }
+
+    .member-role{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,75,75,.10);
+      color:#c72f2f;
+      font-weight:800;
+      font-size:.82rem;
+      border:1px solid rgba(255,75,75,.12);
+      margin-bottom:10px;
+    }
+
+    .member-card p{
+      margin:0;
+      color:#647891;
+      line-height:1.7;
+      font-size:.94rem;
+    }
+
+    .faq-list{
+      display:grid;
+      gap:14px;
+    }
+
+    .faq-item{
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+      border:1px solid rgba(232,237,245,.96);
+      border-radius:22px;
+      padding:20px 20px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .faq-item h3{
+      margin:0 0 8px;
+      color:#082e5b;
+      font-size:1rem;
+    }
+
+    .faq-item p{
+      margin:0;
+      color:#647891;
+      line-height:1.72;
+      font-size:.95rem;
+    }
+
+    .cta{
+      padding-top:10px;
+      padding-bottom:54px;
+    }
+
+    .cta-card{
+      padding:34px 28px;
+      text-align:center;
+    }
+
+    .cta-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      left:-110px;
+      bottom:-130px;
+      background:radial-gradient(circle, rgba(255,75,75,.12), transparent 72%);
+    }
+
+    .cta-card h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.4rem);
+      color:#082e5b;
+    }
+
+    .cta-card p{
+      margin:0 auto;
+      max-width:760px;
+      color:#627791;
+      line-height:1.8;
+    }
+
+    .cta-actions{
+      margin-top:24px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    footer{
+      border-top:1px solid rgba(232,237,245,.95);
+      background:rgba(255,255,255,.68);
+      backdrop-filter:blur(10px);
+    }
+
+    .footer-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:22px 18px 28px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      color:#61758f;
+      font-size:.94rem;
+    }
+
+    .footer-links{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .footer-links a{
+      color:#c72f2f;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    @keyframes floatOrb{
+      0%,100%{transform:translateY(0px)}
+      50%{transform:translateY(-12px)}
+    }
+
+    @media (max-width:1100px){
+      .hero-grid,
+      .highlight-grid,
+      .cards-4,
+      .cards-3,
+      .member-grid{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .hero-grid{
+        grid-template-columns:1fr;
+      }
+
+      .highlight-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:860px){
+      .nav-main{
+        display:none;
+      }
+
+      .header-inner{
+        padding:12px 14px;
+      }
+
+      .hero{
+        padding:42px 0 24px;
+      }
+
+      .hero-card,
+      .glass-box,
+      .cta-card,
+      .highlight{
+        border-radius:26px;
+      }
+
+      .hero-card{
+        padding:28px 22px 24px;
+      }
+
+      .hero-stats{
+        grid-template-columns:1fr;
+      }
+
+      .cards-3,
+      .cards-4,
+      .mini-grid,
+      .member-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:640px){
+      .brand-sub{
+        display:none;
+      }
+
+      .btn,
+      .btn-outline{
+        width:100%;
+      }
+
+      .hero-actions,
+      .cta-actions{
+        flex-direction:column;
+      }
+
+      .header-actions .btn{
+        display:none;
+      }
+
+      .section-head{
+        margin-bottom:14px;
+      }
+
+      .footer-inner{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+    }
+
+    @media (max-width:480px){
+      .hero h1{
+        font-size:1.7rem;
+      }
+
+      .hero p.lead{
+        font-size:.96rem;
+      }
+
+      .container{
+        padding:0 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="soft-bg">
+      <div class="orb o1"></div>
+      <div class="orb o2"></div>
+      <div class="orb o3"></div>
+      <div class="orb o4"></div>
+      <div class="line l1"></div>
+      <div class="line l2"></div>
+      <div class="line l3"></div>
+      <div class="line l4"></div>
+    </div>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-mark"></div>
+          <div>
+            <div class="brand-title">Championnat de Chimie</div>
+            <div class="brand-sub">Jury & encadrement académique</div>
+          </div>
+        </a>
+
+        <nav class="nav-main">
+          <a href="index.html">Accueil</a>
+          <a href="competition.html">Championnat</a>
+          <a href="rules.html">Règlement</a>
+          <a href="results.html">Résultats</a>
+          <a href="login.html">Connexion</a>
+        </nav>
+
+        <div class="header-actions">
+          <a class="btn" href="competition.html">Participer</a>
+
+          <input type="checkbox" id="menuToggle" />
+          <label for="menuToggle" class="menu-btn" aria-label="Ouvrir le menu">
+            <span></span>
+          </label>
+
+          <aside class="side-menu">
+            <h3>Explorer le site</h3>
+            <div class="menu-group">
+              <a href="index.html">Accueil</a>
+              <a href="competition.html">Championnat</a>
+              <a href="rules.html">Règlement</a>
+              <a href="results.html">Résultats</a>
+              <a href="login.html">Connexion</a>
+              <a href="jury.html">Jury</a>
+              <a href="#mission">Mission</a>
+              <a href="#evaluation">Évaluation</a>
+              <a href="#ethique">Éthique</a>
+              <a href="#validation">Validation</a>
+            </div>
+            <div class="menu-note">
+              Cette page présente la mission du jury, les principes d’évaluation et le cadre académique qui renforcent la crédibilité du championnat.
+            </div>
+          </aside>
+
+          <label for="menuToggle" class="menu-overlay"></label>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="hero-grid">
+            <div class="hero-card">
+              <div class="eyebrow">🧑‍⚖️ Jury • Évaluation • Intégrité scientifique</div>
+              <h1>Un encadrement académique pensé pour inspirer confiance.</h1>
+              <p class="lead">
+                Le jury du Championnat de Chimie a pour rôle de garantir la rigueur, l’équité et la qualité de l’évaluation. Cette page permet de présenter un cadre crédible, sérieux et structuré, même avant l’ajout complet des espaces privés de correction et d’administration.
+              </p>
+
+              <div class="hero-actions">
+                <a href="competition.html" class="btn">Voir le championnat</a>
+                <a href="rules.html" class="btn-outline">Lire le règlement</a>
+              </div>
+
+              <div class="hero-stats">
+                <div class="stat">
+                  <strong>01</strong>
+                  <span>Évaluation rigoureuse</span>
+                </div>
+                <div class="stat">
+                  <strong>100%</strong>
+                  <span>Esprit d’équité</span>
+                </div>
+                <div class="stat">
+                  <strong>24/7</strong>
+                  <span>Cadre consultable</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-box">
+              <h2 class="panel-title">Vue d’ensemble</h2>
+              <div class="announcement">
+                <div class="badge-dot"></div>
+                <div>
+                  <strong>Un jury au service de la crédibilité du concours</strong>
+                  <p>
+                    Le jury ne représente pas seulement une instance de correction. Il est aussi le garant de l’impartialité, de la cohérence scientifique, de la validation des résultats et du sérieux académique de l’ensemble de la plateforme.
+                  </p>
+                </div>
+              </div>
+
+              <div class="mini-grid">
+                <div class="mini-card">
+                  <strong>Mission</strong>
+                  <p>Superviser, corriger et valider dans un cadre de rigueur scientifique.</p>
+                </div>
+                <div class="mini-card">
+                  <strong>Éthique</strong>
+                  <p>Préserver l’équité, l’impartialité et le respect du règlement.</p>
+                </div>
+                <div class="mini-card">
+                  <strong>Méthode</strong>
+                  <p>Barèmes clairs, cohérence d’évaluation et vérifications nécessaires.</p>
+                </div>
+                <div class="mini-card">
+                  <strong>Suite</strong>
+                  <p>Préparer plus tard un véritable espace jury privé et opérationnel.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="mission">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Mission du jury</h2>
+              <p>
+                Le jury a pour vocation d’assurer le sérieux scientifique du championnat et de soutenir une évaluation cohérente, juste et crédible.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-3">
+            <div class="card">
+              <div class="icon-bubble">📘</div>
+              <h3>Corriger avec rigueur</h3>
+              <p>
+                Les réponses sont examinées selon des critères académiques, avec attention portée à la justesse scientifique, à la logique et à la qualité de l’argumentation.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">⚖️</div>
+              <h3>Garantir l’équité</h3>
+              <p>
+                Le jury veille à ce que chaque participant soit évalué sur une base claire, stable et cohérente, sans traitement arbitraire.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">✅</div>
+              <h3>Valider les résultats</h3>
+              <p>
+                La publication finale repose sur une vérification sérieuse des résultats afin d’assurer la crédibilité de la compétition et la confiance des candidats.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="evaluation">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Méthode d’évaluation</h2>
+              <p>
+                Une compétition académique gagne en valeur lorsque l’évaluation est lisible, ordonnée et scientifiquement défendable.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-4">
+            <div class="card">
+              <div class="icon-bubble">1</div>
+              <h3>Compréhension</h3>
+              <p>Capacité du candidat à interpréter correctement la consigne et les données scientifiques proposées.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">2</div>
+              <h3>Justesse</h3>
+              <p>Exactitude des réponses, maîtrise des notions de chimie et cohérence scientifique globale.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">3</div>
+              <h3>Raisonnement</h3>
+              <p>Qualité de l’analyse, de la logique et de la progression intellectuelle dans la réponse.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">4</div>
+              <h3>Présentation</h3>
+              <p>Clarté, structure, lisibilité et qualité générale de l’expression scientifique lorsque nécessaire.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="container">
+          <div class="highlight">
+            <div class="highlight-grid">
+              <div>
+                <h2>Un jury crédible donne de la valeur au championnat.</h2>
+                <p>
+                  La présence d’une page dédiée au jury renforce immédiatement l’image institutionnelle du site. Elle montre qu’il existe une structure, une logique de validation et un niveau d’exigence cohérent avec un véritable environnement académique.
+                </p>
+              </div>
+              <div class="highlight-boxes">
+                <div class="highlight-box">Correction rigoureuse fondée sur des critères scientifiques explicites.</div>
+                <div class="highlight-box">Validation progressive avant publication officielle des résultats.</div>
+                <div class="highlight-box">Cadre d’intégrité destiné à protéger l’équité du championnat.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ethique">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Éthique, impartialité et intégrité</h2>
+              <p>
+                Le jury doit être perçu comme un organe de confiance. Cette page pose donc les principes qui protègent la qualité du concours.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-3">
+            <div class="card">
+              <div class="icon-bubble">🔐</div>
+              <h3>Impartialité</h3>
+              <p>
+                Les évaluations sont menées sans favoritisme, avec recherche constante d’une équité entre tous les participants.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">🧭</div>
+              <h3>Respect du règlement</h3>
+              <p>
+                Toute décision s’inscrit dans le cadre des règles officielles publiées sur la plateforme et connues des candidats.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">🛡️</div>
+              <h3>Prévention de la fraude</h3>
+              <p>
+                Le jury et l’organisation peuvent examiner les irrégularités, incohérences ou comportements incompatibles avec l’intégrité académique.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Organisation du jury</h2>
+              <p>
+                Même sans afficher encore des identités définitives, cette structure permet de présenter une organisation sérieuse et progressive.
+              </p>
+            </div>
+          </div>
+
+          <div class="member-grid">
+            <div class="member-card">
+              <div class="avatar">👨‍🏫</div>
+              <h3>Coordination académique</h3>
+              <div class="member-role">Supervision générale</div>
+              <p>
+                Veille à l’orientation académique du championnat, à la cohérence scientifique globale et au respect de l’esprit de la compétition.
+              </p>
+            </div>
+
+            <div class="member-card">
+              <div class="avatar">🧪</div>
+              <h3>Comité scientifique</h3>
+              <div class="member-role">Analyse des contenus</div>
+              <p>
+                Apporte un regard méthodique sur la qualité des questions, la validité scientifique et la cohérence des évaluations.
+              </p>
+            </div>
+
+            <div class="member-card">
+              <div class="avatar">📋</div>
+              <h3>Validation des résultats</h3>
+              <div class="member-role">Contrôle final</div>
+              <p>
+                Vérifie les résultats avant publication, afin de renforcer la fiabilité et la crédibilité des classements officiels.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="validation">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Processus de validation</h2>
+              <p>
+                Les résultats ne deviennent officiels qu’après une séquence logique de vérification et de validation.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-4">
+            <div class="card">
+              <div class="icon-bubble">1</div>
+              <h3>Réception</h3>
+              <p>Les réponses et productions des candidats sont réceptionnées dans le cadre défini par le championnat.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">2</div>
+              <h3>Correction</h3>
+              <p>Une évaluation scientifique est menée à partir de barèmes et de critères cohérents.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">3</div>
+              <h3>Vérification</h3>
+              <p>Les résultats sont relus ou contrôlés afin d’éviter les incohérences avant diffusion.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">4</div>
+              <h3>Publication</h3>
+              <p>Le classement ou les résultats officiels sont ensuite publiés sur la plateforme dédiée.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Questions fréquentes sur le jury</h2>
+              <p>
+                Quelques réponses simples permettent de rassurer les visiteurs et d’augmenter la confiance envers l’organisation du championnat.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-list">
+            <div class="faq-item">
+              <h3>Le jury est-il déjà entièrement affiché ?</h3>
+              <p>
+                Pas nécessairement. Cette page peut présenter dès maintenant la structure, les principes et l’organisation du jury, même si certains profils détaillés sont ajoutés plus tard.
+              </p>
+            </div>
+            <div class="faq-item">
+              <h3>Le jury peut-il modifier les résultats ?</h3>
+              <p>
+                Le rôle du jury est d’évaluer, de vérifier et de valider dans un cadre académique rigoureux. Les résultats officiels reposent sur cette logique de contrôle.
+              </p>
+            </div>
+            <div class="faq-item">
+              <h3>Pourquoi une page jury est-elle importante ?</h3>
+              <p>
+                Parce qu’elle renforce immédiatement la crédibilité du championnat, montre l’existence d’une structure sérieuse et rassure les participants sur la qualité du processus.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta">
+        <div class="container">
+          <div class="cta-card">
+            <h2>Prêt à découvrir le championnat dans un cadre plus crédible encore ?</h2>
+            <p>
+              Cette page complète la vitrine académique du site. Elle s’intègre au reste du mini-site sans casser l’ancien environnement et prépare naturellement les futures zones privées jury et administration.
+            </p>
+            <div class="cta-actions">
+              <a href="competition.html" class="btn">Voir le championnat</a>
+              <a href="results.html" class="btn-outline">Voir les résultats</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <div>© 2026 Championnat de Chimie — Jury & encadrement académique.</div>
+        <div class="footer-links">
+          <a href="index.html">Accueil</a>
+          <a href="competition.html">Championnat</a>
+          <a href="rules.html">Règlement</a>
+          <a href="results.html">Résultats</a>
+          <a href="login.html">Connexion</a>
+          <a href="jury.html">Jury</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
