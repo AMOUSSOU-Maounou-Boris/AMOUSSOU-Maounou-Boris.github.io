@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vérification de certificat | Championnat de Chimie</title>
+  <meta name="description" content="Vérifiez l’authenticité d’un certificat du Championnat de Chimie à partir du numéro d’inscription du candidat." />
+  <style>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    :root{
+      --bg1:#eef7ff;
+      --bg2:#fffaf6;
+      --bg3:#f8fffb;
+
+      --nav:#082e5b;
+      --text:#0b2340;
+      --muted:#627791;
+      --line:#dce7f3;
+
+      --blue:#2f8cff;
+      --blue-dark:#145bd6;
+
+      --red:#ff4b4b;
+      --red-dark:#d82e2e;
+
+      --green:#18c34a;
+      --green-dark:#0f9b3a;
+
+      --gold:#e0a126;
+      --gold-dark:#b47c12;
+
+      --card:rgba(255,255,255,.90);
+      --shadow:0 18px 45px rgba(9,45,92,.10);
+      --shadow-soft:0 10px 24px rgba(10,37,73,.07);
+
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
+
+      --max:1180px;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(47,140,255,.14), transparent 24%),
+        radial-gradient(circle at top right, rgba(24,195,74,.10), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(224,161,38,.08), transparent 20%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 42%, var(--bg3) 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      width:360px;
+      height:360px;
+      border-radius:50%;
+      filter:blur(55px);
+      z-index:-2;
+      pointer-events:none;
+    }
+
+    body::before{
+      top:-120px;
+      left:-120px;
+      background:rgba(47,140,255,.14);
+    }
+
+    body::after{
+      right:-120px;
+      top:140px;
+      background:rgba(24,195,74,.10);
+    }
+
+    .page-wrap{
+      position:relative;
+      min-height:100vh;
+    }
+
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(255,255,255,.74);
+      border-bottom:1px solid rgba(220,231,243,.92);
+      box-shadow:0 6px 24px rgba(8,46,91,.05);
+    }
+
+    .header-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:inherit;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      background:
+        radial-gradient(circle at 30% 30%, #fff 0%, #d8e9ff 22%, #7ab7ff 48%, #1a5ec4 100%);
+      box-shadow:
+        0 10px 24px rgba(47,140,255,.20),
+        inset 0 1px 8px rgba(255,255,255,.75);
+      position:relative;
+      flex:0 0 auto;
+    }
+
+    .brand-mark::before,
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.84);
+      inset:10px;
+    }
+
+    .brand-mark::after{
+      inset:6px 14px;
+      border-color:rgba(255,255,255,.56);
+      transform:rotate(55deg);
+    }
+
+    .brand-title{
+      font-size:1.06rem;
+      font-weight:800;
+      color:var(--nav);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .brand-sub{
+      font-size:.79rem;
+      color:#667b96;
+      margin-top:2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .nav-main{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .nav-main a{
+      text-decoration:none;
+      color:var(--text);
+      font-weight:700;
+      font-size:.94rem;
+      padding:10px 14px;
+      border-radius:999px;
+      transition:.2s ease;
+    }
+
+    .nav-main a:hover,
+    .nav-main a.active{
+      background:rgba(47,140,255,.10);
+      color:var(--blue-dark);
+    }
+
+    .page{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:30px 18px 54px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:22px;
+      align-items:stretch;
+      margin-bottom:24px;
+    }
+
+    .hero-card,
+    .side-card,
+    .verify-card,
+    .result-card,
+    .info-card,
+    .cta-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.93), rgba(255,255,255,.84));
+      border:1px solid rgba(220,231,243,.95);
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero-card{
+      padding:34px 28px 28px;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      left:-100px;
+      top:-110px;
+      background:radial-gradient(circle, rgba(47,140,255,.12), transparent 72%);
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(24,195,74,.10);
+      color:#0f7b33;
+      border:1px solid rgba(24,195,74,.14);
+      font-weight:800;
+      font-size:.85rem;
+      margin-bottom:18px;
+    }
+
+    h1{
+      margin:0 0 14px;
+      font-size:clamp(2rem, 4vw, 3.6rem);
+      line-height:1.04;
+      letter-spacing:-1.2px;
+      color:var(--nav);
+    }
+
+    .lead{
+      margin:0;
+      color:#5d728d;
+      font-size:1.04rem;
+      line-height:1.8;
+      max-width:760px;
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:24px;
+    }
+
+    .btn,
+    .btn-outline{
+      border:none;
+      cursor:pointer;
+      transition:.22s ease;
+      font-weight:800;
+      font-family:inherit;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border-radius:999px;
+      padding:12px 18px;
+    }
+
+    .btn{
+      color:#fff;
+      background:linear-gradient(135deg,var(--green),var(--green-dark));
+      box-shadow:0 14px 30px rgba(24,195,74,.18);
+    }
+
+    .btn-outline{
+      color:var(--blue-dark);
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(47,140,255,.16);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .side-card{
+      padding:22px;
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+
+    .mini{
+      border-radius:22px;
+      padding:18px 16px;
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(220,231,243,.95);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .mini h3{
+      margin:0 0 8px;
+      font-size:1.02rem;
+      color:var(--nav);
+    }
+
+    .mini p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:.94rem;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:22px;
+    }
+
+    .verify-card,
+    .result-card,
+    .info-card,
+    .cta-card{
+      padding:24px 22px;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:1.35rem;
+      color:var(--nav);
+      letter-spacing:-.3px;
+    }
+
+    .section-head p{
+      margin:6px 0 0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:700px;
+      font-size:.95rem;
+    }
+
+    .field{
+      margin-bottom:14px;
+    }
+
+    .field label{
+      display:block;
+      margin-bottom:7px;
+      font-weight:700;
+      color:#21466f;
+      font-size:.92rem;
+    }
+
+    input{
+      width:100%;
+      border-radius:16px;
+      border:1px solid rgba(220,231,243,.95);
+      background:#fff;
+      outline:none;
+      padding:14px 14px;
+      font-size:.98rem;
+      font-family:inherit;
+      color:var(--text);
+      transition:.18s ease;
+      text-transform:uppercase;
+    }
+
+    input:focus{
+      border-color:#8bbcff;
+      box-shadow:0 0 0 4px rgba(47,140,255,.10);
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:6px;
+    }
+
+    .msg{
+      display:none;
+      margin-top:14px;
+      padding:13px 14px;
+      border-radius:14px;
+      font-size:.93rem;
+      line-height:1.55;
+    }
+
+    .msg.show{display:block}
+    .msg.ok{
+      background:rgba(24,195,74,.10);
+      color:#0f7b33;
+      border:1px solid rgba(24,195,74,.16);
+    }
+    .msg.err{
+      background:rgba(255,75,75,.10);
+      color:#a22626;
+      border:1px solid rgba(255,75,75,.16);
+    }
+
+    .certificate-box{
+      border-radius:24px;
+      padding:22px 20px;
+      background:linear-gradient(135deg, rgba(8,46,91,.98), rgba(47,140,255,.92));
+      color:#fff;
+      box-shadow:0 18px 36px rgba(8,46,91,.16);
+      position:relative;
+      overflow:hidden;
+      display:none;
+    }
+
+    .certificate-box.show{
+      display:block;
+    }
+
+    .certificate-box::before{
+      content:"";
+      position:absolute;
+      width:210px;
+      height:210px;
+      border-radius:50%;
+      right:-80px;
+      top:-80px;
+      background:radial-gradient(circle, rgba(255,255,255,.14), transparent 70%);
+    }
+
+    .certificate-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:1;
+      margin-bottom:14px;
+    }
+
+    .valid-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 12px;
+      border-radius:999px;
+      background:rgba(24,195,74,.16);
+      border:1px solid rgba(255,255,255,.18);
+      font-weight:800;
+      font-size:.84rem;
+      color:#fff;
+    }
+
+    .certificate-box h3{
+      margin:0 0 6px;
+      font-size:1.25rem;
+      position:relative;
+      z-index:1;
+    }
+
+    .certificate-box p{
+      margin:0;
+      color:rgba(255,255,255,.90);
+      line-height:1.72;
+      position:relative;
+      z-index:1;
+    }
+
+    .cert-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:16px;
+      position:relative;
+      z-index:1;
+    }
+
+    .cert-mini{
+      border-radius:18px;
+      padding:14px 14px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter:blur(8px);
+    }
+
+    .cert-mini strong{
+      display:block;
+      font-size:.82rem;
+      opacity:.92;
+      margin-bottom:5px;
+    }
+
+    .cert-mini span{
+      font-weight:800;
+      font-size:.95rem;
+      line-height:1.5;
+    }
+
+    .not-found{
+      display:none;
+      border-radius:22px;
+      padding:20px 18px;
+      background:rgba(255,75,75,.08);
+      border:1px solid rgba(255,75,75,.14);
+      color:#a22626;
+      line-height:1.7;
+      font-size:.95rem;
+    }
+
+    .not-found.show{
+      display:block;
+    }
+
+    .cards{
+      display:grid;
+      gap:14px;
+    }
+
+    .mini-card{
+      border-radius:22px;
+      padding:18px 18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,251,255,.88));
+      border:1px solid rgba(220,231,243,.95);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .mini-card h3{
+      margin:0 0 8px;
+      font-size:1.02rem;
+      color:var(--nav);
+    }
+
+    .mini-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.72;
+      font-size:.95rem;
+    }
+
+    .cta{
+      margin-top:22px;
+    }
+
+    .cta-card{
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .cta-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      left:-110px;
+      bottom:-130px;
+      background:radial-gradient(circle, rgba(24,195,74,.12), transparent 72%);
+    }
+
+    .cta-card h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.4rem);
+      color:var(--nav);
+    }
+
+    .cta-card p{
+      margin:0 auto;
+      max-width:760px;
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    .cta-actions{
+      margin-top:24px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    footer{
+      border-top:1px solid rgba(220,231,243,.92);
+      background:rgba(255,255,255,.68);
+      backdrop-filter:blur(10px);
+      margin-top:30px;
+    }
+
+    .footer-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:22px 18px 28px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      color:#61758f;
+      font-size:.94rem;
+    }
+
+    .footer-links{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .footer-links a{
+      color:#1559bf;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    @media (max-width:1120px){
+      .hero,
+      .grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:820px){
+      .nav-main{
+        display:none;
+      }
+
+      .header-inner{
+        padding:12px 14px;
+      }
+
+      .page{
+        padding:22px 14px 44px;
+      }
+
+      .hero-card,
+      .side-card,
+      .verify-card,
+      .result-card,
+      .info-card,
+      .cta-card{
+        border-radius:24px;
+      }
+
+      .hero-card{
+        padding:26px 20px 22px;
+      }
+
+      .cert-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:520px){
+      .brand-sub{
+        display:none;
+      }
+
+      .btn,
+      .btn-outline{
+        width:100%;
+      }
+
+      .hero-actions,
+      .actions,
+      .cta-actions{
+        flex-direction:column;
+      }
+
+      .footer-inner{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-mark"></div>
+          <div>
+            <div class="brand-title">Championnat de Chimie</div>
+            <div class="brand-sub">Vérification de certificat</div>
+          </div>
+        </a>
+
+        <nav class="nav-main">
+          <a href="index.html">Accueil</a>
+          <a href="about.html">À propos</a>
+          <a href="competition.html">Championnat</a>
+          <a href="rules.html">Règlement</a>
+          <a href="results.html">Résultats</a>
+          <a href="laureats.html">Lauréats</a>
+          <a href="jury.html">Jury</a>
+          <a href="announcements.html">Annonces</a>
+          <a href="faq.html">FAQ</a>
+          <a href="dashboard-candidat.html">Espace candidat</a>
+          <a href="login.html">Connexion</a>
+          <a href="contact.html">Contact</a>
+          <a href="verify-certificate.html" class="active">Vérifier certificat</a>
+          <a href="admin.html">Admin</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <div class="hero-card">
+          <div class="eyebrow">✅ Authentification • Numéro candidat • Vérification publique</div>
+          <h1>Vérifier un certificat avec le numéro d’inscription du candidat.</h1>
+          <p class="lead">
+            Cette page permet de confirmer l’authenticité d’un certificat à partir du numéro attribué au candidat lors de son inscription. Elle offre une lecture simple, sérieuse et crédible du statut du certificat.
+          </p>
+
+          <div class="hero-actions">
+            <a href="laureats.html" class="btn">Voir les lauréats</a>
+            <a href="results.html" class="btn-outline">Voir les résultats</a>
+          </div>
+        </div>
+
+        <aside class="side-card">
+          <div class="mini">
+            <h3>Ce qui est vérifié</h3>
+            <p>
+              Le système contrôle ici le numéro unique du candidat, celui qui doit être attribué au moment de l’inscription et qui sert ensuite de référence pour la validité du certificat.
+            </p>
+          </div>
+
+          <div class="mini">
+            <h3>Usage attendu</h3>
+            <p>
+              Universités, encadrants, organisations et partenaires peuvent utiliser cette page pour vérifier rapidement si un certificat présenté correspond bien à un candidat enregistré.
+            </p>
+          </div>
+
+          <div class="mini">
+            <h3>Évolution future</h3>
+            <p>
+              Cette structure est prête pour être reliée plus tard à Firebase afin d’utiliser automatiquement les vrais numéros d’inscription et les vrais certificats délivrés.
+            </p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid">
+        <section class="verify-card">
+          <div class="section-head">
+            <div>
+              <h2>Vérification</h2>
+              <p>
+                Saisis le numéro du candidat exactement tel qu’il a été attribué lors de l’inscription.
+              </p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="candidateNumber">Numéro d’inscription / numéro certificat</label>
+            <input id="candidateNumber" type="text" placeholder="Exemple : CC-2026-0001" />
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="verifyBtn" type="button">Vérifier maintenant</button>
+            <button class="btn-outline" id="resetBtn" type="button">Réinitialiser</button>
+          </div>
+
+          <div id="verifyMsg" class="msg"></div>
+        </section>
+
+        <section class="result-card">
+          <div class="section-head">
+            <div>
+              <h2>Résultat</h2>
+              <p>
+                Le résultat s’affiche ici après vérification du numéro saisi.
+              </p>
+            </div>
+          </div>
+
+          <div id="certificateBox" class="certificate-box">
+            <div class="certificate-top">
+              <h3>Certificat authentifié</h3>
+              <span class="valid-pill">Valide</span>
+            </div>
+
+            <p>
+              Le numéro saisi correspond à un candidat enregistré et à un certificat reconnu par le Championnat de Chimie.
+            </p>
+
+            <div class="cert-grid">
+              <div class="cert-mini">
+                <strong>Nom du candidat</strong>
+                <span id="certName">—</span>
+              </div>
+
+              <div class="cert-mini">
+                <strong>Numéro d’inscription</strong>
+                <span id="certNumber">—</span>
+              </div>
+
+              <div class="cert-mini">
+                <strong>Statut</strong>
+                <span id="certStatus">—</span>
+              </div>
+
+              <div class="cert-mini">
+                <strong>Date</strong>
+                <span id="certDate">—</span>
+              </div>
+
+              <div class="cert-mini">
+                <strong>Édition</strong>
+                <span id="certEdition">—</span>
+              </div>
+
+              <div class="cert-mini">
+                <strong>Distinction</strong>
+                <span id="certMention">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="notFoundBox" class="not-found">
+            Le numéro saisi ne correspond à aucun certificat valide connu dans cette page de démonstration. Vérifie l’écriture du numéro ou réessaie avec le numéro exact attribué au candidat.
+          </div>
+        </section>
+      </section>
+
+      <section class="grid" style="margin-top:22px;">
+        <section class="info-card">
+          <div class="section-head">
+            <div>
+              <h2>Comment fonctionne cette vérification</h2>
+              <p>
+                La logique est simple : un numéro candidat unique est attribué lors de l’inscription, puis ce même numéro sert de référence pour toute vérification future du certificat.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <div class="mini-card">
+              <h3>Numéro unique</h3>
+              <p>
+                Chaque candidat doit disposer d’un identifiant propre, utilisé comme référence stable dans le système.
+              </p>
+            </div>
+
+            <div class="mini-card">
+              <h3>Référence publique</h3>
+              <p>
+                La page de vérification permet ensuite de confirmer publiquement qu’un numéro donné correspond bien à un certificat reconnu.
+              </p>
+            </div>
+
+            <div class="mini-card">
+              <h3>Crédibilité</h3>
+              <p>
+                Ce mécanisme renforce fortement l’image académique du championnat et la confiance des partenaires ou institutions.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="info-card">
+          <div class="section-head">
+            <div>
+              <h2>Numéros d’exemple</h2>
+              <p>
+                En attendant la liaison complète à la base réelle, voici quelques exemples de numéros utilisés par la page.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <div class="mini-card">
+              <h3>CC-2026-0001</h3>
+              <p>Exemple de certificat valide pour démonstration.</p>
+            </div>
+
+            <div class="mini-card">
+              <h3>CC-2026-0002</h3>
+              <p>Exemple de second certificat valide pour démonstration.</p>
+            </div>
+
+            <div class="mini-card">
+              <h3>CC-2026-0003</h3>
+              <p>Exemple de troisième certificat valide pour démonstration.</p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="cta">
+        <div class="cta-card">
+          <h2>Une base prête pour la vraie vérification plus tard.</h2>
+          <p>
+            Cette page est déjà construite pour utiliser le numéro d’inscription du candidat comme référence centrale. Elle pourra ensuite être reliée directement aux vraies données du championnat sans changer la présentation générale.
+          </p>
+          <div class="cta-actions">
+            <a href="laureats.html" class="btn">Voir les lauréats</a>
+            <a href="contact.html" class="btn-outline">Contacter l’organisation</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <div>© 2026 Championnat de Chimie — Vérification de certificat.</div>
+        <div class="footer-links">
+          <a href="index.html">Accueil</a>
+          <a href="competition.html">Championnat</a>
+          <a href="results.html">Résultats</a>
+          <a href="laureats.html">Lauréats</a>
+          <a href="contact.html">Contact</a>
+          <a href="verify-certificate.html">Vérifier certificat</a>
+          <a href="admin.html">Admin</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const certificates = [
+      {
+        number: "CC-2026-0001",
+        name: "Lauréat 1",
+        status: "Certificat valide",
+        date: "15/04/2026",
+        edition: "Édition 2026",
+        mention: "1ère place"
+      },
+      {
+        number: "CC-2026-0002",
+        name: "Lauréat 2",
+        status: "Certificat valide",
+        date: "15/04/2026",
+        edition: "Édition 2026",
+        mention: "2ème place"
+      },
+      {
+        number: "CC-2026-0003",
+        name: "Lauréat 3",
+        status: "Certificat valide",
+        date: "15/04/2026",
+        edition: "Édition 2026",
+        mention: "3ème place"
+      }
+    ];
+
+    const input = document.getElementById("candidateNumber");
+    const verifyBtn = document.getElementById("verifyBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const verifyMsg = document.getElementById("verifyMsg");
+
+    const certificateBox = document.getElementById("certificateBox");
+    const notFoundBox = document.getElementById("notFoundBox");
+
+    const certName = document.getElementById("certName");
+    const certNumber = document.getElementById("certNumber");
+    const certStatus = document.getElementById("certStatus");
+    const certDate = document.getElementById("certDate");
+    const certEdition = document.getElementById("certEdition");
+    const certMention = document.getElementById("certMention");
+
+    function showMessage(text, ok = false){
+      verifyMsg.textContent = text;
+      verifyMsg.className = "msg show " + (ok ? "ok" : "err");
+    }
+
+    function clearMessage(){
+      verifyMsg.className = "msg";
+      verifyMsg.textContent = "";
+    }
+
+    function resetView(){
+      clearMessage();
+      certificateBox.classList.remove("show");
+      notFoundBox.classList.remove("show");
+      certName.textContent = "—";
+      certNumber.textContent = "—";
+      certStatus.textContent = "—";
+      certDate.textContent = "—";
+      certEdition.textContent = "—";
+      certMention.textContent = "—";
+    }
+
+    function verifyCertificate(){
+      const value = input.value.trim().toUpperCase();
+      resetView();
+
+      if(!value){
+        showMessage("Saisis d’abord un numéro de candidat à vérifier.");
+        return;
+      }
+
+      const found = certificates.find(item => item.number.toUpperCase() === value);
+
+      if(!found){
+        notFoundBox.classList.add("show");
+        showMessage("Aucun certificat valide trouvé pour ce numéro.");
+        return;
+      }
+
+      certName.textContent = found.name;
+      certNumber.textContent = found.number;
+      certStatus.textContent = found.status;
+      certDate.textContent = found.date;
+      certEdition.textContent = found.edition;
+      certMention.textContent = found.mention;
+
+      certificateBox.classList.add("show");
+      showMessage("Certificat vérifié avec succès.", true);
+    }
+
+    verifyBtn.addEventListener("click", verifyCertificate);
+    resetBtn.addEventListener("click", () => {
+      input.value = "";
+      resetView();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if(e.key === "Enter"){
+        e.preventDefault();
+        verifyCertificate();
+      }
+    });
+  </script>
+</body>
+</html>
