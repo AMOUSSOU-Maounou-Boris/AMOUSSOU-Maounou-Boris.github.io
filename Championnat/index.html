@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Championnat de Chimie</title>
+  <meta name="description" content="Championnat de Chimie - Compétition académique francophone dédiée à l'excellence en chimie." />
+  <style>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#0b2340;
+      background:
+        radial-gradient(circle at top left, rgba(46,140,255,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(0,214,201,.16), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(20,115,230,.12), transparent 26%),
+        linear-gradient(180deg, #eef7ff 0%, #f7fbff 45%, #eef6ff 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    :root{
+      --nav:#082e5b;
+      --nav-2:#0f4d92;
+      --blue:#2f8cff;
+      --blue-dark:#145bd6;
+      --cyan:#00d6c9;
+      --cyan-dark:#00b7ad;
+      --text:#0b2340;
+      --muted:#61748d;
+      --line:#dbe9f6;
+      --card:rgba(255,255,255,.78);
+      --card-strong:rgba(255,255,255,.92);
+      --shadow:0 18px 45px rgba(9,45,92,.12);
+      --shadow-soft:0 10px 25px rgba(10,37,73,.08);
+      --radius-xl:28px;
+      --radius-lg:22px;
+      --radius-md:16px;
+      --max:1220px;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      inset:auto;
+      width:420px;
+      height:420px;
+      border-radius:50%;
+      filter:blur(55px);
+      z-index:-2;
+      pointer-events:none;
+    }
+    body::before{
+      top:-120px;
+      left:-120px;
+      background:rgba(47,140,255,.18);
+    }
+    body::after{
+      right:-120px;
+      top:140px;
+      background:rgba(0,214,201,.12);
+    }
+
+    .page-wrap{
+      position:relative;
+      min-height:100vh;
+    }
+
+    .molecule-bg{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .orb{
+      position:absolute;
+      border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(47,140,255,.38) 45%, rgba(47,140,255,.10) 70%, transparent 74%);
+      box-shadow:0 0 40px rgba(47,140,255,.15);
+      animation:floatOrb 8s ease-in-out infinite;
+    }
+    .orb.o1{width:120px;height:120px;top:90px;left:6%}
+    .orb.o2{width:78px;height:78px;top:220px;right:12%;animation-delay:1.2s}
+    .orb.o3{width:160px;height:160px;bottom:120px;left:10%;animation-delay:2.1s}
+    .orb.o4{width:96px;height:96px;bottom:80px;right:8%;animation-delay:3s}
+
+    .line{
+      position:absolute;
+      background:linear-gradient(90deg, rgba(47,140,255,.05), rgba(47,140,255,.30), rgba(0,214,201,.18));
+      border-radius:999px;
+      transform-origin:left center;
+      opacity:.55;
+    }
+    .l1{width:180px;height:2px;top:142px;left:10%;transform:rotate(24deg)}
+    .l2{width:220px;height:2px;top:245px;right:8%;transform:rotate(-18deg)}
+    .l3{width:230px;height:2px;bottom:210px;left:12%;transform:rotate(-22deg)}
+    .l4{width:170px;height:2px;bottom:140px;right:12%;transform:rotate(16deg)}
+
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(255,255,255,.68);
+      border-bottom:1px solid rgba(219,233,246,.9);
+      box-shadow:0 6px 24px rgba(8,46,91,.05);
+    }
+
+    .header-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      position:relative;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+      text-decoration:none;
+      color:inherit;
+    }
+
+    .brand-mark{
+      width:46px;
+      height:46px;
+      border-radius:15px;
+      position:relative;
+      background:
+        radial-gradient(circle at 30% 30%, #ffffff 0%, #c9e3ff 22%, #4fa7ff 52%, #1559bf 100%);
+      box-shadow:
+        0 10px 28px rgba(47,140,255,.25),
+        inset 0 1px 8px rgba(255,255,255,.7);
+      flex:0 0 auto;
+    }
+    .brand-mark::before,
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.85);
+      inset:10px;
+    }
+    .brand-mark::after{
+      inset:5px 14px;
+      border-color:rgba(255,255,255,.55);
+      transform:rotate(55deg);
+    }
+
+    .brand-text{
+      min-width:0;
+    }
+
+    .brand-title{
+      margin:0;
+      font-size:1.06rem;
+      font-weight:800;
+      letter-spacing:.2px;
+      color:#0a2f5d;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .brand-sub{
+      margin-top:2px;
+      font-size:.78rem;
+      color:#5f7491;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .nav-main{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+
+    .nav-main a{
+      text-decoration:none;
+      color:#0b2340;
+      font-weight:700;
+      font-size:.95rem;
+      padding:10px 14px;
+      border-radius:999px;
+      transition:.22s ease;
+    }
+
+    .nav-main a:hover{
+      background:rgba(47,140,255,.10);
+      color:#0f4d92;
+    }
+
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+
+    .btn,
+    .btn-outline,
+    .menu-btn{
+      border:none;
+      cursor:pointer;
+      transition:.25s ease;
+      font-weight:800;
+      font-family:inherit;
+    }
+
+    .btn{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:13px 20px;
+      border-radius:999px;
+      color:#fff;
+      background:linear-gradient(135deg, var(--blue), var(--blue-dark));
+      box-shadow:0 14px 34px rgba(47,140,255,.28);
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 18px 36px rgba(47,140,255,.34);
+    }
+
+    .btn-outline{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      color:#0f4d92;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(47,140,255,.18);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .btn-outline:hover{
+      transform:translateY(-2px);
+      background:#fff;
+    }
+
+    .menu-btn{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.86);
+      border:1px solid rgba(47,140,255,.14);
+      box-shadow:var(--shadow-soft);
+      position:relative;
+    }
+
+    .menu-btn span,
+    .menu-btn::before,
+    .menu-btn::after{
+      content:"";
+      position:absolute;
+      width:21px;
+      height:2.4px;
+      border-radius:999px;
+      background:#0f4d92;
+      transition:.22s ease;
+    }
+    .menu-btn span{transform:translateY(0)}
+    .menu-btn::before{transform:translateY(-7px)}
+    .menu-btn::after{transform:translateY(7px)}
+
+    #menuToggle{
+      display:none;
+    }
+
+    .side-menu{
+      position:fixed;
+      top:0;
+      right:-360px;
+      width:min(88vw, 330px);
+      height:100vh;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(22px);
+      border-left:1px solid rgba(219,233,246,.95);
+      box-shadow:-18px 0 40px rgba(8,46,91,.12);
+      padding:24px 18px 24px;
+      z-index:80;
+      transition:right .28s ease;
+      overflow-y:auto;
+    }
+
+    #menuToggle:checked ~ .side-menu{
+      right:0;
+    }
+
+    #menuToggle:checked + label.menu-btn::before{
+      transform:translateY(0) rotate(45deg);
+    }
+    #menuToggle:checked + label.menu-btn::after{
+      transform:translateY(0) rotate(-45deg);
+    }
+    #menuToggle:checked + label.menu-btn span{
+      opacity:0;
+      transform:scaleX(.5);
+    }
+
+    .side-menu h3{
+      margin:6px 4px 18px;
+      font-size:1.18rem;
+      color:#0a2f5d;
+    }
+
+    .side-menu .menu-group{
+      display:grid;
+      gap:10px;
+    }
+
+    .side-menu a{
+      text-decoration:none;
+      color:#0f2747;
+      background:rgba(255,255,255,.76);
+      border:1px solid rgba(47,140,255,.12);
+      border-radius:16px;
+      padding:14px 14px;
+      font-weight:700;
+      box-shadow:0 8px 22px rgba(10,37,73,.05);
+      transition:.22s ease;
+    }
+
+    .side-menu a:hover{
+      transform:translateX(-2px);
+      background:#fff;
+      color:#0f4d92;
+    }
+
+    .menu-note{
+      margin:18px 4px 0;
+      padding:14px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(47,140,255,.09), rgba(0,214,201,.08));
+      border:1px solid rgba(47,140,255,.14);
+      color:#45617e;
+      font-size:.92rem;
+      line-height:1.55;
+    }
+
+    .menu-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(2,18,38,.24);
+      opacity:0;
+      visibility:hidden;
+      z-index:70;
+      transition:.22s ease;
+    }
+
+    #menuToggle:checked ~ .menu-overlay{
+      opacity:1;
+      visibility:visible;
+    }
+
+    main{
+      position:relative;
+      z-index:1;
+    }
+
+    .container{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:0 18px;
+    }
+
+    .hero{
+      padding:64px 0 34px;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.12fr .88fr;
+      gap:28px;
+      align-items:stretch;
+    }
+
+    .hero-card{
+      position:relative;
+      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.78));
+      border:1px solid rgba(219,233,246,.92);
+      border-radius:34px;
+      box-shadow:var(--shadow);
+      padding:34px 30px 30px;
+      overflow:hidden;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      inset:-120px auto auto -100px;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(47,140,255,.14), transparent 70%);
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(47,140,255,.10);
+      color:#0f4d92;
+      font-weight:800;
+      font-size:.86rem;
+      margin-bottom:18px;
+      border:1px solid rgba(47,140,255,.12);
+    }
+
+    .hero h1{
+      margin:0 0 14px;
+      font-size:clamp(2rem, 4vw, 4.2rem);
+      line-height:1.04;
+      letter-spacing:-1.3px;
+      color:#072a54;
+    }
+
+    .hero p.lead{
+      margin:0;
+      max-width:700px;
+      font-size:1.07rem;
+      line-height:1.8;
+      color:#516884;
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:26px;
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+      margin-top:28px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(47,140,255,.10);
+      border-radius:20px;
+      padding:18px 16px;
+      box-shadow:0 10px 20px rgba(8,46,91,.05);
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      color:#0a2f5d;
+      margin-bottom:5px;
+    }
+
+    .stat span{
+      color:#657a95;
+      font-size:.93rem;
+      font-weight:700;
+    }
+
+    .hero-panel{
+      position:relative;
+      display:grid;
+      gap:18px;
+    }
+
+    .glass-box{
+      background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.74));
+      border:1px solid rgba(219,233,246,.95);
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      padding:24px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .glass-box::after{
+      content:"";
+      position:absolute;
+      inset:auto -40px -40px auto;
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(0,214,201,.14), transparent 68%);
+      pointer-events:none;
+    }
+
+    .panel-title{
+      margin:0 0 14px;
+      font-size:1.18rem;
+      color:#0a2f5d;
+    }
+
+    .announcement{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      padding:16px;
+      border-radius:20px;
+      background:linear-gradient(135deg, rgba(47,140,255,.10), rgba(0,214,201,.08));
+      border:1px solid rgba(47,140,255,.12);
+    }
+
+    .badge-dot{
+      width:14px;
+      height:14px;
+      border-radius:50%;
+      background:linear-gradient(135deg, #16c358, #0b9b45);
+      box-shadow:0 0 0 6px rgba(24,195,74,.12);
+      margin-top:5px;
+      flex:0 0 auto;
+    }
+
+    .announcement strong{
+      display:block;
+      margin-bottom:5px;
+      color:#0a2f5d;
+      font-size:1rem;
+    }
+
+    .announcement p{
+      margin:0;
+      color:#60758f;
+      line-height:1.6;
+      font-size:.95rem;
+    }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:12px;
+      margin-top:16px;
+    }
+
+    .mini-card{
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(47,140,255,.10);
+      box-shadow:0 10px 22px rgba(8,46,91,.05);
+    }
+
+    .mini-card strong{
+      display:block;
+      color:#0b2e5a;
+      margin-bottom:6px;
+      font-size:.98rem;
+    }
+
+    .mini-card p{
+      margin:0;
+      color:#647a95;
+      font-size:.92rem;
+      line-height:1.55;
+    }
+
+    section{
+      padding:26px 0;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:clamp(1.5rem, 2.3vw, 2.2rem);
+      color:#082e5b;
+      letter-spacing:-.4px;
+    }
+
+    .section-head p{
+      margin:8px 0 0;
+      color:#61758f;
+      max-width:720px;
+      line-height:1.75;
+    }
+
+    .cards-3{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+    }
+
+    .cards-4{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:16px;
+    }
+
+    .card{
+      position:relative;
+      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.78));
+      border:1px solid rgba(219,233,246,.96);
+      border-radius:26px;
+      padding:22px 20px;
+      box-shadow:var(--shadow-soft);
+      overflow:hidden;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0 auto auto 0;
+      width:100%;
+      height:4px;
+      background:linear-gradient(90deg, var(--blue), var(--cyan));
+      opacity:.85;
+    }
+
+    .icon-bubble{
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      font-size:1.35rem;
+      background:linear-gradient(135deg, rgba(47,140,255,.12), rgba(0,214,201,.12));
+      box-shadow:inset 0 1px 6px rgba(255,255,255,.6);
+      margin-bottom:14px;
+    }
+
+    .card h3{
+      margin:0 0 10px;
+      color:#082e5b;
+      font-size:1.08rem;
+    }
+
+    .card p{
+      margin:0;
+      color:#647891;
+      line-height:1.7;
+      font-size:.95rem;
+    }
+
+    .timeline{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+    }
+
+    .time-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.78));
+      border:1px solid rgba(219,233,246,.95);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .time-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(47,140,255,.10);
+      color:#0f4d92;
+      font-weight:800;
+      font-size:.82rem;
+      margin-bottom:12px;
+      border:1px solid rgba(47,140,255,.10);
+    }
+
+    .time-card h3{
+      margin:0 0 8px;
+      color:#082e5b;
+      font-size:1.07rem;
+    }
+
+    .time-card p{
+      margin:0;
+      color:#627791;
+      line-height:1.7;
+      font-size:.95rem;
+    }
+
+    .highlight{
+      background:linear-gradient(135deg, rgba(8,46,91,.98), rgba(15,77,146,.95));
+      border-radius:34px;
+      padding:34px 28px;
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 22px 48px rgba(8,46,91,.22);
+    }
+
+    .highlight::before{
+      content:"";
+      position:absolute;
+      width:220px;
+      height:220px;
+      right:-80px;
+      top:-80px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.16), transparent 70%);
+    }
+
+    .highlight-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:24px;
+      align-items:center;
+      position:relative;
+      z-index:1;
+    }
+
+    .highlight h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.5rem);
+      letter-spacing:-.6px;
+    }
+
+    .highlight p{
+      margin:0;
+      color:rgba(255,255,255,.86);
+      line-height:1.8;
+      max-width:750px;
+    }
+
+    .highlight-boxes{
+      display:grid;
+      gap:12px;
+    }
+
+    .highlight-box{
+      padding:16px 18px;
+      border-radius:20px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter:blur(8px);
+      font-weight:700;
+      line-height:1.55;
+      color:#eef6ff;
+    }
+
+    .faq-list{
+      display:grid;
+      gap:14px;
+    }
+
+    .faq-item{
+      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.78));
+      border:1px solid rgba(219,233,246,.95);
+      border-radius:22px;
+      padding:20px 20px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .faq-item h3{
+      margin:0 0 8px;
+      color:#082e5b;
+      font-size:1rem;
+    }
+
+    .faq-item p{
+      margin:0;
+      color:#647891;
+      line-height:1.72;
+      font-size:.95rem;
+    }
+
+    .cta{
+      padding-top:10px;
+      padding-bottom:54px;
+    }
+
+    .cta-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+      border:1px solid rgba(219,233,246,.95);
+      border-radius:34px;
+      box-shadow:var(--shadow);
+      padding:34px 28px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .cta-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      left:-110px;
+      bottom:-130px;
+      background:radial-gradient(circle, rgba(47,140,255,.15), transparent 72%);
+    }
+
+    .cta-card h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.4rem);
+      color:#082e5b;
+    }
+
+    .cta-card p{
+      margin:0 auto;
+      max-width:760px;
+      color:#627791;
+      line-height:1.8;
+    }
+
+    .cta-actions{
+      margin-top:24px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    footer{
+      border-top:1px solid rgba(219,233,246,.95);
+      background:rgba(255,255,255,.65);
+      backdrop-filter:blur(10px);
+    }
+
+    .footer-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:22px 18px 28px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      color:#61758f;
+      font-size:.94rem;
+    }
+
+    .footer-links{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .footer-links a{
+      color:#0f4d92;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    @keyframes floatOrb{
+      0%,100%{transform:translateY(0px)}
+      50%{transform:translateY(-12px)}
+    }
+
+    @media (max-width:1100px){
+      .hero-grid,
+      .highlight-grid,
+      .cards-4,
+      .cards-3,
+      .timeline{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .hero-grid{
+        grid-template-columns:1fr;
+      }
+
+      .highlight-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:860px){
+      .nav-main{
+        display:none;
+      }
+
+      .header-inner{
+        padding:12px 14px;
+      }
+
+      .hero{
+        padding:42px 0 24px;
+      }
+
+      .hero-card,
+      .glass-box,
+      .cta-card,
+      .highlight{
+        border-radius:26px;
+      }
+
+      .hero-card{
+        padding:28px 22px 24px;
+      }
+
+      .hero-stats{
+        grid-template-columns:1fr;
+      }
+
+      .cards-3,
+      .cards-4,
+      .timeline,
+      .mini-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:640px){
+      .brand-sub{
+        display:none;
+      }
+
+      .btn,
+      .btn-outline{
+        width:100%;
+      }
+
+      .hero-actions,
+      .cta-actions{
+        flex-direction:column;
+      }
+
+      .header-actions .btn{
+        display:none;
+      }
+
+      .section-head{
+        margin-bottom:14px;
+      }
+
+      .footer-inner{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="molecule-bg">
+      <div class="orb o1"></div>
+      <div class="orb o2"></div>
+      <div class="orb o3"></div>
+      <div class="orb o4"></div>
+      <div class="line l1"></div>
+      <div class="line l2"></div>
+      <div class="line l3"></div>
+      <div class="line l4"></div>
+    </div>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-mark"></div>
+          <div class="brand-text">
+            <div class="brand-title">Championnat de Chimie</div>
+            <div class="brand-sub">Compétition académique francophone</div>
+          </div>
+        </a>
+
+        <nav class="nav-main">
+          <a href="index.html">Accueil</a>
+          <a href="competition.html">Championnat</a>
+          <a href="rules.html">Règlement</a>
+          <a href="results.html">Résultats</a>
+          <a href="login.html">Connexion</a>
+        </nav>
+
+        <div class="header-actions">
+          <a class="btn" href="competition.html">Participer</a>
+
+          <input type="checkbox" id="menuToggle" />
+          <label for="menuToggle" class="menu-btn" aria-label="Ouvrir le menu">
+            <span></span>
+          </label>
+
+          <aside class="side-menu">
+            <h3>Explorer le site</h3>
+            <div class="menu-group">
+              <a href="#about">À propos</a>
+              <a href="#how">Comment ça marche</a>
+              <a href="#dates">Calendrier</a>
+              <a href="#jury">Jury & organisation</a>
+              <a href="#faq">FAQ</a>
+              <a href="competition.html">Championnat</a>
+              <a href="rules.html">Règlement</a>
+              <a href="results.html">Résultats</a>
+              <a href="login.html">Connexion</a>
+              <a href="#contact">Contact</a>
+            </div>
+            <div class="menu-note">
+              Une plateforme pensée pour présenter un championnat de chimie dans un style moderne, académique et crédible, tout en restant claire dès la première visite.
+            </div>
+          </aside>
+
+          <label for="menuToggle" class="menu-overlay"></label>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="hero-grid">
+            <div class="hero-card">
+              <div class="eyebrow">🏆 Excellence académique • Chimie • Francophonie</div>
+              <h1>Le championnat académique de chimie, pensé pour briller.</h1>
+              <p class="lead">
+                Une plateforme moderne, claire et attractive pour mettre en valeur les talents, organiser les épreuves, publier les annonces importantes et offrir un cadre sérieux à une compétition scientifique francophone.
+              </p>
+
+              <div class="hero-actions">
+                <a href="competition.html" class="btn">Participer au championnat</a>
+                <a href="rules.html" class="btn-outline">Voir le règlement</a>
+              </div>
+
+              <div class="hero-stats">
+                <div class="stat">
+                  <strong>01</strong>
+                  <span>Plateforme simple et crédible</span>
+                </div>
+                <div class="stat">
+                  <strong>100%</strong>
+                  <span>Orientation académique</span>
+                </div>
+                <div class="stat">
+                  <strong>24/7</strong>
+                  <span>Accessible en ligne</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-panel">
+              <div class="glass-box">
+                <h2 class="panel-title">Annonce du moment</h2>
+                <div class="announcement">
+                  <div class="badge-dot"></div>
+                  <div>
+                    <strong>Ouverture progressive de la plateforme</strong>
+                    <p>
+                      Le Championnat de Chimie se prépare dans un cadre moderne, lisible et professionnel. Les informations officielles, le règlement et les accès de participation seront publiés ici.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="mini-grid">
+                  <div class="mini-card">
+                    <strong>Épreuves</strong>
+                    <p>QCM, analyse, raisonnement scientifique et résolution de problèmes.</p>
+                  </div>
+                  <div class="mini-card">
+                    <strong>Cadre</strong>
+                    <p>Interface claire, navigation fluide et présentation académique soignée.</p>
+                  </div>
+                  <div class="mini-card">
+                    <strong>Objectif</strong>
+                    <p>Valoriser le mérite, l’excellence et l’engagement scientifique.</p>
+                  </div>
+                  <div class="mini-card">
+                    <strong>Visibilité</strong>
+                    <p>Résultats, annonces et contenus accessibles selon le niveau d’autorisation.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>À propos du championnat</h2>
+              <p>
+                Le Championnat de Chimie est conçu comme une plateforme académique francophone orientée vers la rigueur, la clarté et la valorisation des compétences en chimie. L’idée est de proposer une expérience de concours moderne sans rendre l’interface lourde ou confuse.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-3">
+            <div class="card">
+              <div class="icon-bubble">🧪</div>
+              <h3>Esprit scientifique</h3>
+              <p>
+                Une identité visuelle brillante et sérieuse, inspirée du monde académique, des laboratoires et des compétitions d’excellence.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">🌍</div>
+              <h3>Orientation francophone</h3>
+              <p>
+                Une plateforme pensée d’abord pour un public francophone, avec une présentation claire et accessible à plusieurs pays.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">🎓</div>
+              <h3>Crédibilité institutionnelle</h3>
+              <p>
+                Une structure propre pour accueillir règlement, annonces, participation, résultats et plus tard jury, certificats et espace administrateur.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Comment ça marche</h2>
+              <p>
+                La plateforme reste simple en surface, mais elle s’organise de manière logique pour guider chaque visiteur, candidat ou futur participant.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-4">
+            <div class="card">
+              <div class="icon-bubble">1</div>
+              <h3>Découvrir</h3>
+              <p>Le visiteur consulte l’accueil, le championnat, le règlement et les informations essentielles sans mot de passe.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">2</div>
+              <h3>S’informer</h3>
+              <p>Il comprend les objectifs, le niveau attendu, les modalités de participation et les prochaines échéances.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">3</div>
+              <h3>Se connecter</h3>
+              <p>Le candidat accède ensuite à son espace personnel pour participer, suivre ses données ou consulter ses informations privées.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">4</div>
+              <h3>Participer</h3>
+              <p>La plateforme centralise l’expérience de compétition dans un environnement plus propre, plus stable et plus académique.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="dates">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Calendrier du championnat</h2>
+              <p>
+                Cette zone peut être mise à jour facilement pour afficher les dates importantes, sans surcharger la page d’accueil.
+              </p>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <div class="time-card">
+              <div class="time-pill">Étape 1</div>
+              <h3>Ouverture des annonces</h3>
+              <p>
+                Publication des premières informations, des consignes générales et de la structure officielle du championnat.
+              </p>
+            </div>
+            <div class="time-card">
+              <div class="time-pill">Étape 2</div>
+              <h3>Accès à la compétition</h3>
+              <p>
+                Lancement de la session de participation, avec lien d’accès, règlement détaillé et espace candidat.
+              </p>
+            </div>
+            <div class="time-card">
+              <div class="time-pill">Étape 3</div>
+              <h3>Résultats & suite</h3>
+              <p>
+                Publication des résultats généraux, diffusion des annonces de clôture et éventuelles suites académiques.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="container">
+          <div class="highlight">
+            <div class="highlight-grid">
+              <div>
+                <h2>Une vitrine académique brillante, sans confusion.</h2>
+                <p>
+                  Le site met l’accent sur la clarté visuelle, la lisibilité des informations et la confiance. Le visiteur perçoit immédiatement qu’il s’agit d’un espace sérieux, académique et structuré, sans tomber dans un design lourd ou désordonné.
+                </p>
+              </div>
+              <div class="highlight-boxes">
+                <div class="highlight-box">Topbar sobre avec accès rapide aux sections essentielles.</div>
+                <div class="highlight-box">Menu à trois traits pour élargir le site sans encombrer l’écran.</div>
+                <div class="highlight-box">Fond lumineux, cartes premium et ambiance scientifique moderne.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="jury">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Jury, organisation et crédibilité</h2>
+              <p>
+                Même si certaines zones seront privées plus tard, la page d’accueil peut déjà afficher une image forte de sérieux, d’encadrement et d’organisation scientifique.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-3">
+            <div class="card">
+              <div class="icon-bubble">👨‍🏫</div>
+              <h3>Encadrement</h3>
+              <p>
+                Le championnat peut être présenté comme un espace encadré, avec supervision académique, règlement formel et publication structurée.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">📋</div>
+              <h3>Évaluation</h3>
+              <p>
+                La logique du site permet d’ajouter plus tard des zones privées dédiées au jury, à la correction et à la gestion des résultats.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">🔐</div>
+              <h3>Sécurité</h3>
+              <p>
+                Les pages de présentation restent publiques, tandis que la participation réelle, l’administration et les zones sensibles peuvent rester protégées.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Questions fréquentes</h2>
+              <p>
+                Quelques réponses courtes suffisent pour rassurer les visiteurs dès la première version du site.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-list">
+            <div class="faq-item">
+              <h3>Le site est-il accessible sans mot de passe ?</h3>
+              <p>
+                Oui. Les pages de présentation comme l’accueil, le règlement, les informations générales et certaines annonces peuvent rester visibles sans connexion.
+              </p>
+            </div>
+            <div class="faq-item">
+              <h3>Quelles zones pourront être privées plus tard ?</h3>
+              <p>
+                La participation au test, l’espace candidat, les zones jury, l’administration, les résultats détaillés et les outils internes peuvent être protégés par connexion.
+              </p>
+            </div>
+            <div class="faq-item">
+              <h3>Le site peut-il évoluer sans casser l’ancien ?</h3>
+              <p>
+                Oui. Toute cette nouvelle partie peut vivre dans un dossier séparé du site existant, avec un simple lien de liaison, ce qui évite de casser les pages déjà en place.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta" id="contact">
+        <div class="container">
+          <div class="cta-card">
+            <h2>Prêt à lancer la nouvelle vitrine du championnat ?</h2>
+            <p>
+              Cette page d’accueil pose une base propre, brillante et attractive. Elle peut maintenant servir de porte d’entrée au nouveau mini-site “Championnat de Chimie”, sans casser ton ancien environnement.
+            </p>
+            <div class="cta-actions">
+              <a href="competition.html" class="btn">Découvrir le championnat</a>
+              <a href="login.html" class="btn-outline">Se connecter</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <div>© 2026 Championnat de Chimie — Plateforme académique francophone.</div>
+        <div class="footer-links">
+          <a href="index.html">Accueil</a>
+          <a href="competition.html">Championnat</a>
+          <a href="rules.html">Règlement</a>
+          <a href="results.html">Résultats</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
