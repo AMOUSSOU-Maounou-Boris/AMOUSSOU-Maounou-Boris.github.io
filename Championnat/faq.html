@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FAQ | Championnat de Chimie</title>
+
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#eef7ff,#f7fbff);
+      color:#0b2340;
+    }
+
+    :root{
+      --blue:#2f8cff;
+      --blue-dark:#145bd6;
+      --purple:#7b61ff;
+      --card:#ffffff;
+      --line:#dce7f3;
+      --shadow:0 12px 28px rgba(0,0,0,.08);
+      --radius:20px;
+      --max:1100px;
+    }
+
+    .container{
+      max-width:var(--max);
+      margin:auto;
+      padding:20px;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      background:rgba(255,255,255,.9);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+      z-index:10;
+    }
+
+    .nav{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 20px;
+    }
+
+    .nav a{
+      text-decoration:none;
+      font-weight:700;
+      margin-right:10px;
+      color:#0b2340;
+    }
+
+    .hero{
+      padding:40px 0 20px;
+    }
+
+    h1{
+      margin:0 0 10px;
+      font-size:2.2rem;
+    }
+
+    .lead{
+      color:#61748d;
+      line-height:1.6;
+    }
+
+    .faq{
+      margin-top:20px;
+      display:grid;
+      gap:14px;
+    }
+
+    .item{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid var(--line);
+      overflow:hidden;
+    }
+
+    .question{
+      padding:16px 18px;
+      font-weight:700;
+      cursor:pointer;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .question:hover{
+      background:#f4f8ff;
+    }
+
+    .answer{
+      padding:0 18px 16px;
+      display:none;
+      color:#61748d;
+      line-height:1.6;
+      font-size:.95rem;
+    }
+
+    .item.active .answer{
+      display:block;
+    }
+
+    .cta{
+      margin-top:30px;
+      background:linear-gradient(135deg,#082e5b,#145bd6);
+      color:#fff;
+      padding:30px;
+      border-radius:24px;
+      text-align:center;
+    }
+
+    .cta a{
+      display:inline-block;
+      margin-top:15px;
+      background:#fff;
+      color:#145bd6;
+      padding:10px 16px;
+      border-radius:999px;
+      font-weight:700;
+      text-decoration:none;
+    }
+
+    footer{
+      margin-top:40px;
+      padding:20px;
+      text-align:center;
+      color:#61748d;
+      border-top:1px solid var(--line);
+    }
+
+    @media(max-width:600px){
+      h1{font-size:1.6rem}
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="nav">
+    <div><strong>Championnat de Chimie</strong></div>
+    <div>
+      <a href="index.html">Accueil</a>
+      <a href="competition.html">Championnat</a>
+      <a href="results.html">Résultats</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <section class="hero">
+    <h1>Questions fréquentes</h1>
+    <p class="lead">
+      Cette page regroupe les informations essentielles pour comprendre le fonctionnement du site, du championnat et des accès.
+    </p>
+  </section>
+
+  <div class="faq">
+
+    <div class="item">
+      <div class="question">Qui peut accéder au site ? <span>+</span></div>
+      <div class="answer">
+        Tout le monde peut consulter les pages publiques : accueil, championnat, règlement, résultats et FAQ.
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="question">Quelles parties sont privées ? <span>+</span></div>
+      <div class="answer">
+        Les espaces candidat, jury et administration nécessitent une connexion et des autorisations spécifiques.
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="question">Comment participer au championnat ? <span>+</span></div>
+      <div class="answer">
+        Il suffit d’accéder à la page championnat, puis de suivre les instructions d’inscription et de connexion.
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="question">Faut-il créer un compte ? <span>+</span></div>
+      <div class="answer">
+        Oui, un compte est nécessaire pour participer et accéder aux fonctionnalités privées.
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="question">Comment se déroule la compétition ? <span>+</span></div>
+      <div class="answer">
+        Les épreuves sont accessibles via la plateforme, avec consignes, temps défini et soumission en ligne.
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="question">Où voir les résultats ? <span>+</span></div>
+      <div class="answer">
+        Les résultats sont publiés sur la page dédiée avec classement et informations générales.
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="question">Qui corrige les épreuves ? <span>+</span></div>
+      <div class="answer">
+        Les évaluations sont réalisées dans un cadre structuré via l’espace jury.
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="question">Peut-on contacter l’organisation ? <span>+</span></div>
+      <div class="answer">
+        Oui, via la page contact prévue à cet effet.
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="question">Le site va-t-il évoluer ? <span>+</span></div>
+      <div class="answer">
+        Oui, cette version constitue une base évolutive avec ajout progressif de nouvelles fonctionnalités.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="cta">
+    <h2>Besoin d’aller plus loin ?</h2>
+    <p>Consulte les autres sections du site pour accéder aux informations détaillées.</p>
+    <a href="competition.html">Voir le championnat</a>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Championnat de Chimie
+</footer>
+
+<script>
+  document.querySelectorAll(".question").forEach(q=>{
+    q.addEventListener("click", ()=>{
+      q.parentElement.classList.toggle("active");
+    });
+  });
+</script>
+
+</body>
+</html>
