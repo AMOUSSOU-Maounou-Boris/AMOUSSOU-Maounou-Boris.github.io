@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>À propos | Championnat de Chimie</title>
+  <meta name="description" content="À propos du Championnat de Chimie, sa vision, ses objectifs et son positionnement académique." />
+  <style>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    :root{
+      --bg1:#eef7ff;
+      --bg2:#fffaf7;
+      --bg3:#f8fffb;
+
+      --nav:#082e5b;
+      --text:#0b2340;
+      --muted:#627791;
+      --line:#dce7f3;
+
+      --blue:#2f8cff;
+      --blue-dark:#145bd6;
+
+      --red:#ff4b4b;
+      --red-dark:#d82e2e;
+
+      --green:#18c34a;
+      --green-dark:#0f9b3a;
+
+      --gold:#e0a126;
+      --gold-dark:#b47c12;
+
+      --purple:#7b61ff;
+      --purple-dark:#5a3fe0;
+
+      --card:rgba(255,255,255,.88);
+      --card-strong:rgba(255,255,255,.94);
+
+      --shadow:0 18px 45px rgba(9,45,92,.10);
+      --shadow-soft:0 10px 24px rgba(10,37,73,.07);
+
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
+
+      --max:1240px;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(47,140,255,.14), transparent 24%),
+        radial-gradient(circle at top right, rgba(123,97,255,.10), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(24,195,74,.08), transparent 22%),
+        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 44%, var(--bg3) 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      width:360px;
+      height:360px;
+      border-radius:50%;
+      filter:blur(55px);
+      z-index:-2;
+      pointer-events:none;
+    }
+
+    body::before{
+      top:-120px;
+      left:-120px;
+      background:rgba(47,140,255,.14);
+    }
+
+    body::after{
+      right:-120px;
+      top:140px;
+      background:rgba(123,97,255,.10);
+    }
+
+    .page-wrap{
+      position:relative;
+      min-height:100vh;
+    }
+
+    .bg-soft{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .orb{
+      position:absolute;
+      border-radius:50%;
+      animation:floatOrb 9s ease-in-out infinite;
+      opacity:.9;
+    }
+
+    .o1{
+      width:110px;height:110px;top:100px;left:6%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(47,140,255,.28) 45%, transparent 74%);
+    }
+    .o2{
+      width:88px;height:88px;top:260px;right:10%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(123,97,255,.24) 45%, transparent 74%);
+      animation-delay:1.2s;
+    }
+    .o3{
+      width:142px;height:142px;bottom:140px;left:10%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(24,195,74,.20) 45%, transparent 74%);
+      animation-delay:2s;
+    }
+    .o4{
+      width:96px;height:96px;bottom:80px;right:8%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(224,161,38,.18) 45%, transparent 74%);
+      animation-delay:3s;
+    }
+
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(255,255,255,.72);
+      border-bottom:1px solid rgba(220,231,243,.92);
+      box-shadow:0 6px 24px rgba(8,46,91,.05);
+    }
+
+    .header-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      color:inherit;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      background:
+        radial-gradient(circle at 30% 30%, #fff 0%, #d8e9ff 22%, #7ab7ff 48%, #1a5ec4 100%);
+      box-shadow:
+        0 10px 24px rgba(47,140,255,.20),
+        inset 0 1px 8px rgba(255,255,255,.75);
+      position:relative;
+      flex:0 0 auto;
+    }
+
+    .brand-mark::before,
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.84);
+      inset:10px;
+    }
+
+    .brand-mark::after{
+      inset:6px 14px;
+      border-color:rgba(255,255,255,.56);
+      transform:rotate(55deg);
+    }
+
+    .brand-title{
+      font-size:1.06rem;
+      font-weight:800;
+      color:var(--nav);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .brand-sub{
+      font-size:.79rem;
+      color:#667b96;
+      margin-top:2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .nav-main{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .nav-main a{
+      text-decoration:none;
+      color:var(--text);
+      font-weight:700;
+      font-size:.94rem;
+      padding:10px 14px;
+      border-radius:999px;
+      transition:.2s ease;
+    }
+
+    .nav-main a:hover,
+    .nav-main a.active{
+      background:rgba(47,140,255,.10);
+      color:var(--blue-dark);
+    }
+
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn,
+    .btn-outline{
+      border:none;
+      cursor:pointer;
+      transition:.22s ease;
+      font-weight:800;
+      font-family:inherit;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border-radius:999px;
+      padding:12px 18px;
+    }
+
+    .btn{
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+      box-shadow:0 14px 30px rgba(47,140,255,.20);
+    }
+
+    .btn-outline{
+      color:var(--purple-dark);
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(123,97,255,.16);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      max-width:var(--max);
+      margin:0 auto;
+      padding:30px 18px 54px;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:22px;
+      align-items:stretch;
+      margin-bottom:24px;
+    }
+
+    .hero-card,
+    .hero-side,
+    .section-card,
+    .highlight{
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+      border:1px solid rgba(220,231,243,.95);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero-card{
+      padding:34px 28px 28px;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      left:-100px;
+      top:-110px;
+      background:radial-gradient(circle, rgba(47,140,255,.12), transparent 72%);
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(123,97,255,.10);
+      color:var(--purple-dark);
+      border:1px solid rgba(123,97,255,.12);
+      font-weight:800;
+      font-size:.85rem;
+      margin-bottom:18px;
+    }
+
+    h1{
+      margin:0 0 14px;
+      font-size:clamp(2rem, 4vw, 3.7rem);
+      line-height:1.04;
+      letter-spacing:-1.2px;
+      color:var(--nav);
+    }
+
+    .lead{
+      margin:0;
+      color:#5d728d;
+      font-size:1.04rem;
+      line-height:1.8;
+      max-width:760px;
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:24px;
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+      margin-top:26px;
+    }
+
+    .stat{
+      border-radius:22px;
+      padding:18px 16px;
+      color:#fff;
+      box-shadow:var(--shadow-soft);
+      min-height:112px;
+    }
+
+    .stat.blue{background:linear-gradient(135deg,var(--blue),var(--blue-dark))}
+    .stat.purple{background:linear-gradient(135deg,var(--purple),var(--purple-dark))}
+    .stat.green{background:linear-gradient(135deg,var(--green),var(--green-dark))}
+
+    .stat strong{
+      display:block;
+      font-size:1.55rem;
+      margin-bottom:8px;
+    }
+
+    .stat span{
+      display:block;
+      font-size:.92rem;
+      line-height:1.45;
+      opacity:.96;
+      font-weight:700;
+    }
+
+    .hero-side{
+      padding:22px;
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+
+    .side-box{
+      border-radius:22px;
+      padding:18px 16px;
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(220,231,243,.95);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .side-box h3{
+      margin:0 0 8px;
+      font-size:1.03rem;
+      color:var(--nav);
+    }
+
+    .side-box p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:.94rem;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:22px;
+      margin-top:6px;
+    }
+
+    .section-card{
+      padding:24px 22px;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:1.35rem;
+      color:var(--nav);
+      letter-spacing:-.3px;
+    }
+
+    .section-head p{
+      margin:6px 0 0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:700px;
+      font-size:.95rem;
+    }
+
+    .cards{
+      display:grid;
+      gap:14px;
+    }
+
+    .mini-card{
+      border-radius:22px;
+      padding:18px 18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,251,255,.88));
+      border:1px solid rgba(220,231,243,.95);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .mini-card h3{
+      margin:0 0 8px;
+      font-size:1.02rem;
+      color:var(--nav);
+    }
+
+    .mini-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.72;
+      font-size:.95rem;
+    }
+
+    .highlight{
+      margin-top:22px;
+      padding:34px 28px;
+      color:#fff;
+      background:linear-gradient(135deg, rgba(8,46,91,.98), rgba(90,63,224,.92));
+      box-shadow:0 20px 40px rgba(8,46,91,.16);
+    }
+
+    .highlight::before{
+      content:"";
+      position:absolute;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      right:-90px;
+      top:-90px;
+      background:radial-gradient(circle, rgba(255,255,255,.14), transparent 70%);
+    }
+
+    .highlight-grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:22px;
+      align-items:center;
+    }
+
+    .highlight h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.5rem);
+      letter-spacing:-.6px;
+    }
+
+    .highlight p{
+      margin:0;
+      color:rgba(255,255,255,.90);
+      line-height:1.8;
+    }
+
+    .highlight-boxes{
+      display:grid;
+      gap:12px;
+    }
+
+    .highlight-box{
+      padding:16px 18px;
+      border-radius:20px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter:blur(8px);
+      font-weight:700;
+      line-height:1.55;
+      color:#fff;
+    }
+
+    .cta{
+      margin-top:22px;
+    }
+
+    .cta-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+      border:1px solid rgba(220,231,243,.95);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      padding:34px 28px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .cta-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      left:-110px;
+      bottom:-130px;
+      background:radial-gradient(circle, rgba(123,97,255,.12), transparent 72%);
+    }
+
+    .cta-card h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.4rem);
+      color:var(--nav);
+    }
+
+    .cta-card p{
+      margin:0 auto;
+      max-width:760px;
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    .cta-actions{
+      margin-top:24px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    footer{
+      border-top:1px solid rgba(220,231,243,.92);
+      background:rgba(255,255,255,.68);
+      backdrop-filter:blur(10px);
+      margin-top:30px;
+    }
+
+    .footer-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:22px 18px 28px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      color:#61758f;
+      font-size:.94rem;
+    }
+
+    .footer-links{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .footer-links a{
+      color:#1559bf;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    @keyframes floatOrb{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-12px)}
+    }
+
+    @media (max-width:1120px){
+      .hero,
+      .grid,
+      .highlight-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:820px){
+      .nav-main{
+        display:none;
+      }
+
+      .header-inner{
+        padding:12px 14px;
+      }
+
+      .page{
+        padding:22px 14px 44px;
+      }
+
+      .hero-card,
+      .hero-side,
+      .section-card,
+      .highlight,
+      .cta-card{
+        border-radius:24px;
+      }
+
+      .hero-card{
+        padding:26px 20px 22px;
+      }
+    }
+
+    @media (max-width:520px){
+      .brand-sub{
+        display:none;
+      }
+
+      .hero-stats{
+        grid-template-columns:1fr;
+      }
+
+      .btn,
+      .btn-outline{
+        width:100%;
+      }
+
+      .hero-actions,
+      .cta-actions{
+        flex-direction:column;
+      }
+
+      .header-actions{
+        width:100%;
+      }
+
+      .footer-inner{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="bg-soft">
+      <div class="orb o1"></div>
+      <div class="orb o2"></div>
+      <div class="orb o3"></div>
+      <div class="orb o4"></div>
+    </div>
+
+    <header class="site-header">
+      <div class="header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-mark"></div>
+          <div>
+            <div class="brand-title">Championnat de Chimie</div>
+            <div class="brand-sub">Présentation & vision du projet</div>
+          </div>
+        </a>
+
+        <nav class="nav-main">
+          <a href="index.html">Accueil</a>
+          <a href="about.html" class="active">À propos</a>
+          <a href="competition.html">Championnat</a>
+          <a href="rules.html">Règlement</a>
+          <a href="results.html">Résultats</a>
+          <a href="login.html">Connexion</a>
+          <a href="jury.html">Jury</a>
+          <a href="announcements.html">Annonces</a>
+          <a href="admin.html">Admin</a>
+        </nav>
+
+        <div class="header-actions">
+          <a class="btn" href="competition.html">Participer</a>
+          <a class="btn-outline" href="announcements.html">Voir les annonces</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <div class="hero-card">
+          <div class="eyebrow">🔬 Excellence • Francophonie • Vision académique</div>
+          <h1>Un championnat pensé pour valoriser la chimie et les talents.</h1>
+          <p class="lead">
+            Le Championnat de Chimie est conçu comme une plateforme académique moderne dédiée à la valorisation des connaissances, du raisonnement scientifique et de l’excellence. Il propose un cadre lisible, crédible et évolutif pour organiser des compétitions de chimie dans un environnement francophone.
+          </p>
+
+          <div class="hero-actions">
+            <a href="competition.html" class="btn">Découvrir le championnat</a>
+            <a href="rules.html" class="btn-outline">Lire le règlement</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat blue">
+              <strong>01</strong>
+              <span>Plateforme claire et structurée</span>
+            </div>
+            <div class="stat purple">
+              <strong>100%</strong>
+              <span>Orientation académique</span>
+            </div>
+            <div class="stat green">
+              <strong>24/7</strong>
+              <span>Accessible et évolutive</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="hero-side">
+          <div class="side-box">
+            <h3>Objectif principal</h3>
+            <p>
+              Offrir un espace académique crédible pour présenter des compétitions, publier des informations officielles, inscrire des candidats, afficher des résultats et construire une image sérieuse autour du championnat.
+            </p>
+          </div>
+
+          <div class="side-box">
+            <h3>Public visé</h3>
+            <p>
+              Étudiants, passionnés de chimie, candidats à des défis scientifiques, et plus largement toute personne intéressée par une expérience de compétition académique bien structurée.
+            </p>
+          </div>
+
+          <div class="side-box">
+            <h3>Positionnement</h3>
+            <p>
+              Le site se veut à la fois simple à comprendre, premium visuellement et suffisamment solide pour évoluer vers une véritable plateforme de concours scientifique.
+            </p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid">
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Pourquoi ce projet existe</h2>
+              <p>
+                La chimie mérite un cadre numérique qui ne soit ni confus ni banal. Le projet répond à ce besoin en donnant une présence claire à l’excellence académique.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <div class="mini-card">
+              <h3>Valoriser le mérite</h3>
+              <p>
+                Le championnat met en avant l’effort, la rigueur, la compréhension scientifique et la qualité de raisonnement des candidats dans un cadre sérieux.
+              </p>
+            </div>
+            <div class="mini-card">
+              <h3>Créer une vitrine crédible</h3>
+              <p>
+                L’objectif est aussi de montrer qu’une compétition académique peut disposer d’une vraie identité visuelle, d’une structure propre et d’un espace organisé.
+              </p>
+            </div>
+            <div class="mini-card">
+              <h3>Construire dans la durée</h3>
+              <p>
+                Cette base peut évoluer vers des fonctionnalités plus poussées : jury avancé, gestion des résultats, certificats, espace candidat et administration complète.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Ce que le site apporte déjà</h2>
+              <p>
+                Même dans sa version actuelle, le mini-site met déjà en place les briques essentielles d’un projet académique cohérent.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <div class="mini-card">
+              <h3>Présentation publique</h3>
+              <p>
+                Accueil, règlement, résultats, jury, annonces et présentation générale sont déjà structurés pour donner un vrai visage au championnat.
+              </p>
+            </div>
+            <div class="mini-card">
+              <h3>Participation organisée</h3>
+              <p>
+                Le site prépare l’inscription des candidats et la gestion de la compétition dans un environnement plus clair que de simples pages isolées.
+              </p>
+            </div>
+            <div class="mini-card">
+              <h3>Base de gestion</h3>
+              <p>
+                L’administration et les annonces donnent déjà un début de centre de contrôle, ce qui rend le projet immédiatement plus professionnel.
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="highlight">
+        <div class="highlight-grid">
+          <div>
+            <h2>Une ambition simple : rendre la compétition scientifique plus lisible, plus belle et plus sérieuse.</h2>
+            <p>
+              Le Championnat de Chimie n’est pas pensé comme une simple page web, mais comme une vraie identité académique numérique. Chaque section du site contribue à construire cette crédibilité : accueil, règles, jury, annonces, résultats, connexion et administration.
+            </p>
+          </div>
+
+          <div class="highlight-boxes">
+            <div class="highlight-box">Design académique moderne et premium.</div>
+            <div class="highlight-box">Structure claire pour les visiteurs, candidats et futurs jurés.</div>
+            <div class="highlight-box">Base déjà prête pour grandir sans casser l’existant.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Vision du championnat</h2>
+              <p>
+                Le projet vise à devenir une plateforme de référence pour les compétitions de chimie dans un cadre francophone, tout en restant flexible et accessible.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <div class="mini-card">
+              <h3>Vision académique</h3>
+              <p>
+                Mettre la qualité scientifique et l’évaluation rigoureuse au centre de l’expérience, avec une présentation cohérente et une communication claire.
+              </p>
+            </div>
+            <div class="mini-card">
+              <h3>Vision communautaire</h3>
+              <p>
+                Faire exister un espace où la chimie est valorisée, où les candidats se sentent pris au sérieux et où l’organisation inspire confiance.
+              </p>
+            </div>
+            <div class="mini-card">
+              <h3>Vision évolutive</h3>
+              <p>
+                Préparer une base capable d’accueillir plus tard de nouvelles sessions, plus d’outils d’administration, plus de résultats et plus de reconnaissance.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2>Pages liées à cette vision</h2>
+              <p>
+                Toutes les sections déjà créées participent au même ensemble et renforcent l’identité globale du championnat.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards">
+            <div class="mini-card">
+              <h3>Accueil</h3>
+              <p>
+                Porte d’entrée du projet, elle introduit la mission, l’image et les accès essentiels au championnat.
+              </p>
+            </div>
+            <div class="mini-card">
+              <h3>Jury & résultats</h3>
+              <p>
+                Elles renforcent le sérieux institutionnel en montrant l’existence d’une structure d’évaluation et d’une valorisation du mérite.
+              </p>
+            </div>
+            <div class="mini-card">
+              <h3>Annonces & admin</h3>
+              <p>
+                Elles donnent de la vie au site et préparent un vrai contrôle des informations officielles et du fonctionnement général.
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="cta">
+        <div class="cta-card">
+          <h2>Prêt à continuer la construction du site ?</h2>
+          <p>
+            Cette page “À propos” complète maintenant l’identité du mini-site. Elle s’intègre naturellement au reste des sections déjà créées et renforce immédiatement le niveau académique et professionnel du projet.
+          </p>
+          <div class="cta-actions">
+            <a href="competition.html" class="btn">Aller au championnat</a>
+            <a href="announcements.html" class="btn-outline">Voir les annonces</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <div>© 2026 Championnat de Chimie — Présentation du projet.</div>
+        <div class="footer-links">
+          <a href="index.html">Accueil</a>
+          <a href="about.html">À propos</a>
+          <a href="competition.html">Championnat</a>
+          <a href="rules.html">Règlement</a>
+          <a href="results.html">Résultats</a>
+          <a href="login.html">Connexion</a>
+          <a href="jury.html">Jury</a>
+          <a href="announcements.html">Annonces</a>
+          <a href="admin.html">Admin</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
