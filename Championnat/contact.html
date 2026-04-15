@@ -2,165 +2,75 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Contact | Championnat de Chimie</title>
   <meta name="description" content="Contacter l'organisation du Championnat de Chimie." />
+
   <style>
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
+    *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif}
 
     :root{
-      --bg1:#eef7ff;
-      --bg2:#fff8f8;
-      --bg3:#f8fffb;
-
-      --nav:#082e5b;
+      --bg:#f5f7fb;
+      --panel:#ffffff;
+      --panel-soft:#fbfcfe;
+      --sidebar:#05293d;
+      --sidebar-2:#042336;
       --text:#0b2340;
-      --muted:#627791;
-      --line:#dce7f3;
-
+      --muted:#6a7d95;
+      --line:#dde7f2;
+      --line-soft:#edf2f8;
       --blue:#2f8cff;
       --blue-dark:#145bd6;
-
       --red:#ff4b4b;
-      --red-dark:#d82e2e;
-
       --green:#18c34a;
-      --green-dark:#0f9b3a;
-
+      --gold:#d8a72f;
+      --orange:#ff9f1a;
       --purple:#7b61ff;
-      --purple-dark:#5a3fe0;
-
-      --card:rgba(255,255,255,.88);
-      --card-strong:rgba(255,255,255,.94);
-
-      --shadow:0 18px 45px rgba(9,45,92,.10);
-      --shadow-soft:0 10px 24px rgba(10,37,73,.07);
-
-      --radius-xl:30px;
+      --shadow:0 10px 24px rgba(13,37,71,.08);
+      --radius:18px;
       --radius-lg:22px;
-      --radius-md:16px;
-
-      --max:1240px;
+      --topbar-h:70px;
+      --sidebar-w:272px;
     }
 
     body{
       margin:0;
-      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
       color:var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(47,140,255,.14), transparent 24%),
-        radial-gradient(circle at top right, rgba(255,75,75,.10), transparent 22%),
-        radial-gradient(circle at bottom left, rgba(24,195,74,.08), transparent 22%),
-        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 44%, var(--bg3) 100%);
-      min-height:100vh;
-      overflow-x:hidden;
-    }
-
-    body::before,
-    body::after{
-      content:"";
-      position:fixed;
-      width:360px;
-      height:360px;
-      border-radius:50%;
-      filter:blur(55px);
-      z-index:-2;
-      pointer-events:none;
-    }
-
-    body::before{
-      top:-120px;
-      left:-120px;
-      background:rgba(47,140,255,.14);
-    }
-
-    body::after{
-      right:-120px;
-      top:140px;
-      background:rgba(255,75,75,.10);
-    }
-
-    .page-wrap{
-      position:relative;
       min-height:100vh;
     }
 
-    .bg-soft{
-      position:absolute;
-      inset:0;
-      overflow:hidden;
-      pointer-events:none;
-      z-index:0;
-    }
-
-    .orb{
-      position:absolute;
-      border-radius:50%;
-      animation:floatOrb 9s ease-in-out infinite;
-      opacity:.9;
-    }
-
-    .o1{
-      width:110px;height:110px;top:100px;left:6%;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(47,140,255,.28) 45%, transparent 74%);
-    }
-    .o2{
-      width:88px;height:88px;top:260px;right:10%;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(255,75,75,.24) 45%, transparent 74%);
-      animation-delay:1.2s;
-    }
-    .o3{
-      width:142px;height:142px;bottom:140px;left:10%;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(24,195,74,.20) 45%, transparent 74%);
-      animation-delay:2s;
-    }
-    .o4{
-      width:96px;height:96px;bottom:80px;right:8%;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(123,97,255,.18) 45%, transparent 74%);
-      animation-delay:3s;
-    }
-
-    .site-header{
+    .topbar{
       position:sticky;
       top:0;
-      z-index:50;
-      backdrop-filter:blur(18px);
-      background:rgba(255,255,255,.72);
-      border-bottom:1px solid rgba(220,231,243,.92);
-      box-shadow:0 6px 24px rgba(8,46,91,.05);
-    }
-
-    .header-inner{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:14px 18px;
+      z-index:40;
+      height:var(--topbar-h);
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
-      flex-wrap:wrap;
+      padding:0 18px;
     }
 
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
+      min-width:0;
       text-decoration:none;
       color:inherit;
-      min-width:0;
     }
 
     .brand-mark{
-      width:48px;
-      height:48px;
-      border-radius:16px;
-      background:
-        radial-gradient(circle at 30% 30%, #fff 0%, #d8e9ff 22%, #7ab7ff 48%, #1a5ec4 100%);
-      box-shadow:
-        0 10px 24px rgba(47,140,255,.20),
-        inset 0 1px 8px rgba(255,255,255,.75);
+      width:40px;
+      height:40px;
+      border-radius:14px;
       position:relative;
+      background:
+        radial-gradient(circle at 30% 30%, #fff 0%, #d8e9ff 24%, #7ab7ff 55%, #1a5ec4 100%);
+      box-shadow:0 10px 20px rgba(47,140,255,.20), inset 0 1px 8px rgba(255,255,255,.7);
       flex:0 0 auto;
     }
 
@@ -169,294 +79,280 @@
       content:"";
       position:absolute;
       border-radius:50%;
-      border:2px solid rgba(255,255,255,.84);
-      inset:10px;
+      border:2px solid rgba(255,255,255,.82);
     }
 
-    .brand-mark::after{
-      inset:6px 14px;
-      border-color:rgba(255,255,255,.56);
-      transform:rotate(55deg);
-    }
+    .brand-mark::before{ inset:8px; }
+    .brand-mark::after{ inset:5px 12px; transform:rotate(55deg); border-color:rgba(255,255,255,.56); }
 
+    .brand-text{ min-width:0; }
     .brand-title{
-      font-size:1.06rem;
+      font-size:14px;
       font-weight:800;
-      color:var(--nav);
+      color:#0a2d61;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
     .brand-sub{
-      font-size:.79rem;
-      color:#667b96;
+      font-size:12px;
+      color:#73859b;
       margin-top:2px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    .nav-main{
+    .topbar-right{
       display:flex;
       align-items:center;
+      gap:12px;
+    }
+
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
       gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#35506d;
+      font-weight:700;
+      font-size:13px;
+      box-shadow:var(--shadow);
+    }
+
+    .status-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--red);
+      box-shadow:0 0 0 5px rgba(255,75,75,.14);
+    }
+
+    .status-dot.ok{
+      background:var(--green);
+      box-shadow:0 0 0 5px rgba(24,195,74,.14);
+    }
+
+    .avatar-btn{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fff,#f3f7fc);
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      color:#163861;
+      cursor:pointer;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:var(--sidebar-w) minmax(0,1fr);
+      min-height:calc(100vh - var(--topbar-h));
+    }
+
+    .sidebar{
+      background:linear-gradient(180deg,var(--sidebar),var(--sidebar-2));
+      color:#fff;
+      padding:18px 14px 20px;
+      border-right:1px solid rgba(255,255,255,.06);
+    }
+
+    .sidebar-section-title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      color:rgba(255,255,255,.56);
+      margin:8px 10px 10px;
+      font-weight:700;
+    }
+
+    .nav-list{
+      display:grid;
+      gap:4px;
+      margin-bottom:18px;
+    }
+
+    .nav-link{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      color:#eef7ff;
+      padding:11px 12px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      transition:.18s ease;
+    }
+
+    .nav-link:hover{ background:rgba(255,255,255,.08); }
+    .nav-link.active{
+      background:rgba(47,140,255,.20);
+      border:1px solid rgba(98,180,255,.18);
+    }
+
+    .nav-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#88bfff;
+      flex:0 0 auto;
+    }
+
+    .nav-dot.green{ background:#1ed760; }
+    .nav-dot.red{ background:#ff7777; }
+    .nav-dot.gold{ background:#e7c15a; }
+    .nav-dot.purple{ background:#b29bff; }
+
+    .sidebar-note{
+      margin-top:8px;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:12px;
+      line-height:1.6;
+      color:rgba(255,255,255,.82);
+    }
+
+    .content{
+      padding:20px;
+    }
+
+    .content-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
       flex-wrap:wrap;
     }
 
-    .nav-main a{
-      text-decoration:none;
-      color:var(--text);
-      font-weight:700;
-      font-size:.94rem;
-      padding:10px 14px;
-      border-radius:999px;
-      transition:.2s ease;
+    .title-wrap h1{
+      font-size:34px;
+      line-height:1.05;
+      color:#112f59;
+      letter-spacing:-1px;
+      margin-bottom:10px;
     }
 
-    .nav-main a:hover,
-    .nav-main a.active{
-      background:rgba(47,140,255,.10);
-      color:var(--blue-dark);
+    .title-wrap p{
+      color:var(--muted);
+      max-width:920px;
+      line-height:1.75;
+      font-size:15px;
     }
 
-    .header-actions{
+    .head-actions{
       display:flex;
-      align-items:center;
       gap:10px;
       flex-wrap:wrap;
     }
 
-    .btn,
-    .btn-outline{
+    .head-btn{
       border:none;
-      cursor:pointer;
-      transition:.22s ease;
+      border-radius:14px;
+      padding:13px 16px;
       font-weight:800;
-      font-family:inherit;
+      font-size:14px;
+      cursor:pointer;
+      transition:.18s ease;
       text-decoration:none;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:10px;
-      border-radius:999px;
-      padding:12px 18px;
+      min-width:180px;
     }
 
-    .btn{
+    .head-btn:hover{ transform:translateY(-1px); }
+
+    .head-btn.primary{
       color:#fff;
       background:linear-gradient(135deg,var(--blue),var(--blue-dark));
-      box-shadow:0 14px 30px rgba(47,140,255,.20);
+      box-shadow:0 16px 28px rgba(47,140,255,.18);
     }
 
-    .btn-outline{
-      color:var(--red-dark);
-      background:rgba(255,255,255,.82);
-      border:1px solid rgba(255,75,75,.16);
-      box-shadow:var(--shadow-soft);
-    }
-
-    .page{
-      position:relative;
-      z-index:1;
-      max-width:var(--max);
-      margin:0 auto;
-      padding:30px 18px 54px;
-    }
-
-    .hero{
-      display:grid;
-      grid-template-columns:1.08fr .92fr;
-      gap:22px;
-      align-items:stretch;
-      margin-bottom:24px;
-    }
-
-    .hero-card,
-    .hero-side,
-    .section-card,
-    .cta-card{
-      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
-      border:1px solid rgba(220,231,243,.95);
-      border-radius:32px;
+    .head-btn.soft{
+      color:#163861;
+      background:#fff;
+      border:1px solid var(--line);
       box-shadow:var(--shadow);
-      overflow:hidden;
-      position:relative;
     }
 
-    .hero-card{
-      padding:34px 28px 28px;
-    }
-
-    .hero-card::before{
-      content:"";
-      position:absolute;
-      width:260px;
-      height:260px;
-      border-radius:50%;
-      left:-100px;
-      top:-110px;
-      background:radial-gradient(circle, rgba(47,140,255,.12), transparent 72%);
-      pointer-events:none;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 14px;
-      border-radius:999px;
-      background:rgba(255,75,75,.10);
-      color:var(--red-dark);
-      border:1px solid rgba(255,75,75,.12);
-      font-weight:800;
-      font-size:.85rem;
+    .cards-4{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
       margin-bottom:18px;
     }
 
-    h1{
-      margin:0 0 14px;
-      font-size:clamp(2rem, 4vw, 3.7rem);
-      line-height:1.04;
-      letter-spacing:-1.2px;
-      color:var(--nav);
-    }
-
-    .lead{
-      margin:0;
-      color:#5d728d;
-      font-size:1.04rem;
-      line-height:1.8;
-      max-width:760px;
-    }
-
-    .hero-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-top:24px;
-    }
-
-    .hero-stats{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:12px;
-      margin-top:26px;
-    }
-
-    .stat{
-      border-radius:22px;
-      padding:18px 16px;
-      color:#fff;
-      box-shadow:var(--shadow-soft);
-      min-height:112px;
-    }
-
-    .stat.blue{background:linear-gradient(135deg,var(--blue),var(--blue-dark))}
-    .stat.red{background:linear-gradient(135deg,var(--red),var(--red-dark))}
-    .stat.green{background:linear-gradient(135deg,var(--green),var(--green-dark))}
-
-    .stat strong{
-      display:block;
-      font-size:1.55rem;
-      margin-bottom:8px;
-    }
-
-    .stat span{
-      display:block;
-      font-size:.92rem;
-      line-height:1.45;
-      opacity:.96;
-      font-weight:700;
-    }
-
-    .hero-side{
-      padding:22px;
-      display:grid;
-      gap:14px;
-      align-content:start;
-    }
-
-    .side-box{
-      border-radius:22px;
-      padding:18px 16px;
-      background:rgba(255,255,255,.84);
-      border:1px solid rgba(220,231,243,.95);
-      box-shadow:var(--shadow-soft);
-    }
-
-    .side-box h3{
-      margin:0 0 8px;
-      font-size:1.03rem;
-      color:var(--nav);
-    }
-
-    .side-box p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.65;
-      font-size:.94rem;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:22px;
-      margin-top:6px;
-    }
-
-    .section-card{
-      padding:24px 22px;
-    }
-
-    .section-head{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:16px;
-    }
-
-    .section-head h2{
-      margin:0;
-      font-size:1.35rem;
-      color:var(--nav);
-      letter-spacing:-.3px;
-    }
-
-    .section-head p{
-      margin:6px 0 0;
-      color:var(--muted);
-      line-height:1.7;
-      max-width:700px;
-      font-size:.95rem;
-    }
-
-    .cards{
-      display:grid;
-      gap:14px;
+    .card,
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow);
     }
 
     .mini-card{
-      border-radius:22px;
-      padding:18px 18px;
-      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(247,251,255,.88));
-      border:1px solid rgba(220,231,243,.95);
-      box-shadow:var(--shadow-soft);
+      padding:18px;
+      background:linear-gradient(180deg,#fff,#fbfcff);
     }
 
-    .mini-card h3{
-      margin:0 0 8px;
-      font-size:1.02rem;
-      color:var(--nav);
+    .mini-card strong{
+      display:block;
+      font-size:16px;
+      color:#0f2f58;
+      margin-bottom:8px;
     }
 
     .mini-card p{
-      margin:0;
       color:var(--muted);
-      line-height:1.72;
-      font-size:.95rem;
+      line-height:1.7;
+      font-size:14px;
+      margin:0;
+    }
+
+    .grid-main{
+      display:grid;
+      grid-template-columns:1fr 340px;
+      gap:18px;
+      align-items:start;
+    }
+
+    .grid-stack{
+      display:grid;
+      gap:18px;
+    }
+
+    .panel{ overflow:hidden; }
+
+    .panel-head{
+      padding:20px 22px 0;
+    }
+
+    .panel-head h2{
+      font-size:24px;
+      color:#102f59;
+      margin-bottom:8px;
+      letter-spacing:-.5px;
+    }
+
+    .panel-head p{
+      color:var(--muted);
+      line-height:1.75;
+      font-size:14px;
+      margin-bottom:18px;
+    }
+
+    .panel-body{
+      padding:0 22px 22px;
     }
 
     .contact-form{
@@ -486,13 +382,48 @@
     }
 
     textarea{
-      min-height:140px;
+      min-height:150px;
       resize:vertical;
     }
 
     input:focus, select:focus, textarea:focus{
       border-color:#8bbcff;
       box-shadow:0 0 0 4px rgba(47,140,255,.10);
+    }
+
+    .form-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:4px;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      transition:.22s ease;
+      font-weight:800;
+      font-family:inherit;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border-radius:14px;
+      padding:13px 18px;
+    }
+
+    .btn-main{
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+      box-shadow:0 14px 30px rgba(47,140,255,.20);
+    }
+
+    .btn-soft{
+      color:#163861;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
     }
 
     .msg{
@@ -509,46 +440,94 @@
       color:#0f7b33;
       border:1px solid rgba(24,195,74,.16);
     }
-
-    .cta{
-      margin-top:22px;
+    .msg.err{
+      background:rgba(255,75,75,.10);
+      color:#a22626;
+      border:1px solid rgba(255,75,75,.16);
+    }
+    .msg.info{
+      background:rgba(47,140,255,.10);
+      color:#1459b1;
+      border:1px solid rgba(47,140,255,.16);
     }
 
-    .cta-card{
-      padding:34px 28px;
-      text-align:center;
+    .side-note{
+      padding:14px;
+      border-radius:14px;
+      background:#f9fbfe;
+      border:1px solid var(--line-soft);
+      color:#14375f;
+      font-size:14px;
+      line-height:1.7;
     }
 
-    .cta-card::before{
+    .cta-box{
+      padding:20px 18px;
+      border-radius:18px;
+      background:linear-gradient(135deg, rgba(8,46,91,.98), rgba(47,140,255,.92));
+      color:#fff;
+      box-shadow:0 18px 36px rgba(8,46,91,.16);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .cta-box::before{
       content:"";
       position:absolute;
-      width:260px;
-      height:260px;
+      width:210px;
+      height:210px;
       border-radius:50%;
-      left:-110px;
-      bottom:-130px;
-      background:radial-gradient(circle, rgba(255,75,75,.12), transparent 72%);
+      right:-80px;
+      top:-80px;
+      background:radial-gradient(circle, rgba(255,255,255,.14), transparent 70%);
     }
 
-    .cta-card h2{
-      margin:0 0 12px;
-      font-size:clamp(1.7rem, 2.8vw, 2.4rem);
-      color:var(--nav);
+    .cta-box h3{
+      margin:0 0 10px;
+      font-size:22px;
+      line-height:1.2;
+      position:relative;
+      z-index:1;
     }
 
-    .cta-card p{
-      margin:0 auto;
-      max-width:760px;
-      color:var(--muted);
-      line-height:1.8;
+    .cta-box p{
+      margin:0;
+      color:rgba(255,255,255,.92);
+      line-height:1.78;
+      font-size:14px;
+      position:relative;
+      z-index:1;
     }
 
     .cta-actions{
-      margin-top:24px;
-      display:flex;
+      margin-top:16px;
+      display:grid;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+
+    .cta-link{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
       justify-content:center;
-      gap:12px;
-      flex-wrap:wrap;
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:800;
+      font-size:14px;
+      transition:.18s ease;
+    }
+
+    .cta-link.primary{
+      background:#fff;
+      color:#1459b1;
+    }
+
+    .cta-link.soft{
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.16);
+      color:#fff;
     }
 
     footer{
@@ -559,7 +538,7 @@
     }
 
     .footer-inner{
-      max-width:var(--max);
+      max-width:1240px;
       margin:0 auto;
       padding:22px 18px 28px;
       display:flex;
@@ -583,295 +562,450 @@
       font-weight:700;
     }
 
-    @keyframes floatOrb{
-      0%,100%{transform:translateY(0)}
-      50%{transform:translateY(-12px)}
-    }
-
     @media (max-width:1120px){
-      .hero, .grid{
+      .layout,
+      .grid-main{
         grid-template-columns:1fr;
+      }
+
+      .cards-4{
+        grid-template-columns:repeat(2,1fr);
       }
     }
 
     @media (max-width:820px){
-      .nav-main{
-        display:none;
-      }
-
-      .header-inner{
-        padding:12px 14px;
-      }
-
-      .page{
-        padding:22px 14px 44px;
-      }
-
-      .hero-card,
-      .hero-side,
-      .section-card,
-      .cta-card{
-        border-radius:24px;
-      }
-
-      .hero-card{
-        padding:26px 20px 22px;
+      .content{ padding:16px; }
+      .sidebar{ display:none; }
+      .cards-4{
+        grid-template-columns:1fr;
       }
     }
 
     @media (max-width:520px){
-      .brand-sub{
-        display:none;
-      }
-
-      .hero-stats{
-        grid-template-columns:1fr;
-      }
-
-      .btn,
-      .btn-outline{
-        width:100%;
-      }
-
-      .hero-actions,
-      .cta-actions{
+      .status-chip{ display:none; }
+      .content-head{
         flex-direction:column;
+        align-items:stretch;
       }
-
-      .header-actions{
-        width:100%;
-      }
-
-      .footer-inner{
-        align-items:flex-start;
-        flex-direction:column;
-      }
+      .head-actions{ width:100%; }
+      .head-btn{ width:100%; }
+      .form-actions{ flex-direction:column; }
     }
   </style>
 </head>
 <body>
-  <div class="page-wrap">
-    <div class="bg-soft">
-      <div class="orb o1"></div>
-      <div class="orb o2"></div>
-      <div class="orb o3"></div>
-      <div class="orb o4"></div>
+  <header class="topbar">
+    <a href="./index.html" class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="brand-title">Championnat de Chimie</div>
+        <div class="brand-sub">Contact & assistance</div>
+      </div>
+    </a>
+
+    <div class="topbar-right">
+      <div class="status-chip">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusText">Contact organisation</span>
+      </div>
+      <div class="avatar-btn" id="avatarBtn">☰</div>
     </div>
+  </header>
 
-    <header class="site-header">
-      <div class="header-inner">
-        <a href="index.html" class="brand">
-          <div class="brand-mark"></div>
-          <div>
-            <div class="brand-title">Championnat de Chimie</div>
-            <div class="brand-sub">Contact & assistance</div>
-          </div>
-        </a>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Navigation</div>
+      <nav class="nav-list">
+        <a class="nav-link" href="./index.html"><span class="nav-dot green"></span><span>Accueil</span></a>
+        <a class="nav-link" href="./about.html"><span class="nav-dot purple"></span><span>À propos</span></a>
+        <a class="nav-link" href="./competition.html"><span class="nav-dot green"></span><span>Championnat</span></a>
+        <a class="nav-link" href="./rules.html"><span class="nav-dot gold"></span><span>Règlement</span></a>
+        <a class="nav-link" href="./results.html"><span class="nav-dot purple"></span><span>Résultats</span></a>
+        <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
+        <a class="nav-link" href="./faq.html"><span class="nav-dot blue"></span><span>FAQ</span></a>
+        <a class="nav-link active" href="./contact.html"><span class="nav-dot red"></span><span>Contact</span></a>
+        <a class="nav-link" href="./login.html"><span class="nav-dot blue"></span><span>Connexion</span></a>
+        <a class="nav-link" href="./login.html?redirect=jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
+        <a class="nav-link" href="./login.html?redirect=admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
+      </nav>
 
-        <nav class="nav-main">
-          <a href="index.html">Accueil</a>
-          <a href="about.html">À propos</a>
-          <a href="competition.html">Championnat</a>
-          <a href="rules.html">Règlement</a>
-          <a href="results.html">Résultats</a>
-          <a href="login.html">Connexion</a>
-          <a href="jury.html">Jury</a>
-          <a href="announcements.html">Annonces</a>
-          <a href="contact.html" class="active">Contact</a>
-          <a href="admin.html">Admin</a>
-        </nav>
+      <div class="sidebar-section-title">Rôle de cette page</div>
+      <div class="sidebar-note">
+        Cette page centralise les demandes d’information, les questions des candidats, les messages liés au jury, aux résultats, aux certificats ou à l’organisation générale du championnat.
+      </div>
+    </aside>
 
-        <div class="header-actions">
-          <a class="btn" href="competition.html">Participer</a>
-          <a class="btn-outline" href="announcements.html">Annonces</a>
+    <main class="content">
+      <div class="content-head">
+        <div class="title-wrap">
+          <h1>Contacter l’organisation</h1>
+          <p>
+            Cette page permet d’envoyer un message clair et structuré à l’organisation du Championnat de Chimie.
+            Elle s’intègre directement au système et prépare une vraie boîte de réception côté administration.
+          </p>
+        </div>
+
+        <div class="head-actions">
+          <a class="head-btn soft" href="./faq.html">Voir la FAQ</a>
+          <a class="head-btn primary" href="./competition.html">Voir le championnat</a>
         </div>
       </div>
-    </header>
 
-    <main class="page">
-      <section class="hero">
-        <div class="hero-card">
-          <div class="eyebrow">✉️ Assistance • Informations • Organisation</div>
-          <h1>Contacter l’organisation du championnat.</h1>
-          <p class="lead">
-            Cette page permet de centraliser les demandes d’information, les questions des candidats et les messages liés à l’organisation du Championnat de Chimie. Elle complète naturellement la vitrine académique du site et renforce son sérieux.
-          </p>
+      <section class="cards-4">
+        <article class="card mini-card">
+          <strong>Demandes générales</strong>
+          <p>Informations sur le championnat et son fonctionnement</p>
+        </article>
 
-          <div class="hero-actions">
-            <a href="competition.html" class="btn">Aller au championnat</a>
-            <a href="rules.html" class="btn-outline">Voir le règlement</a>
-          </div>
+        <article class="card mini-card">
+          <strong>Support candidat</strong>
+          <p>Accès, inscription, espace candidat, examen</p>
+        </article>
 
-          <div class="hero-stats">
-            <div class="stat blue">
-              <strong>Info</strong>
-              <span>Questions générales sur la compétition</span>
-            </div>
-            <div class="stat red">
-              <strong>Aide</strong>
-              <span>Assistance pour inscription ou accès</span>
-            </div>
-            <div class="stat green">
-              <strong>Suivi</strong>
-              <span>Canal clair pour l’organisation</span>
-            </div>
-          </div>
-        </div>
+        <article class="card mini-card">
+          <strong>Questions résultats</strong>
+          <p>Publication, visibilité, classement, certificat</p>
+        </article>
 
-        <aside class="hero-side">
-          <div class="side-box">
-            <h3>Quand utiliser cette page</h3>
-            <p>
-              Pour poser une question sur le championnat, signaler un problème d’accès, demander une précision sur les résultats ou contacter l’organisation dans un cadre plus formel.
-            </p>
-          </div>
-
-          <div class="side-box">
-            <h3>Usage futur</h3>
-            <p>
-              Cette page pourra être reliée plus tard à Firebase ou à une messagerie interne, sans casser la structure actuelle du mini-site.
-            </p>
-          </div>
-
-          <div class="side-box">
-            <h3>Pages liées</h3>
-            <p>
-              Accueil, annonces, règlement, résultats, jury et administration restent directement accessibles pour permettre un parcours clair et cohérent.
-            </p>
-          </div>
-        </aside>
+        <article class="card mini-card">
+          <strong>Canal admin</strong>
+          <p>Messages envoyés vers une boîte de réception interne</p>
+        </article>
       </section>
 
-      <section class="grid">
-        <section class="section-card">
-          <div class="section-head">
-            <div>
+      <section class="grid-main">
+        <section class="grid-stack">
+          <section class="panel">
+            <div class="panel-head">
               <h2>Envoyer un message</h2>
               <p>
-                Ce formulaire est prêt pour une intégration plus avancée. Pour l’instant, il donne une base propre, lisible et professionnelle à l’espace de contact.
+                Le message est enregistré dans le système du championnat et préparé pour la boîte de réception de l’administration.
               </p>
             </div>
-          </div>
 
-          <form class="contact-form" id="contactForm">
-            <div class="field">
-              <label for="fullName">Nom complet</label>
-              <input id="fullName" type="text" placeholder="Nom et prénom" required />
+            <div class="panel-body">
+              <form class="contact-form" id="contactForm">
+                <div class="field">
+                  <label for="fullName">Nom complet</label>
+                  <input id="fullName" type="text" placeholder="Nom et prénom" required />
+                </div>
+
+                <div class="field">
+                  <label for="email">Adresse email</label>
+                  <input id="email" type="email" placeholder="exemple@email.com" required />
+                </div>
+
+                <div class="field">
+                  <label for="subject">Sujet</label>
+                  <select id="subject" required>
+                    <option value="">Choisir un sujet</option>
+                    <option value="Information générale">Information générale</option>
+                    <option value="Inscription candidat">Inscription candidat</option>
+                    <option value="Accès espace candidat">Accès espace candidat</option>
+                    <option value="Examen / chrono / soumission">Examen / chrono / soumission</option>
+                    <option value="Question sur le règlement">Question sur le règlement</option>
+                    <option value="Question sur les résultats">Question sur les résultats</option>
+                    <option value="Question sur certificat">Question sur certificat</option>
+                    <option value="Question liée au jury">Question liée au jury</option>
+                    <option value="Problème technique">Problème technique</option>
+                    <option value="Autre demande">Autre demande</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="message">Message</label>
+                  <textarea id="message" placeholder="Écris ton message ici..." required></textarea>
+                </div>
+
+                <div class="form-actions">
+                  <button class="btn btn-main" type="submit" id="sendBtn">Envoyer le message</button>
+                  <button class="btn btn-soft" type="button" id="resetBtn">Réinitialiser</button>
+                </div>
+
+                <div id="contactMsg" class="msg info show">
+                  Si tu es connecté, ton nom et ton email peuvent être préremplis automatiquement.
+                </div>
+              </form>
             </div>
-
-            <div class="field">
-              <label for="email">Adresse email</label>
-              <input id="email" type="email" placeholder="exemple@email.com" required />
-            </div>
-
-            <div class="field">
-              <label for="subject">Sujet</label>
-              <select id="subject" required>
-                <option value="">Choisir un sujet</option>
-                <option>Information générale</option>
-                <option>Inscription au championnat</option>
-                <option>Question sur le règlement</option>
-                <option>Question sur les résultats</option>
-                <option>Problème technique</option>
-                <option>Autre demande</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="message">Message</label>
-              <textarea id="message" placeholder="Écris ton message ici..." required></textarea>
-            </div>
-
-            <button class="btn" type="submit">Envoyer le message</button>
-            <div id="contactMsg" class="msg"></div>
-          </form>
+          </section>
         </section>
 
-        <section class="section-card">
-          <div class="section-head">
-            <div>
-              <h2>Informations utiles</h2>
-              <p>
-                Cette partie sert à cadrer l’expérience utilisateur et à rassurer les visiteurs sur la façon de contacter l’organisation.
-              </p>
-            </div>
-          </div>
-
-          <div class="cards">
-            <div class="mini-card">
-              <h3>Demandes d’information</h3>
-              <p>
-                Tu peux utiliser cette page pour obtenir des précisions sur le fonctionnement du championnat, le calendrier, les modalités de participation ou la logique générale du site.
-              </p>
+        <aside class="grid-stack">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Quand utiliser cette page</h2>
+              <p>Les cas les plus utiles.</p>
             </div>
 
-            <div class="mini-card">
-              <h3>Questions sur les résultats</h3>
-              <p>
-                Les candidats peuvent utiliser ce canal pour demander des précisions générales sur la publication, la consultation ou le calendrier des résultats.
-              </p>
+            <div class="panel-body">
+              <div class="side-note">
+                Pour poser une question sur le championnat, signaler un problème d’accès, demander une précision sur les résultats,
+                évoquer une question de certificat, ou contacter l’organisation dans un cadre plus formel.
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Intégration au système</h2>
+              <p>La logique retenue pour la suite.</p>
             </div>
 
-            <div class="mini-card">
-              <h3>Signalement technique</h3>
-              <p>
-                En cas de difficulté d’accès, de problème d’affichage ou d’anomalie observée sur une page, ce canal peut servir de point de départ pour un suivi.
-              </p>
+            <div class="panel-body">
+              <div class="side-note">
+                Le formulaire envoie le message dans une boîte de réception interne du championnat.
+                Il peut ensuite être lu par l’administration ou relié à une page support dédiée sans casser la structure actuelle.
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Accès liés</h2>
+              <p>Les pages qui complètent cette page de contact.</p>
             </div>
 
-            <div class="mini-card">
-              <h3>Coordination future</h3>
-              <p>
-                Cette page est déjà en place pour préparer une future intégration à une boîte de réception admin, une base Firebase ou une messagerie interne.
-              </p>
+            <div class="panel-body">
+              <div class="side-note">
+                FAQ, règlement, résultats, vérification certificat, espace candidat, jury privé et administration forment un ensemble cohérent autour de cette page.
+              </div>
             </div>
-          </div>
-        </section>
-      </section>
+          </section>
 
-      <section class="cta">
-        <div class="cta-card">
-          <h2>Besoin d’aller plus loin ?</h2>
-          <p>
-            Cette page “Contact” complète maintenant l’écosystème du mini-site. Elle renforce l’image professionnelle du championnat tout en préparant une future gestion plus avancée des messages et demandes.
-          </p>
-          <div class="cta-actions">
-            <a href="announcements.html" class="btn">Voir les annonces</a>
-            <a href="about.html" class="btn-outline">À propos</a>
-          </div>
-        </div>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Besoin d’aller plus loin ?</h2>
+              <p>Accès rapides vers les sections utiles.</p>
+            </div>
+
+            <div class="panel-body">
+              <div class="cta-box">
+                <h3>Continuer l’exploration</h3>
+                <p>
+                  Consulte les autres sections du site pour accéder aux informations détaillées, à la compétition ou à la connexion.
+                </p>
+                <div class="cta-actions">
+                  <a class="cta-link primary" href="./competition.html">Voir le championnat</a>
+                  <a class="cta-link soft" href="./results.html">Voir les résultats</a>
+                  <a class="cta-link soft" href="./login.html">Se connecter</a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </aside>
       </section>
     </main>
-
-    <footer>
-      <div class="footer-inner">
-        <div>© 2026 Championnat de Chimie — Contact & assistance.</div>
-        <div class="footer-links">
-          <a href="index.html">Accueil</a>
-          <a href="about.html">À propos</a>
-          <a href="competition.html">Championnat</a>
-          <a href="rules.html">Règlement</a>
-          <a href="results.html">Résultats</a>
-          <a href="login.html">Connexion</a>
-          <a href="jury.html">Jury</a>
-          <a href="announcements.html">Annonces</a>
-          <a href="contact.html">Contact</a>
-          <a href="admin.html">Admin</a>
-        </div>
-      </div>
-    </footer>
   </div>
 
-  <script>
+  <footer>
+    <div class="footer-inner">
+      <div>© 2026 Championnat de Chimie — Contact & assistance.</div>
+      <div class="footer-links">
+        <a href="./index.html">Accueil</a>
+        <a href="./about.html">À propos</a>
+        <a href="./competition.html">Championnat</a>
+        <a href="./rules.html">Règlement</a>
+        <a href="./results.html">Résultats</a>
+        <a href="./verify-certificate.html">Certificat</a>
+        <a href="./faq.html">FAQ</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, get, push, set, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+
     const form = document.getElementById("contactForm");
     const msg = document.getElementById("contactMsg");
+    const sendBtn = document.getElementById("sendBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const fullNameInput = document.getElementById("fullName");
+    const emailInput = document.getElementById("email");
+    const subjectInput = document.getElementById("subject");
+    const messageInput = document.getElementById("message");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+    const avatarBtn = document.getElementById("avatarBtn");
 
-    form.addEventListener("submit", function(e){
-      e.preventDefault();
-      msg.textContent = "Message préparé avec succès. La liaison technique pourra être ajoutée ensuite.";
-      msg.className = "msg show ok";
+    let currentUser = null;
+    let currentProfile = null;
+
+    function showMessage(text, type = "info"){
+      msg.textContent = text;
+      msg.className = "msg show " + type;
+    }
+
+    function normalizeEmail(value = ""){
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function getRole(user, profile){
+      if (!user) return "visitor";
+      if (normalizeEmail(user.email) === normalizeEmail(ADMIN_EMAIL)) return "admin";
+      const r = String(profile?.role || profile?.userType || profile?.competitionRole || "").toLowerCase();
+      if (r.includes("jury")) return "jury";
+      if (r.includes("admin")) return "admin";
+      return "candidate";
+    }
+
+    function updateHeader(role){
+      if (role === "admin") {
+        statusDot.className = "status-dot ok";
+        statusText.textContent = "Contact admin";
+        return;
+      }
+      if (role === "jury") {
+        statusDot.className = "status-dot ok";
+        statusText.textContent = "Contact jury";
+        return;
+      }
+      if (role === "candidate") {
+        statusDot.className = "status-dot ok";
+        statusText.textContent = "Contact candidat";
+        return;
+      }
+      statusDot.className = "status-dot";
+      statusText.textContent = "Contact organisation";
+    }
+
+    async function prefillUser(){
+      onAuthStateChanged(auth, async (user) => {
+        currentUser = user || null;
+
+        if (!user) {
+          currentProfile = null;
+          updateHeader("visitor");
+          showMessage("Tu peux écrire sans être connecté. Si tu te connectes, certaines informations seront préremplies.", "info");
+          return;
+        }
+
+        try{
+          const snap = await get(ref(db, "users/" + user.uid));
+          currentProfile = snap.exists() ? snap.val() : null;
+        }catch(err){
+          console.error(err);
+          currentProfile = null;
+        }
+
+        const role = getRole(user, currentProfile);
+        updateHeader(role);
+
+        if (!fullNameInput.value) {
+          fullNameInput.value = currentProfile?.displayName || user.displayName || "";
+        }
+
+        if (!emailInput.value) {
+          emailInput.value = user.email || "";
+        }
+
+        showMessage("Session détectée. Le formulaire est prêt à envoyer un message vers l’administration.", "ok");
+      });
+    }
+
+    resetBtn.addEventListener("click", () => {
       form.reset();
+
+      if (currentUser) {
+        fullNameInput.value = currentProfile?.displayName || currentUser.displayName || "";
+        emailInput.value = currentUser.email || "";
+      }
+
+      showMessage("Formulaire réinitialisé.", "info");
     });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const fullName = fullNameInput.value.trim();
+      const email = emailInput.value.trim();
+      const subject = subjectInput.value;
+      const message = messageInput.value.trim();
+
+      if (!fullName || !email || !subject || !message) {
+        showMessage("Veuillez remplir tous les champs.", "err");
+        return;
+      }
+
+      sendBtn.disabled = true;
+      showMessage("Envoi du message en cours...", "info");
+
+      try{
+        const role = getRole(currentUser, currentProfile);
+
+        const inboxRef = push(ref(db, "competitionSupportMessages"));
+        const notificationRef = push(ref(db, "adminNotifications"));
+
+        const payload = {
+          id: inboxRef.key,
+          fullName,
+          email,
+          subject,
+          message,
+          role,
+          uid: currentUser?.uid || null,
+          sourcePage: "contact.html",
+          status: "new",
+          createdAt: Date.now(),
+          createdBy: currentUser?.email || email
+        };
+
+        await set(inboxRef, payload);
+
+        await set(notificationRef, {
+          type: "contact_message",
+          title: "Nouveau message de contact",
+          text: `${fullName} • ${subject}`,
+          sourcePage: "contact.html",
+          relatedId: inboxRef.key,
+          isRead: false,
+          createdAt: Date.now()
+        });
+
+        try{
+          if (currentUser?.uid) {
+            await update(ref(db, "users/" + currentUser.uid), {
+              displayName: fullName,
+              email,
+              updatedAt: Date.now()
+            });
+          }
+        }catch(err){
+          console.error(err);
+        }
+
+        messageInput.value = "";
+        subjectInput.value = "";
+        showMessage("Message envoyé dans la boîte interne du championnat.", "ok");
+      }catch(err){
+        console.error(err);
+        showMessage("Impossible d’envoyer le message pour le moment.", "err");
+      }finally{
+        sendBtn.disabled = false;
+      }
+    });
+
+    avatarBtn.addEventListener("click", () => {
+      if (currentUser) {
+        const role = getRole(currentUser, currentProfile);
+        if (role === "admin") {
+          window.location.href = "./admin.html";
+          return;
+        }
+        if (role === "jury") {
+          window.location.href = "./jury.html";
+          return;
+        }
+        window.location.href = "./dashboard-candidat.html";
+        return;
+      }
+      window.location.href = "./index.html";
+    });
+
+    prefillUser();
   </script>
 </body>
 </html>
