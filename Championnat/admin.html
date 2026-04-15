@@ -2,165 +2,72 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Administration | Championnat de Chimie</title>
-  <meta name="description" content="Espace administrateur du Championnat de Chimie." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin | Championnat de Chimie</title>
+
   <style>
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
+    *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif}
 
     :root{
-      --bg1:#f4f8ff;
-      --bg2:#fff8f8;
-      --bg3:#f7fffb;
-
-      --nav:#082e5b;
+      --bg:#f5f7fb;
+      --panel:#ffffff;
+      --panel-soft:#fbfcfe;
+      --sidebar:#05293d;
+      --sidebar-2:#042336;
       --text:#0b2340;
-      --muted:#647891;
-      --line:#dce7f3;
-
+      --muted:#6a7d95;
+      --line:#dde7f2;
+      --line-soft:#edf2f8;
       --blue:#2f8cff;
       --blue-dark:#145bd6;
-
       --red:#ff4b4b;
-      --red-dark:#d82e2e;
-
       --green:#18c34a;
-      --green-dark:#0f9b3a;
-
-      --gold:#e0a126;
-      --gold-dark:#b47c12;
-
+      --gold:#d8a72f;
+      --orange:#ff9f1a;
       --purple:#7b61ff;
-      --purple-dark:#5a3fe0;
-
-      --card:rgba(255,255,255,.86);
-      --card-strong:rgba(255,255,255,.94);
-
-      --shadow:0 18px 45px rgba(9,45,92,.10);
-      --shadow-soft:0 10px 24px rgba(10,37,73,.07);
-
-      --radius-xl:30px;
+      --shadow:0 10px 24px rgba(13,37,71,.08);
+      --radius:18px;
       --radius-lg:22px;
-      --radius-md:16px;
-
-      --max:1280px;
+      --topbar-h:70px;
+      --sidebar-w:278px;
     }
 
     body{
       margin:0;
-      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
       color:var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(47,140,255,.13), transparent 24%),
-        radial-gradient(circle at top right, rgba(255,75,75,.10), transparent 22%),
-        radial-gradient(circle at bottom left, rgba(24,195,74,.08), transparent 22%),
-        linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 44%, var(--bg3) 100%);
-      min-height:100vh;
-      overflow-x:hidden;
-    }
-
-    body::before,
-    body::after{
-      content:"";
-      position:fixed;
-      width:360px;
-      height:360px;
-      border-radius:50%;
-      filter:blur(55px);
-      z-index:-2;
-      pointer-events:none;
-    }
-    body::before{
-      top:-120px;
-      left:-120px;
-      background:rgba(47,140,255,.14);
-    }
-    body::after{
-      right:-120px;
-      top:140px;
-      background:rgba(255,75,75,.10);
-    }
-
-    .page-wrap{
-      position:relative;
       min-height:100vh;
     }
 
-    .bg-soft{
-      position:absolute;
-      inset:0;
-      overflow:hidden;
-      pointer-events:none;
-      z-index:0;
-    }
-
-    .orb{
-      position:absolute;
-      border-radius:50%;
-      animation:floatOrb 9s ease-in-out infinite;
-      opacity:.9;
-    }
-    .o1{
-      width:110px;height:110px;top:100px;left:6%;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(47,140,255,.28) 45%, transparent 74%);
-    }
-    .o2{
-      width:88px;height:88px;top:260px;right:10%;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(255,75,75,.24) 45%, transparent 74%);
-      animation-delay:1.2s;
-    }
-    .o3{
-      width:142px;height:142px;bottom:140px;left:10%;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(24,195,74,.20) 45%, transparent 74%);
-      animation-delay:2s;
-    }
-    .o4{
-      width:96px;height:96px;bottom:80px;right:8%;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.98), rgba(123,97,255,.20) 45%, transparent 74%);
-      animation-delay:3s;
-    }
-
-    .site-header{
+    .topbar{
       position:sticky;
       top:0;
-      z-index:50;
-      backdrop-filter:blur(18px);
-      background:rgba(255,255,255,.72);
-      border-bottom:1px solid rgba(220,231,243,.92);
-      box-shadow:0 6px 24px rgba(8,46,91,.05);
-    }
-
-    .header-inner{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:14px 18px;
+      z-index:40;
+      height:var(--topbar-h);
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
-      flex-wrap:wrap;
+      padding:0 18px;
     }
 
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      text-decoration:none;
-      color:inherit;
       min-width:0;
     }
 
     .brand-mark{
-      width:48px;
-      height:48px;
-      border-radius:16px;
-      background:
-        radial-gradient(circle at 30% 30%, #fff 0%, #d8e9ff 22%, #7ab7ff 48%, #1a5ec4 100%);
-      box-shadow:
-        0 10px 24px rgba(47,140,255,.20),
-        inset 0 1px 8px rgba(255,255,255,.75);
+      width:40px;
+      height:40px;
+      border-radius:14px;
       position:relative;
+      background:
+        radial-gradient(circle at 30% 30%, #fff 0%, #d8e9ff 24%, #7ab7ff 55%, #1a5ec4 100%);
+      box-shadow:0 10px 20px rgba(47,140,255,.20), inset 0 1px 8px rgba(255,255,255,.7);
       flex:0 0 auto;
     }
 
@@ -169,429 +76,520 @@
       content:"";
       position:absolute;
       border-radius:50%;
-      border:2px solid rgba(255,255,255,.84);
-      inset:10px;
+      border:2px solid rgba(255,255,255,.82);
     }
 
-    .brand-mark::after{
-      inset:6px 14px;
-      border-color:rgba(255,255,255,.56);
-      transform:rotate(55deg);
-    }
+    .brand-mark::before{ inset:8px; }
+    .brand-mark::after{ inset:5px 12px; transform:rotate(55deg); border-color:rgba(255,255,255,.56); }
 
+    .brand-text{ min-width:0; }
     .brand-title{
-      font-size:1.06rem;
+      font-size:14px;
       font-weight:800;
-      color:var(--nav);
+      color:#0a2d61;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
     .brand-sub{
-      font-size:.79rem;
-      color:#667b96;
+      font-size:12px;
+      color:#73859b;
       margin-top:2px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    .nav-main{
+    .topbar-right{
       display:flex;
       align-items:center;
+      gap:12px;
+    }
+
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
       gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#35506d;
+      font-weight:700;
+      font-size:13px;
+      box-shadow:var(--shadow);
+    }
+
+    .status-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--red);
+      box-shadow:0 0 0 5px rgba(255,75,75,.14);
+    }
+
+    .status-dot.ok{
+      background:var(--green);
+      box-shadow:0 0 0 5px rgba(24,195,74,.14);
+    }
+
+    .avatar-btn{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fff,#f3f7fc);
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      color:#163861;
+      cursor:pointer;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:var(--sidebar-w) minmax(0,1fr);
+      min-height:calc(100vh - var(--topbar-h));
+    }
+
+    .sidebar{
+      background:linear-gradient(180deg,var(--sidebar),var(--sidebar-2));
+      color:#fff;
+      padding:18px 14px 20px;
+      border-right:1px solid rgba(255,255,255,.06);
+    }
+
+    .sidebar-section-title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      color:rgba(255,255,255,.56);
+      margin:8px 10px 10px;
+      font-weight:700;
+    }
+
+    .nav-list{
+      display:grid;
+      gap:4px;
+      margin-bottom:18px;
+    }
+
+    .nav-link{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      color:#eef7ff;
+      padding:11px 12px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      transition:.18s ease;
+    }
+
+    .nav-link:hover{ background:rgba(255,255,255,.08); }
+    .nav-link.active{
+      background:rgba(47,140,255,.20);
+      border:1px solid rgba(98,180,255,.18);
+    }
+
+    .nav-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#88bfff;
+      flex:0 0 auto;
+    }
+
+    .nav-dot.green{ background:#1ed760; }
+    .nav-dot.red{ background:#ff7777; }
+    .nav-dot.gold{ background:#e7c15a; }
+    .nav-dot.purple{ background:#b29bff; }
+
+    .sidebar-note{
+      margin-top:8px;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:12px;
+      line-height:1.6;
+      color:rgba(255,255,255,.82);
+    }
+
+    .content{
+      padding:20px;
+    }
+
+    .content-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
       flex-wrap:wrap;
     }
 
-    .nav-main a{
-      text-decoration:none;
-      color:var(--text);
-      font-weight:700;
-      font-size:.94rem;
-      padding:10px 14px;
-      border-radius:999px;
-      transition:.2s ease;
+    .title-wrap h1{
+      font-size:34px;
+      line-height:1.05;
+      color:#112f59;
+      letter-spacing:-1px;
+      margin-bottom:10px;
     }
 
-    .nav-main a:hover,
-    .nav-main a.active{
-      background:rgba(47,140,255,.10);
-      color:var(--blue-dark);
+    .title-wrap p{
+      color:var(--muted);
+      max-width:900px;
+      line-height:1.75;
+      font-size:15px;
     }
 
-    .header-actions{
+    .head-actions{
       display:flex;
-      align-items:center;
       gap:10px;
       flex-wrap:wrap;
     }
 
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border-radius:999px;
-      padding:10px 14px;
-      font-weight:800;
-      font-size:.88rem;
-      background:rgba(255,255,255,.82);
-      border:1px solid rgba(220,231,243,.95);
-      box-shadow:var(--shadow-soft);
-    }
-
-    .dot{
-      width:10px;height:10px;border-radius:50%;
-      background:linear-gradient(135deg,var(--green),var(--green-dark));
-      box-shadow:0 0 0 5px rgba(24,195,74,.10);
-    }
-
-    .btn,
-    .btn-outline{
+    .head-btn{
       border:none;
-      cursor:pointer;
-      transition:.22s ease;
+      border-radius:14px;
+      padding:13px 16px;
       font-weight:800;
-      font-family:inherit;
+      font-size:14px;
+      cursor:pointer;
+      transition:.18s ease;
       text-decoration:none;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:10px;
-      border-radius:999px;
-      padding:12px 18px;
+      min-width:180px;
     }
 
-    .btn{
+    .head-btn:hover{ transform:translateY(-1px); }
+
+    .head-btn.primary{
       color:#fff;
       background:linear-gradient(135deg,var(--blue),var(--blue-dark));
-      box-shadow:0 14px 30px rgba(47,140,255,.20);
+      box-shadow:0 16px 28px rgba(47,140,255,.18);
     }
 
-    .btn:hover{transform:translateY(-1px)}
-    .btn-outline{
-      color:var(--red-dark);
-      background:rgba(255,255,255,.82);
-      border:1px solid rgba(255,75,75,.16);
-      box-shadow:var(--shadow-soft);
-    }
-
-    .page{
-      position:relative;
-      z-index:1;
-      max-width:var(--max);
-      margin:0 auto;
-      padding:28px 18px 54px;
-    }
-
-    .hero{
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:22px;
-      align-items:stretch;
-      margin-bottom:24px;
-    }
-
-    .hero-card,
-    .side-panel,
-    .section-card,
-    .editor-card{
-      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
-      border:1px solid rgba(220,231,243,.95);
-      border-radius:32px;
+    .head-btn.soft{
+      color:#163861;
+      background:#fff;
+      border:1px solid var(--line);
       box-shadow:var(--shadow);
-      overflow:hidden;
-      position:relative;
     }
 
-    .hero-card{
-      padding:32px 28px 28px;
+    .head-btn.danger{
+      color:#fff;
+      background:linear-gradient(135deg,#ff7b7b,#df4b4b);
+      box-shadow:0 16px 28px rgba(223,75,75,.18);
     }
 
-    .hero-card::before{
-      content:"";
-      position:absolute;
-      width:260px;
-      height:260px;
-      border-radius:50%;
-      left:-100px;
-      top:-110px;
-      background:radial-gradient(circle, rgba(47,140,255,.12), transparent 72%);
-      pointer-events:none;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 14px;
-      border-radius:999px;
-      background:rgba(123,97,255,.10);
-      color:var(--purple-dark);
-      border:1px solid rgba(123,97,255,.12);
-      font-weight:800;
-      font-size:.85rem;
+    .cards-4{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
       margin-bottom:18px;
     }
 
-    h1{
-      margin:0 0 14px;
-      font-size:clamp(2rem, 4vw, 3.7rem);
-      line-height:1.04;
-      letter-spacing:-1.2px;
-      color:var(--nav);
+    .card,
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow);
     }
 
-    .lead{
-      margin:0;
-      color:#5d728d;
-      font-size:1.04rem;
-      line-height:1.8;
-      max-width:760px;
+    .mini-card{
+      padding:18px;
+      background:linear-gradient(180deg,#fff,#fbfcff);
     }
 
-    .hero-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-top:24px;
-    }
-
-    .hero-stats{
-      display:grid;
-      grid-template-columns:repeat(4, 1fr);
-      gap:12px;
-      margin-top:26px;
-    }
-
-    .stat{
-      border-radius:22px;
-      padding:18px 16px;
-      color:#fff;
-      box-shadow:var(--shadow-soft);
-      min-height:112px;
-    }
-
-    .stat.blue{background:linear-gradient(135deg,var(--blue),var(--blue-dark))}
-    .stat.red{background:linear-gradient(135deg,var(--red),var(--red-dark))}
-    .stat.green{background:linear-gradient(135deg,var(--green),var(--green-dark))}
-    .stat.gold{background:linear-gradient(135deg,var(--gold),var(--gold-dark))}
-
-    .stat strong{
+    .mini-card strong{
       display:block;
-      font-size:1.55rem;
+      font-size:16px;
+      color:#0f2f58;
       margin-bottom:8px;
     }
 
-    .stat span{
-      display:block;
-      font-size:.92rem;
-      line-height:1.45;
-      opacity:.96;
-      font-weight:700;
-    }
-
-    .side-panel{
-      padding:22px;
-      display:grid;
-      gap:14px;
-      align-content:start;
-    }
-
-    .panel-box{
-      border-radius:22px;
-      padding:18px 16px;
-      background:rgba(255,255,255,.84);
-      border:1px solid rgba(220,231,243,.95);
-      box-shadow:var(--shadow-soft);
-    }
-
-    .panel-box h3{
-      margin:0 0 8px;
-      font-size:1.03rem;
-      color:var(--nav);
-    }
-
-    .panel-box p{
-      margin:0;
+    .mini-card p{
       color:var(--muted);
-      line-height:1.65;
-      font-size:.94rem;
+      line-height:1.7;
+      font-size:14px;
+      margin:0;
     }
 
-    .status-row{
+    .grid-main{
       display:grid;
-      gap:10px;
+      grid-template-columns:1.12fr .88fr;
+      gap:18px;
+      align-items:start;
     }
 
-    .status-item{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:12px 14px;
-      border-radius:16px;
-      background:#f8fbff;
-      border:1px solid rgba(220,231,243,.95);
-      font-weight:700;
-      color:#28496f;
+    .grid-stack{
+      display:grid;
+      gap:18px;
+    }
+
+    .panel{ overflow:hidden; }
+
+    .panel-head{
+      padding:20px 22px 0;
+    }
+
+    .panel-head h2{
+      font-size:24px;
+      color:#102f59;
+      margin-bottom:8px;
+      letter-spacing:-.5px;
+    }
+
+    .panel-head p{
+      color:var(--muted);
+      line-height:1.75;
+      font-size:14px;
+      margin-bottom:18px;
+    }
+
+    .panel-body{
+      padding:0 22px 22px;
     }
 
     .badge{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      padding:7px 12px;
+      gap:8px;
+      padding:7px 11px;
       border-radius:999px;
-      font-size:.8rem;
+      font-size:12px;
       font-weight:800;
-      border:1px solid transparent;
-      white-space:nowrap;
+      margin-right:6px;
+      margin-top:6px;
     }
 
     .badge.green{
       background:rgba(24,195,74,.10);
-      color:#0f7b33;
-      border-color:rgba(24,195,74,.16);
+      color:#0f7a37;
+      border:1px solid rgba(24,195,74,.16);
     }
+
     .badge.red{
       background:rgba(255,75,75,.10);
-      color:#b12828;
-      border-color:rgba(255,75,75,.16);
+      color:#b22f2f;
+      border:1px solid rgba(255,75,75,.16);
     }
-    .badge.gold{
-      background:rgba(224,161,38,.12);
-      color:#8d6111;
-      border-color:rgba(224,161,38,.18);
-    }
+
     .badge.blue{
       background:rgba(47,140,255,.10);
-      color:#1559bf;
-      border-color:rgba(47,140,255,.16);
+      color:#1459b1;
+      border:1px solid rgba(47,140,255,.16);
     }
 
-    .layout{
-      display:grid;
-      grid-template-columns:1.08fr .92fr;
-      gap:22px;
-      margin-top:6px;
+    .badge.gold{
+      background:rgba(216,167,47,.12);
+      color:#9b7112;
+      border:1px solid rgba(216,167,47,.16);
     }
 
-    .section-card,
-    .editor-card{
-      padding:24px 22px;
+    .badge.orange{
+      background:rgba(255,159,26,.12);
+      color:#ad6900;
+      border:1px solid rgba(255,159,26,.16);
     }
 
-    .section-head{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:16px;
+    .badge.purple{
+      background:rgba(123,97,255,.12);
+      color:#5d46c7;
+      border:1px solid rgba(123,97,255,.16);
     }
 
-    .section-head h2{
-      margin:0;
-      font-size:1.35rem;
-      color:var(--nav);
-      letter-spacing:-.3px;
-    }
-
-    .section-head p{
-      margin:6px 0 0;
-      color:var(--muted);
-      line-height:1.7;
-      max-width:700px;
-      font-size:.95rem;
-    }
-
-    .toolbar{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-
-    .tool-btn{
-      border:none;
-      cursor:pointer;
+    .helper{
+      margin-top:16px;
       border-radius:14px;
-      padding:11px 14px;
-      font-weight:800;
-      font-size:.9rem;
-      transition:.2s ease;
-      background:#f7fbff;
-      color:#28517d;
-      border:1px solid rgba(220,231,243,.95);
+      padding:14px 15px;
+      font-size:13px;
+      line-height:1.65;
+      display:none;
     }
 
-    .tool-btn:hover{transform:translateY(-1px)}
-    .tool-btn.blue{
-      background:rgba(47,140,255,.10);
-      color:#1559bf;
-      border-color:rgba(47,140,255,.16);
+    .helper.show{display:block}
+    .helper.ok{
+      background:rgba(24,195,74,.08);
+      border:1px solid rgba(24,195,74,.18);
+      color:#156c37;
     }
-    .tool-btn.red{
-      background:rgba(255,75,75,.10);
-      color:#b12828;
-      border-color:rgba(255,75,75,.16);
+    .helper.err{
+      background:rgba(255,75,75,.08);
+      border:1px solid rgba(255,75,75,.18);
+      color:#a12626;
     }
-    .tool-btn.green{
-      background:rgba(24,195,74,.10);
-      color:#0f7b33;
-      border-color:rgba(24,195,74,.16);
+    .helper.info{
+      background:rgba(47,140,255,.08);
+      border:1px solid rgba(47,140,255,.18);
+      color:#1459b1;
     }
-    .tool-btn.gold{
-      background:rgba(224,161,38,.12);
-      color:#8d6111;
-      border-color:rgba(224,161,38,.18);
+    .helper.warn{
+      background:rgba(255,159,26,.10);
+      border:1px solid rgba(255,159,26,.18);
+      color:#996100;
     }
 
-    .registrations{
+    .status-list{
       display:grid;
       gap:12px;
     }
 
-    .registration-card{
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:14px;
-      align-items:center;
-      border-radius:22px;
-      padding:18px 18px;
-      background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(247,251,255,.88));
-      border:1px solid rgba(220,231,243,.95);
-      box-shadow:var(--shadow-soft);
+    .status-item{
+      padding:14px;
+      border-radius:14px;
+      background:#f9fbfe;
+      border:1px solid var(--line-soft);
     }
 
-    .registration-main{
-      display:grid;
-      gap:7px;
-      min-width:0;
-    }
-
-    .registration-main h3{
-      margin:0;
-      font-size:1.02rem;
-      color:var(--nav);
-      word-break:break-word;
-    }
-
-    .registration-meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
+    .status-item .k{
       color:var(--muted);
-      font-size:.92rem;
-      line-height:1.5;
+      font-size:12px;
+      margin-bottom:6px;
+      font-weight:700;
     }
 
-    .registration-actions{
+    .status-item .v{
+      color:#12355e;
+      font-size:14px;
+      line-height:1.6;
+      font-weight:800;
+    }
+
+    .actions-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 16px;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.18s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      width:100%;
+    }
+
+    .btn:hover{ transform:translateY(-1px); }
+
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+      box-shadow:0 16px 28px rgba(47,140,255,.18);
+    }
+
+    .btn-soft{
+      color:#163861;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+
+    .btn-danger{
+      color:#fff;
+      background:linear-gradient(135deg,#ff7b7b,#df4b4b);
+      box-shadow:0 16px 28px rgba(223,75,75,.18);
+    }
+
+    .btn-success{
+      color:#fff;
+      background:linear-gradient(135deg,#26c86a,#14994a);
+      box-shadow:0 16px 28px rgba(20,153,74,.18);
+    }
+
+    .btn-gold{
+      color:#fff;
+      background:linear-gradient(135deg,#e0a126,#b47c12);
+      box-shadow:0 16px 28px rgba(180,124,18,.18);
+    }
+
+    .form-group{
+      margin-bottom:14px;
+    }
+
+    .form-label{
+      display:block;
+      margin-bottom:7px;
+      font-size:13px;
+      font-weight:800;
+      color:#14375f;
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:#0b2340;
+      outline:none;
+      font-size:14px;
+      transition:.18s ease;
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color:#99c8ff;
+      box-shadow:0 0 0 4px rgba(47,140,255,.10);
+    }
+
+    textarea{
+      min-height:120px;
+      resize:vertical;
+    }
+
+    .split{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .list-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .list-card{
+      padding:14px;
+      border-radius:14px;
+      background:#f9fbfe;
+      border:1px solid var(--line-soft);
+    }
+
+    .list-card strong{
+      display:block;
+      color:#12355e;
+      font-size:14px;
+      margin-bottom:5px;
+    }
+
+    .list-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.65;
+    }
+
+    .list-actions{
       display:flex;
       flex-wrap:wrap;
       gap:8px;
-      justify-content:flex-end;
+      margin-top:10px;
     }
 
     .mini-btn{
@@ -600,102 +598,29 @@
       border-radius:12px;
       padding:10px 12px;
       font-weight:800;
-      font-size:.84rem;
-      transition:.2s ease;
+      font-size:12px;
+      transition:.18s ease;
     }
 
     .mini-btn.blue{
       background:rgba(47,140,255,.10);
-      color:#1559bf;
+      color:#1459b1;
     }
     .mini-btn.green{
       background:rgba(24,195,74,.10);
-      color:#0f7b33;
+      color:#0f7a37;
     }
     .mini-btn.red{
       background:rgba(255,75,75,.10);
-      color:#b12828;
+      color:#b22f2f;
     }
-
-    .empty{
-      padding:22px 18px;
-      border-radius:20px;
-      text-align:center;
-      color:var(--muted);
-      background:rgba(255,255,255,.78);
-      border:1px dashed rgba(220,231,243,.95);
+    .mini-btn.gold{
+      background:rgba(216,167,47,.12);
+      color:#9b7112;
     }
-
-    .field{
-      margin-bottom:14px;
-    }
-
-    .field label{
-      display:block;
-      margin-bottom:7px;
-      font-weight:700;
-      color:#21466f;
-      font-size:.92rem;
-    }
-
-    input,
-    select,
-    textarea{
-      width:100%;
-      border-radius:16px;
-      border:1px solid rgba(220,231,243,.95);
-      background:#fff;
-      outline:none;
-      padding:14px 14px;
-      font-size:.96rem;
-      font-family:inherit;
-      color:var(--text);
-      transition:.18s ease;
-    }
-
-    textarea{
-      min-height:120px;
-      resize:vertical;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus{
-      border-color:#8bbcff;
-      box-shadow:0 0 0 4px rgba(47,140,255,.10);
-    }
-
-    .editor-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    .editor-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:8px;
-    }
-
-    .msg{
-      margin-top:14px;
-      padding:13px 14px;
-      border-radius:14px;
-      font-size:.93rem;
-      line-height:1.55;
-      display:none;
-    }
-    .msg.show{display:block}
-    .msg.ok{
-      background:rgba(24,195,74,.10);
-      color:#0f7b33;
-      border:1px solid rgba(24,195,74,.16);
-    }
-    .msg.err{
-      background:rgba(255,75,75,.10);
-      color:#a22626;
-      border:1px solid rgba(255,75,75,.16);
+    .mini-btn.purple{
+      background:rgba(123,97,255,.12);
+      color:#5d46c7;
     }
 
     .locked-screen{
@@ -718,6 +643,7 @@
     .locked-card h1{
       font-size:clamp(1.8rem, 4vw, 3rem);
       margin-bottom:12px;
+      color:#102f59;
     }
 
     .locked-card p{
@@ -769,336 +695,338 @@
 
     [hidden]{display:none !important}
 
-    @keyframes floatOrb{
-      0%,100%{transform:translateY(0)}
-      50%{transform:translateY(-12px)}
-    }
-
     @media (max-width:1120px){
-      .hero,
-      .layout{
+      .layout,
+      .grid-main{
         grid-template-columns:1fr;
       }
 
-      .hero-stats{
+      .cards-4{
         grid-template-columns:repeat(2,1fr);
       }
     }
 
     @media (max-width:820px){
-      .nav-main{
-        display:none;
-      }
-
-      .header-inner{
-        padding:12px 14px;
-      }
-
-      .page{
-        padding:22px 14px 44px;
-      }
-
-      .hero-card,
-      .side-panel,
-      .section-card,
-      .editor-card{
-        border-radius:24px;
-      }
-
-      .hero-card{
-        padding:26px 20px 22px;
-      }
-
-      .editor-grid{
+      .page{ padding:22px 14px 44px; }
+      .sidebar{ display:none; }
+      .cards-4,
+      .split{
         grid-template-columns:1fr;
-      }
-
-      .registration-card{
-        grid-template-columns:1fr;
-      }
-
-      .registration-actions{
-        justify-content:flex-start;
       }
     }
 
     @media (max-width:520px){
-      .brand-sub{
-        display:none;
-      }
-
-      .hero-stats{
-        grid-template-columns:1fr;
-      }
-
-      .btn,
-      .btn-outline{
-        width:100%;
-      }
-
-      .hero-actions,
-      .editor-actions,
-      .locked-actions{
+      .status-chip{ display:none; }
+      .content-head{
         flex-direction:column;
+        align-items:stretch;
       }
-
-      .header-actions{
-        width:100%;
-      }
-
-      .pill{
-        width:100%;
-        justify-content:center;
-      }
-
-      .toolbar{
-        flex-direction:column;
-      }
-
-      .tool-btn{
-        width:100%;
-      }
-
-      .footer-inner{
-        align-items:flex-start;
-        flex-direction:column;
-      }
+      .head-actions{ width:100%; }
+      .head-btn{ width:100%; }
+      .actions-row{ grid-template-columns:1fr; }
+      .locked-actions{ flex-direction:column; }
+      .footer-inner{ flex-direction:column; align-items:flex-start; }
     }
   </style>
 </head>
 <body>
-  <div class="page-wrap">
-    <div class="bg-soft">
-      <div class="orb o1"></div>
-      <div class="orb o2"></div>
-      <div class="orb o3"></div>
-      <div class="orb o4"></div>
+  <main id="lockedView" class="locked-screen">
+    <div class="locked-card">
+      <h1>Cette zone est réservée à l’administration.</h1>
+      <p>
+        L’espace administrateur contrôle les candidatures, les propositions du jury, l’épreuve active, les copies,
+        les annonces, les résultats et la préparation des certificats. L’accès est vérifié à partir de Firebase Auth
+        et de l’email administrateur autorisé.
+      </p>
+      <div class="locked-actions">
+        <a href="./login.html?redirect=admin.html" class="head-btn primary">Se connecter</a>
+        <a href="./index.html" class="head-btn soft">Retour à l’accueil</a>
+      </div>
     </div>
+  </main>
 
-    <header class="site-header">
-      <div class="header-inner">
-        <a href="index.html" class="brand">
-          <div class="brand-mark"></div>
-          <div>
-            <div class="brand-title">Championnat de Chimie</div>
-            <div class="brand-sub">Administration centrale</div>
-          </div>
-        </a>
-
-        <nav class="nav-main">
-          <a href="index.html">Accueil</a>
-          <a href="competition.html">Championnat</a>
-          <a href="rules.html">Règlement</a>
-          <a href="results.html">Résultats</a>
-          <a href="login.html">Connexion</a>
-          <a href="jury.html">Jury</a>
-          <a href="admin.html" class="active">Admin</a>
-          <a href="./championnat/index.html">Championnat de Chimie</a>
-        </nav>
-
-        <div class="header-actions">
-          <div class="pill"><span class="dot"></span> Tableau de bord administrateur</div>
-          <a class="btn-outline" href="login.html">Changer de compte</a>
+  <div id="adminApp" hidden>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-text">
+          <div class="brand-title">Championnat de Chimie</div>
+          <div class="brand-sub" id="brandSub">Centre de pilotage administrateur</div>
         </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="status-chip">
+          <span id="statusDot" class="status-dot"></span>
+          <span id="statusText">Chargement…</span>
+        </div>
+        <div class="avatar-btn" id="avatarBtn">☰</div>
       </div>
     </header>
 
-    <main id="lockedView" class="locked-screen">
-      <div class="locked-card">
-        <div class="eyebrow">🔒 Accès protégé • Vérification en cours</div>
-        <h1>Cette zone est réservée à l’administration.</h1>
-        <p>
-          L’espace administrateur contrôle les inscriptions, les annonces, les résultats et l’état global du championnat. L’accès est vérifié à partir de Firebase Auth et de l’email administrateur autorisé.
-        </p>
-        <div class="locked-actions">
-          <a href="login.html" class="btn">Se connecter</a>
-          <a href="index.html" class="btn-outline">Retour à l’accueil</a>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-section-title">Navigation</div>
+        <nav class="nav-list" id="sidebarNav"></nav>
+
+        <div class="sidebar-section-title">Statut</div>
+        <div class="sidebar-note" id="sidebarNote">
+          Chargement du tableau de bord administrateur…
         </div>
-      </div>
-    </main>
+      </aside>
 
-    <main id="adminApp" class="page" hidden>
-      <section class="hero">
-        <div class="hero-card">
-          <div class="eyebrow">🛠️ Contrôle global • Inscriptions • Publications • Pilotage</div>
-          <h1>Espace administrateur du championnat.</h1>
-          <p class="lead">
-            Ce tableau de bord centralise la supervision du mini-site : inscriptions des candidats, état du championnat, publication d’annonces, préparation des résultats et évolution future vers un contrôle encore plus complet.
-          </p>
-
-          <div class="hero-actions">
-            <button class="btn" id="refreshBtn" type="button">Actualiser les données</button>
-            <button class="btn-outline" id="signOutBtn" type="button">Se déconnecter</button>
-          </div>
-
-          <div class="hero-stats">
-            <div class="stat blue">
-              <strong id="statRegistrations">0</strong>
-              <span>Inscriptions reçues</span>
-            </div>
-            <div class="stat red">
-              <strong id="statUsers">0</strong>
-              <span>Comptes candidats</span>
-            </div>
-            <div class="stat green">
-              <strong id="statAnnouncements">0</strong>
-              <span>Annonces publiées</span>
-            </div>
-            <div class="stat gold">
-              <strong id="statStatus">Brouillon</strong>
-              <span>État du championnat</span>
-            </div>
-          </div>
-        </div>
-
-        <aside class="side-panel">
-          <div class="panel-box">
-            <h3>Compte administrateur</h3>
-            <p id="adminIdentity">Chargement du profil administrateur…</p>
-          </div>
-
-          <div class="panel-box">
-            <h3>État rapide</h3>
-            <div class="status-row">
-              <div class="status-item">
-                <span>Inscriptions</span>
-                <span class="badge green" id="badgeRegistrationStatus">Ouvertes</span>
-              </div>
-              <div class="status-item">
-                <span>Résultats</span>
-                <span class="badge gold" id="badgeResultsStatus">Préparation</span>
-              </div>
-              <div class="status-item">
-                <span>Jury</span>
-                <span class="badge blue">Structure visible</span>
-              </div>
-              <div class="status-item">
-                <span>Accès admin</span>
-                <span class="badge red">Protégé</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel-box">
-            <h3>Vision</h3>
+      <main class="content">
+        <div class="content-head">
+          <div class="title-wrap">
+            <h1>Administration centrale</h1>
             <p>
-              Cette page constitue la base du contrôle total du mini-site. Elle peut évoluer vers la validation des candidats, la gestion des rôles, la publication des résultats détaillés et un lien plus fort avec l’espace jury.
+              Ce tableau de bord centralise le pilotage du championnat : candidatures, jury, lancement de la compétition,
+              épreuve active, copies, annonces, résultats, support et préparation du certificat.
             </p>
           </div>
-        </aside>
-      </section>
 
-      <section class="layout">
-        <section class="section-card">
-          <div class="section-head">
-            <div>
-              <h2>Inscriptions reçues</h2>
-              <p>
-                Cette liste récupère directement les données envoyées depuis <strong>competition.html</strong>. Tu peux donc suivre les candidats inscrits sans toucher à ton ancien site.
-              </p>
-            </div>
+          <div class="head-actions">
+            <button class="head-btn soft" id="refreshBtn" type="button">Actualiser</button>
+            <button class="head-btn soft" id="goSupportBtn" type="button">Support admin</button>
+            <button class="head-btn danger" id="signOutBtn" type="button">Se déconnecter</button>
           </div>
-
-          <div class="toolbar">
-            <button class="tool-btn blue" id="sortRecentBtn" type="button">Plus récentes</button>
-            <button class="tool-btn green" id="sortNameBtn" type="button">Trier par nom</button>
-            <button class="tool-btn gold" id="filterMasterBtn" type="button">Filtrer Master</button>
-            <button class="tool-btn red" id="clearFilterBtn" type="button">Réinitialiser</button>
-          </div>
-
-          <div id="registrationsList" class="registrations">
-            <div class="empty">Chargement des inscriptions…</div>
-          </div>
-        </section>
-
-        <section class="editor-card">
-          <div class="section-head">
-            <div>
-              <h2>Pilotage du championnat</h2>
-              <p>
-                Cette zone prépare déjà les futures fonctions d’administration : annonces, statut du championnat et publication contrôlée.
-              </p>
-            </div>
-          </div>
-
-          <form id="adminControlForm">
-            <div class="field">
-              <label for="championshipTitle">Titre officiel</label>
-              <input id="championshipTitle" type="text" placeholder="Championnat de Chimie 2026" />
-            </div>
-
-            <div class="editor-grid">
-              <div class="field">
-                <label for="championshipStatus">État du championnat</label>
-                <select id="championshipStatus">
-                  <option value="Brouillon">Brouillon</option>
-                  <option value="Inscriptions ouvertes">Inscriptions ouvertes</option>
-                  <option value="Compétition lancée">Compétition lancée</option>
-                  <option value="Résultats publiés">Résultats publiés</option>
-                  <option value="Clôturé">Clôturé</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label for="resultsVisibility">Visibilité des résultats</label>
-                <select id="resultsVisibility">
-                  <option value="Préparation">Préparation</option>
-                  <option value="Public">Public</option>
-                  <option value="Privé">Privé</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="announcementText">Annonce administrateur</label>
-              <textarea id="announcementText" placeholder="Écris ici une annonce importante pour le championnat..."></textarea>
-            </div>
-
-            <div class="editor-actions">
-              <button class="btn" type="submit">Enregistrer la configuration</button>
-              <button class="btn-outline" type="button" id="publishAnnouncementBtn">Publier une annonce</button>
-            </div>
-
-            <div id="adminMsg" class="msg"></div>
-          </form>
-
-          <div class="section-head" style="margin-top:24px;">
-            <div>
-              <h2>Actions rapides</h2>
-              <p>
-                Ces actions sont surtout visuelles pour l’instant, mais elles servent déjà de base au contrôle futur du site.
-              </p>
-            </div>
-          </div>
-
-          <div class="toolbar">
-            <button class="tool-btn blue" type="button" id="openCompetitionBtn">Ouvrir inscriptions</button>
-            <button class="tool-btn red" type="button" id="closeCompetitionBtn">Fermer inscriptions</button>
-            <button class="tool-btn gold" type="button" id="prepareResultsBtn">Préparer résultats</button>
-            <button class="tool-btn green" type="button" id="publishResultsBtn">Publier résultats</button>
-          </div>
-        </section>
-      </section>
-    </main>
-
-    <footer>
-      <div class="footer-inner">
-        <div>© 2026 Championnat de Chimie — Administration centrale.</div>
-        <div class="footer-links">
-          <a href="index.html">Accueil</a>
-          <a href="competition.html">Championnat</a>
-          <a href="rules.html">Règlement</a>
-          <a href="results.html">Résultats</a>
-          <a href="login.html">Connexion</a>
-          <a href="jury.html">Jury</a>
-          <a href="admin.html">Admin</a>
         </div>
-      </div>
-    </footer>
+
+        <section class="cards-4">
+          <article class="card mini-card">
+            <strong>Candidatures</strong>
+            <p id="statRegistrations">0</p>
+          </article>
+
+          <article class="card mini-card">
+            <strong>Propositions jury</strong>
+            <p id="statProposals">0</p>
+          </article>
+
+          <article class="card mini-card">
+            <strong>Copies reçues</strong>
+            <p id="statSubmissions">0</p>
+          </article>
+
+          <article class="card mini-card">
+            <strong>État du championnat</strong>
+            <p id="statStatus">Brouillon</p>
+          </article>
+        </section>
+
+        <section class="grid-main">
+          <section class="grid-stack">
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Pilotage global</h2>
+                <p>L’admin garde la main sur l’ouverture, la fermeture, l’épreuve active et la visibilité des résultats.</p>
+              </div>
+
+              <div class="panel-body">
+                <div class="status-list">
+                  <div class="status-item">
+                    <div class="k">Administrateur connecté</div>
+                    <div class="v" id="adminIdentity">Chargement…</div>
+                  </div>
+
+                  <div class="status-item">
+                    <div class="k">Épreuve active</div>
+                    <div class="v" id="activeExamLabel">Aucune</div>
+                  </div>
+
+                  <div class="status-item">
+                    <div class="k">Décision actuelle</div>
+                    <div class="v" id="adminDecisionLabel">Brouillon administratif</div>
+                  </div>
+                </div>
+
+                <div class="actions-row">
+                  <button class="btn btn-success" id="launchCompetitionBtn" type="button">Lancer la compétition</button>
+                  <button class="btn btn-danger" id="stopCompetitionBtn" type="button">Arrêter / verrouiller</button>
+                  <button class="btn btn-gold" id="prepareResultsBtn" type="button">Préparer résultats</button>
+                  <button class="btn btn-primary" id="publishResultsBtn" type="button">Publier résultats</button>
+                </div>
+
+                <div id="adminMsg" class="helper info show">
+                  Le lancement influe directement sur ce que voient les candidats, le jury et l’espace d’examen.
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Configuration du championnat</h2>
+                <p>Ces champs structurent le titre officiel, le statut courant, la visibilité et la durée.</p>
+              </div>
+
+              <div class="panel-body">
+                <div class="form-group">
+                  <label class="form-label" for="championshipTitle">Titre officiel</label>
+                  <input id="championshipTitle" type="text" placeholder="Championnat de Chimie 2026" />
+                </div>
+
+                <div class="split">
+                  <div class="form-group">
+                    <label class="form-label" for="championshipStatus">Statut</label>
+                    <select id="championshipStatus">
+                      <option value="Brouillon">Brouillon</option>
+                      <option value="Inscriptions ouvertes">Inscriptions ouvertes</option>
+                      <option value="Compétition lancée">Compétition lancée</option>
+                      <option value="Résultats publiés">Résultats publiés</option>
+                      <option value="Clôturé">Clôturé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="resultsVisibility">Visibilité des résultats</label>
+                    <select id="resultsVisibility">
+                      <option value="Préparation">Préparation</option>
+                      <option value="Public">Public</option>
+                      <option value="Privé">Privé</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="durationMinutes">Durée de l’épreuve (minutes)</label>
+                    <input id="durationMinutes" type="number" min="1" placeholder="50" />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="certificateEnabled">Certificat</label>
+                    <select id="certificateEnabled">
+                      <option value="non">Non activé</option>
+                      <option value="oui">Activé</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary" id="saveConfigBtn" type="button">Enregistrer la configuration</button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Candidatures reçues</h2>
+                <p>Les candidatures envoyées depuis le championnat apparaissent ici, avec leurs statuts et informations utiles.</p>
+              </div>
+
+              <div class="panel-body">
+                <div id="registrationsList" class="list-grid">
+                  <div class="list-card">
+                    <strong>Chargement…</strong>
+                    <p>Les candidatures sont en cours de récupération.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Propositions du jury</h2>
+                <p>L’admin peut relire une proposition, la valider et la transformer en épreuve active utilisable côté examen.</p>
+              </div>
+
+              <div class="panel-body">
+                <div id="proposalList" class="list-grid">
+                  <div class="list-card">
+                    <strong>Chargement…</strong>
+                    <p>Les propositions du jury sont en cours de récupération.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </section>
+
+          <aside class="grid-stack">
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Annonce administrateur</h2>
+                <p>Publie une information utile visible ensuite dans les sections concernées.</p>
+              </div>
+
+              <div class="panel-body">
+                <div class="form-group">
+                  <label class="form-label" for="announcementText">Texte de l’annonce</label>
+                  <textarea id="announcementText" placeholder="Ex : la compétition est officiellement lancée, merci de vérifier votre accès à l’épreuve."></textarea>
+                </div>
+
+                <button class="btn btn-soft" id="publishAnnouncementBtn" type="button">Publier une annonce</button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Copies reçues</h2>
+                <p>Vue simplifiée des copies remontées depuis l’examen.</p>
+              </div>
+
+              <div class="panel-body">
+                <div id="submissionList" class="list-grid">
+                  <div class="list-card">
+                    <strong>Chargement…</strong>
+                    <p>Les copies soumises sont en cours de récupération.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Certificats</h2>
+                <p>Base de pilotage pour activer et préparer l’émission ou la vérification des certificats.</p>
+              </div>
+
+              <div class="panel-body">
+                <div class="form-group">
+                  <label class="form-label" for="certificateNote">Note interne certificat</label>
+                  <textarea id="certificateNote" placeholder="Ex : certificat réservé aux candidats validés / classement minimum / réussite confirmée."></textarea>
+                </div>
+
+                <button class="btn btn-soft" id="saveCertificateBtn" type="button">Enregistrer la politique certificat</button>
+
+                <div id="certificateMsg" class="helper info show">
+                  Cette section prépare la logique certificat sans casser le reste du site.
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Coordination avec le jury</h2>
+                <p>Le jury travaille dans son espace, mais l’admin garde ici la validation finale et le contrôle de publication.</p>
+              </div>
+
+              <div class="panel-body">
+                <div class="list-card">
+                  <strong>Règle centrale</strong>
+                  <p>
+                    Une proposition du jury ne devient visible côté examen qu’après validation administrative,
+                    puis choix comme épreuve active et lancement officiel de la compétition.
+                  </p>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
   </div>
 
+  <footer>
+    <div class="footer-inner">
+      <div>© 2026 Championnat de Chimie — Administration centrale.</div>
+      <div class="footer-links">
+        <a href="./index.html">Accueil</a>
+        <a href="./competition.html">Championnat</a>
+        <a href="./jury.html">Jury</a>
+        <a href="./results.html">Résultats</a>
+        <a href="./admin.html">Admin</a>
+      </div>
+    </div>
+  </footer>
+
   <script type="module">
-    import { auth, db } from "../firebase-config.js";
+    import { auth, db } from "./firebase-config.js";
     import {
       onAuthStateChanged,
       signOut
@@ -1106,111 +1034,58 @@
     import {
       ref,
       get,
-      child,
-      set,
-      push
+      update,
+      push,
+      set
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
 
-    const lockedView = document.getElementById("lockedView");
-    const adminApp = document.getElementById("adminApp");
+    const state = {
+      user: null,
+      profile: null,
+      control: {},
+      candidates: {},
+      proposals: {},
+      submissions: {},
+      announcements: {}
+    };
 
-    const statRegistrations = document.getElementById("statRegistrations");
-    const statUsers = document.getElementById("statUsers");
-    const statAnnouncements = document.getElementById("statAnnouncements");
-    const statStatus = document.getElementById("statStatus");
+    const $ = (id) => document.getElementById(id);
 
-    const adminIdentity = document.getElementById("adminIdentity");
-    const badgeRegistrationStatus = document.getElementById("badgeRegistrationStatus");
-    const badgeResultsStatus = document.getElementById("badgeResultsStatus");
+    const lockedView = $("lockedView");
+    const adminApp = $("adminApp");
 
-    const registrationsList = document.getElementById("registrationsList");
+    const ui = {
+      brandSub: $("brandSub"),
+      statusDot: $("statusDot"),
+      statusText: $("statusText"),
+      sidebarNav: $("sidebarNav"),
+      sidebarNote: $("sidebarNote"),
+      adminIdentity: $("adminIdentity"),
+      statRegistrations: $("statRegistrations"),
+      statProposals: $("statProposals"),
+      statSubmissions: $("statSubmissions"),
+      statStatus: $("statStatus"),
+      activeExamLabel: $("activeExamLabel"),
+      adminDecisionLabel: $("adminDecisionLabel"),
+      registrationsList: $("registrationsList"),
+      proposalList: $("proposalList"),
+      submissionList: $("submissionList"),
+      adminMsg: $("adminMsg"),
+      certificateMsg: $("certificateMsg")
+    };
 
-    const championshipTitle = document.getElementById("championshipTitle");
-    const championshipStatus = document.getElementById("championshipStatus");
-    const resultsVisibility = document.getElementById("resultsVisibility");
-    const announcementText = document.getElementById("announcementText");
-    const adminControlForm = document.getElementById("adminControlForm");
-    const adminMsg = document.getElementById("adminMsg");
-
-    const refreshBtn = document.getElementById("refreshBtn");
-    const signOutBtn = document.getElementById("signOutBtn");
-
-    const sortRecentBtn = document.getElementById("sortRecentBtn");
-    const sortNameBtn = document.getElementById("sortNameBtn");
-    const filterMasterBtn = document.getElementById("filterMasterBtn");
-    const clearFilterBtn = document.getElementById("clearFilterBtn");
-
-    const publishAnnouncementBtn = document.getElementById("publishAnnouncementBtn");
-    const openCompetitionBtn = document.getElementById("openCompetitionBtn");
-    const closeCompetitionBtn = document.getElementById("closeCompetitionBtn");
-    const prepareResultsBtn = document.getElementById("prepareResultsBtn");
-    const publishResultsBtn = document.getElementById("publishResultsBtn");
-
-    let registrationsData = [];
-    let usersData = [];
-    let announcementsCount = 0;
-    let currentAdmin = null;
-    let currentFilter = "recent";
-
-    function showMessage(text, ok = false){
-      adminMsg.textContent = text;
-      adminMsg.className = "msg show " + (ok ? "ok" : "err");
+    function setText(el, value){
+      if (el) el.textContent = value;
     }
 
-    function hideMessage(){
-      adminMsg.className = "msg";
-      adminMsg.textContent = "";
-    }
-
-    function formatDate(ts){
-      if(!ts) return "Date inconnue";
-      try{
-        return new Date(ts).toLocaleString("fr-FR");
-      }catch{
-        return "Date inconnue";
-      }
-    }
-
-    function renderRegistrations(){
-      let list = [...registrationsData];
-
-      if(currentFilter === "name"){
-        list.sort((a,b) => (a.nom || "").localeCompare(b.nom || "", "fr", { sensitivity: "base" }));
-      }else if(currentFilter === "master"){
-        list = list.filter(item => (item.niveau || "").toLowerCase() === "master");
-        list.sort((a,b) => (b.date || 0) - (a.date || 0));
-      }else{
-        list.sort((a,b) => (b.date || 0) - (a.date || 0));
-      }
-
-      if(!list.length){
-        registrationsList.innerHTML = `<div class="empty">Aucune inscription à afficher pour le moment.</div>`;
-        return;
-      }
-
-      registrationsList.innerHTML = list.map(item => `
-        <article class="registration-card">
-          <div class="registration-main">
-            <h3>${escapeHtml(item.nom || "Nom non renseigné")}</h3>
-            <div class="registration-meta">
-              <span><strong>Email :</strong> ${escapeHtml(item.email || "Non renseigné")}</span>
-              <span><strong>Niveau :</strong> ${escapeHtml(item.niveau || "Non défini")}</span>
-              <span><strong>Date :</strong> ${escapeHtml(formatDate(item.date))}</span>
-            </div>
-          </div>
-          <div class="registration-actions">
-            <button class="mini-btn blue" type="button">Voir</button>
-            <button class="mini-btn green" type="button">Valider</button>
-            <button class="mini-btn red" type="button">Archiver</button>
-          </div>
-        </article>
-      `).join("");
+    function normalizeEmail(value = ""){
+      return String(value || "").trim().toLowerCase();
     }
 
     function escapeHtml(value){
-      return String(value)
+      return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -1218,218 +1093,472 @@
         .replace(/'/g, "&#039;");
     }
 
-    async function loadDashboardData(){
-      const snap = await get(ref(db));
-      const data = snap.exists() ? snap.val() : {};
-
-      const registrations = data.competitionRegistrations || {};
-      const users = data.championnatUsers || {};
-      const announcements = data.championnatAnnouncements || {};
-      const settings = data.championnatSettings || {};
-
-      registrationsData = Object.keys(registrations).map(key => ({
-        id: key,
-        ...registrations[key]
-      }));
-
-      usersData = Object.keys(users).map(key => ({
-        id: key,
-        ...users[key]
-      }));
-
-      announcementsCount = Object.keys(announcements).length;
-
-      statRegistrations.textContent = registrationsData.length;
-      statUsers.textContent = usersData.length;
-      statAnnouncements.textContent = announcementsCount;
-      statStatus.textContent = settings.status || "Brouillon";
-
-      badgeRegistrationStatus.textContent =
-        settings.registrationStatus || "Ouvertes";
-      badgeResultsStatus.textContent =
-        settings.resultsVisibility || "Préparation";
-
-      championshipTitle.value = settings.title || "Championnat de Chimie 2026";
-      championshipStatus.value = settings.status || "Brouillon";
-      resultsVisibility.value = settings.resultsVisibility || "Préparation";
-
-      renderRegistrations();
+    function showAdminMsg(text, type = "info"){
+      ui.adminMsg.className = `helper ${type} show`;
+      ui.adminMsg.textContent = text;
     }
 
-    async function saveSettings(extra = {}){
-      const payload = {
-        title: championshipTitle.value.trim() || "Championnat de Chimie 2026",
-        status: championshipStatus.value,
-        resultsVisibility: resultsVisibility.value,
-        registrationStatus:
-          championshipStatus.value === "Inscriptions ouvertes" ? "Ouvertes" :
-          championshipStatus.value === "Clôturé" ? "Fermées" :
-          badgeRegistrationStatus.textContent || "Ouvertes",
-        updatedAt: Date.now(),
-        updatedBy: currentAdmin?.email || ADMIN_EMAIL,
-        ...extra
-      };
-
-      await set(ref(db, "championnatSettings"), payload);
-
-      statStatus.textContent = payload.status;
-      badgeRegistrationStatus.textContent = payload.registrationStatus;
-      badgeResultsStatus.textContent = payload.resultsVisibility;
+    function showCertificateMsg(text, type = "info"){
+      ui.certificateMsg.className = `helper ${type} show`;
+      ui.certificateMsg.textContent = text;
     }
 
-    adminControlForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      hideMessage();
-      try{
-        await saveSettings();
-        showMessage("Configuration administrateur enregistrée avec succès.", true);
-      }catch(err){
-        console.error(err);
-        showMessage("Impossible d’enregistrer la configuration.");
-      }
-    });
+    function renderSidebar(){
+      ui.sidebarNav.innerHTML = `
+        <a class="nav-link active" href="./admin.html"><span class="nav-dot red"></span><span>Tableau de bord admin</span></a>
+        <a class="nav-link" href="./competition.html"><span class="nav-dot green"></span><span>Championnat</span></a>
+        <a class="nav-link" href="./jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
+        <a class="nav-link" href="./examen.html"><span class="nav-dot red"></span><span>Examen</span></a>
+        <a class="nav-link" href="./results.html"><span class="nav-dot purple"></span><span>Résultats</span></a>
+        <a class="nav-link" href="./competition-support-admin.html"><span class="nav-dot red"></span><span>Support admin</span></a>
+        <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Vérification certificat</span></a>
+      `;
+      ui.sidebarNote.textContent = "L’administration garde ici la main sur les candidatures, le jury, l’épreuve active, les annonces, les résultats et la préparation des certificats.";
+    }
 
-    publishAnnouncementBtn.addEventListener("click", async () => {
-      hideMessage();
-      const text = announcementText.value.trim();
-      if(!text){
-        showMessage("Écris d’abord une annonce avant de publier.");
+    function isAdminUser(user){
+      return normalizeEmail(user?.email || "") === normalizeEmail(ADMIN_EMAIL);
+    }
+
+    function isCompetitionLaunched(control){
+      return !!(control && (control.launched === true || String(control.status || "").toLowerCase() === "launched"));
+    }
+
+    function countSubmissions(root){
+      let count = 0;
+      Object.keys(root || {}).forEach(examId => {
+        count += Object.keys(root[examId] || {}).length;
+      });
+      return count;
+    }
+
+    function flattenSubmissions(root){
+      const items = [];
+      Object.keys(root || {}).forEach(examId => {
+        const group = root[examId] || {};
+        Object.keys(group).forEach(uid => {
+          items.push({ examId, uid, ...group[uid] });
+        });
+      });
+      return items;
+    }
+
+    function renderTopState(){
+      const launched = isCompetitionLaunched(state.control);
+
+      ui.statusDot.className = "status-dot " + (launched ? "ok" : "");
+      ui.statusText.textContent = launched ? "Compétition lancée" : "Compétition non lancée";
+
+      ui.statRegistrations.textContent = String(Object.keys(state.candidates || {}).length);
+      ui.statProposals.textContent = String(Object.keys(state.proposals || {}).length);
+      ui.statSubmissions.textContent = String(countSubmissions(state.submissions || {}));
+      ui.statStatus.textContent = state.control?.status || "Brouillon";
+
+      ui.activeExamLabel.textContent = state.control?.activeExamId || state.control?.currentExamId || "Aucune";
+      ui.adminDecisionLabel.textContent = launched
+        ? "Le championnat est officiellement ouvert côté candidats."
+        : "Le championnat reste préparatoire ou verrouillé.";
+    }
+
+    function renderCandidates(){
+      const values = Object.entries(state.candidates || {});
+      if (!values.length) {
+        ui.registrationsList.innerHTML = `
+          <div class="list-card">
+            <strong>Aucune candidature</strong>
+            <p>Aucune candidature n’a encore été enregistrée.</p>
+          </div>
+        `;
         return;
       }
 
-      try{
-        await push(ref(db, "championnatAnnouncements"), {
-          text,
-          createdAt: Date.now(),
-          createdBy: currentAdmin?.email || ADMIN_EMAIL
+      ui.registrationsList.innerHTML = values.slice(0, 12).map(([id, item]) => `
+        <div class="list-card">
+          <strong>${escapeHtml(item.fullName || item.displayName || item.email || "Candidat")}</strong>
+          <p>
+            Email : ${escapeHtml(item.email || "—")}<br>
+            Niveau : ${escapeHtml(item.level || "—")}<br>
+            Statut : ${escapeHtml(item.status || "pending")}
+          </p>
+          <div class="list-actions">
+            <button class="mini-btn green" data-action="approve-candidate" data-id="${escapeHtml(id)}">Valider</button>
+            <button class="mini-btn gold" data-action="mark-pending" data-id="${escapeHtml(id)}">Mettre en attente</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderProposals(){
+      const values = Object.entries(state.proposals || {});
+      if (!values.length) {
+        ui.proposalList.innerHTML = `
+          <div class="list-card">
+            <strong>Aucune proposition jury</strong>
+            <p>Les propositions soumises par le jury apparaîtront ici.</p>
+          </div>
+        `;
+        return;
+      }
+
+      ui.proposalList.innerHTML = values.slice(0, 12).map(([id, item]) => `
+        <div class="list-card">
+          <strong>${escapeHtml(item.title || "Proposition jury")}</strong>
+          <p>
+            Créée par : ${escapeHtml(item.createdByEmail || "—")}<br>
+            Questions : ${Array.isArray(item.questions) ? item.questions.length : 0}<br>
+            Statut : ${escapeHtml(item.status || "submitted")}
+          </p>
+          <div class="list-actions">
+            <button class="mini-btn blue" data-action="activate-proposal" data-id="${escapeHtml(id)}">Activer comme épreuve</button>
+            <button class="mini-btn green" data-action="approve-proposal" data-id="${escapeHtml(id)}">Valider</button>
+            <button class="mini-btn red" data-action="reject-proposal" data-id="${escapeHtml(id)}">Refuser</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderSubmissions(){
+      const items = flattenSubmissions(state.submissions || {});
+      if (!items.length) {
+        ui.submissionList.innerHTML = `
+          <div class="list-card">
+            <strong>Aucune copie reçue</strong>
+            <p>Les copies soumises depuis l’examen apparaîtront ici.</p>
+          </div>
+        `;
+        return;
+      }
+
+      ui.submissionList.innerHTML = items.slice(0, 12).map((item) => `
+        <div class="list-card">
+          <strong>${escapeHtml(item.displayName || item.userEmail || item.uid || "Copie")}</strong>
+          <p>
+            Épreuve : ${escapeHtml(item.examId || "—")}<br>
+            Statut : ${escapeHtml(item.status || "—")}<br>
+            Source : ${escapeHtml(item.submissionSource || "manual")}
+          </p>
+        </div>
+      `).join("");
+    }
+
+    async function loadAllData(){
+      const snap = await get(ref(db));
+      const data = snap.exists() ? snap.val() : {};
+
+      state.control = data.competitionControl?.current || {};
+      state.candidates = data.competitionCandidates || {};
+      state.proposals = data.examProposals || {};
+      state.submissions = data.examSubmissions || {};
+      state.announcements = data.championnatAnnouncements || {};
+
+      setText(ui.adminIdentity, `${state.user?.displayName || "Administrateur"} — ${state.user?.email || ADMIN_EMAIL}`);
+      renderTopState();
+      renderCandidates();
+      renderProposals();
+      renderSubmissions();
+
+      $("championshipTitle").value = state.control?.title || "Championnat de Chimie 2026";
+      $("championshipStatus").value = state.control?.status || "Brouillon";
+      $("resultsVisibility").value = state.control?.resultsVisibility || "Préparation";
+      $("durationMinutes").value = state.control?.durationMinutes || 50;
+      $("certificateEnabled").value = state.control?.certificateEnabled ? "oui" : "non";
+      $("certificateNote").value = state.control?.certificateNote || "";
+    }
+
+    async function saveControl(extra = {}){
+      const payload = {
+        title: $("championshipTitle").value.trim() || "Championnat de Chimie 2026",
+        status: $("championshipStatus").value,
+        resultsVisibility: $("resultsVisibility").value,
+        durationMinutes: Number($("durationMinutes").value || 50),
+        certificateEnabled: $("certificateEnabled").value === "oui",
+        certificateNote: $("certificateNote").value.trim(),
+        updatedAt: Date.now(),
+        updatedBy: state.user?.email || ADMIN_EMAIL,
+        ...extra
+      };
+
+      await update(ref(db, "competitionControl/current"), payload);
+      state.control = { ...state.control, ...payload };
+      renderTopState();
+    }
+
+    async function publishAnnouncement(){
+      const text = $("announcementText").value.trim();
+      if (!text) {
+        showAdminMsg("Écris d’abord une annonce avant de publier.", "err");
+        return;
+      }
+
+      const announcementRef = push(ref(db, "championnatAnnouncements"));
+      await set(announcementRef, {
+        text,
+        createdAt: Date.now(),
+        createdBy: state.user?.email || ADMIN_EMAIL
+      });
+
+      $("announcementText").value = "";
+      showAdminMsg("Annonce publiée avec succès.", "ok");
+      await loadAllData();
+    }
+
+    async function activateProposalAsExam(proposalId){
+      const proposal = state.proposals?.[proposalId];
+      if (!proposal) return;
+
+      await set(ref(db, `exams/${proposalId}`), {
+        title: proposal.title || "Épreuve officielle",
+        instructions: proposal.instructions || "",
+        questions: proposal.questions || [],
+        visibility: "visible",
+        category: "Chimie",
+        durationMinutes: Number($("durationMinutes").value || 50),
+        createdFromProposal: proposalId,
+        createdAt: Date.now(),
+        createdBy: state.user?.email || ADMIN_EMAIL
+      });
+
+      await update(ref(db, "competitionControl/current"), {
+        activeExamId: proposalId,
+        currentExamId: proposalId,
+        durationMinutes: Number($("durationMinutes").value || 50),
+        title: proposal.title || "Épreuve officielle",
+        updatedAt: Date.now(),
+        updatedBy: state.user?.email || ADMIN_EMAIL
+      });
+
+      await update(ref(db, `examProposals/${proposalId}`), {
+        status: "approved_active",
+        activatedAt: Date.now(),
+        activatedBy: state.user?.email || ADMIN_EMAIL
+      });
+
+      showAdminMsg("La proposition a été transformée en épreuve active.", "ok");
+      await loadAllData();
+    }
+
+    async function changeProposalStatus(proposalId, status){
+      await update(ref(db, `examProposals/${proposalId}`), {
+        status,
+        reviewedAt: Date.now(),
+        reviewedBy: state.user?.email || ADMIN_EMAIL
+      });
+      await loadAllData();
+    }
+
+    async function changeCandidateStatus(candidateId, status){
+      await update(ref(db, `competitionCandidates/${candidateId}`), {
+        status,
+        updatedAt: Date.now()
+      });
+      await loadAllData();
+    }
+
+    function bindDynamicActions(){
+      document.querySelectorAll("[data-action='activate-proposal']").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          try{
+            await activateProposalAsExam(btn.dataset.id);
+          }catch(err){
+            console.error(err);
+            showAdminMsg("Impossible d’activer cette proposition comme épreuve.", "err");
+          }
         });
+      });
 
-        announcementText.value = "";
-        announcementsCount += 1;
-        statAnnouncements.textContent = announcementsCount;
-        showMessage("Annonce publiée avec succès.", true);
-      }catch(err){
-        console.error(err);
-        showMessage("Publication de l’annonce impossible.");
-      }
-    });
-
-    openCompetitionBtn.addEventListener("click", async () => {
-      try{
-        championshipStatus.value = "Inscriptions ouvertes";
-        await saveSettings({
-          registrationStatus: "Ouvertes"
+      document.querySelectorAll("[data-action='approve-proposal']").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          try{
+            await changeProposalStatus(btn.dataset.id, "approved");
+            showAdminMsg("Proposition du jury validée.", "ok");
+          }catch(err){
+            console.error(err);
+            showAdminMsg("Impossible de valider cette proposition.", "err");
+          }
         });
-        showMessage("Les inscriptions sont maintenant ouvertes.", true);
-      }catch(err){
-        console.error(err);
-        showMessage("Impossible d’ouvrir les inscriptions.");
-      }
-    });
+      });
 
-    closeCompetitionBtn.addEventListener("click", async () => {
-      try{
-        championshipStatus.value = "Clôturé";
-        await saveSettings({
-          registrationStatus: "Fermées"
+      document.querySelectorAll("[data-action='reject-proposal']").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          try{
+            await changeProposalStatus(btn.dataset.id, "rejected");
+            showAdminMsg("Proposition du jury refusée.", "ok");
+          }catch(err){
+            console.error(err);
+            showAdminMsg("Impossible de refuser cette proposition.", "err");
+          }
         });
-        showMessage("Les inscriptions sont maintenant fermées.", true);
-      }catch(err){
-        console.error(err);
-        showMessage("Impossible de fermer les inscriptions.");
-      }
-    });
+      });
 
-    prepareResultsBtn.addEventListener("click", async () => {
+      document.querySelectorAll("[data-action='approve-candidate']").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          try{
+            await changeCandidateStatus(btn.dataset.id, "approved");
+            showAdminMsg("Candidature validée.", "ok");
+          }catch(err){
+            console.error(err);
+            showAdminMsg("Impossible de valider cette candidature.", "err");
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-action='mark-pending']").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          try{
+            await changeCandidateStatus(btn.dataset.id, "pending");
+            showAdminMsg("Candidature remise en attente.", "ok");
+          }catch(err){
+            console.error(err);
+            showAdminMsg("Impossible de modifier ce statut.", "err");
+          }
+        });
+      });
+    }
+
+    async function bootAdmin(){
+      renderSidebar();
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user || !isAdminUser(user)) {
+          lockedView.hidden = false;
+          adminApp.hidden = true;
+          return;
+        }
+
+        state.user = user;
+        lockedView.hidden = true;
+        adminApp.hidden = false;
+
+        try{
+          await loadAllData();
+          bindDynamicActions();
+        }catch(err){
+          console.error(err);
+          showAdminMsg("Impossible de charger les données administrateur.", "err");
+        }
+      });
+    }
+
+    $("refreshBtn").addEventListener("click", async () => {
       try{
-        resultsVisibility.value = "Préparation";
-        await saveSettings();
-        showMessage("Les résultats sont passés en mode préparation.", true);
+        await loadAllData();
+        bindDynamicActions();
+        showAdminMsg("Tableau de bord actualisé.", "ok");
       }catch(err){
         console.error(err);
-        showMessage("Impossible de préparer les résultats.");
+        showAdminMsg("Actualisation impossible.", "err");
       }
     });
 
-    publishResultsBtn.addEventListener("click", async () => {
-      try{
-        resultsVisibility.value = "Public";
-        championshipStatus.value = "Résultats publiés";
-        await saveSettings();
-        showMessage("Les résultats sont maintenant marqués comme publics.", true);
-      }catch(err){
-        console.error(err);
-        showMessage("Impossible de publier les résultats.");
-      }
-    });
-
-    refreshBtn.addEventListener("click", async () => {
-      hideMessage();
-      try{
-        await loadDashboardData();
-        showMessage("Tableau de bord actualisé.", true);
-      }catch(err){
-        console.error(err);
-        showMessage("Actualisation impossible.");
-      }
-    });
-
-    sortRecentBtn.addEventListener("click", () => {
-      currentFilter = "recent";
-      renderRegistrations();
-    });
-
-    sortNameBtn.addEventListener("click", () => {
-      currentFilter = "name";
-      renderRegistrations();
-    });
-
-    filterMasterBtn.addEventListener("click", () => {
-      currentFilter = "master";
-      renderRegistrations();
-    });
-
-    clearFilterBtn.addEventListener("click", () => {
-      currentFilter = "recent";
-      renderRegistrations();
-    });
-
-    signOutBtn.addEventListener("click", async () => {
+    $("signOutBtn").addEventListener("click", async () => {
       try{
         await signOut(auth);
         window.location.href = "./login.html";
       }catch(err){
         console.error(err);
-        showMessage("Déconnexion impossible.");
+        showAdminMsg("Déconnexion impossible.", "err");
       }
     });
 
-    onAuthStateChanged(auth, async (user) => {
-      if(!user){
-        lockedView.hidden = false;
-        adminApp.hidden = true;
-        return;
-      }
+    $("goSupportBtn").addEventListener("click", () => {
+      window.location.href = "./competition-support-admin.html";
+    });
 
-      if((user.email || "").toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
-        lockedView.hidden = false;
-        adminApp.hidden = true;
-        return;
-      }
+    $("avatarBtn").addEventListener("click", () => {
+      window.location.href = "./competition.html";
+    });
 
-      currentAdmin = user;
-      adminIdentity.textContent = `${user.displayName || "Administrateur"} — ${user.email}`;
-
-      lockedView.hidden = true;
-      adminApp.hidden = false;
-
+    $("saveConfigBtn").addEventListener("click", async () => {
       try{
-        await loadDashboardData();
+        await saveControl();
+        showAdminMsg("Configuration enregistrée avec succès.", "ok");
       }catch(err){
         console.error(err);
-        showMessage("Impossible de charger les données administrateur.");
+        showAdminMsg("Impossible d’enregistrer la configuration.", "err");
       }
     });
+
+    $("launchCompetitionBtn").addEventListener("click", async () => {
+      try{
+        $("championshipStatus").value = "Compétition lancée";
+        await saveControl({
+          launched: true,
+          status: "Compétition lancée",
+          startsAt: Date.now(),
+          endsAt: Date.now() + (Number($("durationMinutes").value || 50) * 60 * 1000)
+        });
+        showAdminMsg("La compétition est maintenant lancée.", "ok");
+      }catch(err){
+        console.error(err);
+        showAdminMsg("Impossible de lancer la compétition.", "err");
+      }
+    });
+
+    $("stopCompetitionBtn").addEventListener("click", async () => {
+      try{
+        await saveControl({
+          launched: false,
+          status: "Clôturé"
+        });
+        showAdminMsg("La compétition a été verrouillée.", "ok");
+      }catch(err){
+        console.error(err);
+        showAdminMsg("Impossible d’arrêter la compétition.", "err");
+      }
+    });
+
+    $("prepareResultsBtn").addEventListener("click", async () => {
+      try{
+        $("resultsVisibility").value = "Préparation";
+        await saveControl({
+          resultsVisibility: "Préparation",
+          status: "Brouillon"
+        });
+        showAdminMsg("Les résultats sont en mode préparation.", "ok");
+      }catch(err){
+        console.error(err);
+        showAdminMsg("Impossible de préparer les résultats.", "err");
+      }
+    });
+
+    $("publishResultsBtn").addEventListener("click", async () => {
+      try{
+        $("resultsVisibility").value = "Public";
+        $("championshipStatus").value = "Résultats publiés";
+        await saveControl({
+          resultsVisibility: "Public",
+          status: "Résultats publiés"
+        });
+        showAdminMsg("Les résultats sont maintenant publics.", "ok");
+      }catch(err){
+        console.error(err);
+        showAdminMsg("Impossible de publier les résultats.", "err");
+      }
+    });
+
+    $("publishAnnouncementBtn").addEventListener("click", async () => {
+      try{
+        await publishAnnouncement();
+      }catch(err){
+        console.error(err);
+        showAdminMsg("Publication de l’annonce impossible.", "err");
+      }
+    });
+
+    $("saveCertificateBtn").addEventListener("click", async () => {
+      try{
+        await saveControl({
+          certificateEnabled: $("certificateEnabled").value === "oui",
+          certificateNote: $("certificateNote").value.trim()
+        });
+        showCertificateMsg("Politique certificat enregistrée.", "ok");
+      }catch(err){
+        console.error(err);
+        showCertificateMsg("Impossible d’enregistrer la politique certificat.", "err");
+      }
+    });
+
+    bootAdmin();
   </script>
 </body>
 </html>
