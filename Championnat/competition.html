@@ -1,747 +1,856 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compétition | Championnat de Chimie</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Championnat | Championnat de Chimie</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, Helvetica, sans-serif}
+    :root{
+      --bg:#f7faff;
+      --bg2:#eef4ff;
+      --card:rgba(255,255,255,.88);
+      --card-strong:#ffffff;
+      --text:#0b2340;
+      --muted:#62748b;
+      --line:#d8e4f2;
+      --blue:#2f8cff;
+      --blue-dark:#145bd6;
+      --red:#ff4b4b;
+      --gold:#d8a72f;
+      --green:#18c34a;
+      --shadow:0 16px 38px rgba(10,37,73,.10);
+      --shadow-soft:0 10px 24px rgba(10,37,73,.08);
+      --radius:24px;
+      --max:1180px;
+    }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, Helvetica, sans-serif;}
+    body{
+      min-height:100vh;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,75,75,.10), transparent 24%),
+        radial-gradient(circle at top right, rgba(47,140,255,.10), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(216,167,47,.08), transparent 22%),
+        linear-gradient(180deg,var(--bg) 0%, var(--bg2) 100%);
+      overflow-x:hidden;
+    }
 
-:root{
-  --bg1:#041126;
-  --bg2:#0a2659;
-  --bg3:#123d84;
-  --blue:#2f8cff;
-  --green:#18c34a;
-  --text:#ffffff;
-  --muted:#cfe0ff;
-  --line:rgba(255,255,255,.14);
-  --glass:rgba(255,255,255,0.07);
-  --glass-2:rgba(255,255,255,0.10);
-  --shadow:0 20px 40px rgba(0,0,0,0.30);
-}
+    body::before{
+      content:"";
+      position:fixed;
+      inset:auto;
+      top:-80px;
+      right:-80px;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(47,140,255,.16), transparent 68%);
+      pointer-events:none;
+      z-index:0;
+    }
 
-body{
-  background: linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));
-  color:var(--text);
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow-x:hidden;
-}
+    header{
+      position:sticky;
+      top:0;
+      z-index:40;
+      backdrop-filter:blur(14px);
+      background:rgba(255,255,255,.78);
+      border-bottom:1px solid rgba(216,228,242,.95);
+    }
 
-body::before,
-body::after{
-  content:"";
-  position:fixed;
-  border-radius:50%;
-  pointer-events:none;
-  z-index:0;
-  filter:blur(10px);
-  opacity:.28;
-}
-body::before{
-  width:260px;height:260px;left:-80px;top:80px;
-  background:radial-gradient(circle, rgba(47,140,255,.55), transparent 68%);
-}
-body::after{
-  width:300px;height:300px;right:-90px;bottom:40px;
-  background:radial-gradient(circle, rgba(24,195,74,.28), transparent 70%);
-}
+    .header-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+    }
 
-/* HEADER */
-header{
-  position:sticky;
-  top:0;
-  z-index:30;
-  padding:18px 24px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:rgba(0,0,0,0.22);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      font-size:1.06rem;
+      color:#082e5b;
+    }
 
-.logo{
-  font-size:20px;
-  font-weight:bold;
-  letter-spacing:1px;
-}
+    .logo-mark{
+      width:46px;
+      height:46px;
+      border-radius:16px;
+      position:relative;
+      background:
+        radial-gradient(circle at 30% 30%, #fff 0%, #ffd8d8 24%, #ff7474 55%, #d72626 100%);
+      box-shadow:0 12px 24px rgba(255,75,75,.20), inset 0 1px 8px rgba(255,255,255,.7);
+      flex:0 0 auto;
+    }
 
-.header-actions{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+    .logo-mark::before,
+    .logo-mark::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.82);
+    }
 
-.status-chip{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 14px;
-  border-radius:999px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.10);
-  font-size:13px;
-  font-weight:700;
-  color:#fff;
-}
+    .logo-mark::before{ inset:10px; }
+    .logo-mark::after{ inset:6px 14px; transform:rotate(55deg); border-color:rgba(255,255,255,.56); }
 
-.status-dot{
-  width:10px;
-  height:10px;
-  border-radius:50%;
-  background:#ff6666;
-  box-shadow:0 0 0 5px rgba(255,102,102,.14);
-}
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
 
-.status-dot.ok{
-  background:var(--green);
-  box-shadow:0 0 0 5px rgba(24,195,74,.14);
-}
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#35506d;
+      font-weight:700;
+      font-size:.88rem;
+      box-shadow:var(--shadow-soft);
+    }
 
-.menu-btn{
-  width:44px;
-  height:44px;
-  display:grid;
-  place-items:center;
-  font-size:22px;
-  cursor:pointer;
-  border-radius:14px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.10);
-  user-select:none;
-}
+    .status-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--red);
+      box-shadow:0 0 0 5px rgba(255,75,75,.14);
+    }
 
-.menu-panel{
-  position:fixed;
-  top:82px;
-  right:18px;
-  width:min(320px, calc(100vw - 24px));
-  background:rgba(6,20,45,.92);
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:20px;
-  box-shadow:0 20px 50px rgba(0,0,0,.35);
-  backdrop-filter:blur(16px);
-  padding:16px;
-  z-index:40;
-  display:none;
-}
+    .status-dot.ok{
+      background:var(--green);
+      box-shadow:0 0 0 5px rgba(24,195,74,.14);
+    }
 
-.menu-panel.show{
-  display:block;
-}
+    .menu-btn{
+      width:46px;
+      height:46px;
+      border:none;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
+      color:#0b2340;
+      font-size:22px;
+      cursor:pointer;
+    }
 
-.menu-panel a{
-  display:block;
-  text-decoration:none;
-  color:#fff;
-  padding:12px 14px;
-  border-radius:12px;
-  font-weight:700;
-  margin-bottom:6px;
-  background:rgba(255,255,255,.04);
-}
+    .menu-panel{
+      position:fixed;
+      top:76px;
+      right:18px;
+      width:min(320px, calc(100vw - 24px));
+      background:rgba(255,255,255,.96);
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:0 24px 48px rgba(10,37,73,.16);
+      backdrop-filter:blur(14px);
+      padding:14px;
+      z-index:45;
+      display:none;
+    }
 
-.menu-panel a:last-child{margin-bottom:0}
-.menu-panel a:hover{background:rgba(255,255,255,.10)}
+    .menu-panel.show{display:block}
 
-/* HERO */
-.hero{
-  position:relative;
-  z-index:1;
-  text-align:center;
-  padding:60px 20px 22px;
-}
+    .menu-panel a{
+      display:block;
+      text-decoration:none;
+      color:#0b2340;
+      padding:12px 14px;
+      border-radius:12px;
+      font-weight:700;
+      margin-bottom:6px;
+      background:#f8fbff;
+      border:1px solid #edf3fb;
+    }
 
-.hero h1{
-  font-size:40px;
-  margin-bottom:15px;
-  background:linear-gradient(90deg,#2f8cff,#18c34a);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
+    .menu-panel a:last-child{margin-bottom:0}
 
-.hero p{
-  color:var(--muted);
-  max-width:760px;
-  margin:auto;
-  line-height:1.75;
-  font-size:15px;
-}
+    .page{
+      position:relative;
+      z-index:1;
+      max-width:var(--max);
+      margin:0 auto;
+      padding:34px 18px 48px;
+    }
 
-.hero-actions{
-  margin-top:24px;
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  flex-wrap:wrap;
-}
+    .hero{
+      text-align:center;
+      padding:22px 0 8px;
+    }
 
-.hero-btn{
-  text-decoration:none;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  min-width:190px;
-  padding:14px 18px;
-  border:none;
-  border-radius:14px;
-  cursor:pointer;
-  font-weight:800;
-  font-size:14px;
-  transition:.25s ease;
-}
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 14px;
+      border-radius:999px;
+      background:rgba(255,75,75,.08);
+      border:1px solid rgba(255,75,75,.12);
+      color:#c92b2b;
+      font-size:.84rem;
+      font-weight:800;
+      margin-bottom:16px;
+    }
 
-.hero-btn:hover{
-  transform:translateY(-1px);
-}
+    .hero h1{
+      font-size:clamp(2.1rem, 4vw, 3.5rem);
+      line-height:1.05;
+      letter-spacing:-1px;
+      margin-bottom:14px;
+      color:#082e5b;
+    }
 
-.hero-btn.primary{
-  color:#fff;
-  background:linear-gradient(90deg,#2f8cff,#18c34a);
-  box-shadow:0 14px 30px rgba(47,140,255,.22);
-}
+    .hero p{
+      max-width:780px;
+      margin:0 auto;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:1rem;
+    }
 
-.hero-btn.soft{
-  color:#fff;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.12);
-}
+    .hero-actions{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:24px;
+    }
 
-/* INFO STRIP */
-.info-strip{
-  position:relative;
-  z-index:1;
-  width:min(1080px, calc(100% - 24px));
-  margin:0 auto 18px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
+    .hero-btn{
+      min-width:220px;
+      padding:15px 18px;
+      border:none;
+      border-radius:16px;
+      font-weight:800;
+      font-size:.97rem;
+      cursor:pointer;
+      transition:.2s ease;
+    }
 
-.info-box{
-  background:rgba(255,255,255,.06);
-  backdrop-filter:blur(14px);
-  border-radius:18px;
-  padding:18px;
-  border:1px solid rgba(255,255,255,.10);
-  box-shadow:var(--shadow);
-}
+    .hero-btn:hover{ transform:translateY(-1px); }
 
-.info-box strong{
-  display:block;
-  margin-bottom:8px;
-  font-size:15px;
-}
+    .hero-btn.primary{
+      color:#fff;
+      background:linear-gradient(135deg, var(--red), #ff7a59, var(--gold));
+      box-shadow:0 16px 28px rgba(255,75,75,.20);
+    }
 
-.info-box p{
-  color:#cfe0ff;
-  font-size:13px;
-  line-height:1.65;
-}
+    .hero-btn.secondary{
+      color:#0b2340;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
+    }
 
-/* CARD */
-.card{
-  position:relative;
-  z-index:1;
-  background:rgba(255,255,255,0.06);
-  backdrop-filter:blur(16px);
-  border-radius:24px;
-  padding:30px;
-  width:min(470px, calc(100% - 24px));
-  margin:24px auto 28px;
-  box-shadow:0 20px 40px rgba(0,0,0,0.3);
-  border:1px solid rgba(255,255,255,.10);
-}
+    .top-grid{
+      margin-top:26px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+    }
 
-.card-head{
-  margin-bottom:18px;
-}
+    .info-box,
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.86));
+      border:1px solid rgba(216,228,242,.96);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+    }
 
-.card-head h2{
-  font-size:24px;
-  margin-bottom:8px;
-}
+    .info-box{
+      padding:20px;
+    }
 
-.card-head p{
-  color:#cfe0ff;
-  line-height:1.7;
-  font-size:14px;
-}
+    .info-box strong{
+      display:block;
+      color:#082e5b;
+      margin-bottom:8px;
+      font-size:1rem;
+    }
 
-/* FORM */
-.form-group{
-  margin-bottom:15px;
-}
+    .info-box p{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:.93rem;
+    }
 
-input, select{
-  width:100%;
-  padding:13px 14px;
-  border:none;
-  border-radius:12px;
-  outline:none;
-  background:#ffffff;
-  color:#000;
-  font-size:14px;
-}
+    .main-grid{
+      margin-top:24px;
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:22px;
+      align-items:start;
+    }
 
-input:focus, select:focus{
-  box-shadow:0 0 0 4px rgba(47,140,255,.16);
-}
+    .side-panel{
+      display:grid;
+      gap:16px;
+    }
 
-/* BUTTON */
-.btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  background:linear-gradient(90deg,#2f8cff,#18c34a);
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-  margin-top:10px;
-  transition:0.3s;
-  font-size:15px;
-}
+    .mini-panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.86));
+      border:1px solid rgba(216,228,242,.96);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
 
-.btn:hover{
-  transform:scale(1.02);
-  opacity:0.95;
-}
+    .mini-panel h3{
+      color:#082e5b;
+      font-size:1.15rem;
+      margin-bottom:10px;
+    }
 
-.btn-secondary{
-  width:100%;
-  padding:13px;
-  border:none;
-  border-radius:14px;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.12);
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-  margin-top:10px;
-  transition:0.3s;
-  font-size:14px;
-}
+    .mini-panel p{
+      color:var(--muted);
+      line-height:1.75;
+      font-size:.94rem;
+    }
 
-.btn-secondary:hover{
-  transform:scale(1.01);
-}
+    .mini-links{
+      margin-top:16px;
+      display:grid;
+      gap:10px;
+    }
 
-.helper{
-  margin-top:14px;
-  padding:13px 14px;
-  border-radius:14px;
-  font-size:13px;
-  line-height:1.6;
-  display:none;
-}
+    .mini-links a{
+      text-decoration:none;
+      text-align:center;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#f8fbff;
+      border:1px solid #e6eef8;
+      color:#0f2f58;
+      font-weight:700;
+    }
 
-.helper.show{display:block}
-.helper.ok{
-  background:rgba(24,195,74,.10);
-  border:1px solid rgba(24,195,74,.18);
-  color:#dfffea;
-}
-.helper.err{
-  background:rgba(255,75,75,.12);
-  border:1px solid rgba(255,75,75,.18);
-  color:#ffe0e0;
-}
-.helper.info{
-  background:rgba(47,140,255,.10);
-  border:1px solid rgba(47,140,255,.18);
-  color:#d9ebff;
-}
+    .card{
+      padding:28px;
+    }
 
-/* BACK LINK */
-.back{
-  text-align:center;
-  margin-top:15px;
-}
+    .card-head h2{
+      font-size:1.8rem;
+      color:#082e5b;
+      margin-bottom:10px;
+    }
 
-.back a{
-  color:#9cc3ff;
-  text-decoration:none;
-  font-size:13px;
-}
+    .card-head p{
+      color:var(--muted);
+      line-height:1.75;
+      font-size:.95rem;
+      margin-bottom:20px;
+    }
 
-/* FOOTER */
-footer{
-  margin-top:auto;
-  text-align:center;
-  padding:15px;
-  font-size:12px;
-  color:#9db3d9;
-  position:relative;
-  z-index:1;
-}
+    .form-group{
+      margin-bottom:14px;
+    }
 
-@media (max-width:920px){
-  .info-strip{
-    grid-template-columns:1fr;
-  }
-}
+    input, select{
+      width:100%;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#fff;
+      outline:none;
+      font-size:.95rem;
+      color:#0b2340;
+    }
 
-@media (max-width:640px){
-  header{
-    padding:16px 14px;
-  }
-  .hero{
-    padding:44px 16px 18px;
-  }
-  .hero h1{
-    font-size:31px;
-  }
-  .card{
-    padding:22px 18px;
-  }
-  .status-chip{
-    display:none;
-  }
-}
-</style>
+    input:focus, select:focus{
+      border-color:#ff9b7a;
+      box-shadow:0 0 0 4px rgba(255,122,89,.10);
+    }
 
+    .btn{
+      width:100%;
+      padding:15px 16px;
+      border:none;
+      border-radius:16px;
+      color:#fff;
+      font-weight:800;
+      font-size:.97rem;
+      cursor:pointer;
+      transition:.2s ease;
+      margin-top:8px;
+    }
+
+    .btn:hover{ transform:translateY(-1px); }
+
+    .btn-main{
+      background:linear-gradient(135deg, var(--red), #ff7a59, var(--gold));
+      box-shadow:0 16px 28px rgba(255,75,75,.18);
+    }
+
+    .btn-soft{
+      color:#0b2340;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .helper{
+      margin-top:16px;
+      border-radius:16px;
+      padding:14px 15px;
+      font-size:.92rem;
+      line-height:1.65;
+      display:none;
+    }
+
+    .helper.show{display:block}
+    .helper.ok{
+      background:rgba(24,195,74,.08);
+      border:1px solid rgba(24,195,74,.18);
+      color:#156c37;
+    }
+    .helper.err{
+      background:rgba(255,75,75,.08);
+      border:1px solid rgba(255,75,75,.18);
+      color:#a12626;
+    }
+    .helper.info{
+      background:rgba(47,140,255,.08);
+      border:1px solid rgba(47,140,255,.18);
+      color:#1459b1;
+    }
+
+    .back{
+      text-align:center;
+      margin-top:16px;
+    }
+
+    .back a{
+      color:#145bd6;
+      text-decoration:none;
+      font-size:.92rem;
+      font-weight:700;
+    }
+
+    footer{
+      text-align:center;
+      padding:18px;
+      font-size:.86rem;
+      color:#6a7e98;
+    }
+
+    @media (max-width:980px){
+      .top-grid,
+      .main-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:720px){
+      .status-chip{display:none}
+      .page{padding:24px 14px 38px}
+      .card, .info-box, .mini-panel{border-radius:20px}
+      .hero-actions{flex-direction:column}
+      .hero-btn{width:100%}
+      .card{padding:22px 18px}
+    }
+  </style>
 </head>
-
 <body>
 
-<header>
-  <div class="logo">🏆 Championnat Chimie</div>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-mark"></div>
+        <div>Championnat de Chimie</div>
+      </div>
 
-  <div class="header-actions">
-    <div class="status-chip">
-      <span id="statusDot" class="status-dot"></span>
-      <span id="statusText">Visiteur public</span>
+      <div class="header-actions">
+        <div class="status-chip">
+          <span id="statusDot" class="status-dot"></span>
+          <span id="statusText">Visiteur public</span>
+        </div>
+        <button class="menu-btn" id="menuBtn" type="button">☰</button>
+      </div>
     </div>
-    <div class="menu-btn" id="menuBtn">☰</div>
-  </div>
-</header>
+  </header>
 
-<div class="menu-panel" id="menuPanel">
-  <a href="./index.html">Accueil</a>
-  <a href="./competition.html">Championnat</a>
-  <a href="./rules.html">Règlement</a>
-  <a href="./results.html">Résultats</a>
-  <a href="./partners.html">Partenaires</a>
-  <a href="./faq.html">FAQ</a>
-  <a href="./login.html">Connexion</a>
-</div>
-
-<section class="hero">
-  <h1>Participer à la compétition</h1>
-  <p>
-    Cette page reste publique. Tu peux découvrir le championnat librement, puis te connecter seulement
-    quand tu veux réellement participer, accéder à ton espace, rejoindre le jury ou ouvrir le pilotage admin selon ton rôle.
-  </p>
-
-  <div class="hero-actions">
-    <button class="hero-btn primary" id="mainActionBtn">Se connecter pour participer</button>
-    <button class="hero-btn soft" id="spaceBtn">Accéder à mon espace</button>
-  </div>
-</section>
-
-<section class="info-strip">
-  <div class="info-box">
-    <strong>Page publique</strong>
-    <p>Le championnat reste visible par les visiteurs. La connexion n’est demandée qu’au moment d’entrer dans une zone privée.</p>
-  </div>
-  <div class="info-box">
-    <strong>Examen sécurisé</strong>
-    <p>L’accès à l’épreuve passe par <code>login.html</code>, puis par une redirection propre selon le rôle reconnu.</p>
-  </div>
-  <div class="info-box">
-    <strong>Pilotage synchronisé</strong>
-    <p>L’administrateur principal garde la main sur l’ouverture de la compétition, des questionnaires et de l’examen actif.</p>
-  </div>
-</section>
-
-<div class="card">
-
-  <div class="card-head">
-    <h2>Préparer ma participation</h2>
-    <p>
-      Remplis ce formulaire pour enregistrer ton intention de participer. Si tu es déjà connecté,
-      tes informations seront liées à ton compte. Sinon, tu seras redirigé proprement vers la connexion.
-    </p>
+  <div class="menu-panel" id="menuPanel">
+    <a href="./index.html">Accueil</a>
+    <a href="./competition.html">Championnat</a>
+    <a href="./rules.html">Règlement</a>
+    <a href="./results.html">Résultats</a>
+    <a href="./partners.html">Partenaires</a>
+    <a href="./faq.html">FAQ</a>
+    <a href="./contact.html">Contact</a>
+    <a href="./login.html">Connexion</a>
   </div>
 
-  <form id="interestForm">
-    <div class="form-group">
-      <input type="text" id="fullName" placeholder="Nom complet" required>
-    </div>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-badge">🏆 Page publique • Accès privé après connexion</div>
+      <h1>Participer au Championnat de Chimie</h1>
+      <p>
+        Le championnat reste visible publiquement. Tu peux découvrir l’événement, préparer ta participation,
+        puis entrer dans l’examen ou ton espace privé au bon moment via une connexion unique.
+      </p>
 
-    <div class="form-group">
-      <input type="email" id="email" placeholder="Adresse email" required>
-    </div>
+      <div class="hero-actions">
+        <button class="hero-btn primary" id="mainActionBtn" type="button">Se connecter pour participer</button>
+        <button class="hero-btn secondary" id="spaceBtn" type="button">Accéder à mon espace</button>
+      </div>
+    </section>
 
-    <div class="form-group">
-      <select id="level" required>
-        <option value="">Choisir ton niveau</option>
-        <option value="Licence">Licence</option>
-        <option value="Master">Master</option>
-        <option value="Doctorat">Doctorat</option>
-      </select>
-    </div>
+    <section class="top-grid">
+      <div class="info-box">
+        <strong>Visibilité publique</strong>
+        <p>La page reste ouverte aux visiteurs. Le règlement, les résultats et les informations générales restent consultables librement.</p>
+      </div>
+      <div class="info-box">
+        <strong>Accès examen sécurisé</strong>
+        <p>L’examen passe par <code>login.html</code>, puis une redirection intelligente vers <code>examen.html</code> selon le rôle et la session.</p>
+      </div>
+      <div class="info-box">
+        <strong>Pilotage centralisé</strong>
+        <p>L’administrateur principal contrôle l’ouverture de la compétition, l’épreuve active, le jury et la publication finale.</p>
+      </div>
+    </section>
 
-    <button class="btn" type="submit" id="submitInterestBtn">S'inscrire au championnat</button>
-    <button class="btn-secondary" type="button" id="examBtn">Passer l'examen</button>
-  </form>
+    <section class="main-grid">
+      <div class="card">
+        <div class="card-head">
+          <h2>Préparer ma participation</h2>
+          <p>
+            Remplis ce formulaire pour enregistrer ton intérêt au championnat. Si tu es connecté, les informations seront liées à ton compte.
+            Sinon, tu seras redirigé vers la connexion avant d’entrer dans les espaces privés.
+          </p>
+        </div>
 
-  <div class="helper info show" id="formMsg">
-    Tu peux lire librement cette page. L’accès à l’examen passera par la connexion si nécessaire.
-  </div>
+        <form id="interestForm">
+          <div class="form-group">
+            <input type="text" id="fullName" placeholder="Nom complet" required />
+          </div>
 
-  <div class="back">
-    <a href="./index.html">← Retour à l'accueil</a>
-  </div>
+          <div class="form-group">
+            <input type="email" id="email" placeholder="Adresse email" required />
+          </div>
 
-</div>
+          <div class="form-group">
+            <select id="level" required>
+              <option value="">Choisir ton niveau</option>
+              <option value="Licence">Licence</option>
+              <option value="Master">Master</option>
+              <option value="Doctorat">Doctorat</option>
+            </select>
+          </div>
 
-<footer>
-  © 2026 Championnat de Chimie
-</footer>
+          <button class="btn btn-main" id="submitInterestBtn" type="submit">S’inscrire au championnat</button>
+          <button class="btn btn-soft" id="examBtn" type="button">Passer l’examen</button>
+        </form>
 
-<script type="module">
-  import { auth, db } from "./firebase-config.js";
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        <div class="helper info show" id="formMsg">
+          Tu peux consulter cette page librement. La connexion sera demandée seulement quand il faut entrer dans une zone privée.
+        </div>
 
-  const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+        <div class="back">
+          <a href="./index.html">← Retour à l’accueil</a>
+        </div>
+      </div>
 
-  const menuBtn = document.getElementById("menuBtn");
-  const menuPanel = document.getElementById("menuPanel");
-  const statusDot = document.getElementById("statusDot");
-  const statusText = document.getElementById("statusText");
-  const mainActionBtn = document.getElementById("mainActionBtn");
-  const spaceBtn = document.getElementById("spaceBtn");
-  const examBtn = document.getElementById("examBtn");
-  const interestForm = document.getElementById("interestForm");
-  const formMsg = document.getElementById("formMsg");
-  const submitInterestBtn = document.getElementById("submitInterestBtn");
+      <aside class="side-panel">
+        <div class="mini-panel">
+          <h3>Accès rapides</h3>
+          <p>
+            Les pages publiques restent ouvertes. Les pages privées sont accessibles après authentification
+            et selon le rôle reconnu dans Firebase.
+          </p>
+          <div class="mini-links">
+            <a href="./rules.html">Lire le règlement</a>
+            <a href="./results.html">Voir les résultats</a>
+            <a href="./login.html?redirect=examen.html">Connexion pour examen</a>
+            <a href="./login.html?redirect=dashboard-candidat.html">Connexion espace candidat</a>
+          </div>
+        </div>
 
-  const fullNameInput = document.getElementById("fullName");
-  const emailInput = document.getElementById("email");
-  const levelInput = document.getElementById("level");
+        <div class="mini-panel">
+          <h3>Fonctionnement</h3>
+          <p>
+            <strong>Visiteur :</strong> découvre le championnat.<br><br>
+            <strong>Candidat :</strong> accède à l’espace privé et à l’examen.<br><br>
+            <strong>Jury :</strong> rejoint l’espace jury.<br><br>
+            <strong>Admin :</strong> pilote l’ensemble du système.
+          </p>
+        </div>
+      </aside>
+    </section>
+  </main>
 
-  const state = {
-    user: null,
-    profile: null,
-    role: "visitor"
-  };
+  <footer>
+    © 2026 Championnat de Chimie
+  </footer>
 
-  function setMessage(text, type = "info"){
-    formMsg.textContent = text;
-    formMsg.className = "helper show " + type;
-  }
+  <script type="module">
+    const menuBtn = document.getElementById("menuBtn");
+    const menuPanel = document.getElementById("menuPanel");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+    const mainActionBtn = document.getElementById("mainActionBtn");
+    const spaceBtn = document.getElementById("spaceBtn");
+    const examBtn = document.getElementById("examBtn");
+    const interestForm = document.getElementById("interestForm");
+    const formMsg = document.getElementById("formMsg");
+    const submitInterestBtn = document.getElementById("submitInterestBtn");
 
-  function normalizeEmail(value = ""){
-    return String(value || "").trim().toLowerCase();
-  }
+    const fullNameInput = document.getElementById("fullName");
+    const emailInput = document.getElementById("email");
+    const levelInput = document.getElementById("level");
 
-  function resolveRole(user, profile){
-    const email = normalizeEmail(user?.email);
-    if (!user) return "visitor";
-    if (email === ADMIN_EMAIL) return "admin";
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
 
-    const role = String(
-      profile?.competitionRole ||
-      profile?.role ||
-      profile?.userType ||
-      ""
-    ).toLowerCase();
+    const state = {
+      user: null,
+      profile: null,
+      role: "visitor",
+      firebaseReady: false
+    };
 
-    if (role === "jury") return "jury";
-    if (role === "admin") return "admin";
-    return "candidate";
-  }
-
-  function applyRoleUI(){
-    if (state.role === "admin") {
-      statusDot.classList.add("ok");
-      statusText.textContent = "Admin connecté";
-      mainActionBtn.textContent = "Ouvrir le pilotage admin";
-      spaceBtn.textContent = "Accéder à l’espace admin";
-      setMessage("Session admin reconnue. Tu peux piloter le championnat ou ouvrir les sections privées.", "ok");
-      return;
+    function setMessage(text, type = "info"){
+      formMsg.textContent = text;
+      formMsg.className = "helper show " + type;
     }
 
-    if (state.role === "jury") {
-      statusDot.classList.add("ok");
-      statusText.textContent = "Jury connecté";
-      mainActionBtn.textContent = "Accéder à l’espace jury";
-      spaceBtn.textContent = "Ouvrir mon espace jury";
-      setMessage("Session jury reconnue. L’accès jury est prêt selon les validations administratives.", "ok");
-      return;
+    function normalizeEmail(value = ""){
+      return String(value || "").trim().toLowerCase();
     }
 
-    if (state.role === "candidate") {
-      statusDot.classList.add("ok");
-      statusText.textContent = "Candidat connecté";
-      mainActionBtn.textContent = "Passer l’examen";
-      spaceBtn.textContent = "Accéder à mon espace candidat";
-      setMessage("Session candidat reconnue. Tu peux préparer ta participation et accéder aux zones privées autorisées.", "ok");
-      return;
+    function resolveRole(user, profile){
+      const email = normalizeEmail(user?.email);
+      if (!user) return "visitor";
+      if (email === ADMIN_EMAIL) return "admin";
+
+      const role = String(
+        profile?.competitionRole ||
+        profile?.role ||
+        profile?.userType ||
+        ""
+      ).toLowerCase();
+
+      if (role === "jury") return "jury";
+      if (role === "admin") return "admin";
+      return "candidate";
     }
 
-    statusDot.classList.remove("ok");
-    statusText.textContent = "Visiteur public";
-    mainActionBtn.textContent = "Se connecter pour participer";
-    spaceBtn.textContent = "Accéder à mon espace";
-    setMessage("Tu peux lire librement cette page. L’accès à l’examen passera par la connexion si nécessaire.", "info");
-  }
-
-  async function getProfile(uid){
-    try{
-      const snap = await get(ref(db, "users/" + uid));
-      return snap.exists() ? snap.val() : null;
-    }catch(err){
-      console.error(err);
-      return null;
-    }
-  }
-
-  function goMainAction(){
-    if (state.role === "admin") {
-      window.location.href = "./admin.html";
-      return;
-    }
-    if (state.role === "jury") {
-      window.location.href = "./jury.html";
-      return;
-    }
-    if (state.role === "candidate") {
-      window.location.href = "./examen.html";
-      return;
-    }
-    window.location.href = "./login.html?redirect=examen.html";
-  }
-
-  function goPrivateSpace(){
-    if (state.role === "admin") {
-      window.location.href = "./admin.html";
-      return;
-    }
-    if (state.role === "jury") {
-      window.location.href = "./jury.html";
-      return;
-    }
-    if (state.role === "candidate") {
-      window.location.href = "./dashboard-candidat.html";
-      return;
-    }
-    window.location.href = "./login.html?redirect=dashboard-candidat.html";
-  }
-
-  menuBtn.addEventListener("click", () => {
-    menuPanel.classList.toggle("show");
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!menuPanel.contains(e.target) && !menuBtn.contains(e.target)) {
-      menuPanel.classList.remove("show");
-    }
-  });
-
-  mainActionBtn.addEventListener("click", goMainAction);
-  spaceBtn.addEventListener("click", goPrivateSpace);
-  examBtn.addEventListener("click", goMainAction);
-
-  interestForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const fullName = fullNameInput.value.trim();
-    const email = emailInput.value.trim();
-    const level = levelInput.value;
-
-    if (!fullName || !email || !level) {
-      setMessage("Veuillez remplir tous les champs.", "err");
-      return;
-    }
-
-    submitInterestBtn.disabled = true;
-
-    try {
-      if (!state.user) {
-        const redirect = encodeURIComponent("dashboard-candidat.html");
-        window.location.href = `./login.html?redirect=${redirect}`;
+    function applyRoleUI(){
+      if (state.role === "admin") {
+        statusDot.classList.add("ok");
+        statusText.textContent = "Admin connecté";
+        mainActionBtn.textContent = "Ouvrir le pilotage admin";
+        spaceBtn.textContent = "Accéder à l’espace admin";
+        setMessage("Session admin reconnue. Tu peux piloter le championnat et ouvrir les sections privées.", "ok");
         return;
       }
 
-      const candidateRef = ref(db, "competitionCandidates/" + state.user.uid);
-      const existingSnap = await get(candidateRef);
-
-      const payload = {
-        uid: state.user.uid,
-        fullName,
-        email,
-        level,
-        competitionRole: state.role === "jury" ? "jury" : (state.role === "admin" ? "admin" : "candidate"),
-        status: existingSnap.exists() ? (existingSnap.val()?.status || "pending") : "pending",
-        updatedAt: Date.now()
-      };
-
-      if (!existingSnap.exists()) {
-        payload.createdAt = Date.now();
-        await set(candidateRef, payload);
-      } else {
-        await update(candidateRef, payload);
+      if (state.role === "jury") {
+        statusDot.classList.add("ok");
+        statusText.textContent = "Jury connecté";
+        mainActionBtn.textContent = "Ouvrir l’espace jury";
+        spaceBtn.textContent = "Accéder à mon espace jury";
+        setMessage("Session jury reconnue. L’espace jury est disponible selon les validations administratives.", "ok");
+        return;
       }
 
-      if (state.profile) {
+      if (state.role === "candidate") {
+        statusDot.classList.add("ok");
+        statusText.textContent = "Candidat connecté";
+        mainActionBtn.textContent = "Passer l’examen";
+        spaceBtn.textContent = "Accéder à mon espace candidat";
+        setMessage("Session candidat reconnue. Tu peux préparer ta participation et accéder aux espaces autorisés.", "ok");
+        return;
+      }
+
+      statusDot.classList.remove("ok");
+      statusText.textContent = "Visiteur public";
+      mainActionBtn.textContent = "Se connecter pour participer";
+      spaceBtn.textContent = "Accéder à mon espace";
+      setMessage("Tu peux consulter cette page librement. La connexion sera demandée seulement quand il faut entrer dans une zone privée.", "info");
+    }
+
+    function goMainAction(){
+      if (state.role === "admin") {
+        window.location.href = "./admin.html";
+        return;
+      }
+      if (state.role === "jury") {
+        window.location.href = "./jury.html";
+        return;
+      }
+      if (state.role === "candidate") {
+        window.location.href = "./examen.html";
+        return;
+      }
+      window.location.href = "./login.html?redirect=examen.html";
+    }
+
+    function goPrivateSpace(){
+      if (state.role === "admin") {
+        window.location.href = "./admin.html";
+        return;
+      }
+      if (state.role === "jury") {
+        window.location.href = "./jury.html";
+        return;
+      }
+      if (state.role === "candidate") {
+        window.location.href = "./dashboard-candidat.html";
+        return;
+      }
+      window.location.href = "./login.html?redirect=dashboard-candidat.html";
+    }
+
+    menuBtn.addEventListener("click", () => {
+      menuPanel.classList.toggle("show");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!menuPanel.contains(e.target) && !menuBtn.contains(e.target)) {
+        menuPanel.classList.remove("show");
+      }
+    });
+
+    mainActionBtn.addEventListener("click", goMainAction);
+    spaceBtn.addEventListener("click", goPrivateSpace);
+    examBtn.addEventListener("click", goMainAction);
+
+    interestForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const fullName = fullNameInput.value.trim();
+      const email = emailInput.value.trim();
+      const level = levelInput.value;
+
+      if (!fullName || !email || !level) {
+        setMessage("Veuillez remplir tous les champs.", "err");
+        return;
+      }
+
+      if (!state.firebaseReady || !state.user) {
+        window.location.href = "./login.html?redirect=dashboard-candidat.html";
+        return;
+      }
+
+      submitInterestBtn.disabled = true;
+
+      try {
+        const [{ ref, get, set, update }, { db }] = await Promise.all([
+          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"),
+          import("./firebase-config.js")
+        ]);
+
+        const candidateRef = ref(db, "competitionCandidates/" + state.user.uid);
+        const existingSnap = await get(candidateRef);
+
+        const payload = {
+          uid: state.user.uid,
+          fullName,
+          email,
+          level,
+          competitionRole: state.role === "jury" ? "jury" : (state.role === "admin" ? "admin" : "candidate"),
+          status: existingSnap.exists() ? (existingSnap.val()?.status || "pending") : "pending",
+          updatedAt: Date.now()
+        };
+
+        if (!existingSnap.exists()) {
+          payload.createdAt = Date.now();
+          await set(candidateRef, payload);
+        } else {
+          await update(candidateRef, payload);
+        }
+
         try{
           await update(ref(db, "users/" + state.user.uid), {
             displayName: fullName,
             email,
-            competitionRole: state.profile?.competitionRole || "candidate",
+            level,
             updatedAt: Date.now()
           });
-        }catch(err){
-          console.error(err);
-        }
+        }catch(err){}
+
+        setMessage("Votre demande de participation a bien été enregistrée.", "ok");
+      } catch (err) {
+        console.error(err);
+        setMessage("Impossible d’enregistrer votre demande pour le moment.", "err");
+      } finally {
+        submitInterestBtn.disabled = false;
       }
-
-      setMessage("Votre intérêt pour le championnat a bien été enregistré. Vous pourrez poursuivre depuis votre espace privé.", "ok");
-    } catch (err) {
-      console.error(err);
-      setMessage("Impossible d’enregistrer votre demande pour le moment. Réessayez.", "err");
-    } finally {
-      submitInterestBtn.disabled = false;
-    }
-  });
-
-  onAuthStateChanged(auth, async (user) => {
-    state.user = user;
-
-    if (!user) {
-      state.profile = null;
-      state.role = "visitor";
-      applyRoleUI();
-      return;
-    }
-
-    state.profile = await getProfile(user.uid);
-    state.role = resolveRole(user, state.profile);
-
-    if (!fullNameInput.value && (state.profile?.displayName || user.displayName)) {
-      fullNameInput.value = state.profile?.displayName || user.displayName || "";
-    }
-
-    if (!emailInput.value && user.email) {
-      emailInput.value = user.email;
-    }
-
-    if (state.profile?.level && !levelInput.value) {
-      levelInput.value = state.profile.level;
-    }
+    });
 
     applyRoleUI();
-  });
-</script>
 
+    async function bootFirebase(){
+      try{
+        const [{ auth, db }, authMod, dbMod] = await Promise.all([
+          import("./firebase-config.js"),
+          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"),
+          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js")
+        ]);
+
+        const { onAuthStateChanged } = authMod;
+        const { ref, get } = dbMod;
+
+        state.firebaseReady = true;
+
+        onAuthStateChanged(auth, async (user) => {
+          state.user = user || null;
+
+          if (!user) {
+            state.profile = null;
+            state.role = "visitor";
+            applyRoleUI();
+            return;
+          }
+
+          try{
+            const snap = await get(ref(db, "users/" + user.uid));
+            state.profile = snap.exists() ? snap.val() : null;
+          }catch(err){
+            console.error(err);
+            state.profile = null;
+          }
+
+          state.role = resolveRole(user, state.profile);
+
+          if (!fullNameInput.value && (state.profile?.displayName || user.displayName)) {
+            fullNameInput.value = state.profile?.displayName || user.displayName || "";
+          }
+
+          if (!emailInput.value && user.email) {
+            emailInput.value = user.email;
+          }
+
+          if (state.profile?.level && !levelInput.value) {
+            levelInput.value = state.profile.level;
+          }
+
+          applyRoleUI();
+        });
+      } catch (err) {
+        console.error("Firebase indisponible sur competition.html :", err);
+        state.firebaseReady = false;
+        state.user = null;
+        state.profile = null;
+        state.role = "visitor";
+        applyRoleUI();
+        setMessage("Mode public actif. Si la connexion privée ne répond pas encore, utilise le bouton de connexion pour continuer.", "info");
+      }
+    }
+
+    bootFirebase();
+  </script>
 </body>
 </html>
