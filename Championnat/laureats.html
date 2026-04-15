@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -112,6 +112,7 @@
       display:flex;
       align-items:center;
       gap:12px;
+      flex:0 0 auto;
     }
 
     .status-chip{
@@ -163,6 +164,7 @@
       cursor:pointer;
       padding:0;
       position:relative;
+      box-shadow:var(--shadow);
     }
 
     .menu-btn span,
@@ -520,7 +522,7 @@
     .rank-main h3{
       margin:0 0 4px;
       font-size:1rem;
-      color:var(--nav);
+      color:var(--sidebar);
     }
 
     .rank-main p{
@@ -736,8 +738,57 @@
       .cards-4{
         grid-template-columns:1fr;
       }
-      .topbar{ padding:0 14px; }
-      .home-btn{ padding:10px 12px; font-size:12px; }
+      .topbar{
+        padding:0 12px;
+        display:grid;
+        grid-template-columns:44px minmax(0,1fr) 34px;
+        align-items:center;
+        gap:10px;
+      }
+      .brand{
+        display:grid;
+        grid-template-columns:44px minmax(0,1fr);
+        align-items:center;
+        gap:10px;
+        min-width:0;
+      }
+      .brand-mark{
+        width:44px;
+        height:44px;
+        border-radius:14px;
+      }
+      .brand-text{
+        min-width:0;
+        width:100%;
+      }
+      .brand-title{
+        font-size:16px;
+        line-height:1.15;
+        white-space:normal;
+        overflow:visible;
+        text-overflow:clip;
+        text-align:center;
+        display:block;
+        width:100%;
+      }
+      .brand-sub{ display:none; }
+      .topbar-right{
+        width:34px;
+        justify-content:flex-end;
+      }
+      .home-btn{ display:none; }
+      .menu-btn{
+        width:34px;
+        height:34px;
+        border-radius:10px;
+      }
+      .menu-btn span,
+      .menu-btn::before,
+      .menu-btn::after{
+        width:14px;
+      }
+      .menu-btn::before{ transform:translateY(-5px); }
+      .menu-btn::after{ transform:translateY(5px); }
       .grid-main{ grid-template-columns:1fr; }
       .rank-item{
         grid-template-columns:auto 1fr;
@@ -749,7 +800,6 @@
     }
 
     @media (max-width:520px){
-      .brand-sub{ display:none; }
       .content-head{
         flex-direction:column;
         align-items:stretch;
@@ -759,6 +809,48 @@
       .footer-inner{
         align-items:flex-start;
         flex-direction:column;
+      }
+      .topbar{
+        padding:0 10px;
+        grid-template-columns:40px minmax(0,1fr) 30px;
+        gap:8px;
+      }
+      .brand{
+        grid-template-columns:40px minmax(0,1fr);
+        gap:8px;
+      }
+      .brand-mark{
+        width:40px;
+        height:40px;
+        border-radius:13px;
+      }
+      .brand-title{
+        font-size:15px;
+        line-height:1.1;
+        letter-spacing:-.2px;
+      }
+      .topbar-right{
+        width:30px;
+      }
+      .menu-btn{
+        width:30px;
+        height:30px;
+        border-radius:9px;
+      }
+      .menu-btn span,
+      .menu-btn::before,
+      .menu-btn::after{
+        width:13px;
+      }
+      .menu-btn::before{ transform:translateY(-4px); }
+      .menu-btn::after{ transform:translateY(4px); }
+      .title-wrap h1{
+        font-size:28px;
+        line-height:1.08;
+      }
+      .title-wrap p{
+        font-size:15px;
+        line-height:1.8;
       }
     }
   </style>
@@ -816,13 +908,13 @@
         <a class="nav-link" href="./about.html"><span class="nav-dot purple"></span><span>À propos</span></a>
         <a class="nav-link" href="./competition.html"><span class="nav-dot green"></span><span>Championnat</span></a>
         <a class="nav-link" href="./rules.html"><span class="nav-dot red"></span><span>Règlement</span></a>
-        <a class="nav-link" href="./results.html"><span class="nav-dot blue"></span><span>Résultats</span></a>
+        <a class="nav-link" href="./results.html"><span class="nav-dot"></span><span>Résultats</span></a>
         <a class="nav-link active" href="./laureats.html"><span class="nav-dot gold"></span><span>Lauréats</span></a>
         <a class="nav-link" href="./announcements.html"><span class="nav-dot purple"></span><span>Annonces</span></a>
-        <a class="nav-link" href="./faq.html"><span class="nav-dot blue"></span><span>FAQ</span></a>
+        <a class="nav-link" href="./faq.html"><span class="nav-dot"></span><span>FAQ</span></a>
         <a class="nav-link" href="./contact.html"><span class="nav-dot red"></span><span>Contact</span></a>
         <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
-        <a class="nav-link" href="./login.html"><span class="nav-dot blue"></span><span>Connexion</span></a>
+        <a class="nav-link" href="./login.html"><span class="nav-dot"></span><span>Connexion</span></a>
         <a class="nav-link" href="./login.html?redirect=dashboard-candidat.html"><span class="nav-dot green"></span><span>Espace candidat</span></a>
         <a class="nav-link" href="./login.html?redirect=jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
         <a class="nav-link" href="./login.html?redirect=admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
