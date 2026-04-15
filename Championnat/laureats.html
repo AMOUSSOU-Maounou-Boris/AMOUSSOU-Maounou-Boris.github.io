@@ -33,15 +33,19 @@
       --shadow:0 10px 24px rgba(13,37,71,.08);
       --radius:18px;
       --radius-lg:22px;
-      --topbar-h:70px;
-      --sidebar-w:276px;
+      --topbar-h:62px;
+      --sidebar-w:244px;
     }
 
-    body{
+    html,body{
       margin:0;
       background:var(--bg);
       color:var(--text);
       min-height:100vh;
+    }
+
+    body{
+      overflow:hidden;
     }
 
     .topbar{
@@ -56,6 +60,12 @@
       align-items:center;
       justify-content:space-between;
       padding:0 18px;
+      transition:transform .24s ease, opacity .24s ease, height .18s ease;
+    }
+
+    .topbar.topbar-hidden{
+      transform:translateY(-100%);
+      opacity:.98;
     }
 
     .brand{
@@ -119,7 +129,7 @@
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:10px 14px;
+      padding:9px 14px;
       border-radius:999px;
       background:#fff;
       border:1px solid var(--line);
@@ -187,7 +197,7 @@
     .layout{
       display:grid;
       grid-template-columns:var(--sidebar-w) minmax(0,1fr);
-      min-height:calc(100vh - var(--topbar-h));
+      height:calc(100vh - var(--topbar-h));
     }
 
     .sidebar{
@@ -195,6 +205,10 @@
       color:#fff;
       padding:18px 14px 20px;
       border-right:1px solid rgba(255,255,255,.06);
+      position:sticky;
+      top:var(--topbar-h);
+      height:calc(100vh - var(--topbar-h));
+      overflow-y:auto;
     }
 
     .sidebar-section-title{
@@ -258,6 +272,9 @@
 
     .content{
       padding:20px;
+      height:calc(100vh - var(--topbar-h));
+      overflow-y:auto;
+      overflow-x:hidden;
     }
 
     .content-head{
@@ -357,7 +374,7 @@
 
     .grid-main{
       display:grid;
-      grid-template-columns:minmax(0,1fr) 340px;
+      grid-template-columns:minmax(0,1fr) 320px;
       gap:18px;
       align-items:start;
     }
@@ -626,11 +643,37 @@
       color:#fff;
     }
 
+    .bottom-cta{
+      margin-top:22px;
+      display:flex;
+      justify-content:center;
+    }
+
+    .bottom-cta .head-btn{
+      min-width:220px;
+    }
+
+    .page-footer{
+      margin-top:26px;
+      padding:20px 16px 26px;
+      text-align:center;
+      color:#5f728a;
+      font-size:14px;
+      line-height:1.75;
+    }
+
+    .page-footer strong{
+      display:block;
+      color:#123861;
+      font-size:15px;
+      margin-bottom:4px;
+    }
+
     .mobile-menu{
       position:fixed;
-      top:74px;
-      right:14px;
-      width:min(320px, calc(100vw - 28px));
+      top:72px;
+      right:12px;
+      width:min(285px, calc(100vw - 24px));
       max-height:72vh;
       overflow:auto;
       background:rgba(255,255,255,.98);
@@ -670,68 +713,18 @@
     .mobile-overlay{
       position:fixed;
       inset:0;
-      background:rgba(3,18,42,.18);
+      background:rgba(3,18,42,.12);
       z-index:70;
       display:none;
     }
 
     .mobile-overlay.show{ display:block; }
 
-    footer{
-      border-top:1px solid rgba(220,231,243,.92);
-      background:rgba(255,255,255,.68);
-      backdrop-filter:blur(10px);
-      margin-top:30px;
-    }
-
-    .footer-inner{
-      max-width:1260px;
-      margin:0 auto;
-      padding:22px 18px 28px;
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      align-items:center;
-      flex-wrap:wrap;
-      color:#61758f;
-      font-size:.94rem;
-    }
-
-    .footer-links{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .footer-links a{
-      color:#1559bf;
-      text-decoration:none;
-      font-weight:700;
-    }
-
-    @media (min-width:821px){
-      body{
-        overflow:hidden;
-      }
-
-      .layout{
-        height:calc(100vh - var(--topbar-h));
-      }
-
-      .sidebar{
-        position:sticky;
-        top:var(--topbar-h);
-        height:calc(100vh - var(--topbar-h));
-        overflow-y:auto;
-      }
-
-      .content{
-        height:calc(100vh - var(--topbar-h));
-        overflow-y:auto;
-      }
-    }
-
     @media (max-width:1120px){
+      body{
+        overflow:auto;
+      }
+
       .layout,
       .grid-main{
         grid-template-columns:1fr;
@@ -750,6 +743,11 @@
       .podium-card.silver,
       .podium-card.bronze{
         min-height:auto;
+      }
+
+      .content{
+        height:auto;
+        overflow:visible;
       }
     }
 
@@ -787,13 +785,13 @@
       .brand-sub{ display:none; }
       .topbar-right{
         margin-left:auto;
-        gap:8px;
+        gap:6px;
         justify-content:flex-end;
       }
       .home-btn{ display:none; }
       .menu-btn{
-        width:34px;
-        height:34px;
+        width:32px;
+        height:32px;
         border-radius:10px;
       }
       .menu-btn span,
@@ -811,6 +809,10 @@
         grid-column:1 / -1;
         justify-self:flex-start;
       }
+      .mobile-menu{
+        width:min(250px, calc(100vw - 20px));
+        right:10px;
+      }
     }
 
     @media (max-width:520px){
@@ -820,10 +822,6 @@
       }
       .head-actions{ width:100%; }
       .head-btn{ width:100%; }
-      .footer-inner{
-        align-items:flex-start;
-        flex-direction:column;
-      }
       .topbar{
         padding:0 10px;
       }
@@ -865,11 +863,19 @@
         font-size:15px;
         line-height:1.8;
       }
+      .mobile-menu{
+        width:min(230px, calc(100vw - 18px));
+        right:9px;
+        top:68px;
+      }
+      .page-footer{
+        padding-bottom:22px;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
+  <header class="topbar" id="topbar">
     <a href="./index.html" class="brand">
       <div class="brand-mark"></div>
       <div class="brand-text">
@@ -939,7 +945,7 @@
       </div>
     </aside>
 
-    <main class="content">
+    <main class="content" id="mainContent">
       <div class="content-head">
         <div class="title-wrap">
           <h1>Les lauréats donnent du prestige au championnat</h1>
@@ -1060,6 +1066,10 @@
                 <div class="score">89 / 100</div>
               </div>
             </div>
+
+            <div class="bottom-cta">
+              <a class="head-btn primary" href="./competition.html">Participer</a>
+            </div>
           </div>
         </section>
 
@@ -1114,27 +1124,20 @@
           </section>
         </aside>
       </section>
+
+      <div class="page-footer">
+        <strong>Championnat de Chimie</strong>
+        Tous droits réservés © 2026 — Lauréats, excellence académique et valorisation des performances scientifiques.
+      </div>
     </main>
   </div>
-
-  <footer>
-    <div class="footer-inner">
-      <div>© 2026 Championnat de Chimie — Lauréats & excellence académique.</div>
-      <div class="footer-links">
-        <a href="./index.html">Accueil</a>
-        <a href="./competition.html">Championnat</a>
-        <a href="./results.html">Résultats</a>
-        <a href="./laureats.html">Lauréats</a>
-        <a href="./announcements.html">Annonces</a>
-        <a href="./contact.html">Contact</a>
-      </div>
-    </div>
-  </footer>
 
   <script>
     const menuBtn = document.getElementById("menuBtn");
     const mobileMenu = document.getElementById("mobileMenu");
     const mobileOverlay = document.getElementById("mobileOverlay");
+    const topbar = document.getElementById("topbar");
+    const mainContent = document.getElementById("mainContent");
 
     function closeMenu(){
       mobileMenu.classList.remove("show");
@@ -1167,6 +1170,37 @@
 
     document.querySelectorAll(".mobile-link").forEach(link => {
       link.addEventListener("click", closeMenu);
+    });
+
+    let lastScrollTop = 0;
+
+    function handleTopbarOnScroll() {
+      const isDesktop = window.innerWidth > 1120;
+      if (!isDesktop) {
+        topbar.classList.remove("topbar-hidden");
+        return;
+      }
+
+      const currentScroll = mainContent.scrollTop;
+
+      if (currentScroll <= 6) {
+        topbar.classList.remove("topbar-hidden");
+      } else if (currentScroll > lastScrollTop + 4) {
+        topbar.classList.add("topbar-hidden");
+      } else if (currentScroll < lastScrollTop - 4) {
+        topbar.classList.remove("topbar-hidden");
+      }
+
+      lastScrollTop = currentScroll < 0 ? 0 : currentScroll;
+    }
+
+    mainContent.addEventListener("scroll", handleTopbarOnScroll);
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth <= 1120) {
+        topbar.classList.remove("topbar-hidden");
+      }
+      closeMenu();
     });
   </script>
 </body>
