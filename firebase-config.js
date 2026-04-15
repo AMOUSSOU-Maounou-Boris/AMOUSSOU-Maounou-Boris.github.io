@@ -15,12 +15,17 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
-export const db = getDatabase(app);
-export const storage = getStorage(app);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const storage = getStorage(app);
 
-setPersistence(auth, browserLocalPersistence).catch((error) => {
-  console.error("Persistence error:", error);
-});
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Auth persistence enabled.");
+  })
+  .catch((error) => {
+    console.error("Persistence error:", error);
+  });
 
+export { app, auth, db, storage };
 export default app;
