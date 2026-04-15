@@ -165,6 +165,7 @@
       padding:0;
       position:relative;
       box-shadow:var(--shadow);
+      flex:0 0 auto;
     }
 
     .menu-btn span,
@@ -708,6 +709,28 @@
       font-weight:700;
     }
 
+    @media (min-width:821px){
+      body{
+        overflow:hidden;
+      }
+
+      .layout{
+        height:calc(100vh - var(--topbar-h));
+      }
+
+      .sidebar{
+        position:sticky;
+        top:var(--topbar-h);
+        height:calc(100vh - var(--topbar-h));
+        overflow-y:auto;
+      }
+
+      .content{
+        height:calc(100vh - var(--topbar-h));
+        overflow-y:auto;
+      }
+    }
+
     @media (max-width:1120px){
       .layout,
       .grid-main{
@@ -740,16 +763,9 @@
       }
       .topbar{
         padding:0 12px;
-        display:grid;
-        grid-template-columns:44px minmax(0,1fr) 34px;
-        align-items:center;
-        gap:10px;
       }
       .brand{
-        display:grid;
-        grid-template-columns:44px minmax(0,1fr);
-        align-items:center;
-        gap:10px;
+        flex:1 1 auto;
         min-width:0;
       }
       .brand-mark{
@@ -759,21 +775,19 @@
       }
       .brand-text{
         min-width:0;
-        width:100%;
+        flex:1 1 auto;
       }
       .brand-title{
-        font-size:16px;
-        line-height:1.15;
-        white-space:normal;
-        overflow:visible;
-        text-overflow:clip;
-        text-align:center;
-        display:block;
-        width:100%;
+        font-size:15px;
+        line-height:1.1;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
       }
       .brand-sub{ display:none; }
       .topbar-right{
-        width:34px;
+        margin-left:auto;
+        gap:8px;
         justify-content:flex-end;
       }
       .home-btn{ display:none; }
@@ -812,11 +826,8 @@
       }
       .topbar{
         padding:0 10px;
-        grid-template-columns:40px minmax(0,1fr) 30px;
-        gap:8px;
       }
       .brand{
-        grid-template-columns:40px minmax(0,1fr);
         gap:8px;
       }
       .brand-mark{
@@ -825,12 +836,14 @@
         border-radius:13px;
       }
       .brand-title{
-        font-size:15px;
+        font-size:14px;
         line-height:1.1;
-        letter-spacing:-.2px;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
       }
       .topbar-right{
-        width:30px;
+        gap:6px;
       }
       .menu-btn{
         width:30px;
