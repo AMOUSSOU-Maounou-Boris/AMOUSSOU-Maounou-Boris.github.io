@@ -132,18 +132,54 @@
       box-shadow:0 0 0 5px rgba(47,140,255,.14);
     }
 
+    .home-btn{
+      width:auto;
+      height:38px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fff,#f3f7fc);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 14px;
+      font-weight:800;
+      font-size:13px;
+      color:#163861;
+      cursor:pointer;
+      text-decoration:none;
+      box-shadow:var(--shadow);
+    }
+
     .avatar-btn{
       width:38px;
       height:38px;
-      border-radius:50%;
+      border-radius:12px;
       border:1px solid var(--line);
       background:linear-gradient(180deg,#fff,#f3f7fc);
-      display:grid;
+      display:none;
       place-items:center;
       font-weight:800;
       color:#163861;
       cursor:pointer;
+      position:relative;
+      box-shadow:var(--shadow);
     }
+
+    .avatar-btn span,
+    .avatar-btn::before,
+    .avatar-btn::after{
+      content:"";
+      position:absolute;
+      width:18px;
+      height:2px;
+      border-radius:999px;
+      background:#163861;
+      transition:.18s ease;
+    }
+
+    .avatar-btn span{ transform:translateY(0); }
+    .avatar-btn::before{ transform:translateY(-6px); }
+    .avatar-btn::after{ transform:translateY(6px); }
 
     .layout{
       display:grid;
@@ -479,6 +515,57 @@
       line-height:1.75;
     }
 
+    .mobile-menu{
+      position:fixed;
+      top:74px;
+      right:14px;
+      width:min(320px, calc(100vw - 28px));
+      max-height:72vh;
+      overflow:auto;
+      background:rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:0 24px 48px rgba(10,37,73,.18);
+      padding:14px;
+      z-index:80;
+      display:none;
+    }
+
+    .mobile-menu.show{ display:block; }
+
+    .mobile-menu h3{
+      margin:2px 4px 12px;
+      font-size:15px;
+      color:#0f2f58;
+    }
+
+    .mobile-group{
+      display:grid;
+      gap:8px;
+      margin-bottom:14px;
+    }
+
+    .mobile-link{
+      text-decoration:none;
+      color:#11345d;
+      background:#f8fbff;
+      border:1px solid #e6eef8;
+      border-radius:12px;
+      padding:11px 12px;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    .mobile-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(3,18,42,.18);
+      z-index:70;
+      display:none;
+    }
+
+    .mobile-overlay.show{ display:block; }
+
     footer{
       border-top:1px solid rgba(220,231,243,.92);
       background:rgba(255,255,255,.68);
@@ -529,6 +616,8 @@
       .founder-grid{
         grid-template-columns:1fr;
       }
+      .avatar-btn{ display:grid; }
+      .home-btn{ display:inline-flex; }
     }
 
     @media (max-width:520px){
@@ -539,6 +628,7 @@
       }
       .head-actions{ width:100%; }
       .head-btn{ width:100%; }
+      .brand-sub{ display:none; }
     }
   </style>
 </head>
@@ -557,9 +647,33 @@
         <span class="status-dot"></span>
         <span>À propos du projet</span>
       </div>
-      <div class="avatar-btn" id="avatarBtn">☰</div>
+      <a href="./index.html" class="home-btn">Accueil</a>
+      <button class="avatar-btn" id="avatarBtn" type="button" aria-label="Ouvrir le menu">
+        <span></span>
+      </button>
     </div>
   </header>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="mobile-menu" id="mobileMenu">
+    <h3>Explorer le site</h3>
+
+    <div class="mobile-group">
+      <a class="mobile-link" href="./index.html">Accueil</a>
+      <a class="mobile-link" href="./about.html">À propos</a>
+      <a class="mobile-link" href="./competition.html">Championnat</a>
+      <a class="mobile-link" href="./rules.html">Règlement</a>
+      <a class="mobile-link" href="./results.html">Résultats</a>
+      <a class="mobile-link" href="./announcements.html">Annonces</a>
+      <a class="mobile-link" href="./faq.html">FAQ</a>
+      <a class="mobile-link" href="./contact.html">Contact</a>
+      <a class="mobile-link" href="./verify-certificate.html">Certificat</a>
+      <a class="mobile-link" href="./login.html">Connexion</a>
+      <a class="mobile-link" href="./login.html?redirect=jury.html">Jury</a>
+      <a class="mobile-link" href="./login.html?redirect=admin.html">Administration</a>
+    </div>
+  </aside>
 
   <div class="layout">
     <aside class="sidebar">
@@ -638,7 +752,7 @@
                   Directeur et fondateur du projet de Championnat de Chimie, <strong>XXX</strong> est
                   <strong>Ingénieur Chimiste</strong>, rattaché à l’<strong>Université de Poitiers</strong>,
                   spécialité <strong>Chimie Verte, Catalyse et Environnement</strong> du programme <strong>XXX</strong>,
-                  France.  
+                  France.
                   Il est également <strong>Membre du Laboratoire XXX</strong>, département de Chimie,
                   <strong>Université du Québec à Montréal (UQAM)</strong>, Canada.
                 </p>
@@ -803,8 +917,41 @@
   </footer>
 
   <script>
-    document.getElementById("avatarBtn").addEventListener("click", () => {
-      window.location.href = "./index.html";
+    const avatarBtn = document.getElementById("avatarBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const mobileOverlay = document.getElementById("mobileOverlay");
+
+    function closeMenu(){
+      mobileMenu.classList.remove("show");
+      mobileOverlay.classList.remove("show");
+    }
+
+    function openMenu(){
+      mobileMenu.classList.add("show");
+      mobileOverlay.classList.add("show");
+    }
+
+    avatarBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (mobileMenu.classList.contains("show")) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    mobileOverlay.addEventListener("click", closeMenu);
+
+    document.addEventListener("click", (e) => {
+      const insideMenu = mobileMenu.contains(e.target);
+      const onBtn = avatarBtn.contains(e.target);
+      if (!insideMenu && !onBtn) {
+        closeMenu();
+      }
+    });
+
+    document.querySelectorAll(".mobile-link").forEach(link => {
+      link.addEventListener("click", closeMenu);
     });
   </script>
 </body>
