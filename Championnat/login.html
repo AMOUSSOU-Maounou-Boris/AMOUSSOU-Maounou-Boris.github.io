@@ -234,6 +234,23 @@
       padding:24px;
     }
 
+    .redirect-chip{
+      display:none;
+      margin-bottom:14px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#f7fbff;
+      border:1px solid #dbe7f2;
+      color:#145bd6;
+      font-weight:700;
+      font-size:.92rem;
+      line-height:1.5;
+    }
+
+    .redirect-chip.show{
+      display:block;
+    }
+
     .tabs{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -331,6 +348,12 @@
     .btn:hover{
       transform:translateY(-1px);
       opacity:.97;
+    }
+
+    .btn:disabled{
+      opacity:.7;
+      cursor:not-allowed;
+      transform:none;
     }
 
     .sub-actions{
@@ -489,7 +512,7 @@
         <div class="brand-mark"></div>
         <div>
           <div class="brand-title">Championnat de Chimie</div>
-          <div class="brand-sub">Connexion des candidats</div>
+          <div class="brand-sub">Entrée privée unique du système</div>
         </div>
       </a>
 
@@ -505,29 +528,33 @@
   <main class="page">
     <section class="hero">
       <div class="hero-info">
-        <div class="eyebrow">🔐 Accès candidat • Inscription • Authentification</div>
-        <h1>Connecte-toi ou crée ton compte pour participer.</h1>
+        <div class="eyebrow">🔐 Connexion centrale • Candidat • Jury • Admin</div>
+        <h1>Une seule entrée pour accéder au bon espace.</h1>
         <p class="lead">
-          Cette page permet aux candidats de rejoindre la plateforme dans un cadre sérieux, lisible et sécurisé. Elle constitue la base de l’espace personnel qui servira ensuite à participer aux épreuves, consulter les résultats privés et suivre les informations importantes.
+          Cette page sert désormais de point d’entrée privé unique. Le championnat reste visible publiquement,
+          mais l’examen, le jury, l’administration et l’espace candidat passent ici avant d’ouvrir la bonne section
+          selon le rôle reconnu dans Firebase.
         </p>
 
         <div class="hero-grid">
           <div class="mini">
-            <strong>Compte personnel</strong>
-            <p>Chaque candidat peut disposer d’un accès individuel pour un usage clair et sécurisé.</p>
+            <strong>Page publique conservée</strong>
+            <p><code>competition.html</code> reste visible à tous. La connexion n’est demandée qu’au moment de participer réellement.</p>
           </div>
           <div class="mini">
-            <strong>Base réelle</strong>
-            <p>La connexion s’appuie sur Firebase Auth pour éviter les mots de passe stockés dans le code.</p>
+            <strong>Redirection intelligente</strong>
+            <p>Après connexion, admin, jury et candidat sont dirigés vers la bonne page sans confusion ni répétition.</p>
           </div>
           <div class="mini">
-            <strong>Évolution facile</strong>
-            <p>Cette base pourra ensuite servir pour jury, administration et résultats détaillés.</p>
+            <strong>Base commune</strong>
+            <p>La page utilise le même Firebase que ton système existant pour garder une logique unique et synchronisée.</p>
           </div>
         </div>
       </div>
 
       <div class="auth-card">
+        <div id="redirectChip" class="redirect-chip"></div>
+
         <div class="tabs">
           <button class="tab-btn active" id="showLogin" type="button">Se connecter</button>
           <button class="tab-btn" id="showSignup" type="button">Créer un compte</button>
@@ -536,7 +563,8 @@
         <section class="form-panel active" id="loginPanel">
           <h2 class="panel-title">Connexion</h2>
           <p class="panel-desc">
-            Connecte-toi avec ton adresse email et ton mot de passe pour accéder à ton espace candidat.
+            Connecte-toi avec ton adresse email et ton mot de passe. La page te redirigera ensuite automatiquement
+            vers l’espace correspondant à ton rôle et à la page que tu voulais ouvrir.
           </p>
 
           <form id="loginForm">
@@ -554,11 +582,11 @@
               </div>
             </div>
 
-            <button class="btn" type="submit">Se connecter</button>
+            <button class="btn" id="loginBtn" type="submit">Se connecter</button>
           </form>
 
           <div class="sub-actions">
-            <a href="competition.html">Participer au championnat</a>
+            <a href="competition.html">Voir le championnat</a>
             <a href="rules.html">Lire le règlement</a>
           </div>
 
@@ -568,7 +596,8 @@
         <section class="form-panel" id="signupPanel">
           <h2 class="panel-title">Créer un compte</h2>
           <p class="panel-desc">
-            Crée ton compte candidat pour préparer une participation plus complète et une gestion plus propre des accès.
+            Crée ton compte candidat. Le rôle jury ou admin reste géré séparément par le système principal
+            et par l’administrateur.
           </p>
 
           <form id="signupForm">
@@ -593,7 +622,7 @@
               </div>
             </div>
 
-            <button class="btn" type="submit">Créer mon compte</button>
+            <button class="btn" id="signupBtn" type="submit">Créer mon compte</button>
           </form>
 
           <div class="sub-actions">
@@ -605,8 +634,8 @@
         </section>
 
         <div class="quick-links">
-          <a href="competition.html">Formulaire de participation</a>
-          <a href="results.html">Classement officiel</a>
+          <a href="competition.html">Voir le championnat</a>
+          <a href="examen.html">Passer l’examen</a>
         </div>
       </div>
     </section>
@@ -614,7 +643,7 @@
 
   <footer>
     <div class="footer-inner">
-      <div>© 2026 Championnat de Chimie — Accès candidat sécurisé.</div>
+      <div>© 2026 Championnat de Chimie — Connexion centrale sécurisée.</div>
       <div class="footer-links">
         <a href="index.html">Accueil</a>
         <a href="competition.html">Championnat</a>
@@ -625,21 +654,63 @@
   </footer>
 
   <script type="module">
-    import { auth, db } from "../firebase-config.js";
+    import { auth, db } from "./firebase-config.js";
     import {
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
-      updateProfile
+      updateProfile,
+      onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       ref,
-      set
+      set,
+      get,
+      update
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
 
     const showLogin = document.getElementById("showLogin");
     const showSignup = document.getElementById("showSignup");
     const loginPanel = document.getElementById("loginPanel");
     const signupPanel = document.getElementById("signupPanel");
+
+    const loginForm = document.getElementById("loginForm");
+    const signupForm = document.getElementById("signupForm");
+    const loginMsg = document.getElementById("loginMsg");
+    const signupMsg = document.getElementById("signupMsg");
+    const loginBtn = document.getElementById("loginBtn");
+    const signupBtn = document.getElementById("signupBtn");
+    const redirectChip = document.getElementById("redirectChip");
+
+    const params = new URLSearchParams(window.location.search);
+    const requestedRedirectRaw = (params.get("redirect") || "").trim();
+
+    const allowedRedirects = new Set([
+      "examen.html",
+      "admin.html",
+      "jury.html",
+      "dashboard-candidat.html",
+      "competition.html",
+      "index.html",
+      "results.html"
+    ]);
+
+    const requestedRedirect = allowedRedirects.has(requestedRedirectRaw)
+      ? requestedRedirectRaw
+      : "";
+
+    const redirectLabels = {
+      "examen.html": "Vous vous connectez pour accéder à l’examen.",
+      "admin.html": "Vous vous connectez pour accéder à l’administration.",
+      "jury.html": "Vous vous connectez pour accéder à l’espace jury.",
+      "dashboard-candidat.html": "Vous vous connectez pour accéder à votre espace candidat."
+    };
+
+    if (requestedRedirect && redirectLabels[requestedRedirect]) {
+      redirectChip.textContent = redirectLabels[requestedRedirect];
+      redirectChip.classList.add("show");
+    }
 
     function activateTab(type){
       const login = type === "login";
@@ -652,37 +723,152 @@
     showLogin.addEventListener("click", () => activateTab("login"));
     showSignup.addEventListener("click", () => activateTab("signup"));
 
-    const loginForm = document.getElementById("loginForm");
-    const signupForm = document.getElementById("signupForm");
-    const loginMsg = document.getElementById("loginMsg");
-    const signupMsg = document.getElementById("signupMsg");
-
     function showMessage(el, text, ok = false){
       el.textContent = text;
       el.className = "msg show " + (ok ? "ok" : "err");
     }
 
+    function clearMessages(){
+      loginMsg.className = "msg";
+      signupMsg.className = "msg";
+      loginMsg.textContent = "";
+      signupMsg.textContent = "";
+    }
+
+    function sanitizeEmail(email = ""){
+      return String(email || "").trim().toLowerCase();
+    }
+
+    async function getUserProfile(uid){
+      try{
+        const snap = await get(ref(db, "users/" + uid));
+        return snap.exists() ? snap.val() : null;
+      }catch(err){
+        console.error("Erreur lecture profil :", err);
+        return null;
+      }
+    }
+
+    function resolveRole(user, profile){
+      const email = sanitizeEmail(user?.email);
+      if (email === ADMIN_EMAIL) return "admin";
+
+      const role = String(
+        profile?.competitionRole ||
+        profile?.role ||
+        profile?.userType ||
+        ""
+      ).toLowerCase();
+
+      if (role === "jury") return "jury";
+      if (role === "admin") return "admin";
+      return "candidate";
+    }
+
+    function redirectAfterAuth(user, profile){
+      const role = resolveRole(user, profile);
+
+      if (role === "admin") {
+        if (requestedRedirect === "jury.html") {
+          window.location.href = "./jury.html";
+          return;
+        }
+        if (requestedRedirect === "examen.html") {
+          window.location.href = "./examen.html";
+          return;
+        }
+        window.location.href = "./admin.html";
+        return;
+      }
+
+      if (role === "jury") {
+        if (requestedRedirect === "admin.html") {
+          window.location.href = "./jury.html";
+          return;
+        }
+        if (requestedRedirect === "examen.html") {
+          window.location.href = "./jury.html";
+          return;
+        }
+        window.location.href = requestedRedirect || "./jury.html";
+        return;
+      }
+
+      if (requestedRedirect === "admin.html" || requestedRedirect === "jury.html") {
+        window.location.href = "./dashboard-candidat.html";
+        return;
+      }
+
+      if (requestedRedirect === "examen.html") {
+        window.location.href = "./examen.html";
+        return;
+      }
+
+      window.location.href = "./dashboard-candidat.html";
+    }
+
+    async function ensureUserRecord(user, extra = {}){
+      const userRef = ref(db, "users/" + user.uid);
+      const existingSnap = await get(userRef);
+
+      if (!existingSnap.exists()) {
+        await set(userRef, {
+          uid: user.uid,
+          displayName: extra.displayName || user.displayName || "",
+          email: user.email || "",
+          role: "candidate",
+          competitionRole: "candidate",
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        });
+      } else {
+        await update(userRef, {
+          displayName: extra.displayName || existingSnap.val()?.displayName || user.displayName || "",
+          email: user.email || existingSnap.val()?.email || "",
+          updatedAt: Date.now()
+        });
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+
+      try{
+        const profile = await getUserProfile(user.uid);
+        redirectAfterAuth(user, profile);
+      }catch(err){
+        console.error(err);
+      }
+    });
+
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      loginMsg.className = "msg";
+      clearMessages();
+      loginBtn.disabled = true;
+
       const email = document.getElementById("loginEmail").value.trim();
       const password = document.getElementById("loginPassword").value;
 
       try{
-        await signInWithEmailAndPassword(auth, email, password);
-        showMessage(loginMsg, "Connexion réussie. Redirection...", true);
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const profile = await getUserProfile(cred.user.uid);
+
+        showMessage(loginMsg, "Connexion réussie. Redirection en cours...", true);
         setTimeout(() => {
-          window.location.href = "./competition.html";
-        }, 900);
+          redirectAfterAuth(cred.user, profile);
+        }, 500);
       }catch(err){
         console.error(err);
         showMessage(loginMsg, "Connexion impossible. Vérifie ton email et ton mot de passe.");
+      }finally{
+        loginBtn.disabled = false;
       }
     });
 
     signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      signupMsg.className = "msg";
+      clearMessages();
+      signupBtn.disabled = true;
 
       const name = document.getElementById("signupName").value.trim();
       const email = document.getElementById("signupEmail").value.trim();
@@ -690,6 +876,7 @@
 
       if(!name || !email || !password){
         showMessage(signupMsg, "Veuillez remplir tous les champs.");
+        signupBtn.disabled = false;
         return;
       }
 
@@ -697,24 +884,30 @@
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(cred.user, { displayName: name });
 
-        await set(ref(db, "championnatUsers/" + cred.user.uid), {
-          uid: cred.user.uid,
-          nom: name,
-          email,
-          role: "candidat",
-          createdAt: Date.now()
-        });
+        await ensureUserRecord(cred.user, { displayName: name });
 
-        showMessage(signupMsg, "Compte créé avec succès. Redirection...", true);
+        showMessage(signupMsg, "Compte créé avec succès. Redirection en cours...", true);
         signupForm.reset();
 
         setTimeout(() => {
-          window.location.href = "./competition.html";
-        }, 1000);
+          if (requestedRedirect === "examen.html") {
+            window.location.href = "./dashboard-candidat.html";
+            return;
+          }
+          window.location.href = "./dashboard-candidat.html";
+        }, 650);
 
       }catch(err){
         console.error(err);
-        showMessage(signupMsg, "Création impossible. Cet email est peut-être déjà utilisé.");
+        if (String(err?.code || "").includes("email-already-in-use")) {
+          showMessage(signupMsg, "Cet email est déjà utilisé. Connecte-toi directement.");
+        } else if (String(err?.code || "").includes("weak-password")) {
+          showMessage(signupMsg, "Mot de passe trop faible. Utilise au moins 6 caractères.");
+        } else {
+          showMessage(signupMsg, "Création impossible pour le moment. Réessaie dans un instant.");
+        }
+      }finally{
+        signupBtn.disabled = false;
       }
     });
   </script>
