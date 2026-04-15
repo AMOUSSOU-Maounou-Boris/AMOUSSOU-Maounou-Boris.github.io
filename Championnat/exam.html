@@ -1,206 +1,1699 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Épreuve</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Passer l'examen | Championnat de Chimie</title>
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg1:#041126;
+      --bg2:#0c2a58;
+      --bg3:#123f88;
+      --card:rgba(255,255,255,.96);
+      --card-soft:rgba(248,252,255,.88);
+      --glass:rgba(255,255,255,.14);
+      --text:#0b2340;
+      --muted:#61748d;
+      --line:#dbe6f4;
+      --nav:#082e5b;
+      --blue:#2f8cff;
+      --blue-dark:#0f4d92;
+      --green:#18c34a;
+      --red:#df4b4b;
+      --orange:#ff9f1a;
+      --gold:#d8b14b;
+      --shadow:0 18px 44px rgba(7,31,66,.18);
+      --shadow-soft:0 10px 24px rgba(8,35,78,.12);
+      --radius:24px;
+      --radius-sm:16px;
+      --max:1320px;
+    }
 
-<style>
-body{font-family:Arial;margin:0;background:#eef7ff}
-.container{max-width:1100px;margin:auto;padding:20px}
-.card{background:#fff;padding:15px;margin-bottom:15px;border-radius:12px}
-.btn{padding:12px;border:none;background:#2f8cff;color:#fff;font-weight:800;border-radius:999px;cursor:pointer}
-.badge{padding:4px 8px;border-radius:999px;color:#fff;font-size:.8rem}
-.green{background:#18c34a}
-.red{background:#ff4b4b}
-</style>
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:Arial, Helvetica, sans-serif;
+      color:#fff;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(120,190,255,.24), transparent 24%),
+        radial-gradient(circle at 90% 15%, rgba(255,255,255,.09), transparent 22%),
+        radial-gradient(circle at 80% 85%, rgba(47,140,255,.20), transparent 22%),
+        linear-gradient(135deg,var(--bg1),var(--bg2) 46%,var(--bg3));
+      overflow-x:hidden;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      inset:auto;
+      pointer-events:none;
+      z-index:0;
+      filter:blur(1px);
+      opacity:.35;
+    }
+
+    body::before{
+      top:7%;
+      left:-80px;
+      width:320px;
+      height:320px;
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:50%;
+      box-shadow:
+        0 0 0 22px rgba(255,255,255,.04),
+        0 0 0 54px rgba(255,255,255,.03);
+      animation:floatOrb 14s ease-in-out infinite;
+    }
+
+    body::after{
+      right:-70px;
+      bottom:8%;
+      width:280px;
+      height:280px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:50%;
+      box-shadow:
+        0 0 0 18px rgba(255,255,255,.05),
+        0 0 0 44px rgba(255,255,255,.03);
+      animation:floatOrb 16s ease-in-out infinite reverse;
+    }
+
+    @keyframes floatOrb{
+      0%,100%{transform:translateY(0) rotate(0deg)}
+      50%{transform:translateY(-18px) rotate(8deg)}
+    }
+
+    .chem-net{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      opacity:.30;
+      background-image:
+        linear-gradient(60deg, transparent 46%, rgba(255,255,255,.06) 47%, rgba(255,255,255,.06) 53%, transparent 54%),
+        linear-gradient(-60deg, transparent 46%, rgba(255,255,255,.05) 47%, rgba(255,255,255,.05) 53%, transparent 54%);
+      background-size:170px 170px, 170px 170px;
+      mask-image:linear-gradient(to bottom, transparent, rgba(0,0,0,.9) 14%, rgba(0,0,0,.92) 80%, transparent);
+      -webkit-mask-image:linear-gradient(to bottom, transparent, rgba(0,0,0,.9) 14%, rgba(0,0,0,.92) 80%, transparent);
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      width:min(calc(100% - 24px), var(--max));
+      margin:18px auto 34px;
+    }
+
+    .topbar{
+      position:sticky;
+      top:12px;
+      z-index:30;
+      backdrop-filter:blur(14px);
+      background:rgba(8,46,91,.64);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:22px;
+      box-shadow:0 12px 36px rgba(3,18,42,.24);
+      padding:14px 18px;
+    }
+
+    .topbar-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:50px;
+      height:50px;
+      border-radius:18px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.25) 26%, transparent 27%),
+        radial-gradient(circle at 72% 34%, rgba(255,255,255,.7), rgba(255,255,255,.15) 18%, transparent 19%),
+        linear-gradient(135deg, #58b0ff, #0d5dc8 55%, #0a3474);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.28),
+        0 10px 24px rgba(0,0,0,.22);
+      position:relative;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+
+    .brand-mark::before,
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      border:1px solid rgba(255,255,255,.45);
+      border-radius:50%;
+    }
+    .brand-mark::before{ inset:8px 10px 16px 10px; transform:rotate(25deg); }
+    .brand-mark::after{ inset:15px 8px 9px 8px; transform:rotate(-28deg); }
+
+    .brand h1{
+      margin:0;
+      font-size:1.15rem;
+      line-height:1.15;
+      letter-spacing:.2px;
+    }
+
+    .brand p{
+      margin:3px 0 0;
+      color:rgba(255,255,255,.82);
+      font-size:.92rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.09);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      font-size:.92rem;
+      font-weight:700;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--green);
+      box-shadow:0 0 0 6px rgba(24,195,74,.14);
+      flex:0 0 auto;
+    }
+
+    .dot.red{
+      background:var(--red);
+      box-shadow:0 0 0 6px rgba(223,75,75,.14);
+    }
+
+    .btn{
+      border:none;
+      outline:none;
+      cursor:pointer;
+      border-radius:14px;
+      padding:12px 16px;
+      font-size:.95rem;
+      font-weight:800;
+      transition:.18s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+
+    .btn:hover{ transform:translateY(-1px); }
+    .btn:disabled{ opacity:.58; cursor:not-allowed; transform:none; }
+
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(135deg, #3da6ff, #1568d8);
+      box-shadow:0 12px 26px rgba(21,104,216,.26);
+    }
+
+    .btn-soft{
+      color:#fff;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+    }
+
+    .btn-danger{
+      color:#fff;
+      background:linear-gradient(135deg, #ff7b7b, #df4b4b);
+      box-shadow:0 12px 26px rgba(223,75,75,.22);
+    }
+
+    .hero{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:1.28fr .72fr;
+      gap:16px;
+      align-items:stretch;
+    }
+
+    .hero-card,
+    .side-card,
+    .panel,
+    .question-card{
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,.16);
+      backdrop-filter:blur(16px);
+    }
+
+    .hero-card{
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06)),
+        linear-gradient(160deg, rgba(88,176,255,.16), rgba(10,52,116,.14) 65%, rgba(255,255,255,.08));
+      padding:26px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      right:-80px;
+      top:-60px;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.22), transparent 62%);
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:.84rem;
+      font-weight:800;
+      color:#f2f8ff;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+    }
+
+    .hero h2{
+      margin:14px 0 10px;
+      font-size:2rem;
+      line-height:1.1;
+      letter-spacing:.2px;
+    }
+
+    .hero p{
+      margin:0;
+      color:rgba(255,255,255,.86);
+      line-height:1.7;
+      max-width:900px;
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+      margin-top:18px;
+    }
+
+    .mini{
+      border-radius:18px;
+      padding:14px 15px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    }
+
+    .mini .label{
+      color:rgba(255,255,255,.74);
+      font-size:.82rem;
+      margin-bottom:6px;
+    }
+
+    .mini .value{
+      font-weight:900;
+      font-size:1.08rem;
+      color:#fff;
+    }
+
+    .side-card{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08)),
+        linear-gradient(140deg, rgba(47,140,255,.18), rgba(255,255,255,.05));
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      justify-content:space-between;
+    }
+
+    .timer-ring{
+      position:relative;
+      min-height:210px;
+      border-radius:26px;
+      background:rgba(5,27,59,.36);
+      border:1px solid rgba(255,255,255,.12);
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:18px;
+    }
+
+    .timer-ring::before{
+      content:"";
+      position:absolute;
+      inset:16px;
+      border-radius:50%;
+      border:10px solid rgba(255,255,255,.08);
+    }
+
+    .timer-ring::after{
+      content:"";
+      position:absolute;
+      inset:8px;
+      border-radius:50%;
+      border:1px dashed rgba(255,255,255,.10);
+      animation:spin 14s linear infinite;
+    }
+
+    @keyframes spin{
+      from{transform:rotate(0deg)}
+      to{transform:rotate(360deg)}
+    }
+
+    .timer-content{
+      position:relative;
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:center;
+    }
+
+    .timer-title{
+      color:rgba(255,255,255,.74);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      font-size:.82rem;
+    }
+
+    .timer-value{
+      font-size:2.45rem;
+      font-weight:900;
+      letter-spacing:1px;
+      color:#fff;
+      text-shadow:0 10px 28px rgba(0,0,0,.18);
+    }
+
+    .timer-note{
+      color:rgba(255,255,255,.82);
+      font-size:.9rem;
+    }
+
+    .side-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .layout{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:320px minmax(0,1fr);
+      gap:16px;
+      align-items:start;
+    }
+
+    .panel{
+      background:var(--card);
+      color:var(--text);
+      border:1px solid rgba(7,31,66,.06);
+      overflow:hidden;
+    }
+
+    .panel-header{
+      padding:18px 18px 0;
+    }
+
+    .panel-title{
+      margin:0;
+      font-size:1.06rem;
+      color:var(--nav);
+      font-weight:900;
+    }
+
+    .panel-sub{
+      margin:7px 0 0;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:.94rem;
+    }
+
+    .panel-body{
+      padding:18px;
+    }
+
+    .status-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .status-item{
+      padding:14px 14px;
+      border-radius:18px;
+      background:linear-gradient(180deg, #ffffff, #f7fbff);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .status-item .k{
+      font-size:.82rem;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .status-item .v{
+      font-weight:900;
+      color:var(--nav);
+      line-height:1.4;
+      word-break:break-word;
+    }
+
+    .status-badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .badge{
+      padding:8px 11px;
+      border-radius:999px;
+      font-size:.8rem;
+      font-weight:800;
+      border:1px solid transparent;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .badge.blue{ background:#edf5ff; color:#1568d8; border-color:#d6e7ff; }
+    .badge.green{ background:#ecfff3; color:#1b9551; border-color:#d5f6e3; }
+    .badge.red{ background:#fff0f0; color:#cf4343; border-color:#ffd2d2; }
+    .badge.orange{ background:#fff7ea; color:#c77b0c; border-color:#ffe3b6; }
+
+    .notice{
+      margin-top:16px;
+      padding:14px 16px;
+      border-radius:18px;
+      font-size:.95rem;
+      line-height:1.6;
+      border:1px solid;
+    }
+
+    .notice.info{ background:#f3f9ff; color:#1459b1; border-color:#d7eaff; }
+    .notice.warn{ background:#fff8ef; color:#ad6b07; border-color:#ffe0b4; }
+    .notice.error{ background:#fff3f3; color:#c53d3d; border-color:#ffd2d2; }
+    .notice.success{ background:#effcf3; color:#14834a; border-color:#cdf3da; }
+
+    .exam-shell{
+      display:grid;
+      gap:16px;
+    }
+
+    .controls-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:4px;
+    }
+
+    .right-mini{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .question-list{
+      display:grid;
+      gap:16px;
+    }
+
+    .question-card{
+      background:linear-gradient(180deg, #ffffff, #f7fbff);
+      color:var(--text);
+      border:1px solid var(--line);
+      padding:18px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .question-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:10px;
+    }
+
+    .q-index{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      color:#fff;
+      font-weight:900;
+      background:linear-gradient(135deg, #2f8cff, #115dc2);
+      box-shadow:0 10px 22px rgba(47,140,255,.24);
+      flex:0 0 auto;
+    }
+
+    .q-main{
+      flex:1;
+      min-width:0;
+    }
+
+    .q-type{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eff6ff;
+      color:#1459b1;
+      border:1px solid #d8e8ff;
+      font-size:.77rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.35px;
+      margin-bottom:8px;
+    }
+
+    .q-title{
+      margin:0;
+      color:var(--nav);
+      font-size:1.02rem;
+      line-height:1.6;
+      font-weight:800;
+      white-space:pre-wrap;
+    }
+
+    .q-help{
+      margin:8px 0 0;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:.92rem;
+      white-space:pre-wrap;
+    }
+
+    .answers{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .choice{
+      position:relative;
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      padding:14px 14px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:#fff;
+      cursor:pointer;
+      transition:.16s ease;
+    }
+
+    .choice:hover{
+      transform:translateY(-1px);
+      border-color:#b8d9ff;
+      box-shadow:0 10px 22px rgba(47,140,255,.08);
+    }
+
+    .choice input{
+      margin-top:2px;
+      transform:scale(1.12);
+      accent-color:#1568d8;
+      flex:0 0 auto;
+    }
+
+    .choice span{
+      color:var(--text);
+      line-height:1.55;
+      font-weight:700;
+      white-space:pre-wrap;
+    }
+
+    textarea.answer-text{
+      width:100%;
+      min-height:150px;
+      resize:vertical;
+      border-radius:18px;
+      padding:16px;
+      border:1px solid var(--line);
+      outline:none;
+      font:inherit;
+      color:var(--text);
+      background:#fff;
+      box-shadow:inset 0 1px 2px rgba(7,31,66,.03);
+    }
+
+    textarea.answer-text:focus{
+      border-color:#99c8ff;
+      box-shadow:0 0 0 4px rgba(47,140,255,.10);
+    }
+
+    .footer-actions{
+      position:sticky;
+      bottom:12px;
+      z-index:15;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+      padding:14px;
+      border-radius:22px;
+      background:rgba(255,255,255,.90);
+      backdrop-filter:blur(16px);
+      border:1px solid rgba(7,31,66,.08);
+      box-shadow:0 18px 42px rgba(7,31,66,.14);
+      color:var(--text);
+    }
+
+    .foot-left{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    .hidden{ display:none !important; }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:rgba(2,12,30,.58);
+      backdrop-filter:blur(12px);
+    }
+
+    .modal{
+      width:min(580px, calc(100vw - 24px));
+      background:rgba(255,255,255,.98);
+      border-radius:28px;
+      padding:24px;
+      color:var(--text);
+      box-shadow:0 28px 70px rgba(7,31,66,.28);
+      border:1px solid rgba(255,255,255,.7);
+      text-align:center;
+    }
+
+    .modal h3{
+      margin:0 0 10px;
+      color:var(--nav);
+      font-size:1.38rem;
+    }
+
+    .modal p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .modal-actions{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .skeleton{
+      background:linear-gradient(90deg, #eef4fb, #f7fbff, #eef4fb);
+      background-size:200% 100%;
+      animation:skeleton 1.25s linear infinite;
+      border-radius:16px;
+    }
+
+    @keyframes skeleton{
+      0%{background-position:200% 0}
+      100%{background-position:-200% 0}
+    }
+
+    .auth-mask{
+      position:fixed;
+      inset:0;
+      z-index:120;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(75,150,255,.20), transparent 25%),
+        linear-gradient(135deg,#06142b,#0d2d61 50%,#15438e);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .auth-card{
+      width:min(540px, calc(100vw - 24px));
+      padding:26px;
+      border-radius:28px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 24px 70px rgba(0,0,0,.22);
+      backdrop-filter:blur(18px);
+      color:#fff;
+      text-align:center;
+    }
+
+    .auth-card h2{
+      margin:0 0 10px;
+      font-size:1.6rem;
+    }
+
+    .auth-card p{
+      margin:0;
+      line-height:1.7;
+      color:rgba(255,255,255,.84);
+    }
+
+    @media (max-width:1100px){
+      .hero{ grid-template-columns:1fr; }
+      .layout{ grid-template-columns:1fr; }
+      .side-actions{ grid-template-columns:1fr 1fr; }
+    }
+
+    @media (max-width:760px){
+      .page{ width:min(calc(100% - 14px), var(--max)); }
+      .topbar{ top:8px; border-radius:18px; }
+      .hero-card, .side-card, .panel, .question-card{ border-radius:20px; }
+      .hero h2{ font-size:1.55rem; }
+      .hero-stats{ grid-template-columns:1fr; }
+      .side-actions{ grid-template-columns:1fr; }
+      .timer-value{ font-size:2rem; }
+      .footer-actions{ bottom:8px; }
+      .question-top{ align-items:flex-start; }
+      .q-index{ width:38px; height:38px; border-radius:12px; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="chem-net"></div>
 
-<div class="container">
+  <div id="authMask" class="auth-mask">
+    <div class="auth-card">
+      <h2>Chargement sécurisé de l’épreuve</h2>
+      <p>Vérification de votre session, de vos droits d’accès et de l’état actuel du championnat de chimie…</p>
+    </div>
+  </div>
 
-<div class="card">
-⏱ Temps : <span id="timer">50:00</span>
-</div>
+  <div class="page">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-mark"></div>
+          <div>
+            <h1>Championnat de Chimie</h1>
+            <p>Passage officiel de l’épreuve académique</p>
+          </div>
+        </div>
 
-<!-- CODE EXAM -->
-<div class="card">
-<h3>Code d’accès</h3>
-<input id="examCodeInput" placeholder="Coller le code ici">
-<button class="btn" onclick="verifyCode()">Valider</button>
-</div>
+        <div class="top-actions">
+          <div class="chip"><span id="globalDot" class="dot red"></span><span id="globalStatusText">Compétition non lancée</span></div>
+          <a class="btn btn-soft" href="./competition.html">Retour championnat</a>
+          <a class="btn btn-soft" href="./dashboard-candidat.html">Espace candidat</a>
+        </div>
+      </div>
+    </div>
 
-<!-- INFOS -->
-<div class="card" id="candidateInfo" style="display:none">
-<h3>Informations candidat</h3>
-Numéro examen : <strong id="examId"></strong>
-</div>
+    <section class="hero">
+      <div class="hero-card">
+        <div class="eyebrow">Épreuve synchronisée • Validation admin requise</div>
+        <h2 id="examTitleHero">Examen officiel en attente d’activation</h2>
+        <p id="examIntroHero">
+          Cette page suit automatiquement l’état du championnat. Les candidats ne voient l’épreuve que lorsque
+          l’administrateur principal valide les questionnaires puis lance officiellement la compétition.
+        </p>
 
-<!-- EXAM -->
-<div class="card" id="examSection" style="display:none">
+        <div class="hero-stats">
+          <div class="mini">
+            <div class="label">Statut actuel</div>
+            <div class="value" id="heroStatus">En attente</div>
+          </div>
+          <div class="mini">
+            <div class="label">Durée</div>
+            <div class="value" id="heroDuration">—</div>
+          </div>
+          <div class="mini">
+            <div class="label">Épreuve active</div>
+            <div class="value" id="heroExamId">Aucune</div>
+          </div>
+        </div>
+      </div>
 
-<details>
-<summary>Question 1</summary>
-<label><input type="radio" name="q1" value="1"> H2O</label><br>
-<label><input type="radio" name="q1" value="0"> CO2</label>
-</details>
+      <aside class="side-card">
+        <div class="timer-ring">
+          <div class="timer-content">
+            <div class="timer-title">Chronomètre officiel</div>
+            <div class="timer-value" id="timerDisplay">--:--:--</div>
+            <div class="timer-note" id="timerNote">Le compte à rebours démarre lorsque l’épreuve est disponible.</div>
+          </div>
+        </div>
 
-<textarea id="q2" placeholder="Réponse"></textarea>
+        <div class="side-actions">
+          <button id="startBtn" class="btn btn-primary" disabled>Commencer l’épreuve</button>
+          <button id="saveBtn" class="btn btn-soft" disabled>Enregistrer</button>
+          <button id="submitBtn" class="btn btn-danger" disabled>Soumettre ma copie</button>
+          <a class="btn btn-soft" href="./results.html">Résultats</a>
+        </div>
+      </aside>
+    </section>
 
-<button class="btn" onclick="submitExam()">Soumettre</button>
+    <section class="layout">
+      <aside class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">Pilotage et synchronisation</h3>
+          <p class="panel-sub">Ce bloc reflète ce que l’admin a décidé. Il influence automatiquement ce que voient les candidats, le jury et les écrans de suivi.</p>
+        </div>
+        <div class="panel-body">
+          <div class="status-list">
+            <div class="status-item">
+              <div class="k">Utilisateur connecté</div>
+              <div class="v" id="userLabel">Chargement…</div>
+            </div>
+            <div class="status-item">
+              <div class="k">Rôle détecté</div>
+              <div class="v" id="roleLabel">—</div>
+              <div class="status-badges">
+                <span class="badge blue" id="roleBadge">Session sécurisée</span>
+              </div>
+            </div>
+            <div class="status-item">
+              <div class="k">Décision administrative</div>
+              <div class="v" id="adminDecisionLabel">Aucune épreuve candidate visible pour le moment.</div>
+            </div>
+            <div class="status-item">
+              <div class="k">Questionnaire actif</div>
+              <div class="v" id="activeExamLabel">Aucun questionnaire actif</div>
+            </div>
+            <div class="status-item">
+              <div class="k">Ma copie</div>
+              <div class="v" id="submissionStatusLabel">Non commencée</div>
+              <div class="status-badges">
+                <span class="badge orange" id="syncBadge">Synchronisation initiale…</span>
+              </div>
+            </div>
+          </div>
 
-</div>
+          <div id="infoNotice" class="notice info" style="margin-top:16px;">
+            Les brouillons du jury restent invisibles ici tant que l’administrateur principal ne les valide pas puis ne lance pas la compétition.
+          </div>
+        </div>
+      </aside>
 
-<!-- ADMIN -->
-<div class="card" id="adminPanel" style="display:none">
-<h3>ADMIN</h3>
+      <main class="exam-shell">
+        <section class="panel">
+          <div class="panel-header">
+            <div class="controls-row">
+              <div>
+                <h3 class="panel-title">Sujet et consignes</h3>
+                <p class="panel-sub">QCM et réponses rédigées. Sauvegarde locale + distante pendant l’épreuve.</p>
+              </div>
+              <div class="right-mini">
+                <span class="badge blue" id="questionCountBadge">0 question</span>
+                <span class="badge green" id="windowBadge">Fenêtre fermée</span>
+              </div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="subjectBlock">
+              <div class="skeleton" style="height:22px;width:260px;margin-bottom:14px;"></div>
+              <div class="skeleton" style="height:14px;width:100%;margin-bottom:10px;"></div>
+              <div class="skeleton" style="height:14px;width:92%;margin-bottom:10px;"></div>
+              <div class="skeleton" style="height:14px;width:85%;"></div>
+            </div>
+          </div>
+        </section>
 
-<input id="newCode" placeholder="Définir code examen">
-<button onclick="setCode()">Définir</button>
+        <section class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Questions</h3>
+            <p class="panel-sub">La soumission est automatique à la fin du temps. L’admin garde la main sur l’ouverture et la fermeture.</p>
+          </div>
+          <div class="panel-body">
+            <div id="questionList" class="question-list">
+              <div class="skeleton" style="height:160px;"></div>
+              <div class="skeleton" style="height:160px;"></div>
+            </div>
+          </div>
+        </section>
 
-<div id="logs"></div>
+        <div class="footer-actions">
+          <div class="foot-left">
+            <span class="badge blue" id="footStatus">Attente</span>
+            <span class="muted" id="footHint">Votre progression sera enregistrée automatiquement pendant l’épreuve.</span>
+          </div>
+          <div class="foot-left">
+            <button id="saveBtnBottom" class="btn btn-soft" disabled>Enregistrer maintenant</button>
+            <button id="submitBtnBottom" class="btn btn-danger" disabled>Soumettre définitivement</button>
+          </div>
+        </div>
+      </main>
+    </section>
+  </div>
 
-</div>
+  <div id="startOverlay" class="overlay hidden">
+    <div class="modal">
+      <h3>Prêt à commencer ?</h3>
+      <p>
+        Dès que vous démarrez, votre copie est créée, votre session d’examen est suivie, et le chrono officiel continue.
+        Assurez-vous d’être prêt avant de lancer l’épreuve.
+      </p>
+      <div class="modal-actions">
+        <button id="cancelStartBtn" class="btn btn-soft" style="color:#0b2340;border:1px solid #d9e5f2;background:#fff;">Annuler</button>
+        <button id="confirmStartBtn" class="btn btn-primary">Oui, commencer</button>
+      </div>
+    </div>
+  </div>
 
-</div>
+  <div id="submitOverlay" class="overlay hidden">
+    <div class="modal">
+      <h3>Soumettre votre copie</h3>
+      <p>
+        Après soumission, vos réponses seront figées. Le jury ne verra que ce que l’administrateur principal lui autorise ensuite.
+        Voulez-vous envoyer définitivement votre copie ?
+      </p>
+      <div class="modal-actions">
+        <button id="cancelSubmitBtn" class="btn btn-soft" style="color:#0b2340;border:1px solid #d9e5f2;background:#fff;">Revenir</button>
+        <button id="confirmSubmitBtn" class="btn btn-danger">Oui, soumettre</button>
+      </div>
+    </div>
+  </div>
 
-<script type="module">
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import {
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      ref,
+      get,
+      onValue,
+      set,
+      update,
+      push,
+      off,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getDatabase, ref, set, get, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
 
-const firebaseConfig = {
-  apiKey:"YOUR_KEY",
-  authDomain:"YOUR_DOMAIN",
-  databaseURL:"YOUR_DB",
-  projectId:"YOUR_PROJECT"
-};
+    const state = {
+      user: null,
+      role: "guest",
+      control: null,
+      activeExamId: null,
+      exam: null,
+      submission: null,
+      answers: {},
+      listeners: [],
+      timerId: null,
+      autosaveId: null,
+      examStarted: false,
+      locked: true,
+      submitting: false
+    };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+    const $ = (id) => document.getElementById(id);
 
-const ADMIN = "borisamoussou01@gmail.com";
+    const authMask = $("authMask");
+    const startOverlay = $("startOverlay");
+    const submitOverlay = $("submitOverlay");
 
-let user;
-let examId;
+    const ui = {
+      globalDot: $("globalDot"),
+      globalStatusText: $("globalStatusText"),
+      examTitleHero: $("examTitleHero"),
+      examIntroHero: $("examIntroHero"),
+      heroStatus: $("heroStatus"),
+      heroDuration: $("heroDuration"),
+      heroExamId: $("heroExamId"),
+      timerDisplay: $("timerDisplay"),
+      timerNote: $("timerNote"),
+      startBtn: $("startBtn"),
+      saveBtn: $("saveBtn"),
+      submitBtn: $("submitBtn"),
+      saveBtnBottom: $("saveBtnBottom"),
+      submitBtnBottom: $("submitBtnBottom"),
+      userLabel: $("userLabel"),
+      roleLabel: $("roleLabel"),
+      roleBadge: $("roleBadge"),
+      adminDecisionLabel: $("adminDecisionLabel"),
+      activeExamLabel: $("activeExamLabel"),
+      submissionStatusLabel: $("submissionStatusLabel"),
+      syncBadge: $("syncBadge"),
+      infoNotice: $("infoNotice"),
+      questionCountBadge: $("questionCountBadge"),
+      windowBadge: $("windowBadge"),
+      subjectBlock: $("subjectBlock"),
+      questionList: $("questionList"),
+      footStatus: $("footStatus"),
+      footHint: $("footHint")
+    };
 
-/* AUTH */
-onAuthStateChanged(auth,(u)=>{
-  if(!u){location.href="login.html"}
-  user=u;
+    function setText(el, value){
+      if (el) el.textContent = value;
+    }
 
-  if(user.email===ADMIN){
-    document.getElementById("adminPanel").style.display="block";
-    loadLogs();
-  }
-});
+    function escapeHtml(str = ""){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
-/* CODE EXAM */
-async function verifyCode(){
-  const code = document.getElementById("examCodeInput").value;
+    function formatDuration(mins){
+      const n = Number(mins || 0);
+      if (!Number.isFinite(n) || n <= 0) return "—";
+      const h = Math.floor(n / 60);
+      const m = n % 60;
+      return h > 0 ? `${h} h ${m} min` : `${m} min`;
+    }
 
-  const snap = await get(ref(db,"examConfig/code"));
+    function formatDateTime(ts){
+      if (!ts) return "—";
+      try{
+        return new Date(ts).toLocaleString("fr-FR", {
+          year:"numeric", month:"2-digit", day:"2-digit",
+          hour:"2-digit", minute:"2-digit", second:"2-digit"
+        });
+      }catch{
+        return "—";
+      }
+    }
 
-  if(!snap.exists() || snap.val()!==code){
-    alert("Code incorrect");
-    return;
-  }
+    function formatRemaining(ms){
+      if (!Number.isFinite(ms) || ms <= 0) return "00:00:00";
+      const total = Math.floor(ms / 1000);
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
 
-  startExam();
-}
+    function clearRegisteredListeners(){
+      state.listeners.forEach(({path, cb}) => {
+        try { off(path, "value", cb); } catch(e) {}
+      });
+      state.listeners = [];
+    }
 
-/* GENERATE ID */
-function generateExamId(){
-  return "EX-"+Math.random().toString(36).substring(2,8).toUpperCase();
-}
+    function listen(pathRef, cb){
+      onValue(pathRef, cb);
+      state.listeners.push({ path:pathRef, cb });
+    }
 
-/* START */
-function startExam(){
-  examId = generateExamId();
+    function getUserRole(user, profile = {}){
+      if (!user) return "guest";
+      const email = String(user.email || "").toLowerCase();
+      const profileRole = String(profile.role || profile.userType || "").toLowerCase();
+      if (email === ADMIN_EMAIL.toLowerCase()) return "admin";
+      if (profileRole.includes("admin")) return "admin";
+      if (profileRole.includes("jury")) return "jury";
+      if (profileRole.includes("candidate") || profileRole.includes("candidat")) return "candidate";
+      return "candidate";
+    }
 
-  document.getElementById("examId").textContent = examId;
-  document.getElementById("candidateInfo").style.display="block";
-  document.getElementById("examSection").style.display="block";
+    function setRoleUI(role){
+      setText(ui.roleLabel, role === "admin" ? "Administrateur principal"
+        : role === "jury" ? "Jury"
+        : role === "candidate" ? "Candidat"
+        : "Invité");
+      setText(ui.roleBadge, role === "admin" ? "Pilotage total"
+        : role === "jury" ? "Vue jury contrôlée"
+        : role === "candidate" ? "Session candidat"
+        : "Accès non autorisé");
 
-  set(ref(db,"candidates/"+user.uid),{
-    email:user.email,
-    examId,
-    lastActive:Date.now()
-  });
-}
+      ui.roleBadge.className = "badge " + (
+        role === "admin" ? "red" :
+        role === "jury" ? "orange" :
+        role === "candidate" ? "green" :
+        "blue"
+      );
+    }
 
-/* TIMER */
-let t=3000;
-setInterval(()=>{
-  let m=Math.floor(t/60),s=t%60;
-  document.getElementById("timer").textContent=`${m}:${s<10?'0'+s:s}`;
-  t--;
-},1000);
+    function setGlobalStatus(launched, text){
+      ui.globalDot.className = "dot " + (launched ? "" : "red");
+      setText(ui.globalStatusText, text);
+      setText(ui.heroStatus, text);
+      setText(ui.footStatus, launched ? "Épreuve ouverte" : "Verrouillée");
+      ui.footStatus.className = "badge " + (launched ? "green" : "red");
+    }
 
-/* ANTI-TRICHE */
-document.addEventListener("copy",e=>e.preventDefault());
-document.addEventListener("paste",e=>e.preventDefault());
+    function setNotice(type, text){
+      ui.infoNotice.className = `notice ${type}`;
+      setText(ui.infoNotice, text);
+    }
 
-window.addEventListener("blur",()=>{
-  log("Changement onglet");
-});
+    function isCompetitionLaunched(control){
+      return !!(control && (control.launched === true || String(control.status || "").toLowerCase() === "launched"));
+    }
 
-window.addEventListener("beforeunload",()=>{
-  log("Tentative refresh");
-});
+    function getExamWindowEnd(control, submission){
+      const controlEndsAt = Number(control?.endsAt || 0);
+      const submissionEndsAt = Number(submission?.examWindowEndAt || 0);
+      return Math.max(controlEndsAt, submissionEndsAt);
+    }
 
-function log(msg){
-  push(ref(db,"logs"),{
-    user:user.email,
-    msg,
-    time:Date.now()
-  });
-}
+    function isSubmissionFinal(submission){
+      return !!submission && (submission.status === "submitted" || submission.status === "auto_submitted" || submission.status === "locked");
+    }
 
-/* ADMIN SET CODE */
-function setCode(){
-  const code=document.getElementById("newCode").value;
-  set(ref(db,"examConfig/code"),code);
-  alert("Code défini");
-}
+    function setButtonsState({canStart=false, canSave=false, canSubmit=false} = {}){
+      ui.startBtn.disabled = !canStart;
+      ui.saveBtn.disabled = !canSave;
+      ui.submitBtn.disabled = !canSubmit;
+      ui.saveBtnBottom.disabled = !canSave;
+      ui.submitBtnBottom.disabled = !canSubmit;
+    }
 
-/* LOAD LOGS */
-function loadLogs(){
-  onValue(ref(db,"logs"),snap=>{
-    let html="";
-    snap.forEach(c=>{
-      let d=c.val();
-      html+=`<div>${d.user} - ${d.msg}</div>`;
+    function renderSubject(){
+      const exam = state.exam;
+      const control = state.control;
+
+      if (!exam){
+        ui.subjectBlock.innerHTML = `
+          <div class="notice warn">
+            Aucun sujet officiel n’est actuellement disponible pour affichage. Le jury peut avoir envoyé des propositions,
+            mais elles ne deviennent visibles ici qu’après validation par l’administrateur principal.
+          </div>
+        `;
+        return;
+      }
+
+      const title = escapeHtml(exam.title || control?.title || "Épreuve officielle");
+      const instructions = escapeHtml(exam.instructions || control?.instructions || "Aucune consigne fournie pour le moment.");
+      const category = escapeHtml(exam.category || "Chimie");
+      const duration = formatDuration(exam.durationMinutes || control?.durationMinutes);
+
+      ui.subjectBlock.innerHTML = `
+        <div style="display:grid;gap:14px;">
+          <div class="status-badges" style="margin-top:0;">
+            <span class="badge blue">Discipline : ${category}</span>
+            <span class="badge green">Durée : ${duration}</span>
+            <span class="badge orange">Validation admin</span>
+          </div>
+          <div style="padding:18px;border-radius:20px;background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #dbe6f4;">
+            <div style="font-size:1.25rem;font-weight:900;color:#082e5b;line-height:1.4;">${title}</div>
+            <div style="margin-top:12px;color:#61748d;line-height:1.8;white-space:pre-wrap;">${instructions}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function normalizeQuestions(exam){
+      if (!exam) return [];
+      if (Array.isArray(exam.questions)) return exam.questions.filter(Boolean);
+      if (exam.questions && typeof exam.questions === "object"){
+        return Object.keys(exam.questions)
+          .map((k) => ({ id:k, ...exam.questions[k] }))
+          .filter(Boolean)
+          .sort((a,b) => Number(a.order || 0) - Number(b.order || 0));
+      }
+      return [];
+    }
+
+    function getAnswerFor(question, idx){
+      const key = question.id || `q_${idx}`;
+      return state.answers?.[key];
+    }
+
+    function renderQuestions(){
+      const exam = state.exam;
+      const questions = normalizeQuestions(exam);
+
+      setText(ui.questionCountBadge, `${questions.length} ${questions.length > 1 ? "questions" : "question"}`);
+
+      if (!exam || !questions.length){
+        ui.questionList.innerHTML = `
+          <div class="notice warn">
+            Pas encore de questions visibles. Soit l’épreuve n’a pas été chargée, soit aucun questionnaire validé n’a encore été publié.
+          </div>
+        `;
+        return;
+      }
+
+      const disabled = state.locked || isSubmissionFinal(state.submission);
+      const html = questions.map((q, index) => {
+        const qKey = q.id || `q_${index}`;
+        const qType = String(q.type || "qcm").toLowerCase();
+        const title = escapeHtml(q.title || q.question || `Question ${index + 1}`);
+        const help = escapeHtml(q.help || q.description || "");
+        const points = q.points ? `<span class="badge orange">${escapeHtml(String(q.points))} pt${Number(q.points) > 1 ? "s" : ""}</span>` : "";
+        let answerHtml = "";
+
+        if (qType === "text" || qType === "textarea" || qType === "open") {
+          answerHtml = `
+            <textarea class="answer-text" data-question-id="${escapeHtml(qKey)}" placeholder="Rédigez votre réponse ici…" ${disabled ? "disabled" : ""}>${escapeHtml(getAnswerFor(q, index) || "")}</textarea>
+          `;
+        } else {
+          const options = Array.isArray(q.options) ? q.options : [];
+          answerHtml = `
+            <div class="answers">
+              ${options.map((opt, optIndex) => {
+                const optValue = typeof opt === "object" ? String(opt.value ?? opt.text ?? `option_${optIndex}`) : String(opt);
+                const optLabel = typeof opt === "object" ? String(opt.text ?? opt.value ?? `Choix ${optIndex + 1}`) : String(opt);
+                const checked = String(getAnswerFor(q, index) || "") === optValue ? "checked" : "";
+                return `
+                  <label class="choice">
+                    <input type="radio" name="q_${escapeHtml(qKey)}" value="${escapeHtml(optValue)}" data-question-id="${escapeHtml(qKey)}" ${disabled ? "disabled" : ""} ${checked}/>
+                    <span>${escapeHtml(optLabel)}</span>
+                  </label>
+                `;
+              }).join("")}
+            </div>
+          `;
+        }
+
+        return `
+          <article class="question-card">
+            <div class="question-top">
+              <div class="q-index">${index + 1}</div>
+              <div class="q-main">
+                <div class="q-type">${qType === "text" || qType === "textarea" || qType === "open" ? "Réponse libre" : "QCM"} ${points}</div>
+                <h4 class="q-title">${title}</h4>
+                ${help ? `<p class="q-help">${help}</p>` : ""}
+              </div>
+            </div>
+            ${answerHtml}
+          </article>
+        `;
+      }).join("");
+
+      ui.questionList.innerHTML = html;
+      bindAnswerEvents();
+    }
+
+    function bindAnswerEvents(){
+      document.querySelectorAll("input[type='radio'][data-question-id]").forEach((input) => {
+        input.addEventListener("change", (e) => {
+          const qid = e.target.dataset.questionId;
+          state.answers[qid] = e.target.value;
+          markDraftChanged();
+        });
+      });
+
+      document.querySelectorAll("textarea[data-question-id]").forEach((ta) => {
+        ta.addEventListener("input", (e) => {
+          const qid = e.target.dataset.questionId;
+          state.answers[qid] = e.target.value;
+          markDraftChanged();
+        });
+      });
+    }
+
+    let draftDirty = false;
+
+    function markDraftChanged(){
+      draftDirty = true;
+      setText(ui.syncBadge, "Réponses modifiées");
+      ui.syncBadge.className = "badge orange";
+    }
+
+    async function saveDraft(manual = false){
+      if (!state.user || !state.activeExamId || state.locked || isSubmissionFinal(state.submission)) return;
+      try{
+        const submissionPath = ref(db, `examSubmissions/${state.activeExamId}/${state.user.uid}`);
+        const payload = {
+          uid: state.user.uid,
+          userEmail: state.user.email || "",
+          examId: state.activeExamId,
+          answers: state.answers || {},
+          updatedAt: serverTimestamp(),
+          status: state.submission?.status || "in_progress",
+          roleSnapshot: state.role
+        };
+
+        if (!state.submission?.startedAt) payload.startedAt = serverTimestamp();
+        if (!state.submission?.examWindowEndAt && state.control?.endsAt) payload.examWindowEndAt = Number(state.control.endsAt);
+        await update(submissionPath, payload);
+
+        draftDirty = false;
+        setText(ui.syncBadge, manual ? "Brouillon enregistré" : "Sauvegarde auto OK");
+        ui.syncBadge.className = "badge green";
+      }catch(e){
+        console.error(e);
+        setText(ui.syncBadge, "Erreur de sauvegarde");
+        ui.syncBadge.className = "badge red";
+      }
+    }
+
+    async function createOrStartSubmission(){
+      if (!state.user || !state.activeExamId || !state.exam || state.locked) return;
+      const submissionPath = ref(db, `examSubmissions/${state.activeExamId}/${state.user.uid}`);
+      const existing = (await get(submissionPath)).val();
+
+      if (existing && isSubmissionFinal(existing)) {
+        state.submission = existing;
+        refreshComputedState();
+        return;
+      }
+
+      const payload = {
+        uid: state.user.uid,
+        userEmail: state.user.email || "",
+        displayName: state.user.displayName || "",
+        examId: state.activeExamId,
+        examTitle: state.exam.title || "",
+        status: "in_progress",
+        startedAt: existing?.startedAt || serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        submittedAt: existing?.submittedAt || null,
+        examWindowEndAt: Number(state.control?.endsAt || 0),
+        roleSnapshot: state.role,
+        answers: existing?.answers || state.answers || {},
+        adminLaunchSnapshot: {
+          launched: !!state.control?.launched,
+          status: state.control?.status || ""
+        }
+      };
+
+      await update(submissionPath, payload);
+      state.answers = payload.answers || {};
+      setText(ui.submissionStatusLabel, "En cours");
+      setText(ui.syncBadge, "Session démarrée");
+      ui.syncBadge.className = "badge green";
+    }
+
+    async function submitExam(auto = false){
+      if (state.submitting || !state.user || !state.activeExamId) return;
+      state.submitting = true;
+      setButtonsState({ canStart:false, canSave:false, canSubmit:false });
+
+      try{
+        const submissionPath = ref(db, `examSubmissions/${state.activeExamId}/${state.user.uid}`);
+        await update(submissionPath, {
+          uid: state.user.uid,
+          userEmail: state.user.email || "",
+          examId: state.activeExamId,
+          answers: state.answers || {},
+          updatedAt: serverTimestamp(),
+          submittedAt: serverTimestamp(),
+          status: auto ? "auto_submitted" : "submitted",
+          lockedAt: serverTimestamp(),
+          submissionSource: auto ? "timer" : "manual"
+        });
+
+        setText(ui.submissionStatusLabel, auto ? "Soumise automatiquement" : "Soumise");
+        setText(ui.syncBadge, auto ? "Fin du temps — copie envoyée" : "Copie envoyée");
+        ui.syncBadge.className = "badge green";
+        setNotice("success", auto
+          ? "Le temps est écoulé. Votre copie a été soumise automatiquement."
+          : "Votre copie a bien été soumise. Elle reste figée jusqu’aux étapes suivantes du processus administratif.");
+      }catch(e){
+        console.error(e);
+        setText(ui.syncBadge, "Échec de soumission");
+        ui.syncBadge.className = "badge red";
+        setNotice("error", "Impossible de soumettre votre copie pour le moment. Vérifiez votre connexion puis réessayez.");
+      }finally{
+        state.submitting = false;
+        submitOverlay.classList.add("hidden");
+      }
+    }
+
+    function stopTimer(){
+      if (state.timerId) clearInterval(state.timerId);
+      state.timerId = null;
+    }
+
+    function stopAutosave(){
+      if (state.autosaveId) clearInterval(state.autosaveId);
+      state.autosaveId = null;
+    }
+
+    function startAutosave(){
+      stopAutosave();
+      state.autosaveId = setInterval(() => {
+        if (draftDirty && !state.locked && !isSubmissionFinal(state.submission)) {
+          saveDraft(false);
+        }
+      }, 12000);
+    }
+
+    function startTimer(){
+      stopTimer();
+
+      const endAt = getExamWindowEnd(state.control, state.submission);
+      if (!endAt || endAt <= 0) {
+        ui.timerDisplay.textContent = "--:--:--";
+        ui.timerNote.textContent = "Aucune fenêtre de temps active.";
+        return;
+      }
+
+      const tick = async () => {
+        const now = Date.now();
+        const remaining = endAt - now;
+        ui.timerDisplay.textContent = formatRemaining(remaining);
+
+        if (remaining <= 0) {
+          ui.timerDisplay.textContent = "00:00:00";
+          ui.timerNote.textContent = "Temps écoulé";
+          if (!isSubmissionFinal(state.submission) && state.role === "candidate") {
+            await submitExam(true);
+          }
+          stopTimer();
+          refreshComputedState();
+          return;
+        }
+
+        if (remaining <= 5 * 60 * 1000) {
+          ui.timerNote.textContent = "Fin proche : sauvegardez et vérifiez vos réponses.";
+        } else {
+          ui.timerNote.textContent = `Fin prévue : ${formatDateTime(endAt)}`;
+        }
+      };
+
+      tick();
+      state.timerId = setInterval(tick, 1000);
+    }
+
+    function refreshComputedState(){
+      const control = state.control || {};
+      const exam = state.exam;
+      const launched = isCompetitionLaunched(control);
+      const submitted = isSubmissionFinal(state.submission);
+      const now = Date.now();
+      const endAt = getExamWindowEnd(control, state.submission);
+      const withinWindow = launched && endAt > now;
+      const canCandidateSeeExam = launched && !!state.activeExamId && !!exam && (String(exam.visibility || "visible").toLowerCase() !== "hidden");
+      const isCandidate = state.role === "candidate";
+      const isAdminOrJury = state.role === "admin" || state.role === "jury";
+
+      state.locked = !(canCandidateSeeExam || isAdminOrJury);
+
+      setGlobalStatus(launched, launched ? "Compétition lancée" : "Compétition non lancée");
+      setText(ui.heroDuration, formatDuration(exam?.durationMinutes || control?.durationMinutes));
+      setText(ui.heroExamId, state.activeExamId || "Aucune");
+      setText(ui.activeExamLabel, exam?.title || "Aucun questionnaire actif");
+
+      if (!state.activeExamId) {
+        setText(ui.adminDecisionLabel, "Aucune épreuve active n’a été sélectionnée par l’administrateur principal.");
+      } else if (!launched) {
+        setText(ui.adminDecisionLabel, "Une épreuve existe, mais elle reste verrouillée tant que l’administrateur n’a pas lancé officiellement la compétition.");
+      } else {
+        setText(ui.adminDecisionLabel, "L’épreuve active est autorisée et visible selon votre rôle.");
+      }
+
+      if (state.role === "candidate") {
+        if (!state.activeExamId || !exam) {
+          setNotice("warn", "Aucune épreuve validée n’est disponible pour le moment.");
+        } else if (!launched) {
+          setNotice("info", "L’épreuve a été préparée, mais elle ne devient visible pour les candidats qu’après action de l’administrateur principal.");
+        } else if (submitted) {
+          setNotice("success", "Votre copie est déjà soumise. Elle reste enregistrée et figée.");
+        } else if (withinWindow) {
+          setNotice("success", "La compétition est ouverte. Vous pouvez commencer ou poursuivre votre épreuve.");
+        } else {
+          setNotice("error", "La fenêtre de passage est fermée. Vous ne pouvez plus modifier votre copie.");
+        }
+      } else if (state.role === "jury") {
+        setNotice("info", launched
+          ? "Vue jury : l’épreuve est en cours. Les questionnaires du jury ne deviennent utilisables qu’après validation admin."
+          : "Vue jury : les propositions existent, mais rien n’est encore ouvert aux candidats tant que l’admin principal ne lance pas la compétition.");
+      } else if (state.role === "admin") {
+        setNotice("info", launched
+          ? "Vue admin : l’épreuve est officiellement lancée. Les candidats voient uniquement ce que vous avez validé."
+          : "Vue admin : vous gardez le contrôle total. Les candidats n’ont encore aucun accès effectif à l’épreuve.");
+      }
+
+      if (!exam) {
+        setText(ui.examTitleHero, "Examen officiel en attente d’activation");
+        setText(ui.examIntroHero, "Le sujet visible ici dépend du questionnaire actif choisi et validé par l’administrateur principal.");
+      } else {
+        setText(ui.examTitleHero, exam.title || "Épreuve officielle");
+        setText(ui.examIntroHero, exam.instructions || "Veuillez lire attentivement les consignes avant de commencer.");
+      }
+
+      const canStart = state.role === "candidate" && launched && withinWindow && !!exam && !state.submission?.startedAt && !submitted;
+      const canSave = state.role === "candidate" && launched && withinWindow && !!exam && !submitted;
+      const canSubmit = state.role === "candidate" && launched && withinWindow && !!exam && !!state.submission?.startedAt && !submitted;
+      setButtonsState({ canStart, canSave, canSubmit });
+
+      setText(ui.windowBadge, launched && withinWindow ? "Fenêtre ouverte" : "Fenêtre fermée");
+      ui.windowBadge.className = "badge " + (launched && withinWindow ? "green" : "red");
+
+      setText(ui.submissionStatusLabel,
+        submitted ? (state.submission?.status === "auto_submitted" ? "Soumise automatiquement" : "Soumise") :
+        state.submission?.startedAt ? "En cours" :
+        "Non commencée"
+      );
+
+      setText(ui.footHint,
+        submitted ? "Votre copie est verrouillée." :
+        launched ? "Vos réponses sont synchronisées pendant l’épreuve." :
+        "L’admin doit d’abord lancer la compétition."
+      );
+
+      renderSubject();
+      renderQuestions();
+      startTimer();
+
+      if (state.role === "candidate" && launched && !submitted) {
+        startAutosave();
+      } else {
+        stopAutosave();
+      }
+    }
+
+    async function loadExamAndSubmission(){
+      const control = state.control || {};
+      state.activeExamId = control.activeExamId || control.currentExamId || null;
+
+      if (!state.activeExamId) {
+        state.exam = null;
+        state.submission = null;
+        state.answers = {};
+        refreshComputedState();
+        return;
+      }
+
+      const examPath = ref(db, `exams/${state.activeExamId}`);
+      const submissionPath = ref(db, `examSubmissions/${state.activeExamId}/${state.user.uid}`);
+
+      const [examSnap, submissionSnap] = await Promise.all([
+        get(examPath),
+        get(submissionPath)
+      ]);
+
+      state.exam = examSnap.val() || null;
+      state.submission = submissionSnap.val() || null;
+      state.answers = { ...(state.submission?.answers || {}) };
+
+      refreshComputedState();
+
+      const submissionListener = (snap) => {
+        state.submission = snap.val() || null;
+        state.answers = { ...(state.submission?.answers || state.answers || {}) };
+        refreshComputedState();
+      };
+      listen(submissionPath, submissionListener);
+    }
+
+    async function initForUser(user){
+      state.user = user;
+
+      setText(ui.userLabel, user?.email || "Utilisateur inconnu");
+
+      const profileSnap = await get(ref(db, `users/${user.uid}`));
+      const profile = profileSnap.val() || {};
+      state.role = getUserRole(user, profile);
+      setRoleUI(state.role);
+
+      const controlPath = ref(db, "competitionControl/current");
+      const controlListener = async (snap) => {
+        state.control = snap.val() || {};
+        await loadExamAndSubmission();
+      };
+      listen(controlPath, controlListener);
+
+      authMask.classList.add("hidden");
+    }
+
+    function bindStaticActions(){
+      ui.startBtn.addEventListener("click", () => startOverlay.classList.remove("hidden"));
+      $("cancelStartBtn").addEventListener("click", () => startOverlay.classList.add("hidden"));
+      $("confirmStartBtn").addEventListener("click", async () => {
+        $("confirmStartBtn").disabled = true;
+        try{
+          await createOrStartSubmission();
+          startOverlay.classList.add("hidden");
+          refreshComputedState();
+        }catch(e){
+          console.error(e);
+          setNotice("error", "Impossible de démarrer l’épreuve pour le moment.");
+        }finally{
+          $("confirmStartBtn").disabled = false;
+        }
+      });
+
+      ui.saveBtn.addEventListener("click", () => saveDraft(true));
+      ui.saveBtnBottom.addEventListener("click", () => saveDraft(true));
+
+      ui.submitBtn.addEventListener("click", () => submitOverlay.classList.remove("hidden"));
+      ui.submitBtnBottom.addEventListener("click", () => submitOverlay.classList.remove("hidden"));
+      $("cancelSubmitBtn").addEventListener("click", () => submitOverlay.classList.add("hidden"));
+      $("confirmSubmitBtn").addEventListener("click", () => submitExam(false));
+    }
+
+    bindStaticActions();
+
+    onAuthStateChanged(auth, async (user) => {
+      clearRegisteredListeners();
+      stopTimer();
+      stopAutosave();
+
+      if (!user) {
+        window.location.replace("./login.html?redirect=examen.html");
+        return;
+      }
+
+      try{
+        await initForUser(user);
+      }catch(e){
+        console.error(e);
+        setNotice("error", "Erreur de chargement de l’épreuve. Réessayez dans un instant.");
+        authMask.classList.add("hidden");
+      }
     });
-    document.getElementById("logs").innerHTML=html;
-  });
-}
 
-/* SUBMIT */
-function submitExam(){
-  const q1=document.querySelector('input[name="q1"]:checked')?.value || 0;
-  const q2=document.getElementById("q2").value;
-
-  const score = Number(q1);
-
-  push(ref(db,"answers"),{
-    user:user.email,
-    examId,
-    score,
-    q2,
-    time:Date.now()
-  });
-
-  alert("Envoyé");
-}
-
-window.verifyCode=verifyCode;
-window.submitExam=submitExam;
-window.setCode=setCode;
-
-</script>
-
+    window.addEventListener("beforeunload", async () => {
+      if (draftDirty && !state.locked && !isSubmissionFinal(state.submission)) {
+        try { await saveDraft(false); } catch(e) {}
+      }
+    });
+  </script>
 </body>
 </html>
