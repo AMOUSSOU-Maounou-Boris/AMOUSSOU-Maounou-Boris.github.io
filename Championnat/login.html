@@ -26,15 +26,11 @@
       --blue-dark:#145bd6;
       --red:#ff4b4b;
       --red-dark:#df2e2e;
-      --gold:#d8a72f;
       --text:#0b2340;
       --muted:#61748d;
       --line:#dbe7f2;
-      --card:rgba(255,255,255,.84);
       --shadow:0 18px 45px rgba(9,45,92,.10);
       --shadow-soft:0 10px 24px rgba(10,37,73,.08);
-      --radius-xl:28px;
-      --radius-lg:20px;
       --max:1180px;
     }
 
@@ -361,8 +357,6 @@
       font-size:.92rem;
     }
 
-    .input-wrap{position:relative}
-
     input, select{
       width:100%;
       padding:14px 14px;
@@ -549,22 +543,22 @@
         <div class="eyebrow">🔐 Connexion centrale • Candidat • Jury • Admin</div>
         <h1>Une seule entrée pour accéder au bon espace.</h1>
         <p class="lead">
-          Cette page est la porte d’entrée privée du site. Les visiteurs peuvent voir le championnat publiquement,
-          mais l’examen, le jury, l’administration et l’espace candidat passent ici avant d’ouvrir la bonne section selon le rôle reconnu.
+          Cette page sert d’entrée privée pour les candidats, le jury et l’administration.
+          Le championnat reste public, mais les zones privées passent ici avant d’ouvrir la bonne section.
         </p>
 
         <div class="hero-grid">
           <div class="mini">
             <strong>Championnat public</strong>
-            <p><code>competition.html</code> reste visible publiquement. La connexion n’est demandée qu’au moment d’entrer dans une zone privée.</p>
+            <p><code>competition.html</code> reste visible à tous. La connexion est demandée seulement pour les espaces privés.</p>
           </div>
           <div class="mini">
-            <strong>Routage intelligent</strong>
-            <p>Après connexion, l’utilisateur vérifié est automatiquement redirigé vers l’espace candidat, jury ou admin.</p>
+            <strong>Redirection simple</strong>
+            <p>Après connexion, le système t’envoie automatiquement vers la bonne page selon ton rôle.</p>
           </div>
           <div class="mini">
-            <strong>Compte vérifié</strong>
-            <p>Le compte doit confirmer l’adresse email avant d’ouvrir les espaces privés dépendants de <code>login.html</code>.</p>
+            <strong>Même Firebase</strong>
+            <p>Cette version est adaptée à ton ancien Firebase et au même <code>firebase-config.js</code>.</p>
           </div>
         </div>
       </div>
@@ -580,22 +574,18 @@
         <section class="form-panel active" id="loginPanel">
           <h2 class="panel-title">Connexion</h2>
           <p class="panel-desc">
-            Connecte-toi avec ton adresse email et ton mot de passe. Après vérification, la page te redirigera vers l’espace adapté à ton rôle et à la page demandée.
+            Connecte-toi avec ton email et ton mot de passe. La redirection vers l’espace candidat, jury ou admin se fera automatiquement.
           </p>
 
           <form id="loginForm">
             <div class="field">
               <label for="loginEmail">Adresse email</label>
-              <div class="input-wrap">
-                <input type="email" id="loginEmail" required placeholder="exemple@email.com">
-              </div>
+              <input type="email" id="loginEmail" required placeholder="exemple@email.com">
             </div>
 
             <div class="field">
               <label for="loginPassword">Mot de passe</label>
-              <div class="input-wrap">
-                <input type="password" id="loginPassword" required placeholder="Votre mot de passe">
-              </div>
+              <input type="password" id="loginPassword" required placeholder="Votre mot de passe">
             </div>
 
             <button class="btn" id="loginBtn" type="submit">Se connecter</button>
@@ -603,7 +593,7 @@
 
           <div class="sub-actions">
             <a href="competition.html">Voir le championnat</a>
-            <button type="button" id="resendVerifyBtn">Renvoyer le mail d’activation</button>
+            <a href="rules.html">Lire le règlement</a>
           </div>
 
           <div class="msg" id="loginMsg"></div>
@@ -612,54 +602,38 @@
         <section class="form-panel" id="signupPanel">
           <h2 class="panel-title">Créer un compte</h2>
           <p class="panel-desc">
-            Crée un compte pour ce site. Le rôle candidat est libre. Les rôles jury et admin demandent un code de création.
+            Crée ton compte pour ce site. Le rôle admin reste réservé à l’email principal.
+            Le jury et le candidat peuvent être enregistrés via leur rôle.
           </p>
 
           <form id="signupForm">
             <div class="field">
               <label for="signupName">Nom complet</label>
-              <div class="input-wrap">
-                <input type="text" id="signupName" required placeholder="Nom et prénom">
-              </div>
+              <input type="text" id="signupName" required placeholder="Nom et prénom">
             </div>
 
             <div class="field">
               <label for="signupEmail">Adresse email</label>
-              <div class="input-wrap">
-                <input type="email" id="signupEmail" required placeholder="exemple@email.com">
-              </div>
+              <input type="email" id="signupEmail" required placeholder="exemple@email.com">
             </div>
 
             <div class="field">
               <label for="signupRole">Type de compte</label>
-              <div class="input-wrap">
-                <select id="signupRole" required>
-                  <option value="candidate">Candidat</option>
-                  <option value="jury">Jury</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field" id="roleCodeField" style="display:none;">
-              <label for="roleAccessCode">Code de création jury/admin</label>
-              <div class="input-wrap">
-                <input type="text" id="roleAccessCode" placeholder="Code spécial requis">
-              </div>
+              <select id="signupRole" required>
+                <option value="candidate">Candidat</option>
+                <option value="jury">Jury</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
 
             <div class="field">
               <label for="signupPassword">Mot de passe</label>
-              <div class="input-wrap">
-                <input type="password" id="signupPassword" required minlength="6" placeholder="6 caractères minimum">
-              </div>
+              <input type="password" id="signupPassword" required minlength="6" placeholder="6 caractères minimum">
             </div>
 
             <div class="field">
               <label for="signupPasswordConfirm">Confirmer le mot de passe</label>
-              <div class="input-wrap">
-                <input type="password" id="signupPasswordConfirm" required minlength="6" placeholder="Retape le mot de passe">
-              </div>
+              <input type="password" id="signupPasswordConfirm" required minlength="6" placeholder="Retape le mot de passe">
             </div>
 
             <button class="btn" id="signupBtn" type="submit">Créer mon compte</button>
@@ -700,9 +674,7 @@
       createUserWithEmailAndPassword,
       updateProfile,
       onAuthStateChanged,
-      sendEmailVerification,
-      signOut,
-      reload
+      signOut
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       ref,
@@ -711,12 +683,7 @@
       update
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const SITE_KEY = "championnatchimie";
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
-
-    // Change ces codes avant mise en ligne
-    const ADMIN_CREATION_CODE = "ADMIN-CHIMIE-2026";
-    const JURY_CREATION_CODE = "JURY-CHIMIE-2026";
 
     const showLogin = document.getElementById("showLogin");
     const showSignup = document.getElementById("showSignup");
@@ -735,18 +702,10 @@
     const menuPanel = document.getElementById("menuPanel");
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
-
-    const resendVerifyBtn = document.getElementById("resendVerifyBtn");
     const quickExamBtn = document.getElementById("quickExamBtn");
-
-    const signupRole = document.getElementById("signupRole");
-    const roleCodeField = document.getElementById("roleCodeField");
-    const roleAccessCode = document.getElementById("roleAccessCode");
 
     const params = new URLSearchParams(window.location.search);
     const requestedRedirectRaw = (params.get("redirect") || "").trim();
-    const verifiedFlag = params.get("verified");
-    const mode = params.get("mode");
 
     const allowedRedirects = new Set([
       "examen.html",
@@ -787,8 +746,6 @@
       loginPanel.classList.toggle("active", login);
       signupPanel.classList.toggle("active", !login);
     }
-
-    if (mode === "signup") activateTab("signup");
 
     showLogin.addEventListener("click", () => activateTab("login"));
     showSignup.addEventListener("click", () => activateTab("signup"));
@@ -834,31 +791,6 @@
         console.error("Erreur lecture profil :", err);
         return null;
       }
-    }
-
-    function updateRoleFieldVisibility(){
-      const role = signupRole.value;
-      const needsCode = role === "jury" || role === "admin";
-      roleCodeField.style.display = needsCode ? "block" : "none";
-      if (!needsCode) roleAccessCode.value = "";
-    }
-
-    signupRole.addEventListener("change", updateRoleFieldVisibility);
-    updateRoleFieldVisibility();
-
-    function makeContinueUrl(){
-      const url = new URL("./login.html", window.location.href);
-      if (requestedRedirect) url.searchParams.set("redirect", requestedRedirect);
-      url.searchParams.set("verified", "1");
-      return url.href;
-    }
-
-    async function sendVerificationForCurrentUser(user){
-      const actionCodeSettings = {
-        url: makeContinueUrl(),
-        handleCodeInApp: false
-      };
-      await sendEmailVerification(user, actionCodeSettings);
     }
 
     function buildMenu(role){
@@ -918,39 +850,67 @@
       }
     }
 
-    function setStatus(role, verified = false){
+    function setStatus(role){
       if (role === "admin") {
         statusDot.classList.add("ok");
-        statusText.textContent = verified ? "Admin vérifié" : "Admin non vérifié";
+        statusText.textContent = "Admin connecté";
         return;
       }
       if (role === "jury") {
         statusDot.classList.add("ok");
-        statusText.textContent = verified ? "Jury vérifié" : "Jury non vérifié";
+        statusText.textContent = "Jury connecté";
         return;
       }
       if (role === "candidate") {
         statusDot.classList.add("ok");
-        statusText.textContent = verified ? "Candidat vérifié" : "Candidat non vérifié";
+        statusText.textContent = "Candidat connecté";
         return;
       }
       statusDot.classList.remove("ok");
       statusText.textContent = "Visiteur public";
     }
 
+    async function ensureUserRecord(user, extra = {}){
+      const userRef = ref(db, "users/" + user.uid);
+      const existingSnap = await get(userRef);
+
+      const email = user.email || "";
+      const roleToSave =
+        sanitizeEmail(email) === sanitizeEmail(ADMIN_EMAIL)
+          ? "admin"
+          : (extra.role || "candidate");
+
+      if (!existingSnap.exists()) {
+        await set(userRef, {
+          uid: user.uid,
+          displayName: extra.displayName || user.displayName || "",
+          email,
+          role: roleToSave,
+          competitionRole: roleToSave,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        });
+      } else {
+        await update(userRef, {
+          displayName: extra.displayName || existingSnap.val()?.displayName || user.displayName || "",
+          email: email || existingSnap.val()?.email || "",
+          updatedAt: Date.now()
+        });
+      }
+    }
+
     function routeAfterAuth(user, profile){
       const role = resolveRole(user, profile);
 
-      if (!user.emailVerified) {
-        showMessage(
-          loginMsg,
-          "Connexion réussie, mais votre adresse email n’est pas encore vérifiée. Ouvrez votre boîte mail, activez votre compte, puis revenez ici avec le bouton de retour prévu dans le lien.",
-          "info"
-        );
-        return;
-      }
-
       if (role === "admin") {
+        if (requestedRedirect === "jury.html") {
+          window.location.href = "./jury.html";
+          return;
+        }
+        if (requestedRedirect === "examen.html") {
+          window.location.href = "./examen.html";
+          return;
+        }
         window.location.href = "./admin.html";
         return;
       }
@@ -981,45 +941,16 @@
       window.location.href = "./dashboard-candidat.html";
     }
 
-    async function ensureUserRecord(user, extra = {}){
-      const userRef = ref(db, "users/" + user.uid);
-      const existingSnap = await get(userRef);
-
-      const basePayload = {
-        uid: user.uid,
-        displayName: extra.displayName || user.displayName || "",
-        email: user.email || "",
-        siteKey: SITE_KEY,
-        updatedAt: Date.now()
-      };
-
-      if (!existingSnap.exists()) {
-        await set(userRef, {
-          ...basePayload,
-          role: extra.role || "candidate",
-          competitionRole: extra.role || "candidate",
-          createdAt: Date.now(),
-          emailVerified: !!user.emailVerified
-        });
-      } else {
-        await update(userRef, {
-          ...basePayload,
-          emailVerified: !!user.emailVerified
-        });
-      }
-    }
-
     function goToExam(){
-      if (state.user && state.user.emailVerified) {
-        const role = state.role;
-        if (role === "admin") {
-          window.location.href = "./admin.html";
-          return;
-        }
-        if (role === "jury") {
-          window.location.href = "./jury.html";
-          return;
-        }
+      if (state.role === "admin") {
+        window.location.href = "./admin.html";
+        return;
+      }
+      if (state.role === "jury") {
+        window.location.href = "./jury.html";
+        return;
+      }
+      if (state.role === "candidate") {
         window.location.href = "./examen.html";
         return;
       }
@@ -1027,35 +958,6 @@
     }
 
     quickExamBtn.addEventListener("click", goToExam);
-
-    resendVerifyBtn.addEventListener("click", async () => {
-      clearMessages();
-
-      try{
-        if (!auth.currentUser) {
-          showMessage(loginMsg, "Connectez-vous d’abord pour pouvoir renvoyer le mail d’activation.", "err");
-          return;
-        }
-
-        await reload(auth.currentUser);
-
-        if (auth.currentUser.emailVerified) {
-          const profile = await getUserProfile(auth.currentUser.uid);
-          routeAfterAuth(auth.currentUser, profile);
-          return;
-        }
-
-        await sendVerificationForCurrentUser(auth.currentUser);
-        showMessage(
-          loginMsg,
-          "Un nouveau mail d’activation a été envoyé. Vérifiez votre boîte de réception ainsi que vos spams.",
-          "ok"
-        );
-      }catch(err){
-        console.error(err);
-        showMessage(loginMsg, "Impossible de renvoyer le mail d’activation pour le moment.", "err");
-      }
-    });
 
     menuBtn.addEventListener("click", () => {
       menuPanel.classList.toggle("show");
@@ -1078,17 +980,8 @@
         return;
       }
 
-      try{
-        await reload(user);
-      }catch(err){
-        console.error(err);
-      }
-
       state.profile = await getUserProfile(user.uid);
       state.role = resolveRole(user, state.profile);
-
-      renderMenu(state.role);
-      setStatus(state.role, !!user.emailVerified);
 
       try{
         await ensureUserRecord(user, { role: state.role });
@@ -1096,13 +989,8 @@
         console.error(err);
       }
 
-      if (verifiedFlag === "1" && user.emailVerified) {
-        showMessage(loginMsg, "Adresse email vérifiée avec succès. Redirection en cours…", "ok");
-        setTimeout(() => {
-          routeAfterAuth(user, state.profile);
-        }, 500);
-        return;
-      }
+      renderMenu(state.role);
+      setStatus(state.role);
     });
 
     loginForm.addEventListener("submit", async (e) => {
@@ -1115,15 +1003,13 @@
 
       try{
         const cred = await signInWithEmailAndPassword(auth, email, password);
-        await reload(cred.user);
-
         const profile = await getUserProfile(cred.user.uid);
-        await ensureUserRecord(cred.user, { role: resolveRole(cred.user, profile) });
 
-        showMessage(loginMsg, "Connexion réussie. Vérification de votre accès…", "ok");
+        showMessage(loginMsg, "Connexion réussie. Redirection en cours...", "ok");
+
         setTimeout(() => {
           routeAfterAuth(cred.user, profile);
-        }, 450);
+        }, 500);
 
       }catch(err){
         console.error(err);
@@ -1145,8 +1031,7 @@
 
       const name = document.getElementById("signupName").value.trim();
       const email = document.getElementById("signupEmail").value.trim();
-      const role = signupRole.value;
-      const accessCode = roleAccessCode.value.trim();
+      const selectedRole = document.getElementById("signupRole").value;
       const password = document.getElementById("signupPassword").value;
       const passwordConfirm = document.getElementById("signupPasswordConfirm").value;
 
@@ -1162,55 +1047,41 @@
         return;
       }
 
-      if (role === "admin" && accessCode !== ADMIN_CREATION_CODE) {
-        showMessage(signupMsg, "Code de création admin incorrect.", "err");
-        signupBtn.disabled = false;
-        return;
-      }
-
-      if (role === "jury" && accessCode !== JURY_CREATION_CODE) {
-        showMessage(signupMsg, "Code de création jury incorrect.", "err");
-        signupBtn.disabled = false;
-        return;
-      }
-
       try{
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(cred.user, { displayName: name });
 
-        await ensureUserRecord(cred.user, { displayName: name, role });
+        const finalRole =
+          sanitizeEmail(email) === sanitizeEmail(ADMIN_EMAIL)
+            ? "admin"
+            : selectedRole;
 
-        await update(ref(db, "users/" + cred.user.uid), {
+        await set(ref(db, "users/" + cred.user.uid), {
+          uid: cred.user.uid,
           displayName: name,
           email: email,
-          role: role,
-          competitionRole: role,
-          siteKey: SITE_KEY,
-          emailVerified: false,
+          role: finalRole,
+          competitionRole: finalRole,
+          createdAt: Date.now(),
           updatedAt: Date.now()
         });
 
-        await sendVerificationForCurrentUser(cred.user);
-
-        showMessage(
-          signupMsg,
-          "Compte créé avec succès. Un mail d’activation vient d’être envoyé. Vérifiez votre boîte mail, cliquez sur le lien d’activation, puis revenez automatiquement ici grâce au lien de retour.",
-          "ok"
-        );
-
+        showMessage(signupMsg, "Compte créé avec succès. Redirection en cours...", "ok");
         signupForm.reset();
-        updateRoleFieldVisibility();
+
+        setTimeout(() => {
+          routeAfterAuth(cred.user, {
+            role: finalRole,
+            competitionRole: finalRole
+          });
+        }, 650);
 
       }catch(err){
         console.error(err);
         const code = String(err?.code || "");
 
         if (code.includes("email-already-in-use")) {
-          showMessage(
-            signupMsg,
-            "Cet email est déjà utilisé dans ce projet Firebase. Pour que ce site soit vraiment séparé de l’ancien, il faut un nouveau projet Firebase et un nouveau firebase-config.js.",
-            "err"
-          );
+          showMessage(signupMsg, "Cet email est déjà utilisé dans ce Firebase. Connecte-toi directement avec ce compte.", "err");
         } else if (code.includes("weak-password")) {
           showMessage(signupMsg, "Mot de passe trop faible. Utilise au moins 6 caractères.", "err");
         } else {
@@ -1223,14 +1094,6 @@
 
     renderMenu("visitor");
     setStatus("visitor");
-
-    if (verifiedFlag === "1") {
-      showMessage(
-        loginMsg,
-        "Retour après vérification détecté. Connectez-vous si nécessaire ou attendez la redirection automatique si votre session est encore active.",
-        "info"
-      );
-    }
   </script>
 </body>
 </html>
