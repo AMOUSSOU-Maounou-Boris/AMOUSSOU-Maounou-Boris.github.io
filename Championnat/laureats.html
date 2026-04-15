@@ -46,11 +46,19 @@
 
     body{
       overflow:hidden;
+      padding-top:var(--topbar-h);
+      transition:padding-top .24s ease;
+    }
+
+    body.topbar-collapsed{
+      padding-top:0;
     }
 
     .topbar{
-      position:sticky;
+      position:fixed;
       top:0;
+      left:0;
+      right:0;
       z-index:60;
       height:var(--topbar-h);
       background:rgba(255,255,255,.94);
@@ -198,6 +206,11 @@
       display:grid;
       grid-template-columns:var(--sidebar-w) minmax(0,1fr);
       height:calc(100vh - var(--topbar-h));
+      transition:height .24s ease;
+    }
+
+    body.topbar-collapsed .layout{
+      height:100vh;
     }
 
     .sidebar{
@@ -205,10 +218,13 @@
       color:#fff;
       padding:18px 14px 20px;
       border-right:1px solid rgba(255,255,255,.06);
-      position:sticky;
-      top:var(--topbar-h);
       height:calc(100vh - var(--topbar-h));
       overflow-y:auto;
+      transition:height .24s ease;
+    }
+
+    body.topbar-collapsed .sidebar{
+      height:100vh;
     }
 
     .sidebar-section-title{
@@ -275,6 +291,11 @@
       height:calc(100vh - var(--topbar-h));
       overflow-y:auto;
       overflow-x:hidden;
+      transition:height .24s ease;
+    }
+
+    body.topbar-collapsed .content{
+      height:100vh;
     }
 
     .content-head{
@@ -723,11 +744,21 @@
     @media (max-width:1120px){
       body{
         overflow:auto;
+        padding-top:var(--topbar-h);
+      }
+
+      body.topbar-collapsed{
+        padding-top:var(--topbar-h);
       }
 
       .layout,
+      body.topbar-collapsed .layout,
       .grid-main{
         grid-template-columns:1fr;
+      }
+
+      .layout{
+        height:auto;
       }
 
       .cards-4{
@@ -743,6 +774,10 @@
       .podium-card.silver,
       .podium-card.bronze{
         min-height:auto;
+      }
+
+      .sidebar{
+        height:auto;
       }
 
       .content{
@@ -761,10 +796,18 @@
       }
       .topbar{
         padding:0 12px;
+        display:grid;
+        grid-template-columns:32px 1fr 32px;
+        align-items:center;
+        gap:8px;
       }
       .brand{
-        flex:1 1 auto;
-        min-width:0;
+        grid-column:1 / 4;
+        display:grid;
+        grid-template-columns:44px 1fr 32px;
+        align-items:center;
+        gap:8px;
+        width:100%;
       }
       .brand-mark{
         width:44px;
@@ -773,18 +816,24 @@
       }
       .brand-text{
         min-width:0;
-        flex:1 1 auto;
+        text-align:center;
+        width:100%;
       }
       .brand-title{
-        font-size:15px;
+        font-size:17px;
         line-height:1.1;
         white-space:nowrap;
         overflow:hidden;
         text-overflow:ellipsis;
+        text-align:center;
       }
       .brand-sub{ display:none; }
       .topbar-right{
-        margin-left:auto;
+        position:absolute;
+        right:12px;
+        top:50%;
+        transform:translateY(-50%);
+        margin-left:0;
         gap:6px;
         justify-content:flex-end;
       }
@@ -826,6 +875,7 @@
         padding:0 10px;
       }
       .brand{
+        grid-template-columns:40px 1fr 30px;
         gap:8px;
       }
       .brand-mark{
@@ -834,13 +884,15 @@
         border-radius:13px;
       }
       .brand-title{
-        font-size:14px;
-        line-height:1.1;
+        font-size:18px;
+        line-height:1.08;
+        text-align:center;
         white-space:nowrap;
         overflow:hidden;
         text-overflow:ellipsis;
       }
       .topbar-right{
+        right:10px;
         gap:6px;
       }
       .menu-btn{
@@ -920,7 +972,7 @@
   </aside>
 
   <div class="layout">
-    <aside class="sidebar">
+    <aside class="sidebar" id="leftSidebar">
       <div class="sidebar-section-title">Navigation</div>
       <nav class="nav-list">
         <a class="nav-link" href="./index.html"><span class="nav-dot green"></span><span>Accueil</span></a>
@@ -1176,8 +1228,10 @@
 
     function handleTopbarOnScroll() {
       const isDesktop = window.innerWidth > 1120;
+
       if (!isDesktop) {
         topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
         return;
       }
 
@@ -1185,10 +1239,13 @@
 
       if (currentScroll <= 6) {
         topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
       } else if (currentScroll > lastScrollTop + 4) {
         topbar.classList.add("topbar-hidden");
+        document.body.classList.add("topbar-collapsed");
       } else if (currentScroll < lastScrollTop - 4) {
         topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
       }
 
       lastScrollTop = currentScroll < 0 ? 0 : currentScroll;
@@ -1199,6 +1256,7 @@
     window.addEventListener("resize", () => {
       if (window.innerWidth <= 1120) {
         topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
       }
       closeMenu();
     });
