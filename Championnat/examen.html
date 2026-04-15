@@ -3,127 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Passer l'examen | Championnat de Chimie</title>
+  <title>Examen | Championnat de Chimie</title>
   <style>
-    *{box-sizing:border-box}
+    *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif}
+
     :root{
-      --bg1:#041126;
-      --bg2:#0c2a58;
-      --bg3:#123f88;
-      --card:rgba(255,255,255,.96);
-      --card-soft:rgba(248,252,255,.88);
-      --glass:rgba(255,255,255,.14);
+      --bg:#f5f7fb;
+      --panel:#ffffff;
+      --panel-soft:#fbfcfe;
+      --sidebar:#05293d;
+      --sidebar-2:#042336;
       --text:#0b2340;
-      --muted:#61748d;
-      --line:#dbe6f4;
-      --nav:#082e5b;
+      --muted:#6a7d95;
+      --line:#dde7f2;
+      --line-soft:#edf2f8;
       --blue:#2f8cff;
-      --blue-dark:#0f4d92;
+      --blue-dark:#145bd6;
+      --red:#ff4b4b;
       --green:#18c34a;
-      --red:#df4b4b;
+      --gold:#d8a72f;
       --orange:#ff9f1a;
-      --gold:#d8b14b;
-      --shadow:0 18px 44px rgba(7,31,66,.18);
-      --shadow-soft:0 10px 24px rgba(8,35,78,.12);
-      --radius:24px;
-      --radius-sm:16px;
-      --max:1320px;
+      --shadow:0 10px 24px rgba(13,37,71,.08);
+      --radius:18px;
+      --radius-lg:22px;
+      --topbar-h:70px;
+      --sidebar-w:272px;
     }
 
-    html,body{
+    body{
       margin:0;
-      min-height:100%;
-      font-family:Arial, Helvetica, sans-serif;
-      color:#fff;
-      background:
-        radial-gradient(circle at 10% 10%, rgba(120,190,255,.24), transparent 24%),
-        radial-gradient(circle at 90% 15%, rgba(255,255,255,.09), transparent 22%),
-        radial-gradient(circle at 80% 85%, rgba(47,140,255,.20), transparent 22%),
-        linear-gradient(135deg,var(--bg1),var(--bg2) 46%,var(--bg3));
-      overflow-x:hidden;
-    }
-
-    body::before,
-    body::after{
-      content:"";
-      position:fixed;
-      inset:auto;
-      pointer-events:none;
-      z-index:0;
-      filter:blur(1px);
-      opacity:.35;
-    }
-
-    body::before{
-      top:7%;
-      left:-80px;
-      width:320px;
-      height:320px;
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:50%;
-      box-shadow:
-        0 0 0 22px rgba(255,255,255,.04),
-        0 0 0 54px rgba(255,255,255,.03);
-      animation:floatOrb 14s ease-in-out infinite;
-    }
-
-    body::after{
-      right:-70px;
-      bottom:8%;
-      width:280px;
-      height:280px;
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:50%;
-      box-shadow:
-        0 0 0 18px rgba(255,255,255,.05),
-        0 0 0 44px rgba(255,255,255,.03);
-      animation:floatOrb 16s ease-in-out infinite reverse;
-    }
-
-    @keyframes floatOrb{
-      0%,100%{transform:translateY(0) rotate(0deg)}
-      50%{transform:translateY(-18px) rotate(8deg)}
-    }
-
-    .chem-net{
-      position:fixed;
-      inset:0;
-      z-index:0;
-      pointer-events:none;
-      opacity:.30;
-      background-image:
-        linear-gradient(60deg, transparent 46%, rgba(255,255,255,.06) 47%, rgba(255,255,255,.06) 53%, transparent 54%),
-        linear-gradient(-60deg, transparent 46%, rgba(255,255,255,.05) 47%, rgba(255,255,255,.05) 53%, transparent 54%);
-      background-size:170px 170px, 170px 170px;
-      mask-image:linear-gradient(to bottom, transparent, rgba(0,0,0,.9) 14%, rgba(0,0,0,.92) 80%, transparent);
-      -webkit-mask-image:linear-gradient(to bottom, transparent, rgba(0,0,0,.9) 14%, rgba(0,0,0,.92) 80%, transparent);
-    }
-
-    .page{
-      position:relative;
-      z-index:1;
-      width:min(calc(100% - 24px), var(--max));
-      margin:18px auto 34px;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
     }
 
     .topbar{
       position:sticky;
-      top:12px;
-      z-index:30;
+      top:0;
+      z-index:40;
+      height:var(--topbar-h);
+      background:rgba(255,255,255,.94);
       backdrop-filter:blur(14px);
-      background:rgba(8,46,91,.64);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:22px;
-      box-shadow:0 12px 36px rgba(3,18,42,.24);
-      padding:14px 18px;
-    }
-
-    .topbar-inner{
+      border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
+      padding:0 18px;
     }
 
     .brand{
@@ -134,18 +59,13 @@
     }
 
     .brand-mark{
-      width:50px;
-      height:50px;
-      border-radius:18px;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.25) 26%, transparent 27%),
-        radial-gradient(circle at 72% 34%, rgba(255,255,255,.7), rgba(255,255,255,.15) 18%, transparent 19%),
-        linear-gradient(135deg, #58b0ff, #0d5dc8 55%, #0a3474);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.28),
-        0 10px 24px rgba(0,0,0,.22);
+      width:40px;
+      height:40px;
+      border-radius:14px;
       position:relative;
-      overflow:hidden;
+      background:
+        radial-gradient(circle at 30% 30%, #fff 0%, #ffd8d8 24%, #ff7474 55%, #d72626 100%);
+      box-shadow:0 10px 20px rgba(255,75,75,.20), inset 0 1px 8px rgba(255,255,255,.7);
       flex:0 0 auto;
     }
 
@@ -153,395 +73,415 @@
     .brand-mark::after{
       content:"";
       position:absolute;
-      border:1px solid rgba(255,255,255,.45);
       border-radius:50%;
-    }
-    .brand-mark::before{ inset:8px 10px 16px 10px; transform:rotate(25deg); }
-    .brand-mark::after{ inset:15px 8px 9px 8px; transform:rotate(-28deg); }
-
-    .brand h1{
-      margin:0;
-      font-size:1.15rem;
-      line-height:1.15;
-      letter-spacing:.2px;
+      border:2px solid rgba(255,255,255,.82);
     }
 
-    .brand p{
-      margin:3px 0 0;
-      color:rgba(255,255,255,.82);
-      font-size:.92rem;
+    .brand-mark::before{ inset:8px; }
+    .brand-mark::after{ inset:5px 12px; transform:rotate(55deg); border-color:rgba(255,255,255,.56); }
+
+    .brand-text{ min-width:0; }
+    .brand-title{
+      font-size:14px;
+      font-weight:800;
+      color:#0a2d61;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .brand-sub{
+      font-size:12px;
+      color:#73859b;
+      margin-top:2px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    .top-actions{
+    .topbar-right{
       display:flex;
       align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
+      gap:12px;
     }
 
-    .chip{
+    .status-chip{
       display:inline-flex;
       align-items:center;
       gap:8px;
       padding:10px 14px;
       border-radius:999px;
-      background:rgba(255,255,255,.09);
-      border:1px solid rgba(255,255,255,.12);
-      color:#fff;
-      font-size:.92rem;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#35506d;
       font-weight:700;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+      font-size:13px;
+      box-shadow:var(--shadow);
     }
 
-    .dot{
+    .status-dot{
       width:10px;
       height:10px;
       border-radius:50%;
+      background:var(--red);
+      box-shadow:0 0 0 5px rgba(255,75,75,.14);
+    }
+
+    .status-dot.ok{
       background:var(--green);
-      box-shadow:0 0 0 6px rgba(24,195,74,.14);
+      box-shadow:0 0 0 5px rgba(24,195,74,.14);
+    }
+
+    .avatar-btn{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fff,#f3f7fc);
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      color:#163861;
+      cursor:pointer;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:var(--sidebar-w) minmax(0,1fr);
+      min-height:calc(100vh - var(--topbar-h));
+    }
+
+    .sidebar{
+      background:linear-gradient(180deg,var(--sidebar),var(--sidebar-2));
+      color:#fff;
+      padding:18px 14px 20px;
+      border-right:1px solid rgba(255,255,255,.06);
+    }
+
+    .sidebar-section-title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      color:rgba(255,255,255,.56);
+      margin:8px 10px 10px;
+      font-weight:700;
+    }
+
+    .nav-list{
+      display:grid;
+      gap:4px;
+      margin-bottom:18px;
+    }
+
+    .nav-link{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      color:#eef7ff;
+      padding:11px 12px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      transition:.18s ease;
+    }
+
+    .nav-link:hover{ background:rgba(255,255,255,.08); }
+    .nav-link.active{
+      background:rgba(47,140,255,.20);
+      border:1px solid rgba(98,180,255,.18);
+    }
+
+    .nav-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#88bfff;
       flex:0 0 auto;
     }
 
-    .dot.red{
-      background:var(--red);
-      box-shadow:0 0 0 6px rgba(223,75,75,.14);
+    .nav-dot.green{ background:#1ed760; }
+    .nav-dot.red{ background:#ff7777; }
+    .nav-dot.gold{ background:#e7c15a; }
+
+    .sidebar-note{
+      margin-top:8px;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:12px;
+      line-height:1.6;
+      color:rgba(255,255,255,.82);
     }
 
-    .btn{
+    .content{
+      padding:20px;
+    }
+
+    .content-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .title-wrap h1{
+      font-size:34px;
+      line-height:1.05;
+      color:#112f59;
+      letter-spacing:-1px;
+      margin-bottom:10px;
+    }
+
+    .title-wrap p{
+      color:var(--muted);
+      max-width:860px;
+      line-height:1.75;
+      font-size:15px;
+    }
+
+    .head-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .head-btn{
       border:none;
-      outline:none;
-      cursor:pointer;
       border-radius:14px;
-      padding:12px 16px;
-      font-size:.95rem;
+      padding:13px 16px;
       font-weight:800;
+      font-size:14px;
+      cursor:pointer;
       transition:.18s ease;
       text-decoration:none;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:8px;
+      min-width:180px;
     }
 
-    .btn:hover{ transform:translateY(-1px); }
-    .btn:disabled{ opacity:.58; cursor:not-allowed; transform:none; }
+    .head-btn:hover{ transform:translateY(-1px); }
 
-    .btn-primary{
+    .head-btn.primary{
       color:#fff;
-      background:linear-gradient(135deg, #3da6ff, #1568d8);
-      box-shadow:0 12px 26px rgba(21,104,216,.26);
+      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+      box-shadow:0 16px 28px rgba(47,140,255,.18);
     }
 
-    .btn-soft{
-      color:#fff;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.14);
-    }
-
-    .btn-danger{
-      color:#fff;
-      background:linear-gradient(135deg, #ff7b7b, #df4b4b);
-      box-shadow:0 12px 26px rgba(223,75,75,.22);
-    }
-
-    .hero{
-      margin-top:18px;
-      display:grid;
-      grid-template-columns:1.28fr .72fr;
-      gap:16px;
-      align-items:stretch;
-    }
-
-    .hero-card,
-    .side-card,
-    .panel,
-    .question-card{
-      border-radius:var(--radius);
+    .head-btn.soft{
+      color:#163861;
+      background:#fff;
+      border:1px solid var(--line);
       box-shadow:var(--shadow);
-      border:1px solid rgba(255,255,255,.16);
-      backdrop-filter:blur(16px);
     }
 
-    .hero-card{
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06)),
-        linear-gradient(160deg, rgba(88,176,255,.16), rgba(10,52,116,.14) 65%, rgba(255,255,255,.08));
-      padding:26px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .hero-card::before{
-      content:"";
-      position:absolute;
-      right:-80px;
-      top:-60px;
-      width:260px;
-      height:260px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(255,255,255,.22), transparent 62%);
-      pointer-events:none;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.14);
-      font-size:.84rem;
-      font-weight:800;
-      color:#f2f8ff;
-      letter-spacing:.3px;
-      text-transform:uppercase;
-    }
-
-    .hero h2{
-      margin:14px 0 10px;
-      font-size:2rem;
-      line-height:1.1;
-      letter-spacing:.2px;
-    }
-
-    .hero p{
-      margin:0;
-      color:rgba(255,255,255,.86);
-      line-height:1.7;
-      max-width:900px;
-    }
-
-    .hero-stats{
+    .cards-3{
       display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:12px;
-      margin-top:18px;
-    }
-
-    .mini{
-      border-radius:18px;
-      padding:14px 15px;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
-    }
-
-    .mini .label{
-      color:rgba(255,255,255,.74);
-      font-size:.82rem;
-      margin-bottom:6px;
-    }
-
-    .mini .value{
-      font-weight:900;
-      font-size:1.08rem;
-      color:#fff;
-    }
-
-    .side-card{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08)),
-        linear-gradient(140deg, rgba(47,140,255,.18), rgba(255,255,255,.05));
-      padding:20px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-      justify-content:space-between;
-    }
-
-    .timer-ring{
-      position:relative;
-      min-height:210px;
-      border-radius:26px;
-      background:rgba(5,27,59,.36);
-      border:1px solid rgba(255,255,255,.12);
-      overflow:hidden;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding:18px;
-    }
-
-    .timer-ring::before{
-      content:"";
-      position:absolute;
-      inset:16px;
-      border-radius:50%;
-      border:10px solid rgba(255,255,255,.08);
-    }
-
-    .timer-ring::after{
-      content:"";
-      position:absolute;
-      inset:8px;
-      border-radius:50%;
-      border:1px dashed rgba(255,255,255,.10);
-      animation:spin 14s linear infinite;
-    }
-
-    @keyframes spin{
-      from{transform:rotate(0deg)}
-      to{transform:rotate(360deg)}
-    }
-
-    .timer-content{
-      position:relative;
-      z-index:1;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      align-items:center;
-    }
-
-    .timer-title{
-      color:rgba(255,255,255,.74);
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.5px;
-      font-size:.82rem;
-    }
-
-    .timer-value{
-      font-size:2.45rem;
-      font-weight:900;
-      letter-spacing:1px;
-      color:#fff;
-      text-shadow:0 10px 28px rgba(0,0,0,.18);
-    }
-
-    .timer-note{
-      color:rgba(255,255,255,.82);
-      font-size:.9rem;
-    }
-
-    .side-actions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .layout{
-      margin-top:18px;
-      display:grid;
-      grid-template-columns:320px minmax(0,1fr);
+      grid-template-columns:repeat(3,1fr);
       gap:16px;
+      margin-bottom:18px;
+    }
+
+    .card,
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow);
+    }
+
+    .mini-card{
+      padding:18px;
+      background:linear-gradient(180deg,#fff,#fbfcff);
+    }
+
+    .mini-card strong{
+      display:block;
+      font-size:16px;
+      color:#0f2f58;
+      margin-bottom:8px;
+    }
+
+    .mini-card p{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .grid-main{
+      display:grid;
+      grid-template-columns:340px minmax(0,1fr);
+      gap:18px;
       align-items:start;
     }
 
-    .panel{
-      background:var(--card);
-      color:var(--text);
-      border:1px solid rgba(7,31,66,.06);
-      overflow:hidden;
+    .grid-stack{
+      display:grid;
+      gap:18px;
     }
 
-    .panel-header{
-      padding:18px 18px 0;
+    .panel{ overflow:hidden; }
+
+    .panel-head{
+      padding:20px 22px 0;
     }
 
-    .panel-title{
-      margin:0;
-      font-size:1.06rem;
-      color:var(--nav);
-      font-weight:900;
+    .panel-head h2{
+      font-size:24px;
+      color:#102f59;
+      margin-bottom:8px;
+      letter-spacing:-.5px;
     }
 
-    .panel-sub{
-      margin:7px 0 0;
+    .panel-head p{
       color:var(--muted);
-      line-height:1.6;
-      font-size:.94rem;
+      line-height:1.75;
+      font-size:14px;
+      margin-bottom:18px;
     }
 
     .panel-body{
-      padding:18px;
+      padding:0 22px 22px;
+    }
+
+    .timer-box{
+      text-align:center;
+      padding:12px 0 6px;
+    }
+
+    .timer-label{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      margin-bottom:8px;
+    }
+
+    .timer-value{
+      font-size:34px;
+      font-weight:900;
+      color:#12355e;
+      letter-spacing:1px;
+      margin-bottom:8px;
+    }
+
+    .timer-note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
     }
 
     .status-list{
       display:grid;
-      gap:10px;
+      gap:12px;
     }
 
     .status-item{
-      padding:14px 14px;
-      border-radius:18px;
-      background:linear-gradient(180deg, #ffffff, #f7fbff);
-      border:1px solid var(--line);
-      box-shadow:var(--shadow-soft);
+      padding:14px;
+      border-radius:14px;
+      background:#f9fbfe;
+      border:1px solid var(--line-soft);
     }
 
     .status-item .k{
-      font-size:.82rem;
       color:var(--muted);
+      font-size:12px;
       margin-bottom:6px;
+      font-weight:700;
     }
 
     .status-item .v{
-      font-weight:900;
-      color:var(--nav);
-      line-height:1.4;
-      word-break:break-word;
-    }
-
-    .status-badges{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top:10px;
+      color:#12355e;
+      font-size:14px;
+      line-height:1.6;
+      font-weight:800;
     }
 
     .badge{
-      padding:8px 11px;
-      border-radius:999px;
-      font-size:.8rem;
-      font-weight:800;
-      border:1px solid transparent;
       display:inline-flex;
       align-items:center;
-      gap:6px;
-    }
-
-    .badge.blue{ background:#edf5ff; color:#1568d8; border-color:#d6e7ff; }
-    .badge.green{ background:#ecfff3; color:#1b9551; border-color:#d5f6e3; }
-    .badge.red{ background:#fff0f0; color:#cf4343; border-color:#ffd2d2; }
-    .badge.orange{ background:#fff7ea; color:#c77b0c; border-color:#ffe3b6; }
-
-    .notice{
-      margin-top:16px;
-      padding:14px 16px;
-      border-radius:18px;
-      font-size:.95rem;
-      line-height:1.6;
-      border:1px solid;
-    }
-
-    .notice.info{ background:#f3f9ff; color:#1459b1; border-color:#d7eaff; }
-    .notice.warn{ background:#fff8ef; color:#ad6b07; border-color:#ffe0b4; }
-    .notice.error{ background:#fff3f3; color:#c53d3d; border-color:#ffd2d2; }
-    .notice.success{ background:#effcf3; color:#14834a; border-color:#cdf3da; }
-
-    .exam-shell{
-      display:grid;
-      gap:16px;
-    }
-
-    .controls-row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:4px;
-    }
-
-    .right-mini{
-      display:flex;
-      flex-wrap:wrap;
       gap:8px;
+      padding:7px 11px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      margin-right:6px;
+      margin-top:6px;
+    }
+
+    .badge.green{
+      background:rgba(24,195,74,.10);
+      color:#0f7a37;
+      border:1px solid rgba(24,195,74,.16);
+    }
+
+    .badge.red{
+      background:rgba(255,75,75,.10);
+      color:#b22f2f;
+      border:1px solid rgba(255,75,75,.16);
+    }
+
+    .badge.blue{
+      background:rgba(47,140,255,.10);
+      color:#1459b1;
+      border:1px solid rgba(47,140,255,.16);
+    }
+
+    .badge.gold{
+      background:rgba(216,167,47,.12);
+      color:#9b7112;
+      border:1px solid rgba(216,167,47,.16);
+    }
+
+    .badge.orange{
+      background:rgba(255,159,26,.12);
+      color:#ad6900;
+      border:1px solid rgba(255,159,26,.16);
+    }
+
+    .helper{
+      margin-top:16px;
+      border-radius:14px;
+      padding:14px 15px;
+      font-size:13px;
+      line-height:1.65;
+      display:none;
+    }
+
+    .helper.show{display:block}
+    .helper.ok{
+      background:rgba(24,195,74,.08);
+      border:1px solid rgba(24,195,74,.18);
+      color:#156c37;
+    }
+    .helper.err{
+      background:rgba(255,75,75,.08);
+      border:1px solid rgba(255,75,75,.18);
+      color:#a12626;
+    }
+    .helper.info{
+      background:rgba(47,140,255,.08);
+      border:1px solid rgba(47,140,255,.18);
+      color:#1459b1;
+    }
+    .helper.warn{
+      background:rgba(255,159,26,.10);
+      border:1px solid rgba(255,159,26,.18);
+      color:#996100;
+    }
+
+    .subject-box{
+      padding:16px;
+      border-radius:16px;
+      background:#f9fbfe;
+      border:1px solid var(--line-soft);
+      color:#14375f;
+      line-height:1.75;
+      font-size:14px;
     }
 
     .question-list{
@@ -550,108 +490,73 @@
     }
 
     .question-card{
-      background:linear-gradient(180deg, #ffffff, #f7fbff);
-      color:var(--text);
-      border:1px solid var(--line);
       padding:18px;
-      box-shadow:var(--shadow-soft);
+      border-radius:18px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
     }
 
-    .question-top{
+    .question-head{
       display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
       gap:14px;
-      margin-bottom:10px;
+      align-items:flex-start;
+      margin-bottom:12px;
     }
 
     .q-index{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
       width:42px;
       height:42px;
       border-radius:14px;
+      display:grid;
+      place-items:center;
       color:#fff;
       font-weight:900;
-      background:linear-gradient(135deg, #2f8cff, #115dc2);
-      box-shadow:0 10px 22px rgba(47,140,255,.24);
+      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
       flex:0 0 auto;
     }
 
-    .q-main{
-      flex:1;
-      min-width:0;
-    }
-
-    .q-type{
-      display:inline-flex;
-      align-items:center;
-      gap:7px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#eff6ff;
-      color:#1459b1;
-      border:1px solid #d8e8ff;
-      font-size:.77rem;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.35px;
-      margin-bottom:8px;
-    }
-
-    .q-title{
+    .q-main h4{
       margin:0;
-      color:var(--nav);
-      font-size:1.02rem;
+      color:#0f2f58;
+      font-size:16px;
       line-height:1.6;
-      font-weight:800;
-      white-space:pre-wrap;
     }
 
-    .q-help{
+    .q-main p{
       margin:8px 0 0;
       color:var(--muted);
-      line-height:1.6;
-      font-size:.92rem;
-      white-space:pre-wrap;
+      font-size:13px;
+      line-height:1.65;
     }
 
     .answers{
       display:grid;
       gap:10px;
-      margin-top:14px;
+      margin-top:12px;
     }
 
     .choice{
-      position:relative;
       display:flex;
       align-items:flex-start;
-      gap:12px;
-      padding:14px 14px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:#fff;
+      gap:10px;
+      padding:13px 14px;
+      border-radius:14px;
+      background:#f9fbfe;
+      border:1px solid var(--line-soft);
       cursor:pointer;
-      transition:.16s ease;
-    }
-
-    .choice:hover{
-      transform:translateY(-1px);
-      border-color:#b8d9ff;
-      box-shadow:0 10px 22px rgba(47,140,255,.08);
     }
 
     .choice input{
-      margin-top:2px;
-      transform:scale(1.12);
+      margin-top:3px;
       accent-color:#1568d8;
       flex:0 0 auto;
     }
 
     .choice span{
-      color:var(--text);
-      line-height:1.55;
+      color:#14375f;
+      font-size:14px;
+      line-height:1.6;
       font-weight:700;
       white-space:pre-wrap;
     }
@@ -660,14 +565,13 @@
       width:100%;
       min-height:150px;
       resize:vertical;
-      border-radius:18px;
-      padding:16px;
+      border-radius:14px;
+      padding:14px;
       border:1px solid var(--line);
       outline:none;
       font:inherit;
       color:var(--text);
       background:#fff;
-      box-shadow:inset 0 1px 2px rgba(7,31,66,.03);
     }
 
     textarea.answer-text:focus{
@@ -675,7 +579,52 @@
       box-shadow:0 0 0 4px rgba(47,140,255,.10);
     }
 
-    .footer-actions{
+    .actions-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 16px;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.18s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      width:100%;
+    }
+
+    .btn:hover{ transform:translateY(-1px); }
+    .btn:disabled{ opacity:.58; cursor:not-allowed; transform:none; }
+
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+      box-shadow:0 16px 28px rgba(47,140,255,.18);
+    }
+
+    .btn-soft{
+      color:#163861;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+
+    .btn-danger{
+      color:#fff;
+      background:linear-gradient(135deg,#ff7b7b,#df4b4b);
+      box-shadow:0 16px 28px rgba(223,75,75,.18);
+    }
+
+    .sticky-actions{
       position:sticky;
       bottom:12px;
       z-index:15;
@@ -685,12 +634,13 @@
       align-items:center;
       flex-wrap:wrap;
       padding:14px;
-      border-radius:22px;
-      background:rgba(255,255,255,.90);
+      border-radius:18px;
+      background:rgba(255,255,255,.94);
       backdrop-filter:blur(16px);
       border:1px solid rgba(7,31,66,.08);
       box-shadow:0 18px 42px rgba(7,31,66,.14);
       color:var(--text);
+      margin-top:16px;
     }
 
     .foot-left{
@@ -702,7 +652,7 @@
 
     .muted{
       color:var(--muted);
-      font-size:.92rem;
+      font-size:13px;
     }
 
     .hidden{ display:none !important; }
@@ -715,31 +665,32 @@
       align-items:center;
       justify-content:center;
       padding:20px;
-      background:rgba(2,12,30,.58);
-      backdrop-filter:blur(12px);
+      background:rgba(10,20,35,.42);
+      backdrop-filter:blur(8px);
     }
 
     .modal{
-      width:min(580px, calc(100vw - 24px));
-      background:rgba(255,255,255,.98);
-      border-radius:28px;
+      width:min(560px, calc(100vw - 24px));
+      background:#fff;
+      border-radius:22px;
       padding:24px;
       color:var(--text);
-      box-shadow:0 28px 70px rgba(7,31,66,.28);
-      border:1px solid rgba(255,255,255,.7);
+      box-shadow:0 28px 70px rgba(7,31,66,.20);
+      border:1px solid var(--line);
       text-align:center;
     }
 
     .modal h3{
       margin:0 0 10px;
-      color:var(--nav);
-      font-size:1.38rem;
+      color:#102f59;
+      font-size:24px;
     }
 
     .modal p{
       margin:0;
       color:var(--muted);
-      line-height:1.7;
+      line-height:1.75;
+      font-size:14px;
     }
 
     .modal-actions{
@@ -750,25 +701,11 @@
       margin-top:18px;
     }
 
-    .skeleton{
-      background:linear-gradient(90deg, #eef4fb, #f7fbff, #eef4fb);
-      background-size:200% 100%;
-      animation:skeleton 1.25s linear infinite;
-      border-radius:16px;
-    }
-
-    @keyframes skeleton{
-      0%{background-position:200% 0}
-      100%{background-position:-200% 0}
-    }
-
     .auth-mask{
       position:fixed;
       inset:0;
       z-index:120;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(75,150,255,.20), transparent 25%),
-        linear-gradient(135deg,#06142b,#0d2d61 50%,#15438e);
+      background:rgba(245,247,251,.96);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -776,211 +713,258 @@
     }
 
     .auth-card{
-      width:min(540px, calc(100vw - 24px));
+      width:min(520px, calc(100vw - 24px));
       padding:26px;
-      border-radius:28px;
-      background:rgba(255,255,255,.12);
-      border:1px solid rgba(255,255,255,.18);
-      box-shadow:0 24px 70px rgba(0,0,0,.22);
-      backdrop-filter:blur(18px);
-      color:#fff;
+      border-radius:24px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:0 24px 60px rgba(7,31,66,.14);
+      color:var(--text);
       text-align:center;
     }
 
     .auth-card h2{
       margin:0 0 10px;
-      font-size:1.6rem;
+      font-size:28px;
+      color:#102f59;
     }
 
     .auth-card p{
       margin:0;
-      line-height:1.7;
-      color:rgba(255,255,255,.84);
+      line-height:1.75;
+      color:var(--muted);
+      font-size:14px;
     }
 
     @media (max-width:1100px){
-      .hero{ grid-template-columns:1fr; }
       .layout{ grid-template-columns:1fr; }
-      .side-actions{ grid-template-columns:1fr 1fr; }
+      .sidebar{ display:none; }
+      .cards-3,
+      .grid-main{
+        grid-template-columns:1fr;
+      }
+      .content{ padding:16px; }
     }
 
-    @media (max-width:760px){
-      .page{ width:min(calc(100% - 14px), var(--max)); }
-      .topbar{ top:8px; border-radius:18px; }
-      .hero-card, .side-card, .panel, .question-card{ border-radius:20px; }
-      .hero h2{ font-size:1.55rem; }
-      .hero-stats{ grid-template-columns:1fr; }
-      .side-actions{ grid-template-columns:1fr; }
-      .timer-value{ font-size:2rem; }
-      .footer-actions{ bottom:8px; }
-      .question-top{ align-items:flex-start; }
-      .q-index{ width:38px; height:38px; border-radius:12px; }
+    @media (max-width:720px){
+      .topbar{ padding:0 12px; }
+      .content-head{
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .head-actions{ width:100%; }
+      .head-btn{ width:100%; }
+      .title-wrap h1{ font-size:28px; }
+      .status-chip{ display:none; }
+      .actions-row{ grid-template-columns:1fr; }
+      .sticky-actions{ bottom:8px; }
+      .timer-value{ font-size:28px; }
     }
   </style>
 </head>
 <body>
-  <div class="chem-net"></div>
-
   <div id="authMask" class="auth-mask">
     <div class="auth-card">
       <h2>Chargement sécurisé de l’épreuve</h2>
-      <p>Vérification de votre session, de vos droits d’accès et de l’état actuel du championnat de chimie…</p>
+      <p>Vérification de votre session, de vos droits d’accès et de l’état actuel du championnat…</p>
     </div>
   </div>
 
-  <div class="page">
-    <div class="topbar">
-      <div class="topbar-inner">
-        <div class="brand">
-          <div class="brand-mark"></div>
-          <div>
-            <h1>Championnat de Chimie</h1>
-            <p>Passage officiel de l’épreuve académique</p>
-          </div>
-        </div>
-
-        <div class="top-actions">
-          <div class="chip"><span id="globalDot" class="dot red"></span><span id="globalStatusText">Compétition non lancée</span></div>
-          <a class="btn btn-soft" href="./competition.html">Retour championnat</a>
-          <a class="btn btn-soft" href="./dashboard-candidat.html">Espace candidat</a>
-        </div>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="brand-title">Championnat de Chimie</div>
+        <div class="brand-sub" id="brandSub">Passage officiel de l’épreuve académique</div>
       </div>
     </div>
 
-    <section class="hero">
-      <div class="hero-card">
-        <div class="eyebrow">Épreuve synchronisée • Validation admin requise</div>
-        <h2 id="examTitleHero">Examen officiel en attente d’activation</h2>
-        <p id="examIntroHero">
-          Cette page suit automatiquement l’état du championnat. Les candidats ne voient l’épreuve que lorsque
-          l’administrateur principal valide les questionnaires puis lance officiellement la compétition.
-        </p>
+    <div class="topbar-right">
+      <div class="status-chip">
+        <span id="globalDot" class="status-dot"></span>
+        <span id="globalStatusText">Chargement…</span>
+      </div>
+      <div class="avatar-btn" id="avatarBtn">☰</div>
+    </div>
+  </header>
 
-        <div class="hero-stats">
-          <div class="mini">
-            <div class="label">Statut actuel</div>
-            <div class="value" id="heroStatus">En attente</div>
-          </div>
-          <div class="mini">
-            <div class="label">Durée</div>
-            <div class="value" id="heroDuration">—</div>
-          </div>
-          <div class="mini">
-            <div class="label">Épreuve active</div>
-            <div class="value" id="heroExamId">Aucune</div>
-          </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Navigation</div>
+      <nav class="nav-list" id="sidebarNav"></nav>
+
+      <div class="sidebar-section-title">Statut</div>
+      <div class="sidebar-note" id="sidebarNote">
+        Chargement de la session d’examen…
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="content-head">
+        <div class="title-wrap">
+          <h1 id="examTitleHero">Examen officiel en attente d’activation</h1>
+          <p id="examIntroHero">
+            Cette page suit automatiquement l’état du championnat. Les candidats ne voient l’épreuve que lorsque
+            l’administrateur principal valide les questionnaires puis lance officiellement la compétition.
+          </p>
+        </div>
+
+        <div class="head-actions">
+          <a class="head-btn soft" href="./competition.html">Retour championnat</a>
+          <a class="head-btn soft" href="./dashboard-candidat.html">Espace candidat</a>
         </div>
       </div>
 
-      <aside class="side-card">
-        <div class="timer-ring">
-          <div class="timer-content">
-            <div class="timer-title">Chronomètre officiel</div>
-            <div class="timer-value" id="timerDisplay">--:--:--</div>
-            <div class="timer-note" id="timerNote">Le compte à rebours démarre lorsque l’épreuve est disponible.</div>
-          </div>
-        </div>
+      <section class="cards-3">
+        <article class="card mini-card">
+          <strong>Statut actuel</strong>
+          <p id="heroStatus">En attente</p>
+        </article>
 
-        <div class="side-actions">
-          <button id="startBtn" class="btn btn-primary" disabled>Commencer l’épreuve</button>
-          <button id="saveBtn" class="btn btn-soft" disabled>Enregistrer</button>
-          <button id="submitBtn" class="btn btn-danger" disabled>Soumettre ma copie</button>
-          <a class="btn btn-soft" href="./results.html">Résultats</a>
-        </div>
-      </aside>
-    </section>
+        <article class="card mini-card">
+          <strong>Durée</strong>
+          <p id="heroDuration">—</p>
+        </article>
 
-    <section class="layout">
-      <aside class="panel">
-        <div class="panel-header">
-          <h3 class="panel-title">Pilotage et synchronisation</h3>
-          <p class="panel-sub">Ce bloc reflète ce que l’admin a décidé. Il influence automatiquement ce que voient les candidats, le jury et les écrans de suivi.</p>
-        </div>
-        <div class="panel-body">
-          <div class="status-list">
-            <div class="status-item">
-              <div class="k">Utilisateur connecté</div>
-              <div class="v" id="userLabel">Chargement…</div>
+        <article class="card mini-card">
+          <strong>Épreuve active</strong>
+          <p id="heroExamId">Aucune</p>
+        </article>
+      </section>
+
+      <section class="grid-main">
+        <aside class="grid-stack">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Chronomètre officiel</h2>
+              <p>Le compte à rebours démarre lorsque l’épreuve devient réellement disponible.</p>
             </div>
-            <div class="status-item">
-              <div class="k">Rôle détecté</div>
-              <div class="v" id="roleLabel">—</div>
-              <div class="status-badges">
-                <span class="badge blue" id="roleBadge">Session sécurisée</span>
+
+            <div class="panel-body">
+              <div class="timer-box">
+                <div class="timer-label">Temps restant</div>
+                <div class="timer-value" id="timerDisplay">--:--:--</div>
+                <div class="timer-note" id="timerNote">Le compte à rebours démarre lorsque l’épreuve est disponible.</div>
+              </div>
+
+              <div class="actions-row">
+                <button id="startBtn" class="btn btn-primary" disabled>Commencer l’épreuve</button>
+                <button id="saveBtn" class="btn btn-soft" disabled>Enregistrer</button>
+                <button id="submitBtn" class="btn btn-danger" disabled>Soumettre ma copie</button>
+                <a class="btn btn-soft" href="./results.html">Résultats</a>
               </div>
             </div>
-            <div class="status-item">
-              <div class="k">Décision administrative</div>
-              <div class="v" id="adminDecisionLabel">Aucune épreuve candidate visible pour le moment.</div>
-            </div>
-            <div class="status-item">
-              <div class="k">Questionnaire actif</div>
-              <div class="v" id="activeExamLabel">Aucun questionnaire actif</div>
-            </div>
-            <div class="status-item">
-              <div class="k">Ma copie</div>
-              <div class="v" id="submissionStatusLabel">Non commencée</div>
-              <div class="status-badges">
-                <span class="badge orange" id="syncBadge">Synchronisation initiale…</span>
-              </div>
-            </div>
-          </div>
+          </section>
 
-          <div id="infoNotice" class="notice info" style="margin-top:16px;">
-            Les brouillons du jury restent invisibles ici tant que l’administrateur principal ne les valide pas puis ne lance pas la compétition.
-          </div>
-        </div>
-      </aside>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Pilotage et synchronisation</h2>
+              <p>Ce bloc reflète ce que l’admin a décidé. Il influence automatiquement ce que voient les candidats et le jury.</p>
+            </div>
 
-      <main class="exam-shell">
-        <section class="panel">
-          <div class="panel-header">
-            <div class="controls-row">
-              <div>
-                <h3 class="panel-title">Sujet et consignes</h3>
-                <p class="panel-sub">QCM et réponses rédigées. Sauvegarde locale + distante pendant l’épreuve.</p>
+            <div class="panel-body">
+              <div class="status-list">
+                <div class="status-item">
+                  <div class="k">Utilisateur connecté</div>
+                  <div class="v" id="userLabel">Chargement…</div>
+                </div>
+
+                <div class="status-item">
+                  <div class="k">Rôle détecté</div>
+                  <div class="v" id="roleLabel">—</div>
+                  <div>
+                    <span class="badge blue" id="roleBadge">Session sécurisée</span>
+                  </div>
+                </div>
+
+                <div class="status-item">
+                  <div class="k">Décision administrative</div>
+                  <div class="v" id="adminDecisionLabel">Aucune épreuve candidate visible pour le moment.</div>
+                </div>
+
+                <div class="status-item">
+                  <div class="k">Questionnaire actif</div>
+                  <div class="v" id="activeExamLabel">Aucun questionnaire actif</div>
+                </div>
+
+                <div class="status-item">
+                  <div class="k">Ma copie</div>
+                  <div class="v" id="submissionStatusLabel">Non commencée</div>
+                  <div>
+                    <span class="badge orange" id="syncBadge">Synchronisation initiale…</span>
+                  </div>
+                </div>
               </div>
-              <div class="right-mini">
-                <span class="badge blue" id="questionCountBadge">0 question</span>
-                <span class="badge green" id="windowBadge">Fenêtre fermée</span>
+
+              <div id="infoNotice" class="helper info show">
+                Les brouillons du jury restent invisibles ici tant que l’administrateur principal ne les valide pas puis ne lance pas la compétition.
               </div>
             </div>
-          </div>
-          <div class="panel-body">
-            <div id="subjectBlock">
-              <div class="skeleton" style="height:22px;width:260px;margin-bottom:14px;"></div>
-              <div class="skeleton" style="height:14px;width:100%;margin-bottom:10px;"></div>
-              <div class="skeleton" style="height:14px;width:92%;margin-bottom:10px;"></div>
-              <div class="skeleton" style="height:14px;width:85%;"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Suite du parcours</h2>
+              <p>Le certificat et les résultats dépendent de la validation et des publications administratives.</p>
+            </div>
+
+            <div class="panel-body">
+              <div class="list-line" style="padding:14px;border-radius:12px;background:#f9fbfe;border:1px solid var(--line-soft);color:#14375f;font-size:14px;line-height:1.7;">
+                <strong style="display:block;margin-bottom:6px;">Certificat</strong>
+                Si un certificat est prévu pour votre parcours, il sera géré depuis l’administration puis vérifiable dans la section correspondante.
+              </div>
+            </div>
+          </section>
+        </aside>
+
+        <section class="grid-stack">
+          <section class="panel">
+            <div class="panel-head">
+              <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;">
+                <div>
+                  <h2>Sujet et consignes</h2>
+                  <p>QCM et réponses rédigées. Sauvegarde locale et distante pendant l’épreuve.</p>
+                </div>
+                <div>
+                  <span class="badge blue" id="questionCountBadge">0 question</span>
+                  <span class="badge green" id="windowBadge">Fenêtre fermée</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <div id="subjectBlock" class="subject-box">
+                Chargement du sujet…
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Questions</h2>
+              <p>La soumission est automatique à la fin du temps. L’admin garde la main sur l’ouverture et la fermeture.</p>
+            </div>
+
+            <div class="panel-body">
+              <div id="questionList" class="question-list">
+                <div class="question-card">Chargement des questions…</div>
+              </div>
+            </div>
+          </section>
+
+          <div class="sticky-actions">
+            <div class="foot-left">
+              <span class="badge blue" id="footStatus">Attente</span>
+              <span class="muted" id="footHint">Votre progression sera enregistrée automatiquement pendant l’épreuve.</span>
+            </div>
+            <div class="foot-left">
+              <button id="saveBtnBottom" class="btn btn-soft" style="width:auto;" disabled>Enregistrer maintenant</button>
+              <button id="submitBtnBottom" class="btn btn-danger" style="width:auto;" disabled>Soumettre définitivement</button>
             </div>
           </div>
         </section>
-
-        <section class="panel">
-          <div class="panel-header">
-            <h3 class="panel-title">Questions</h3>
-            <p class="panel-sub">La soumission est automatique à la fin du temps. L’admin garde la main sur l’ouverture et la fermeture.</p>
-          </div>
-          <div class="panel-body">
-            <div id="questionList" class="question-list">
-              <div class="skeleton" style="height:160px;"></div>
-              <div class="skeleton" style="height:160px;"></div>
-            </div>
-          </div>
-        </section>
-
-        <div class="footer-actions">
-          <div class="foot-left">
-            <span class="badge blue" id="footStatus">Attente</span>
-            <span class="muted" id="footHint">Votre progression sera enregistrée automatiquement pendant l’épreuve.</span>
-          </div>
-          <div class="foot-left">
-            <button id="saveBtnBottom" class="btn btn-soft" disabled>Enregistrer maintenant</button>
-            <button id="submitBtnBottom" class="btn btn-danger" disabled>Soumettre définitivement</button>
-          </div>
-        </div>
-      </main>
-    </section>
+      </section>
+    </main>
   </div>
 
   <div id="startOverlay" class="overlay hidden">
@@ -991,8 +975,8 @@
         Assurez-vous d’être prêt avant de lancer l’épreuve.
       </p>
       <div class="modal-actions">
-        <button id="cancelStartBtn" class="btn btn-soft" style="color:#0b2340;border:1px solid #d9e5f2;background:#fff;">Annuler</button>
-        <button id="confirmStartBtn" class="btn btn-primary">Oui, commencer</button>
+        <button id="cancelStartBtn" class="btn btn-soft" style="width:auto;">Annuler</button>
+        <button id="confirmStartBtn" class="btn btn-primary" style="width:auto;">Oui, commencer</button>
       </div>
     </div>
   </div>
@@ -1005,8 +989,8 @@
         Voulez-vous envoyer définitivement votre copie ?
       </p>
       <div class="modal-actions">
-        <button id="cancelSubmitBtn" class="btn btn-soft" style="color:#0b2340;border:1px solid #d9e5f2;background:#fff;">Revenir</button>
-        <button id="confirmSubmitBtn" class="btn btn-danger">Oui, soumettre</button>
+        <button id="cancelSubmitBtn" class="btn btn-soft" style="width:auto;">Revenir</button>
+        <button id="confirmSubmitBtn" class="btn btn-danger" style="width:auto;">Oui, soumettre</button>
       </div>
     </div>
   </div>
@@ -1020,9 +1004,7 @@
       ref,
       get,
       onValue,
-      set,
       update,
-      push,
       off,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -1032,6 +1014,7 @@
     const state = {
       user: null,
       role: "guest",
+      profile: null,
       control: null,
       activeExamId: null,
       exam: null,
@@ -1040,7 +1023,6 @@
       listeners: [],
       timerId: null,
       autosaveId: null,
-      examStarted: false,
       locked: true,
       submitting: false
     };
@@ -1079,11 +1061,19 @@
       subjectBlock: $("subjectBlock"),
       questionList: $("questionList"),
       footStatus: $("footStatus"),
-      footHint: $("footHint")
+      footHint: $("footHint"),
+      sidebarNav: $("sidebarNav"),
+      sidebarNote: $("sidebarNote"),
+      brandSub: $("brandSub"),
+      avatarBtn: $("avatarBtn")
     };
 
     function setText(el, value){
       if (el) el.textContent = value;
+    }
+
+    function normalizeEmail(value = ""){
+      return String(value || "").trim().toLowerCase();
     }
 
     function escapeHtml(str = ""){
@@ -1138,24 +1128,84 @@
 
     function getUserRole(user, profile = {}){
       if (!user) return "guest";
-      const email = String(user.email || "").toLowerCase();
-      const profileRole = String(profile.role || profile.userType || "").toLowerCase();
-      if (email === ADMIN_EMAIL.toLowerCase()) return "admin";
+      const email = normalizeEmail(user.email || "");
+      const profileRole = String(profile.competitionRole || profile.role || profile.userType || "").toLowerCase();
+      if (email === normalizeEmail(ADMIN_EMAIL)) return "admin";
       if (profileRole.includes("admin")) return "admin";
       if (profileRole.includes("jury")) return "jury";
       if (profileRole.includes("candidate") || profileRole.includes("candidat")) return "candidate";
       return "candidate";
     }
 
+    function getSidebarLinks(role){
+      if (role === "admin") {
+        return [
+          { label:"Tableau de bord admin", href:"./admin.html", color:"red" },
+          { label:"Championnat", href:"./competition.html", color:"green" },
+          { label:"Espace jury", href:"./jury.html", color:"gold" },
+          { label:"Examen", href:"./examen.html", color:"red", active:true },
+          { label:"Résultats", href:"./results.html", color:"green" }
+        ];
+      }
+
+      if (role === "jury") {
+        return [
+          { label:"Espace jury", href:"./jury.html", color:"gold" },
+          { label:"Championnat", href:"./competition.html", color:"green" },
+          { label:"Examen", href:"./examen.html", color:"red", active:true },
+          { label:"Résultats", href:"./results.html", color:"green" }
+        ];
+      }
+
+      return [
+        { label:"Mon espace candidat", href:"./dashboard-candidat.html", color:"green" },
+        { label:"Championnat", href:"./competition.html", color:"green" },
+        { label:"Examen", href:"./examen.html", color:"red", active:true },
+        { label:"Résultats", href:"./results.html", color:"gold" },
+        { label:"Certificat", href:"./verify-certificate.html", color:"green" }
+      ];
+    }
+
+    function renderSidebar(role){
+      ui.sidebarNav.innerHTML = getSidebarLinks(role).map(item => `
+        <a class="nav-link ${item.active ? "active" : ""}" href="${item.href}">
+          <span class="nav-dot ${item.color || ""}"></span>
+          <span>${item.label}</span>
+        </a>
+      `).join("");
+
+      if (role === "admin") {
+        ui.sidebarNote.textContent = "Vue administrateur : vous pouvez surveiller l’épreuve active et contrôler l’état global du championnat.";
+        ui.brandSub.textContent = "Vue admin de l’épreuve";
+        return;
+      }
+
+      if (role === "jury") {
+        ui.sidebarNote.textContent = "Vue jury : vous pouvez consulter l’état de l’épreuve selon les validations administratives.";
+        ui.brandSub.textContent = "Vue jury de l’épreuve";
+        return;
+      }
+
+      ui.sidebarNote.textContent = "Cette page permet au candidat de consulter et passer l’épreuve officielle, selon l’ouverture décidée par l’administration.";
+      ui.brandSub.textContent = "Passage officiel de l’épreuve";
+    }
+
     function setRoleUI(role){
-      setText(ui.roleLabel, role === "admin" ? "Administrateur principal"
-        : role === "jury" ? "Jury"
-        : role === "candidate" ? "Candidat"
-        : "Invité");
-      setText(ui.roleBadge, role === "admin" ? "Pilotage total"
-        : role === "jury" ? "Vue jury contrôlée"
-        : role === "candidate" ? "Session candidat"
-        : "Accès non autorisé");
+      renderSidebar(role);
+
+      setText(ui.roleLabel,
+        role === "admin" ? "Administrateur principal" :
+        role === "jury" ? "Jury" :
+        role === "candidate" ? "Candidat" :
+        "Invité"
+      );
+
+      setText(ui.roleBadge,
+        role === "admin" ? "Pilotage total" :
+        role === "jury" ? "Vue jury contrôlée" :
+        role === "candidate" ? "Session candidat" :
+        "Accès non autorisé"
+      );
 
       ui.roleBadge.className = "badge " + (
         role === "admin" ? "red" :
@@ -1166,7 +1216,7 @@
     }
 
     function setGlobalStatus(launched, text){
-      ui.globalDot.className = "dot " + (launched ? "" : "red");
+      ui.globalDot.className = "status-dot " + (launched ? "ok" : "");
       setText(ui.globalStatusText, text);
       setText(ui.heroStatus, text);
       setText(ui.footStatus, launched ? "Épreuve ouverte" : "Verrouillée");
@@ -1174,7 +1224,7 @@
     }
 
     function setNotice(type, text){
-      ui.infoNotice.className = `notice ${type}`;
+      ui.infoNotice.className = `helper ${type} show`;
       setText(ui.infoNotice, text);
     }
 
@@ -1206,7 +1256,7 @@
 
       if (!exam){
         ui.subjectBlock.innerHTML = `
-          <div class="notice warn">
+          <div class="helper warn show">
             Aucun sujet officiel n’est actuellement disponible pour affichage. Le jury peut avoir envoyé des propositions,
             mais elles ne deviennent visibles ici qu’après validation par l’administrateur principal.
           </div>
@@ -1221,15 +1271,13 @@
 
       ui.subjectBlock.innerHTML = `
         <div style="display:grid;gap:14px;">
-          <div class="status-badges" style="margin-top:0;">
+          <div>
             <span class="badge blue">Discipline : ${category}</span>
             <span class="badge green">Durée : ${duration}</span>
             <span class="badge orange">Validation admin</span>
           </div>
-          <div style="padding:18px;border-radius:20px;background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid #dbe6f4;">
-            <div style="font-size:1.25rem;font-weight:900;color:#082e5b;line-height:1.4;">${title}</div>
-            <div style="margin-top:12px;color:#61748d;line-height:1.8;white-space:pre-wrap;">${instructions}</div>
-          </div>
+          <div style="font-size:20px;font-weight:900;color:#082e5b;line-height:1.4;">${title}</div>
+          <div style="color:#61748d;line-height:1.8;white-space:pre-wrap;">${instructions}</div>
         </div>
       `;
     }
@@ -1259,7 +1307,7 @@
 
       if (!exam || !questions.length){
         ui.questionList.innerHTML = `
-          <div class="notice warn">
+          <div class="helper warn show">
             Pas encore de questions visibles. Soit l’épreuve n’a pas été chargée, soit aucun questionnaire validé n’a encore été publié.
           </div>
         `;
@@ -1300,12 +1348,15 @@
 
         return `
           <article class="question-card">
-            <div class="question-top">
+            <div class="question-head">
               <div class="q-index">${index + 1}</div>
               <div class="q-main">
-                <div class="q-type">${qType === "text" || qType === "textarea" || qType === "open" ? "Réponse libre" : "QCM"} ${points}</div>
-                <h4 class="q-title">${title}</h4>
-                ${help ? `<p class="q-help">${help}</p>` : ""}
+                <div>
+                  <span class="badge blue">${qType === "text" || qType === "textarea" || qType === "open" ? "Réponse libre" : "QCM"}</span>
+                  ${points}
+                </div>
+                <h4>${title}</h4>
+                ${help ? `<p>${help}</p>` : ""}
               </div>
             </div>
             ${answerHtml}
@@ -1430,14 +1481,14 @@
         setText(ui.submissionStatusLabel, auto ? "Soumise automatiquement" : "Soumise");
         setText(ui.syncBadge, auto ? "Fin du temps — copie envoyée" : "Copie envoyée");
         ui.syncBadge.className = "badge green";
-        setNotice("success", auto
+        setNotice("ok", auto
           ? "Le temps est écoulé. Votre copie a été soumise automatiquement."
           : "Votre copie a bien été soumise. Elle reste figée jusqu’aux étapes suivantes du processus administratif.");
       }catch(e){
         console.error(e);
         setText(ui.syncBadge, "Échec de soumission");
         ui.syncBadge.className = "badge red";
-        setNotice("error", "Impossible de soumettre votre copie pour le moment. Vérifiez votre connexion puis réessayez.");
+        setNotice("err", "Impossible de soumettre votre copie pour le moment. Vérifiez votre connexion puis réessayez.");
       }finally{
         state.submitting = false;
         submitOverlay.classList.add("hidden");
@@ -1509,7 +1560,6 @@
       const endAt = getExamWindowEnd(control, state.submission);
       const withinWindow = launched && endAt > now;
       const canCandidateSeeExam = launched && !!state.activeExamId && !!exam && (String(exam.visibility || "visible").toLowerCase() !== "hidden");
-      const isCandidate = state.role === "candidate";
       const isAdminOrJury = state.role === "admin" || state.role === "jury";
 
       state.locked = !(canCandidateSeeExam || isAdminOrJury);
@@ -1533,11 +1583,11 @@
         } else if (!launched) {
           setNotice("info", "L’épreuve a été préparée, mais elle ne devient visible pour les candidats qu’après action de l’administrateur principal.");
         } else if (submitted) {
-          setNotice("success", "Votre copie est déjà soumise. Elle reste enregistrée et figée.");
+          setNotice("ok", "Votre copie est déjà soumise. Elle reste enregistrée et figée.");
         } else if (withinWindow) {
-          setNotice("success", "La compétition est ouverte. Vous pouvez commencer ou poursuivre votre épreuve.");
+          setNotice("ok", "La compétition est ouverte. Vous pouvez commencer ou poursuivre votre épreuve.");
         } else {
-          setNotice("error", "La fenêtre de passage est fermée. Vous ne pouvez plus modifier votre copie.");
+          setNotice("err", "La fenêtre de passage est fermée. Vous ne pouvez plus modifier votre copie.");
         }
       } else if (state.role === "jury") {
         setNotice("info", launched
@@ -1624,13 +1674,17 @@
 
     async function initForUser(user){
       state.user = user;
-
       setText(ui.userLabel, user?.email || "Utilisateur inconnu");
 
       const profileSnap = await get(ref(db, `users/${user.uid}`));
-      const profile = profileSnap.val() || {};
-      state.role = getUserRole(user, profile);
+      state.profile = profileSnap.val() || {};
+      state.role = getUserRole(user, state.profile);
       setRoleUI(state.role);
+
+      if (state.role === "guest") {
+        window.location.replace("./login.html?redirect=examen.html");
+        return;
+      }
 
       const controlPath = ref(db, "competitionControl/current");
       const controlListener = async (snap) => {
@@ -1643,6 +1697,18 @@
     }
 
     function bindStaticActions(){
+      ui.avatarBtn.addEventListener("click", () => {
+        if (state.role === "admin") {
+          window.location.href = "./admin.html";
+          return;
+        }
+        if (state.role === "jury") {
+          window.location.href = "./jury.html";
+          return;
+        }
+        window.location.href = "./dashboard-candidat.html";
+      });
+
       ui.startBtn.addEventListener("click", () => startOverlay.classList.remove("hidden"));
       $("cancelStartBtn").addEventListener("click", () => startOverlay.classList.add("hidden"));
       $("confirmStartBtn").addEventListener("click", async () => {
@@ -1653,7 +1719,7 @@
           refreshComputedState();
         }catch(e){
           console.error(e);
-          setNotice("error", "Impossible de démarrer l’épreuve pour le moment.");
+          setNotice("err", "Impossible de démarrer l’épreuve pour le moment.");
         }finally{
           $("confirmStartBtn").disabled = false;
         }
@@ -1684,7 +1750,7 @@
         await initForUser(user);
       }catch(e){
         console.error(e);
-        setNotice("error", "Erreur de chargement de l’épreuve. Réessayez dans un instant.");
+        setNotice("err", "Erreur de chargement de l’épreuve. Réessayez dans un instant.");
         authMask.classList.add("hidden");
       }
     });
