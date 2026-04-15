@@ -6,216 +6,1054 @@
   <title>Dashboard Candidat | Championnat de Chimie</title>
 
   <style>
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:linear-gradient(180deg,#eef7ff,#f7fbff);
-      color:#0b2340;
-    }
+    *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif}
 
     :root{
+      --bg:#f5f7fb;
+      --panel:#ffffff;
+      --panel-soft:#fbfcfe;
+      --sidebar:#05293d;
+      --sidebar-2:#042336;
+      --text:#0b2340;
+      --muted:#6a7d95;
+      --line:#dde7f2;
+      --line-soft:#edf2f8;
       --blue:#2f8cff;
       --blue-dark:#145bd6;
-      --green:#18c34a;
       --red:#ff4b4b;
-      --purple:#7b61ff;
-
-      --card:#ffffff;
-      --line:#dce7f3;
-      --shadow:0 12px 28px rgba(0,0,0,.08);
+      --green:#18c34a;
+      --gold:#d8a72f;
+      --shadow:0 10px 24px rgba(13,37,71,.08);
       --radius:18px;
-      --max:1100px;
+      --radius-lg:22px;
+      --topbar-h:70px;
+      --sidebar-w:272px;
     }
 
-    .container{
-      max-width:var(--max);
-      margin:auto;
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:40;
+      height:var(--topbar-h);
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 18px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      position:relative;
+      background:
+        radial-gradient(circle at 30% 30%, #fff 0%, #ffd8d8 24%, #ff7474 55%, #d72626 100%);
+      box-shadow:0 10px 20px rgba(255,75,75,.20), inset 0 1px 8px rgba(255,255,255,.7);
+      flex:0 0 auto;
+    }
+
+    .brand-mark::before,
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.82);
+    }
+
+    .brand-mark::before{ inset:8px; }
+    .brand-mark::after{ inset:5px 12px; transform:rotate(55deg); border-color:rgba(255,255,255,.56); }
+
+    .brand-text{ min-width:0; }
+    .brand-title{
+      font-size:14px;
+      font-weight:800;
+      color:#0a2d61;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .brand-sub{
+      font-size:12px;
+      color:#73859b;
+      margin-top:2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#35506d;
+      font-weight:700;
+      font-size:13px;
+      box-shadow:var(--shadow);
+    }
+
+    .status-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--red);
+      box-shadow:0 0 0 5px rgba(255,75,75,.14);
+    }
+
+    .status-dot.ok{
+      background:var(--green);
+      box-shadow:0 0 0 5px rgba(24,195,74,.14);
+    }
+
+    .avatar-btn{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,#fff,#f3f7fc);
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      color:#163861;
+      cursor:pointer;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:var(--sidebar-w) minmax(0,1fr);
+      min-height:calc(100vh - var(--topbar-h));
+    }
+
+    .sidebar{
+      background:linear-gradient(180deg,var(--sidebar),var(--sidebar-2));
+      color:#fff;
+      padding:18px 14px 20px;
+      border-right:1px solid rgba(255,255,255,.06);
+    }
+
+    .sidebar-section-title{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      color:rgba(255,255,255,.56);
+      margin:8px 10px 10px;
+      font-weight:700;
+    }
+
+    .nav-list{
+      display:grid;
+      gap:4px;
+      margin-bottom:18px;
+    }
+
+    .nav-link{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      color:#eef7ff;
+      padding:11px 12px;
+      border-radius:12px;
+      font-size:14px;
+      font-weight:700;
+      transition:.18s ease;
+    }
+
+    .nav-link:hover{
+      background:rgba(255,255,255,.08);
+    }
+
+    .nav-link.active{
+      background:rgba(47,140,255,.20);
+      border:1px solid rgba(98,180,255,.18);
+    }
+
+    .nav-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#88bfff;
+      flex:0 0 auto;
+    }
+
+    .nav-dot.green{ background:#1ed760; }
+    .nav-dot.red{ background:#ff7777; }
+    .nav-dot.gold{ background:#e7c15a; }
+
+    .sidebar-note{
+      margin-top:8px;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:12px;
+      line-height:1.6;
+      color:rgba(255,255,255,.82);
+    }
+
+    .content{
       padding:20px;
     }
 
-    header{
-      position:sticky;
-      top:0;
-      background:rgba(255,255,255,.9);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--line);
-      z-index:10;
-    }
-
-    .nav{
+    .content-head{
       display:flex;
+      align-items:flex-start;
       justify-content:space-between;
-      align-items:center;
-      padding:12px 20px;
-    }
-
-    .nav a{
-      text-decoration:none;
-      font-weight:700;
-      margin-right:10px;
-      color:#0b2340;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
       gap:16px;
-      margin-top:20px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
     }
 
-    .card{
-      background:var(--card);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
+    .title-wrap h1{
+      font-size:34px;
+      line-height:1.05;
+      color:#112f59;
+      letter-spacing:-1px;
+      margin-bottom:10px;
+    }
+
+    .title-wrap p{
+      color:var(--muted);
+      max-width:860px;
+      line-height:1.75;
+      font-size:15px;
+    }
+
+    .head-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .head-btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 16px;
+      font-weight:800;
+      font-size:14px;
+      cursor:pointer;
+      transition:.18s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:190px;
+    }
+
+    .head-btn:hover{ transform:translateY(-1px); }
+
+    .head-btn.primary{
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+      box-shadow:0 16px 28px rgba(47,140,255,.18);
+    }
+
+    .head-btn.soft{
+      color:#163861;
+      background:#fff;
       border:1px solid var(--line);
-      padding:18px;
+      box-shadow:var(--shadow);
     }
 
-    .card h3{
-      margin:0 0 10px;
-      font-size:1.1rem;
+    .cards-3{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .card,
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow);
+    }
+
+    .mini-card{
+      padding:18px;
+      background:linear-gradient(180deg,#fff,#fbfcff);
+    }
+
+    .mini-card strong{
+      display:block;
+      font-size:16px;
+      color:#0f2f58;
+      margin-bottom:8px;
+    }
+
+    .mini-card p{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .grid-main{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .grid-stack{
+      display:grid;
+      gap:18px;
+    }
+
+    .panel{ overflow:hidden; }
+
+    .panel-head{
+      padding:20px 22px 0;
+    }
+
+    .panel-head h2{
+      font-size:24px;
+      color:#102f59;
+      margin-bottom:8px;
+      letter-spacing:-.5px;
+    }
+
+    .panel-head p{
+      color:var(--muted);
+      line-height:1.75;
+      font-size:14px;
+      margin-bottom:18px;
+    }
+
+    .panel-body{
+      padding:0 22px 22px;
+    }
+
+    .profile-box{
+      display:grid;
+      grid-template-columns:72px minmax(0,1fr);
+      gap:16px;
+      align-items:start;
+    }
+
+    .avatar{
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      background:linear-gradient(180deg,#eff4fb,#dfeaf7);
+      border:1px solid var(--line);
+      display:grid;
+      place-items:center;
+      font-size:24px;
+      font-weight:800;
+      color:#24486f;
+    }
+
+    .profile-main h3{
+      font-size:24px;
+      color:#102f59;
+      margin-bottom:6px;
+    }
+
+    .profile-main p{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+      margin-bottom:10px;
+    }
+
+    .profile-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+      margin-top:16px;
+    }
+
+    .meta{
+      padding:14px;
+      border-radius:14px;
+      background:#f9fbfe;
+      border:1px solid var(--line-soft);
+    }
+
+    .meta small{
+      display:block;
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+      font-weight:700;
+    }
+
+    .meta strong{
+      color:#12355e;
+      font-size:14px;
+      line-height:1.5;
     }
 
     .badge{
-      display:inline-block;
-      padding:6px 10px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 11px;
       border-radius:999px;
-      font-size:.8rem;
-      font-weight:700;
-      color:#fff;
-    }
-
-    .green{background:var(--green)}
-    .red{background:var(--red)}
-    .blue{background:var(--blue)}
-
-    .main-btn{
-      display:block;
-      width:100%;
-      margin-top:10px;
-      padding:14px;
-      text-align:center;
-      border-radius:999px;
-      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
-      color:#fff;
-      text-decoration:none;
+      font-size:12px;
       font-weight:800;
     }
 
-    .links{
+    .badge.green{
+      background:rgba(24,195,74,.10);
+      color:#0f7a37;
+      border:1px solid rgba(24,195,74,.16);
+    }
+
+    .badge.red{
+      background:rgba(255,75,75,.10);
+      color:#b22f2f;
+      border:1px solid rgba(255,75,75,.16);
+    }
+
+    .badge.blue{
+      background:rgba(47,140,255,.10);
+      color:#1459b1;
+      border:1px solid rgba(47,140,255,.16);
+    }
+
+    .badge.gold{
+      background:rgba(216,167,47,.12);
+      color:#9b7112;
+      border:1px solid rgba(216,167,47,.16);
+    }
+
+    .cta-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      padding:14px 16px;
+      border:none;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+      text-decoration:none;
+      transition:.18s ease;
+      margin-top:12px;
+    }
+
+    .cta-btn:hover{ transform:translateY(-1px); }
+
+    .cta-btn.primary{
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+      box-shadow:0 16px 28px rgba(47,140,255,.18);
+    }
+
+    .cta-btn.soft{
+      color:#163861;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+
+    .list{
       display:grid;
       gap:10px;
     }
 
-    .links a{
-      display:block;
-      padding:12px;
+    .list-line{
+      padding:13px 14px;
       border-radius:12px;
-      background:#f4f8ff;
+      background:#f9fbfe;
+      border:1px solid var(--line-soft);
+      color:#14375f;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .list-line strong{
+      display:block;
+      margin-bottom:4px;
+      font-size:14px;
+    }
+
+    .quick-links{
+      display:grid;
+      gap:10px;
+    }
+
+    .quick-links a{
       text-decoration:none;
+      padding:12px 14px;
+      border-radius:12px;
+      background:#f8fbff;
+      border:1px solid #e6eef8;
+      color:#0f2f58;
       font-weight:700;
-      color:#0b2340;
+      font-size:14px;
     }
 
-    .annonce{
-      font-size:.9rem;
-      color:#61748d;
-      padding:8px 0;
-      border-bottom:1px solid var(--line);
+    .helper{
+      margin-top:16px;
+      border-radius:14px;
+      padding:14px 15px;
+      font-size:13px;
+      line-height:1.65;
+      display:none;
     }
 
-    footer{
-      margin-top:30px;
-      padding:20px;
-      text-align:center;
-      color:#61748d;
-      border-top:1px solid var(--line);
+    .helper.show{display:block}
+    .helper.ok{
+      background:rgba(24,195,74,.08);
+      border:1px solid rgba(24,195,74,.18);
+      color:#156c37;
+    }
+    .helper.err{
+      background:rgba(255,75,75,.08);
+      border:1px solid rgba(255,75,75,.18);
+      color:#a12626;
+    }
+    .helper.info{
+      background:rgba(47,140,255,.08);
+      border:1px solid rgba(47,140,255,.18);
+      color:#1459b1;
     }
 
-    @media(max-width:800px){
-      .grid{grid-template-columns:1fr}
+    @media (max-width:1100px){
+      .layout{ grid-template-columns:1fr; }
+      .sidebar{ display:none; }
+      .cards-3,
+      .grid-main,
+      .profile-grid{
+        grid-template-columns:1fr;
+      }
+      .content{ padding:16px; }
+    }
+
+    @media (max-width:720px){
+      .topbar{ padding:0 12px; }
+      .content-head{
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .head-actions{ width:100%; }
+      .head-btn{ width:100%; }
+      .title-wrap h1{ font-size:28px; }
+      .status-chip{ display:none; }
+      .profile-box{ grid-template-columns:1fr; }
+      .avatar{ width:64px; height:64px; }
     }
   </style>
 </head>
-
 <body>
-
-<header>
-  <div class="nav">
-    <div><strong>Dashboard Candidat</strong></div>
-    <div>
-      <a href="index.html">Accueil</a>
-      <a href="competition.html">Championnat</a>
-      <a href="results.html">Résultats</a>
-      <a href="contact.html">Contact</a>
-    </div>
-  </div>
-</header>
-
-<div class="container">
-
-  <!-- PROFIL -->
-  <div class="card">
-    <h3>Profil</h3>
-    <p><strong>Nom :</strong> Utilisateur</p>
-    <p><strong>Email :</strong> email@example.com</p>
-    <span class="badge blue">Compte actif</span>
-  </div>
-
-  <div class="grid">
-
-    <!-- STATUT -->
-    <div class="card">
-      <h3>Statut du championnat</h3>
-      <span class="badge green">Ouvert</span>
-      <p style="margin-top:10px;color:#61748d;">
-        Vous pouvez participer au championnat maintenant.
-      </p>
-
-      <a href="competition.html" class="main-btn">
-        Accéder à l’épreuve
-      </a>
-    </div>
-
-    <!-- SUIVI -->
-    <div class="card">
-      <h3>Suivi</h3>
-      <p>Participation : Non</p>
-      <p>Score : —</p>
-      <p>Classement : —</p>
-    </div>
-
-    <!-- ANNONCES -->
-    <div class="card">
-      <h3>Annonces</h3>
-      <div class="annonce">Ouverture progressive du championnat</div>
-      <div class="annonce">Les règles sont disponibles</div>
-      <div class="annonce">Résultats bientôt publiés</div>
-
-      <a href="announcements.html" class="main-btn" style="margin-top:12px;">
-        Voir toutes les annonces
-      </a>
-    </div>
-
-    <!-- LIENS -->
-    <div class="card">
-      <h3>Accès rapide</h3>
-      <div class="links">
-        <a href="rules.html">Voir le règlement</a>
-        <a href="results.html">Voir les résultats</a>
-        <a href="faq.html">FAQ</a>
-        <a href="contact.html">Contact</a>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <div class="brand-title">Championnat de Chimie</div>
+        <div class="brand-sub" id="brandSub">Espace privé du candidat</div>
       </div>
     </div>
 
+    <div class="topbar-right">
+      <div class="status-chip">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusText">Chargement…</span>
+      </div>
+      <div class="avatar-btn" id="avatarBtn">☰</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Navigation</div>
+      <nav class="nav-list" id="sidebarNav"></nav>
+
+      <div class="sidebar-section-title">Statut</div>
+      <div class="sidebar-note" id="sidebarNote">
+        Chargement de votre espace candidat…
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="content-head">
+        <div class="title-wrap">
+          <h1>Mon espace candidat</h1>
+          <p>
+            Cet espace vous permet de suivre votre participation, consulter votre statut, ouvrir l’épreuve,
+            vérifier vos informations et suivre l’évolution du championnat depuis une interface centralisée.
+          </p>
+        </div>
+
+        <div class="head-actions">
+          <button class="head-btn primary" id="goExamBtn" type="button">Passer l’examen</button>
+          <button class="head-btn soft" id="goCompetitionBtn" type="button">Voir le championnat</button>
+        </div>
+      </div>
+
+      <section class="cards-3">
+        <article class="card mini-card">
+          <strong>Compte candidat</strong>
+          <p id="miniAccountText">Connexion en cours…</p>
+        </article>
+
+        <article class="card mini-card">
+          <strong>Statut du championnat</strong>
+          <p id="miniCompetitionText">Synchronisation des informations en cours…</p>
+        </article>
+
+        <article class="card mini-card">
+          <strong>Accès examen</strong>
+          <p id="miniExamText">L’accès à l’épreuve dépend de l’état actuel du championnat et de votre session.</p>
+        </article>
+      </section>
+
+      <section class="grid-main">
+        <section class="grid-stack">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Profil candidat</h2>
+              <p>Vos informations de base sont récupérées depuis votre compte et votre dossier candidat.</p>
+            </div>
+
+            <div class="panel-body">
+              <div class="profile-box">
+                <div class="avatar" id="profileAvatar">C</div>
+
+                <div class="profile-main">
+                  <h3 id="profileName">Chargement…</h3>
+                  <p id="profileEmail">—</p>
+                  <span class="badge blue" id="profileBadge">Compte candidat</span>
+
+                  <div class="profile-grid">
+                    <div class="meta">
+                      <small>Nom complet</small>
+                      <strong id="metaFullName">—</strong>
+                    </div>
+
+                    <div class="meta">
+                      <small>Email</small>
+                      <strong id="metaEmail">—</strong>
+                    </div>
+
+                    <div class="meta">
+                      <small>Niveau</small>
+                      <strong id="metaLevel">—</strong>
+                    </div>
+
+                    <div class="meta">
+                      <small>Statut dossier</small>
+                      <strong id="metaStatus">—</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="helper info show" id="profileMsg">
+                Votre espace candidat est relié aux informations enregistrées lors de votre participation.
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Suivi du championnat</h2>
+              <p>Vue synthétique de votre état de participation et de l’état du championnat.</p>
+            </div>
+
+            <div class="panel-body">
+              <div class="list">
+                <div class="list-line">
+                  <strong>Participation</strong>
+                  <span id="trackParticipation">—</span>
+                </div>
+
+                <div class="list-line">
+                  <strong>Épreuve active</strong>
+                  <span id="trackExam">—</span>
+                </div>
+
+                <div class="list-line">
+                  <strong>Statut global</strong>
+                  <span id="trackCompetition">—</span>
+                </div>
+
+                <div class="list-line">
+                  <strong>Résultat / Score</strong>
+                  <span id="trackScore">—</span>
+                </div>
+              </div>
+
+              <a href="./examen.html" class="cta-btn primary">Accéder à l’épreuve</a>
+            </div>
+          </section>
+        </section>
+
+        <aside class="grid-stack">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Annonces</h2>
+              <p>Informations utiles visibles rapidement depuis votre espace.</p>
+            </div>
+
+            <div class="panel-body">
+              <div class="list" id="announcementsList">
+                <div class="list-line">
+                  <strong>Chargement</strong>
+                  Les annonces sont en cours de préparation…
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Accès rapides</h2>
+              <p>Raccourcis utiles pour continuer votre parcours sans vous perdre.</p>
+            </div>
+
+            <div class="panel-body">
+              <div class="quick-links">
+                <a href="./competition.html">Voir le championnat</a>
+                <a href="./rules.html">Lire le règlement</a>
+                <a href="./results.html">Voir les résultats</a>
+                <a href="./faq.html">FAQ</a>
+                <a href="./contact.html">Contact</a>
+              </div>
+            </div>
+          </section>
+        </aside>
+      </section>
+    </main>
   </div>
 
-</div>
+  <script type="module">
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
 
-<footer>
-  © 2026 Championnat de Chimie
-</footer>
+    const sidebarNav = document.getElementById("sidebarNav");
+    const sidebarNote = document.getElementById("sidebarNote");
+    const brandSub = document.getElementById("brandSub");
 
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+    const avatarBtn = document.getElementById("avatarBtn");
+
+    const goExamBtn = document.getElementById("goExamBtn");
+    const goCompetitionBtn = document.getElementById("goCompetitionBtn");
+
+    const miniAccountText = document.getElementById("miniAccountText");
+    const miniCompetitionText = document.getElementById("miniCompetitionText");
+    const miniExamText = document.getElementById("miniExamText");
+
+    const profileAvatar = document.getElementById("profileAvatar");
+    const profileName = document.getElementById("profileName");
+    const profileEmail = document.getElementById("profileEmail");
+    const profileBadge = document.getElementById("profileBadge");
+    const metaFullName = document.getElementById("metaFullName");
+    const metaEmail = document.getElementById("metaEmail");
+    const metaLevel = document.getElementById("metaLevel");
+    const metaStatus = document.getElementById("metaStatus");
+    const profileMsg = document.getElementById("profileMsg");
+
+    const trackParticipation = document.getElementById("trackParticipation");
+    const trackExam = document.getElementById("trackExam");
+    const trackCompetition = document.getElementById("trackCompetition");
+    const trackScore = document.getElementById("trackScore");
+
+    const announcementsList = document.getElementById("announcementsList");
+
+    const state = {
+      user: null,
+      profile: null,
+      role: "visitor",
+      candidateRecord: null,
+      competitionControl: null
+    };
+
+    function normalizeEmail(value = ""){
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function resolveRole(user, profile){
+      const email = normalizeEmail(user?.email);
+      if (!user) return "visitor";
+      if (email === ADMIN_EMAIL) return "admin";
+
+      const role = String(
+        profile?.competitionRole ||
+        profile?.role ||
+        profile?.userType ||
+        ""
+      ).toLowerCase();
+
+      if (role === "jury") return "jury";
+      if (role === "admin") return "admin";
+      return "candidate";
+    }
+
+    function getSidebarLinks(role){
+      if (role === "admin") {
+        return [
+          { label:"Tableau de bord admin", href:"./admin.html", color:"red" },
+          { label:"Championnat", href:"./competition.html", color:"green" },
+          { label:"Espace jury", href:"./jury.html", color:"gold" },
+          { label:"Résultats", href:"./results.html", color:"green" },
+          { label:"Support admin", href:"./competition-support-admin.html", color:"red" }
+        ];
+      }
+
+      if (role === "jury") {
+        return [
+          { label:"Espace jury", href:"./jury.html", color:"gold" },
+          { label:"Championnat", href:"./competition.html", color:"green" },
+          { label:"Résultats", href:"./results.html", color:"green" }
+        ];
+      }
+
+      return [
+        { label:"Mon espace candidat", href:"./dashboard-candidat.html", color:"green", active:true },
+        { label:"Championnat", href:"./competition.html", color:"green" },
+        { label:"Passer l’examen", href:"./examen.html", color:"red" },
+        { label:"Résultats", href:"./results.html", color:"gold" },
+        { label:"Contact", href:"./contact.html", color:"green" }
+      ];
+    }
+
+    function renderSidebar(role){
+      const links = getSidebarLinks(role);
+      sidebarNav.innerHTML = links.map(item => `
+        <a class="nav-link ${item.active ? "active" : ""}" href="${item.href}">
+          <span class="nav-dot ${item.color || ""}"></span>
+          <span>${item.label}</span>
+        </a>
+      `).join("");
+
+      if (role === "admin") {
+        sidebarNote.textContent = "Compte admin détecté. Vous allez être redirigé vers le pilotage administrateur.";
+        brandSub.textContent = "Redirection admin";
+        return;
+      }
+
+      if (role === "jury") {
+        sidebarNote.textContent = "Compte jury détecté. Vous allez être redirigé vers l’espace jury.";
+        brandSub.textContent = "Redirection jury";
+        return;
+      }
+
+      sidebarNote.textContent = "Cet espace centralise vos informations de participation, votre accès à l’épreuve et votre suivi candidat.";
+      brandSub.textContent = "Espace privé du candidat";
+    }
+
+    function setCandidateStatusTexts(){
+      const control = state.competitionControl || {};
+      const candidate = state.candidateRecord || {};
+
+      const launched = !!(control.launched === true || String(control.status || "").toLowerCase() === "launched");
+      const activeExamId = control.activeExamId || control.currentExamId || null;
+
+      miniAccountText.textContent = state.user
+        ? `Connecté en tant que ${state.user.email || "candidat"}`
+        : "Aucune session détectée.";
+
+      miniCompetitionText.textContent = launched
+        ? "Le championnat semble actuellement lancé ou disponible."
+        : "Le championnat est visible, mais l’épreuve peut encore être verrouillée.";
+
+      miniExamText.textContent = activeExamId
+        ? `Une épreuve active est référencée (${activeExamId}).`
+        : "Aucune épreuve active n’est encore visible.";
+
+      trackParticipation.textContent = candidate.status
+        ? `Dossier ${candidate.status}`
+        : "Participation non encore confirmée";
+
+      trackExam.textContent = activeExamId
+        ? `${activeExamId}`
+        : "Aucune épreuve active";
+
+      trackCompetition.textContent = launched
+        ? "Compétition lancée"
+        : (control.status || "En préparation");
+
+      trackScore.textContent = candidate.score != null
+        ? String(candidate.score)
+        : "Aucun score publié";
+    }
+
+    function setProfileData(){
+      const user = state.user;
+      const profile = state.profile || {};
+      const candidate = state.candidateRecord || {};
+
+      const fullName = profile.displayName || user?.displayName || candidate.fullName || "Candidat";
+      const email = user?.email || profile.email || candidate.email || "—";
+      const level = candidate.level || profile.level || "Non renseigné";
+      const status = candidate.status || "Non défini";
+
+      profileAvatar.textContent = (fullName || "C").trim().charAt(0).toUpperCase();
+      profileName.textContent = fullName;
+      profileEmail.textContent = email;
+      metaFullName.textContent = fullName;
+      metaEmail.textContent = email;
+      metaLevel.textContent = level;
+      metaStatus.textContent = status;
+
+      if (status === "approved" || status === "validated") {
+        profileBadge.className = "badge green";
+        profileBadge.textContent = "Dossier validé";
+        profileMsg.className = "helper show ok";
+        profileMsg.textContent = "Votre profil candidat est actif et votre dossier semble validé.";
+      } else if (status === "pending") {
+        profileBadge.className = "badge gold";
+        profileBadge.textContent = "Dossier en attente";
+        profileMsg.className = "helper show info";
+        profileMsg.textContent = "Votre demande de participation est enregistrée et reste en attente de suivi.";
+      } else {
+        profileBadge.className = "badge blue";
+        profileBadge.textContent = "Compte candidat";
+        profileMsg.className = "helper show info";
+        profileMsg.textContent = "Votre espace candidat est relié aux informations enregistrées lors de votre participation.";
+      }
+    }
+
+    function setAnnouncements(){
+      const control = state.competitionControl || {};
+      const items = [];
+
+      if (control.status) {
+        items.push({
+          title: "État actuel du championnat",
+          text: `Le système indique actuellement : ${control.status}.`
+        });
+      }
+
+      if (control.activeExamId || control.currentExamId) {
+        items.push({
+          title: "Épreuve active",
+          text: `Une épreuve active est référencée : ${control.activeExamId || control.currentExamId}.`
+        });
+      }
+
+      if (!items.length) {
+        items.push(
+          { title:"Ouverture progressive", text:"Le championnat peut être visible avant l’ouverture complète de l’épreuve." },
+          { title:"Règlement disponible", text:"Le règlement et les informations publiques peuvent être consultés à tout moment." },
+          { title:"Résultats", text:"Les résultats seront visibles lorsqu’ils seront publiés par l’administration." }
+        );
+      }
+
+      announcementsList.innerHTML = items.map(item => `
+        <div class="list-line">
+          <strong>${item.title}</strong>
+          ${item.text}
+        </div>
+      `).join("");
+    }
+
+    function applyRoleUI(){
+      renderSidebar(state.role);
+
+      if (state.role === "admin") {
+        statusDot.classList.add("ok");
+        statusText.textContent = "Admin connecté";
+        window.location.replace("./admin.html");
+        return;
+      }
+
+      if (state.role === "jury") {
+        statusDot.classList.add("ok");
+        statusText.textContent = "Jury connecté";
+        window.location.replace("./jury.html");
+        return;
+      }
+
+      statusDot.classList.add("ok");
+      statusText.textContent = "Candidat connecté";
+
+      setProfileData();
+      setCandidateStatusTexts();
+      setAnnouncements();
+    }
+
+    avatarBtn.addEventListener("click", () => {
+      window.location.href = "./competition.html";
+    });
+
+    goExamBtn.addEventListener("click", () => {
+      window.location.href = "./examen.html";
+    });
+
+    goCompetitionBtn.addEventListener("click", () => {
+      window.location.href = "./competition.html";
+    });
+
+    async function bootFirebase(){
+      try{
+        const [{ auth, db }, authMod, dbMod] = await Promise.all([
+          import("./firebase-config.js"),
+          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"),
+          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js")
+        ]);
+
+        const { onAuthStateChanged } = authMod;
+        const { ref, get } = dbMod;
+
+        onAuthStateChanged(auth, async (user) => {
+          if (!user) {
+            window.location.replace("./login.html?redirect=dashboard-candidat.html");
+            return;
+          }
+
+          state.user = user;
+
+          try{
+            const [profileSnap, candidateSnap, controlSnap] = await Promise.all([
+              get(ref(db, "users/" + user.uid)),
+              get(ref(db, "competitionCandidates/" + user.uid)),
+              get(ref(db, "competitionControl/current"))
+            ]);
+
+            state.profile = profileSnap.exists() ? profileSnap.val() : null;
+            state.candidateRecord = candidateSnap.exists() ? candidateSnap.val() : null;
+            state.competitionControl = controlSnap.exists() ? controlSnap.val() : null;
+          }catch(err){
+            console.error(err);
+            state.profile = null;
+            state.candidateRecord = null;
+            state.competitionControl = null;
+          }
+
+          state.role = resolveRole(user, state.profile);
+          applyRoleUI();
+        });
+      }catch(err){
+        console.error("Erreur dashboard-candidat.html :", err);
+        window.location.replace("./login.html?redirect=dashboard-candidat.html");
+      }
+    }
+
+    bootFirebase();
+  </script>
 </body>
 </html>
