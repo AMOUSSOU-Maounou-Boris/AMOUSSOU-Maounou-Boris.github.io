@@ -1767,17 +1767,46 @@
 
     function applyAuthLinks(){
       if (state.user) {
-        desktopAuthLink.href = "./profile.html";
-        desktopAuthLabel.textContent = "Mon compte";
-        mobileAuthLink.href = "./profile.html";
-        mobileAuthLink.textContent = "Mon compte";
+        // cacher Connexion
+        desktopAuthLink.style.display = "none";
+        mobileAuthLink.style.display = "none";
+    
+        // récupérer photo utilisateur (si dispo)
+        const photo = state.profile?.photoURL || state.user.photoURL || "";
+    
+        // bouton profil avec point vert
         loginPageBtn.href = "./profile.html";
-        loginPageBtn.textContent = "Mon compte";
+        loginPageBtn.innerHTML = `
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span style="position:relative;display:inline-block;width:22px;height:22px;">
+              <img src="${photo || 'https://via.placeholder.com/40'}" 
+                   style="width:22px;height:22px;border-radius:50%;object-fit:cover;border:2px solid #fff;">
+              <span style="
+                position:absolute;
+                bottom:-1px;
+                right:-1px;
+                width:8px;
+                height:8px;
+                background:#18c34a;
+                border-radius:50%;
+                border:2px solid white;
+              "></span>
+            </span>
+            <span>Mon profil</span>
+          </span>
+        `;
+    
       } else {
+        // afficher Connexion
+        desktopAuthLink.style.display = "";
+        mobileAuthLink.style.display = "";
+    
         desktopAuthLink.href = "./login.html";
         desktopAuthLabel.textContent = "Connexion";
+    
         mobileAuthLink.href = "./login.html";
         mobileAuthLink.textContent = "Connexion";
+    
         loginPageBtn.href = "./login.html";
         loginPageBtn.textContent = "Connexion";
       }
