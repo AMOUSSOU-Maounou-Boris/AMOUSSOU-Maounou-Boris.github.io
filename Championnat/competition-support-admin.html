@@ -302,6 +302,10 @@
       overflow-y:auto;
       overflow-x:hidden;
       transition:height .24s ease;
+      background:
+        radial-gradient(circle at top right, rgba(255,99,181,.05), transparent 24%),
+        radial-gradient(circle at top left, rgba(255,159,26,.06), transparent 20%),
+        var(--bg);
     }
 
     body.topbar-collapsed .content{
@@ -418,6 +422,12 @@
       background:linear-gradient(180deg,#fff,#faf7ff);
     }
     .mini-card:nth-child(4) strong{ color:#6a45d7; }
+
+    .mini-card strong{
+      display:block;
+      font-size:16px;
+      margin-bottom:8px;
+    }
 
     .mini-card p{
       color:var(--muted);
@@ -667,6 +677,18 @@
       font-size:13px;
       line-height:1.72;
       white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .sender-link{
+      color:#12355e;
+      text-decoration:none;
+      font-weight:800;
+    }
+
+    .sender-link:hover{
+      color:#1459b1;
+      text-decoration:underline;
     }
 
     .list-actions{
@@ -983,7 +1005,7 @@
 </head>
 <body>
   <header class="topbar" id="topbar">
-    <a href="./login.html?redirect=admin.html" class="brand">
+    <a href="./competition-support-admin.html" class="brand">
       <div class="brand-mark"></div>
       <div class="brand-text">
         <div class="brand-title">Championnat de Chimie</div>
@@ -1019,12 +1041,13 @@
       <a class="mobile-link" href="./faq.html">FAQ</a>
       <a class="mobile-link" href="./contact.html">Contact</a>
       <a class="mobile-link" href="./verify-certificate.html">Vérifier certificat</a>
+      <a class="mobile-link" href="./profile.html">Mon profil</a>
       <a class="mobile-link" href="./login.html">Connexion</a>
       <a class="mobile-link" href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
       <a class="mobile-link" href="./login.html?redirect=jury.html">Jury</a>
-      <a class="mobile-link" href="./login.html?redirect=admin.html">Administration</a>
-      <a class="mobile-link" href="./login.html?redirect=admin.html">Tableau de bord admin</a>
-      <a class="mobile-link" href="./login.html?redirect=competition-support-admin.html">Support admin</a>
+      <a class="mobile-link" href="./login.html?redirect=competition-admin.html">Administration</a>
+      <a class="mobile-link" href="./competition-admin.html">Tableau de bord admin</a>
+      <a class="mobile-link" href="./competition-support-admin.html">Support admin</a>
     </div>
   </aside>
 
@@ -1042,17 +1065,18 @@
         <a class="nav-link" href="./faq.html"><span class="nav-dot purple"></span><span>FAQ</span></a>
         <a class="nav-link" href="./contact.html"><span class="nav-dot red"></span><span>Contact</span></a>
         <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
+        <a class="nav-link" href="./profile.html"><span class="nav-dot blue"></span><span>Mon profil</span></a>
         <a class="nav-link" href="./login.html"><span class="nav-dot orange"></span><span>Connexion</span></a>
         <a class="nav-link" href="./login.html?redirect=dashboard-candidat.html"><span class="nav-dot green"></span><span>Espace candidat</span></a>
         <a class="nav-link" href="./login.html?redirect=jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
-        <a class="nav-link" href="./login.html?redirect=admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
-        <a class="nav-link" href="./login.html?redirect=admin.html"><span class="nav-dot red"></span><span>Tableau de bord admin</span></a>
+        <a class="nav-link" href="./login.html?redirect=competition-admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
+        <a class="nav-link" href="./competition-admin.html"><span class="nav-dot red"></span><span>Tableau de bord admin</span></a>
         <a class="nav-link active" href="./competition-support-admin.html"><span class="nav-dot orange"></span><span>Support admin</span></a>
       </nav>
 
       <div class="sidebar-section-title">À quoi ça sert</div>
       <div class="sidebar-note">
-        Cette page centralise les messages internes : candidats, jury, partenaires, support technique et demandes liées au championnat.
+        Cette page centralise les messages internes : candidats, jury, partenaires, support technique, certificats et demandes liées au championnat.
       </div>
     </aside>
 
@@ -1062,12 +1086,12 @@
           <h1>Support administrateur</h1>
           <p>
             Cette boîte de réception permet de suivre et traiter les demandes liées au championnat :
-            jury, candidats, partenaires, support, questions techniques et signalements.
+            jury, candidats, partenaires, support, questions techniques, certificats et signalements.
           </p>
         </div>
 
         <div class="head-actions">
-          <a class="head-btn soft" href="./login.html?redirect=admin.html">Retour admin</a>
+          <a class="head-btn soft" href="./competition-admin.html">Retour admin</a>
           <button class="head-btn primary" id="refreshBtn" type="button">Actualiser</button>
         </div>
       </div>
@@ -1233,6 +1257,10 @@
       createMsg.textContent = text;
     }
 
+    function getProfileHref(uid){
+      return uid ? `./profile.html?uid=${encodeURIComponent(uid)}` : "";
+    }
+
     function getMessagesArray(){
       return Object.entries(state.messages || {}).map(([id, value]) => ({ id, ...value }));
     }
@@ -1276,6 +1304,7 @@
       if (role === "admin") return '<span class="badge red">Admin</span>';
       if (role === "jury") return '<span class="badge gold">Jury</span>';
       if (role === "candidate") return '<span class="badge blue">Candidat</span>';
+      if (role === "partner") return '<span class="badge gold">Partenaire</span>';
       return '<span class="badge blue">Visiteur</span>';
     }
 
@@ -1323,6 +1352,7 @@
         message,
         category,
         status: "new",
+        sourcePage: "competition-support-admin.html",
         createdAt: Date.now(),
         updatedAt: Date.now()
       });
@@ -1362,6 +1392,10 @@
           const senderEmail = escapeHtml(item.senderEmail || "—");
           const role = escapeHtml(item.senderRole || "visitor");
           const currentStatus = item.status || "new";
+          const profileHref = getProfileHref(item.senderUid);
+          const senderHtml = profileHref
+            ? `<a class="sender-link" href="${profileHref}">${senderName}</a>`
+            : senderName;
 
           return `
             <div class="list-card status-${escapeHtml(currentStatus)}">
@@ -1374,7 +1408,7 @@
               </div>
 
               <p>
-                De : ${senderName}<br>
+                De : ${senderHtml}<br>
                 Email : ${senderEmail}
               </p>
 
@@ -1484,7 +1518,7 @@
     async function boot(){
       onAuthStateChanged(auth, async (user) => {
         if (!user || !isAdmin(user)) {
-          window.location.replace("./login.html?redirect=admin.html");
+          window.location.replace("./login.html?redirect=competition-support-admin.html");
           return;
         }
 
@@ -1492,8 +1526,7 @@
         await loadMessages();
       });
     }
-
-    filterToolbar.querySelectorAll("[data-filter]").forEach(btn => {
+        filterToolbar.querySelectorAll("[data-filter]").forEach(btn => {
       btn.addEventListener("click", () => {
         filterToolbar.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("is-active"));
         btn.classList.add("is-active");
