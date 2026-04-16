@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin | Championnat de Chimie</title>
+  <title>Administration | Championnat de Chimie</title>
 
   <style>
     *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif}
@@ -26,6 +26,7 @@
       --gold-dark:#b47c12;
       --orange:#ff9f1a;
       --purple:#7b61ff;
+      --pink:#ff63b5;
       --shadow:0 10px 24px rgba(13,37,71,.08);
       --radius:18px;
       --radius-lg:22px;
@@ -64,7 +65,7 @@
       align-items:center;
       justify-content:space-between;
       padding:0 18px;
-      transition:transform .24s ease, opacity .24s ease, height .18s ease;
+      transition:transform .24s ease, opacity .24s ease;
     }
 
     .topbar.topbar-hidden{
@@ -101,9 +102,14 @@
     }
 
     .brand-mark::before{ inset:8px; }
-    .brand-mark::after{ inset:5px 12px; transform:rotate(55deg); border-color:rgba(255,255,255,.56); }
+    .brand-mark::after{
+      inset:5px 12px;
+      transform:rotate(55deg);
+      border-color:rgba(255,255,255,.56);
+    }
 
     .brand-text{ min-width:0; }
+
     .brand-title{
       font-size:14px;
       font-weight:800;
@@ -274,6 +280,9 @@
     .nav-dot.red{ background:#ff7777; }
     .nav-dot.gold{ background:#e7c15a; }
     .nav-dot.purple{ background:#b29bff; }
+    .nav-dot.orange{ background:#ffb347; }
+    .nav-dot.pink{ background:#ff7cc7; }
+    .nav-dot.blue{ background:#88bfff; }
 
     .sidebar-note{
       margin-top:8px;
@@ -321,7 +330,7 @@
 
     .title-wrap p{
       color:var(--muted);
-      max-width:900px;
+      max-width:940px;
       line-height:1.75;
       font-size:15px;
       margin:0;
@@ -734,6 +743,7 @@
       font-size:15px;
       overflow:hidden;
       flex:0 0 auto;
+      text-decoration:none;
     }
 
     .online-avatar img{
@@ -1057,7 +1067,7 @@
       <h1>Cette zone est réservée à l’administration.</h1>
       <p>
         L’espace administrateur contrôle les candidatures, les propositions du jury, l’épreuve active, les copies,
-        les annonces, les résultats, les comptes connectés et la préparation des certificats.
+        les annonces, les résultats, les comptes connectés, les profils publics et la préparation des certificats.
       </p>
       <div class="locked-actions">
         <a href="./login.html?redirect=competition-admin.html" class="head-btn primary">Se connecter</a>
@@ -1072,14 +1082,19 @@
     <h3>Explorer l’administration</h3>
     <div class="mobile-group">
       <a class="mobile-link" href="./competition-admin.html">Tableau de bord admin</a>
-      <a class="mobile-link" href="./competition.html">Championnat</a>
-      <a class="mobile-link" href="./jury.html">Jury</a>
-      <a class="mobile-link" href="./announcements.html">Annonces</a>
-      <a class="mobile-link" href="./competition-support-admin.html">Support admin</a>
-      <a class="mobile-link" href="./results.html">Résultats</a>
-      <a class="mobile-link" href="./verify-certificate.html">Vérification certificat</a>
-      <a class="mobile-link" href="./profile.html">Mon profil</a>
       <a class="mobile-link" href="./index.html">Accueil</a>
+      <a class="mobile-link" href="./about.html">À propos</a>
+      <a class="mobile-link" href="./competition.html">Championnat</a>
+      <a class="mobile-link" href="./rules.html">Règlement</a>
+      <a class="mobile-link" href="./results.html">Résultats</a>
+      <a class="mobile-link" href="./laureats.html">Lauréats</a>
+      <a class="mobile-link" href="./announcements.html">Annonces</a>
+      <a class="mobile-link" href="./jury.html">Jury</a>
+      <a class="mobile-link" href="./examen.html">Examen</a>
+      <a class="mobile-link" href="./profile.html">Mon profil</a>
+      <a class="mobile-link" href="./competition-support-admin.html">Support admin</a>
+      <a class="mobile-link" href="./verify-certificate.html">Vérification certificat</a>
+      <a class="mobile-link" href="./contact.html">Contact</a>
     </div>
   </aside>
 
@@ -1189,7 +1204,7 @@
                 </div>
 
                 <div id="adminMsg" class="helper info show">
-                  Le lancement influe directement sur ce que voient les candidats, le jury, l’espace d’examen et les annonces liées.
+                  Le lancement influe directement sur ce que voient les candidats, le jury, l’espace d’examen, les annonces et les validations liées.
                 </div>
               </div>
             </section>
@@ -1282,7 +1297,7 @@
             <section class="panel">
               <div class="panel-head">
                 <h2>Annonce administrateur</h2>
-                <p>Publie une information utile visible ensuite dans les sections concernées.</p>
+                <p>Publie une information utile visible ensuite dans les sections concernées, notamment les annonces.</p>
               </div>
 
               <div class="panel-body">
@@ -1306,6 +1321,24 @@
                   <div class="list-card">
                     <strong>Chargement…</strong>
                     <p>Les comptes connectés apparaîtront ici avec leur profil public et leur statut.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Demandes de partage</h2>
+                <p>
+                  Les partages demandés depuis les annonces arrivent ici. Le compteur réel ne doit augmenter qu’après validation administrative.
+                </p>
+              </div>
+
+              <div class="panel-body">
+                <div id="shareRequestsList" class="list-grid">
+                  <div class="list-card">
+                    <strong>Chargement…</strong>
+                    <p>Les demandes de partage sont en cours de récupération.</p>
                   </div>
                 </div>
               </div>
@@ -1346,7 +1379,7 @@
                 </div>
               </div>
             </section>
-          </aside>
+                      </aside>
         </section>
 
         <div class="page-footer">
@@ -1381,7 +1414,9 @@
       proposals: {},
       submissions: {},
       announcements: {},
-      users: {}
+      users: {},
+      shareRequests: {},
+      feedIndex: {}
     };
 
     const $ = (id) => document.getElementById(id);
@@ -1411,6 +1446,7 @@
       proposalList: $("proposalList"),
       submissionList: $("submissionList"),
       onlineUsersList: $("onlineUsersList"),
+      shareRequestsList: $("shareRequestsList"),
       adminMsg: $("adminMsg"),
       certificateMsg: $("certificateMsg")
     };
@@ -1445,15 +1481,21 @@
     function renderSidebar(){
       ui.sidebarNav.innerHTML = `
         <a class="nav-link active" href="./competition-admin.html"><span class="nav-dot red"></span><span>Tableau de bord admin</span></a>
+        <a class="nav-link" href="./index.html"><span class="nav-dot green"></span><span>Accueil</span></a>
+        <a class="nav-link" href="./about.html"><span class="nav-dot purple"></span><span>À propos</span></a>
         <a class="nav-link" href="./competition.html"><span class="nav-dot green"></span><span>Championnat</span></a>
+        <a class="nav-link" href="./rules.html"><span class="nav-dot gold"></span><span>Règlement</span></a>
+        <a class="nav-link" href="./results.html"><span class="nav-dot purple"></span><span>Résultats</span></a>
+        <a class="nav-link" href="./laureats.html"><span class="nav-dot gold"></span><span>Lauréats</span></a>
+        <a class="nav-link" href="./announcements.html"><span class="nav-dot purple"></span><span>Annonces</span></a>
         <a class="nav-link" href="./jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
         <a class="nav-link" href="./examen.html"><span class="nav-dot red"></span><span>Examen</span></a>
-        <a class="nav-link" href="./announcements.html"><span class="nav-dot purple"></span><span>Annonces</span></a>
-        <a class="nav-link" href="./results.html"><span class="nav-dot purple"></span><span>Résultats</span></a>
+        <a class="nav-link" href="./profile.html"><span class="nav-dot blue"></span><span>Mon profil</span></a>
         <a class="nav-link" href="./competition-support-admin.html"><span class="nav-dot red"></span><span>Support admin</span></a>
         <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Vérification certificat</span></a>
+        <a class="nav-link" href="./contact.html"><span class="nav-dot red"></span><span>Contact</span></a>
       `;
-      ui.sidebarNote.textContent = "L’administration garde ici la main sur les candidatures, le jury, l’épreuve active, les annonces, les comptes connectés, les résultats et la préparation des certificats.";
+      ui.sidebarNote.textContent = "L’administration garde ici la main sur les candidatures, le jury, l’épreuve active, les annonces, les comptes connectés, les partages en attente, les résultats et la préparation des certificats.";
     }
 
     function isAdminUser(user){
@@ -1461,7 +1503,11 @@
     }
 
     function isCompetitionLaunched(control){
-      return !!(control && (control.launched === true || String(control.status || "").toLowerCase() === "launched"));
+      return !!(control && (
+        control.launched === true ||
+        String(control.status || "").toLowerCase() === "launched" ||
+        String(control.status || "").toLowerCase() === "compétition lancée"
+      ));
     }
 
     function countSubmissions(root){
@@ -1693,6 +1739,54 @@
       }).join("");
     }
 
+    function renderShareRequests(){
+      const values = Object.entries(state.shareRequests || {})
+        .map(([id, value]) => ({ id, ...value }))
+        .sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      if (!values.length) {
+        ui.shareRequestsList.innerHTML = `
+          <div class="list-card">
+            <strong>Aucune demande</strong>
+            <p>Aucune demande de partage interne n’est en attente pour le moment.</p>
+          </div>
+        `;
+        return;
+      }
+
+      ui.shareRequestsList.innerHTML = values.slice(0, 20).map(item => {
+        const requesterUid = item.requesterUid || "";
+        const requesterName = item.requesterName || "Membre";
+        const currentStatus = item.status || "pending";
+        const postId = item.postId || "";
+        const currentCount = Number(state.feedIndex?.[postId]?.sharesCount || 0);
+
+        return `
+          <div class="list-card">
+            <strong>
+              ${requesterUid
+                ? `<a class="online-name" href="${profileHref(requesterUid)}">${escapeHtml(requesterName)}</a>`
+                : escapeHtml(requesterName)}
+            </strong>
+            <p>
+              Publication : ${escapeHtml(postId || "—")}<br>
+              Statut : ${escapeHtml(currentStatus)}<br>
+              Partages comptés actuellement : ${currentCount}
+            </p>
+
+            <div class="list-actions">
+              ${currentStatus === "pending" ? `
+                <button class="mini-btn green" data-action="approve-share" data-id="${escapeHtml(item.id)}">Valider</button>
+                <button class="mini-btn red" data-action="reject-share" data-id="${escapeHtml(item.id)}">Refuser</button>
+              ` : ``}
+              ${currentStatus === "approved" ? `<span class="badge green">Validé</span>` : ``}
+              ${currentStatus === "rejected" ? `<span class="badge red">Refusé</span>` : ``}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
     async function loadAllData(){
       const snap = await get(ref(db));
       const data = snap.exists() ? snap.val() : {};
@@ -1701,8 +1795,10 @@
       state.candidates = data.competitionCandidates || {};
       state.proposals = data.examProposals || {};
       state.submissions = data.examSubmissions || {};
-      state.announcements = data.championnatAnnouncements || {};
+      state.announcements = data.competitionAdminAnnouncements || {};
       state.users = data.users || {};
+      state.shareRequests = data.championnatShareRequests || {};
+      state.feedIndex = data.championnatFeedIndex || {};
 
       setText(ui.adminIdentity, `${state.user?.displayName || "Administrateur"} — ${state.user?.email || ADMIN_EMAIL}`);
       renderTopState();
@@ -1710,6 +1806,7 @@
       renderProposals();
       renderSubmissions();
       renderOnlineUsers();
+      renderShareRequests();
 
       $("championshipTitle").value = state.control?.title || "Championnat de Chimie 2026";
       $("championshipStatus").value = state.control?.status || "Brouillon";
@@ -1757,10 +1854,11 @@
         "Administration du championnat";
       const photoUrl = pp.photoUrl || "";
 
-      const announcementRef = push(ref(db, "championnatAnnouncements"));
+      const announcementRef = push(ref(db, "competitionAdminAnnouncements"));
       await set(announcementRef, {
         text,
         createdAt: Date.now(),
+        updatedAt: Date.now(),
         createdBy: state.user?.email || ADMIN_EMAIL,
         authorUid: state.user?.uid || "",
         authorName: displayName,
@@ -1769,7 +1867,13 @@
         sourceLabel: "Annonce officielle",
         category: "information",
         status: "published",
-        manageable: true
+        pinned: false,
+        manageable: true,
+        likesCount: 0,
+        commentsCount: 0,
+        viewsCount: 0,
+        sharesCount: 0,
+        deleted: false
       });
 
       $("announcementText").value = "";
@@ -1826,6 +1930,45 @@
         status,
         updatedAt: Date.now()
       });
+      await loadAllData();
+    }
+
+    async function approveShareRequest(requestId){
+      const req = state.shareRequests?.[requestId];
+      if (!req) return;
+
+      const postId = req.postId;
+      if (!postId) return;
+
+      const currentCount = Number(state.feedIndex?.[postId]?.sharesCount || 0);
+
+      await update(ref(db, `championnatShareRequests/${requestId}`), {
+        status: "approved",
+        approvedAt: Date.now(),
+        approvedBy: state.user?.email || ADMIN_EMAIL
+      });
+
+      await update(ref(db, `championnatFeedIndex/${postId}`), {
+        sharesCount: currentCount + 1,
+        updatedAt: Date.now(),
+        updatedBy: state.user?.email || ADMIN_EMAIL
+      });
+
+      showAdminMsg("Partage validé et maintenant comptabilisé.", "ok");
+      await loadAllData();
+    }
+
+    async function rejectShareRequest(requestId){
+      const req = state.shareRequests?.[requestId];
+      if (!req) return;
+
+      await update(ref(db, `championnatShareRequests/${requestId}`), {
+        status: "rejected",
+        rejectedAt: Date.now(),
+        rejectedBy: state.user?.email || ADMIN_EMAIL
+      });
+
+      showAdminMsg("Demande de partage refusée.", "ok");
       await loadAllData();
     }
 
@@ -1888,6 +2031,28 @@
           }
         });
       });
+
+      document.querySelectorAll("[data-action='approve-share']").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          try{
+            await approveShareRequest(btn.dataset.id);
+          }catch(err){
+            console.error(err);
+            showAdminMsg("Impossible de valider ce partage.", "err");
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-action='reject-share']").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          try{
+            await rejectShareRequest(btn.dataset.id);
+          }catch(err){
+            console.error(err);
+            showAdminMsg("Impossible de refuser ce partage.", "err");
+          }
+        });
+      });
     }
 
     let lastScrollTop = 0;
@@ -1902,7 +2067,8 @@
       }
 
       const currentScroll = mainContent.scrollTop;
-            if (currentScroll <= 6) {
+
+      if (currentScroll <= 6) {
         topbar.classList.remove("topbar-hidden");
         document.body.classList.remove("topbar-collapsed");
       } else if (currentScroll > lastScrollTop + 4) {
