@@ -944,6 +944,16 @@
       color:#153861;
     }
 
+    .comment-link{
+      color:#153861;
+      text-decoration:none;
+    }
+
+    .comment-link:hover{
+      text-decoration:underline;
+      color:#145bd6;
+    }
+
     .comment-text{
       color:#4d657f;
       line-height:1.7;
@@ -1327,10 +1337,13 @@
       <a class="mobile-link" href="./faq.html">FAQ</a>
       <a class="mobile-link" href="./contact.html">Contact</a>
       <a class="mobile-link" href="./verify-certificate.html">Vérifier certificat</a>
+      <a class="mobile-link" href="./profile.html">Mon profil</a>
       <a class="mobile-link" id="mobileAuthLink" href="./login.html">Connexion</a>
       <a class="mobile-link" href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
       <a class="mobile-link" href="./login.html?redirect=jury.html">Jury</a>
       <a class="mobile-link" href="./login.html?redirect=competition-admin.html">Administration</a>
+      <a class="mobile-link" href="./competition-admin.html">Tableau de bord admin</a>
+      <a class="mobile-link" href="./competition-support-admin.html">Support admin</a>
     </div>
   </aside>
 
@@ -1348,10 +1361,13 @@
         <a class="nav-link" href="./faq.html"><span class="nav-dot blue"></span><span>FAQ</span></a>
         <a class="nav-link" href="./contact.html"><span class="nav-dot red"></span><span>Contact</span></a>
         <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
+        <a class="nav-link" href="./profile.html"><span class="nav-dot blue"></span><span>Mon profil</span></a>
         <a class="nav-link" id="desktopAuthLink" href="./login.html"><span class="nav-dot orange"></span><span id="desktopAuthLabel">Connexion</span></a>
         <a class="nav-link" href="./login.html?redirect=dashboard-candidat.html"><span class="nav-dot green"></span><span>Espace candidat</span></a>
         <a class="nav-link" href="./login.html?redirect=jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
         <a class="nav-link" href="./login.html?redirect=competition-admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
+        <a class="nav-link" href="./competition-admin.html"><span class="nav-dot red"></span><span>Tableau de bord admin</span></a>
+        <a class="nav-link" href="./competition-support-admin.html"><span class="nav-dot orange"></span><span>Support admin</span></a>
       </nav>
 
       <div class="sidebar-section-title">Rôle de cette page</div>
@@ -1437,6 +1453,7 @@
               <h2>Créer une publication</h2>
               <p>Texte, image, lien et aperçu avant envoi. Image compressée pour rester légère.</p>
             </div>
+
             <div class="panel-body">
               <div class="field">
                 <label for="postText">Texte</label>
@@ -1498,6 +1515,7 @@
               <h2>Filtrer le fil</h2>
               <p>Retrouve rapidement les publications utiles.</p>
             </div>
+
             <div class="panel-body">
               <div class="field">
                 <label for="searchInput">Recherche</label>
@@ -1734,8 +1752,10 @@
       return `./profile.html?uid=${encodeURIComponent(uid)}`;
     }
 
-    function safePublicText(v){
-      return escapeHtml(String(v || "").trim());
+    function commentProfileHref(comment){
+      const uid = String(comment.uid || "").trim();
+      if (!uid) return "./profile.html";
+      return `./profile.html?uid=${encodeURIComponent(uid)}`;
     }
 
     function avatarContent(post){
@@ -2157,14 +2177,7 @@
         createdAt: Date.now()
       });
 
-      await runTransaction(ref(db, `championnatFeedIndex/${postId}/sharesCount`), current => (current || 0) + 1);
-
-      if (state.posts[postId]) {
-        state.posts[postId].sharesCount = (state.posts[postId].sharesCount || 0) + 1;
-      }
-
-      alert("Demande de partage enregistrée. Elle reste interne au site jusqu’à validation.");
-      renderFeed();
+      alert("Demande de partage enregistrée. Elle restera sans comptage tant qu’elle n’est pas validée administrativement.");
     }
 
     async function registerView(postId){
@@ -2303,10 +2316,14 @@
         const canDelete = !!(state.user && (c.uid === state.user.uid || isAdmin(state.user)));
         const replyBoxId = `reply-box-${postId}-${c.id}`;
         const replyInputId = `reply-input-${postId}-${c.id}`;
+        const commentLink = state.user
+          ? `<a class="comment-link" href="${commentProfileHref(c)}">${escapeHtml(c.authorName || "Membre")}</a>`
+          : `${escapeHtml(c.authorName || "Membre")}`;
+
         return `
           <article class="comment-card" style="${parentId ? "margin-left:16px;" : ""}">
             <div class="comment-top">
-              <span class="comment-name">${escapeHtml(c.authorName || "Membre")}</span>
+              <span class="comment-name">${commentLink}</span>
               <span class="badge gray">${escapeHtml(formatDate(c.createdAt))}</span>
             </div>
             <div class="comment-text">${escapeHtml(c.text || "")}</div>
@@ -2393,7 +2410,7 @@
               <span class="stat-chip">👁️ ${post.viewsCount || 0} vues</span>
               <span class="stat-chip">❤️ ${post.likesCount || 0} likes</span>
               <span class="stat-chip">💬 ${post.commentsCount || 0} commentaires</span>
-              <span class="stat-chip">🔁 ${post.sharesCount || 0} partages demandés</span>
+              <span class="stat-chip">🔁 ${post.sharesCount || 0} partages validés</span>
             </div>
 
             <div class="post-actions">
@@ -2638,6 +2655,14 @@
             state.posts[id] = {
               ...state.posts[id],
               ...liveIndex[id]
+            };
+          } else {
+            state.posts[id] = {
+              ...state.posts[id],
+              likesCount: Number(state.posts[id].likesCount || 0),
+              commentsCount: Number(state.posts[id].commentsCount || 0),
+              viewsCount: Number(state.posts[id].viewsCount || 0),
+              sharesCount: Number(state.posts[id].sharesCount || 0)
             };
           }
         });
