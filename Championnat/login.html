@@ -787,7 +787,6 @@
 
     const allowedRedirects = new Set([
       "examen.html",
-      "admin.html",
       "jury.html",
       "dashboard-candidat.html",
       "competition.html",
@@ -805,7 +804,7 @@
 
     const redirectLabels = {
       "examen.html": "Vous vous connectez pour accéder à l’examen.",
-      "admin.html": "Vous vous connectez pour accéder à l’administration.",
+      "competition-admin.html": "Vous vous connectez pour accéder à l’administration.",
       "competition-admin.html": "Vous vous connectez pour accéder à l’administration du championnat.",
       "competition-support-admin.html": "Vous vous connectez pour accéder au support administration.",
       "jury.html": "Vous vous connectez pour accéder à l’espace jury.",
@@ -1187,7 +1186,7 @@
       const role = resolveRole(user, profile);
 
       if (requestedRedirect) {
-        if (role !== "admin" && (requestedRedirect === "admin.html" || requestedRedirect === "competition-admin.html" || requestedRedirect === "competition-support-admin.html")) {
+        if (role !== "admin" && (requestedRedirect === "competition-admin.html" || requestedRedirect === "competition-support-admin.html")) {
           if (role === "jury") {
             window.location.href = "./jury.html";
             return;
