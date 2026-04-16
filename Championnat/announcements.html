@@ -318,7 +318,7 @@
       color:#fff;
       position:relative;
       overflow:hidden;
-      background:linear-gradient(135deg, rgba(9,46,91,.98), rgba(123,97,255,.92), rgba(224,161,38,.86));
+      background:linear-gradient(135deg, #113d7d 0%, #4f46c6 48%, #d8a72f 100%);
       box-shadow:0 22px 42px rgba(9,46,91,.15);
     }
 
@@ -330,7 +330,7 @@
       border-radius:50%;
       right:-80px;
       top:-110px;
-      background:radial-gradient(circle, rgba(255,255,255,.18), transparent 70%);
+      background:radial-gradient(circle, rgba(255,255,255,.14), transparent 70%);
     }
 
     .hero-box h1{
@@ -340,11 +340,13 @@
       letter-spacing:-1px;
       position:relative;
       z-index:1;
+      color:#ffffff;
+      text-shadow:0 1px 1px rgba(0,0,0,.08);
     }
 
     .hero-box p{
       margin:0;
-      color:rgba(255,255,255,.92);
+      color:rgba(255,255,255,.96);
       line-height:1.78;
       font-size:15px;
       max-width:860px;
@@ -359,6 +361,13 @@
       margin-top:18px;
       position:relative;
       z-index:1;
+    }
+
+    .hero-meta .badge{
+      background:rgba(255,255,255,.14) !important;
+      color:#fff !important;
+      border-color:rgba(255,255,255,.20) !important;
+      backdrop-filter:blur(8px);
     }
 
     .hero-cup{
@@ -377,6 +386,10 @@
       grid-template-columns:var(--feed-left) minmax(0,1fr);
       gap:18px;
       align-items:start;
+    }
+
+    .feed-layout.feed-public{
+      grid-template-columns:1fr;
     }
 
     .stack{
@@ -494,6 +507,55 @@
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:10px;
+    }
+
+    .file-field{
+      display:grid;
+      gap:8px;
+    }
+
+    .file-picker{
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:10px;
+      align-items:center;
+    }
+
+    .file-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:0 16px;
+      border-radius:14px;
+      background:#f7fbff;
+      border:1px solid #dfeaf7;
+      color:#21466f;
+      font-weight:800;
+      cursor:pointer;
+      white-space:nowrap;
+      transition:.18s ease;
+    }
+
+    .file-btn:hover{ transform:translateY(-1px); }
+
+    .file-name{
+      min-height:48px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid #e6eef8;
+      background:#fff;
+      color:#60748c;
+      display:flex;
+      align-items:center;
+      font-size:14px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .real-file-input{
+      display:none;
     }
 
     .inline-note{
@@ -781,6 +843,12 @@
       border-color:rgba(24,195,74,.16);
     }
 
+    .action-btn[disabled]{
+      cursor:not-allowed;
+      opacity:.55;
+      transform:none;
+    }
+
     .comments-wrap{
       border-top:1px solid #edf2f8;
       padding:0 18px 18px;
@@ -832,24 +900,28 @@
       word-break:break-word;
     }
 
-    .profile-box{
+    .login-box{
       padding:18px;
       border-radius:18px;
       background:linear-gradient(135deg, rgba(47,140,255,.08), rgba(123,97,255,.08));
       border:1px solid rgba(123,97,255,.10);
     }
 
-    .profile-box h3{
+    .login-box h3{
       margin:0 0 8px;
       color:#12355e;
       font-size:18px;
     }
 
-    .profile-box p{
+    .login-box p{
       margin:0 0 14px;
       color:var(--muted);
       line-height:1.7;
       font-size:14px;
+    }
+
+    .gated-hidden{
+      display:none !important;
     }
 
     .empty{
@@ -1062,6 +1134,9 @@
       .post-actions{
         grid-template-columns:1fr;
       }
+      .file-picker{
+        grid-template-columns:1fr;
+      }
       .topbar{
         padding:0 10px;
       }
@@ -1175,7 +1250,7 @@
 
       <div class="sidebar-section-title">Rôle de cette page</div>
       <div class="sidebar-note">
-        Ici, les utilisateurs connectés avec email vérifié peuvent publier du texte, une image, un lien, liker, commenter et partager. La suppression d’une publication passe par une demande validable par l’admin.
+        Les visiteurs voient les publications publiées. Les comptes connectés avec email vérifié peuvent ensuite publier, aimer, commenter, partager et demander la suppression de leurs propres publications.
       </div>
     </aside>
 
@@ -1184,13 +1259,13 @@
         <div class="hero-box">
           <h1>Un espace vivant pour les publications du championnat</h1>
           <p>
-            Cette page devient le cœur communautaire du site : annonces, publications des membres, images, liens, commentaires, likes, partages et suivi des vues, tout en restant relié à l’administration du championnat.
+            Cette page devient le cœur communautaire du site : annonces, publications des membres, images, liens, commentaires, likes, partages et suivi des vues, tout en restant reliée à l’administration du championnat.
           </p>
           <div class="hero-meta">
-            <span class="badge gold">🏆 Coupe visible</span>
-            <span class="badge blue">Publications ouvertes</span>
-            <span class="badge purple">Admin prioritaire</span>
-            <span class="badge green">Communauté vérifiée</span>
+            <span class="badge">🏆 Coupe visible</span>
+            <span class="badge">Publications ouvertes</span>
+            <span class="badge">Admin prioritaire</span>
+            <span class="badge">Communauté vérifiée</span>
           </div>
         </div>
         <div class="hero-cup">🏆</div>
@@ -1215,42 +1290,43 @@
         </article>
       </section>
 
-      <section class="feed-layout">
-        <aside class="stack">
-          <section class="panel">
+      <section class="feed-layout" id="feedLayout">
+        <aside class="stack" id="leftTools">
+          <section class="panel" id="loginPanel">
             <div class="panel-head">
-              <h2>Profil minimum avant publication</h2>
-              <p>Quelques informations de base sont demandées avant publication pour garder un espace sérieux.</p>
+              <h2>Connexion requise</h2>
+              <p>Pour publier, liker, commenter ou partager, il faut être connecté avec email vérifié.</p>
             </div>
             <div class="panel-body">
-              <div class="profile-box">
-                <h3>Informations visibles</h3>
+              <div class="login-box">
+                <h3>Se connecter</h3>
                 <p>
-                  Nom public et petite présentation. Si elles manquent, le système te les demandera avant de publier.
+                  Tant que la personne n’est pas connectée, elle voit uniquement les publications déjà publiées.
                 </p>
 
                 <div class="field">
-                  <label for="profileName">Nom public</label>
-                  <input id="profileName" type="text" placeholder="Ton nom public" />
+                  <label for="loginEmail">Email</label>
+                  <input id="loginEmail" type="email" placeholder="adresse@email.com" />
                 </div>
 
                 <div class="field">
-                  <label for="profileTagline">Courte présentation</label>
-                  <input id="profileTagline" type="text" placeholder="Ex. Étudiant en chimie organique" />
+                  <label for="loginPassword">Mot de passe</label>
+                  <input id="loginPassword" type="password" placeholder="Mot de passe" />
                 </div>
 
                 <div class="btn-row">
-                  <button class="btn primary" id="saveProfileBtn" type="button">Enregistrer mon profil</button>
+                  <button class="btn primary" id="loginBtn" type="button">Connexion</button>
+                  <a class="btn soft" href="./login.html">Ouvrir login.html</a>
                 </div>
 
-                <div id="profileMsg" class="inline-note info show">
-                  Connecte-toi et vérifie ton email pour publier. La lecture reste ouverte à tous.
+                <div id="loginMsg" class="inline-note info show">
+                  Connecte-toi ici ou utilise la page de connexion du site.
                 </div>
               </div>
             </div>
           </section>
 
-          <section class="panel">
+          <section class="panel gated-hidden" id="composerPanel">
             <div class="panel-head">
               <h2>Créer une publication</h2>
               <p>Texte, image et lien. Publication autorisée aux comptes connectés avec email vérifié.</p>
@@ -1267,9 +1343,13 @@
                   <input id="postLink" type="url" placeholder="https://..." />
                 </div>
 
-                <div class="field">
-                  <label for="postImageFile">Photo</label>
-                  <input id="postImageFile" type="file" accept="image/*" />
+                <div class="field file-field">
+                  <label>Photo</label>
+                  <div class="file-picker">
+                    <label class="file-btn" for="postImageFile">Choisir un fichier</label>
+                    <div class="file-name" id="fileNameLabel">Aucun fichier choisi</div>
+                  </div>
+                  <input class="real-file-input" id="postImageFile" type="file" accept="image/*" />
                 </div>
               </div>
 
@@ -1295,7 +1375,7 @@
             </div>
           </section>
 
-          <section class="panel">
+          <section class="panel gated-hidden" id="filtersPanel">
             <div class="panel-head">
               <h2>Filtrer le fil</h2>
               <p>Retrouve rapidement les publications utiles.</p>
@@ -1333,8 +1413,8 @@
           <section class="panel">
             <div class="panel-head">
               <h2>Fil des publications</h2>
-              <p>
-                Tous les membres connectés avec email vérifié peuvent publier. Les likes, commentaires, vues et partages sont visibles. La suppression d’un post de l’utilisateur passe par une demande, validable par l’admin.
+              <p id="feedIntroText">
+                Les visiteurs voient les publications publiées. Après connexion avec email vérifié, les boutons publier, commenter, liker et partager deviennent actifs.
               </p>
             </div>
             <div class="panel-body">
@@ -1355,7 +1435,10 @@
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      onAuthStateChanged,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       ref,
       get,
@@ -1376,14 +1459,21 @@
     const mainContent = document.getElementById("mainContent");
     const statusText = document.getElementById("statusText");
 
-    const profileName = document.getElementById("profileName");
-    const profileTagline = document.getElementById("profileTagline");
-    const saveProfileBtn = document.getElementById("saveProfileBtn");
-    const profileMsg = document.getElementById("profileMsg");
+    const loginPanel = document.getElementById("loginPanel");
+    const composerPanel = document.getElementById("composerPanel");
+    const filtersPanel = document.getElementById("filtersPanel");
+    const feedLayout = document.getElementById("feedLayout");
+    const feedIntroText = document.getElementById("feedIntroText");
+
+    const loginEmail = document.getElementById("loginEmail");
+    const loginPassword = document.getElementById("loginPassword");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginMsg = document.getElementById("loginMsg");
 
     const postText = document.getElementById("postText");
     const postLink = document.getElementById("postLink");
     const postImageFile = document.getElementById("postImageFile");
+    const fileNameLabel = document.getElementById("fileNameLabel");
     const postCategory = document.getElementById("postCategory");
     const publishBtn = document.getElementById("publishBtn");
     const clearComposerBtn = document.getElementById("clearComposerBtn");
@@ -1484,14 +1574,20 @@
       return !!(state.user && state.user.emailVerified);
     }
 
-    function hasMinimumProfile(){
-      return !!(state.profile?.publicProfile?.name && state.profile?.publicProfile?.tagline);
+    function updateFileLabel(){
+      const file = postImageFile.files?.[0];
+      fileNameLabel.textContent = file ? file.name : "Aucun fichier choisi";
     }
 
     function applyUserHeader(){
       if (!state.user) {
         statusText.textContent = "Espace annonces";
-        showNote(profileMsg, "Connecte-toi et vérifie ton email pour publier. La lecture reste ouverte à tous.", "info");
+        loginPanel.classList.remove("gated-hidden");
+        composerPanel.classList.add("gated-hidden");
+        filtersPanel.classList.add("gated-hidden");
+        feedLayout.classList.add("feed-public");
+        feedIntroText.textContent = "Les visiteurs voient uniquement les publications publiées. Après connexion avec email vérifié, les boutons publier, commenter, liker et partager deviennent actifs.";
+        showNote(loginMsg, "Connecte-toi pour publier et interagir.", "info");
         return;
       }
 
@@ -1500,49 +1596,43 @@
       else if (role === "jury") statusText.textContent = "Jury connecté";
       else statusText.textContent = state.user.emailVerified ? "Membre vérifié" : "Email non vérifié";
 
-      if (state.profile?.publicProfile?.name) profileName.value = state.profile.publicProfile.name || "";
-      if (state.profile?.publicProfile?.tagline) profileTagline.value = state.profile.publicProfile.tagline || "";
-
       if (!state.user.emailVerified) {
-        showNote(profileMsg, "Ton compte est connecté, mais il faut vérifier ton email avant de publier, liker, commenter ou partager.", "err");
-      } else if (!hasMinimumProfile()) {
-        showNote(profileMsg, "Complète au minimum ton nom public et ta courte présentation avant de publier.", "info");
+        loginPanel.classList.remove("gated-hidden");
+        composerPanel.classList.add("gated-hidden");
+        filtersPanel.classList.add("gated-hidden");
+        feedLayout.classList.add("feed-public");
+        feedIntroText.textContent = "Ton compte est connecté mais ton email n’est pas encore vérifié. Les publications visibles restent accessibles en lecture.";
+        showNote(loginMsg, "Ton compte est connecté, mais il faut vérifier ton email avant de publier, liker, commenter ou partager.", "err");
       } else {
-        showNote(profileMsg, "Profil minimum prêt. Tu peux publier dans le fil.", "ok");
+        loginPanel.classList.add("gated-hidden");
+        composerPanel.classList.remove("gated-hidden");
+        filtersPanel.classList.remove("gated-hidden");
+        feedLayout.classList.remove("feed-public");
+        feedIntroText.textContent = "Les comptes connectés avec email vérifié peuvent publier, liker, commenter, partager et demander la suppression de leurs publications.";
       }
     }
 
-    async function saveProfileBasics(){
-      if (!state.user) {
-        showNote(profileMsg, "Connecte-toi d’abord.", "err");
+    async function doLogin(){
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
+
+      if (!email || !password) {
+        showNote(loginMsg, "Entre l’email et le mot de passe.", "err");
         return;
       }
 
-      const name = profileName.value.trim();
-      const tagline = profileTagline.value.trim();
+      loginBtn.disabled = true;
+      showNote(loginMsg, "Connexion en cours…", "info");
 
-      if (!name || !tagline) {
-        showNote(profileMsg, "Renseigne le nom public et la courte présentation.", "err");
-        return;
+      try{
+        await signInWithEmailAndPassword(auth, email, password);
+        showNote(loginMsg, "Connexion réussie.", "ok");
+      }catch(err){
+        console.error(err);
+        showNote(loginMsg, "Connexion impossible. Vérifie l’email et le mot de passe.", "err");
+      }finally{
+        loginBtn.disabled = false;
       }
-
-      await update(ref(db, `users/${state.user.uid}`), {
-        displayName: name,
-        updatedAt: Date.now(),
-        publicProfile: {
-          name,
-          tagline,
-          emailVerified: !!state.user.emailVerified
-        }
-      });
-
-      state.profile = {
-        ...(state.profile || {}),
-        displayName: name,
-        publicProfile: { name, tagline, emailVerified: !!state.user.emailVerified }
-      };
-
-      showNote(profileMsg, "Profil enregistré avec succès.", "ok");
     }
 
     function clearComposer(){
@@ -1550,6 +1640,7 @@
       postLink.value = "";
       postImageFile.value = "";
       postCategory.value = "information";
+      updateFileLabel();
       showNote(composerMsg, "Zone de publication réinitialisée.", "info");
     }
 
@@ -1591,10 +1682,6 @@
         showNote(composerMsg, "Il faut vérifier ton email avant de publier.", "err");
         return;
       }
-      if (!hasMinimumProfile()) {
-        showNote(composerMsg, "Complète d’abord le profil minimum à gauche.", "err");
-        return;
-      }
 
       const text = postText.value.trim();
       const link = postLink.value.trim();
@@ -1615,12 +1702,22 @@
           imageDataUrl = await resizeImageToDataUrl(imageFile);
         }
 
+        const authorName =
+          state.profile?.publicProfile?.name ||
+          state.profile?.displayName ||
+          state.user.displayName ||
+          (state.user.email ? state.user.email.split("@")[0] : "Membre");
+
+        const authorTagline =
+          state.profile?.publicProfile?.tagline ||
+          "Membre du championnat";
+
         const postRef = push(ref(db, "championnatPosts"));
         const payload = {
           authorUid: state.user.uid,
           authorEmail: state.user.email || "",
-          authorName: state.profile?.publicProfile?.name || state.profile?.displayName || state.user.displayName || "Membre",
-          authorTagline: state.profile?.publicProfile?.tagline || "",
+          authorName,
+          authorTagline,
           category,
           text,
           linkUrl: link,
@@ -1634,7 +1731,8 @@
           commentsCount: 0,
           viewsCount: 0,
           sharesCount: 0,
-          deleted: false
+          deleted: false,
+          status: "published"
         };
 
         await set(postRef, payload);
@@ -1683,10 +1781,16 @@
       const text = input.value.trim();
       if (!text) return;
 
+      const authorName =
+        state.profile?.publicProfile?.name ||
+        state.profile?.displayName ||
+        state.user.displayName ||
+        (state.user.email ? state.user.email.split("@")[0] : "Membre");
+
       const commentRef = push(ref(db, `championnatPostComments/${postId}`));
       await set(commentRef, {
         uid: state.user.uid,
-        authorName: state.profile?.publicProfile?.name || state.profile?.displayName || state.user.displayName || "Membre",
+        authorName,
         text,
         createdAt: Date.now()
       });
@@ -1747,7 +1851,7 @@
         senderUid: state.user.uid,
         senderEmail: state.user.email || "",
         senderRole: "member",
-        senderName: state.profile?.publicProfile?.name || state.user.displayName || "Membre",
+        senderName: post.authorName || "Membre",
         subject: "Demande de suppression publication",
         message: `Demande de suppression de la publication : ${String(post.text || "").slice(0, 180)}`,
         category: "other",
@@ -1776,12 +1880,12 @@
     }
 
     function getFilteredPosts(){
-      const query = searchInput.value.trim().toLowerCase();
-      const type = typeFilter.value;
+      const query = (searchInput?.value || "").trim().toLowerCase();
+      const type = typeFilter?.value || "all";
 
       let list = Object.entries(state.posts || {})
         .map(([id, value]) => ({ id, ...value }))
-        .filter(post => !post.deleted);
+        .filter(post => !post.deleted && post.status !== "archived");
 
       if (type !== "all") {
         list = list.filter(post => slugType(post.category) === type);
@@ -1839,6 +1943,7 @@
         const canRequestDelete = !!(state.user && state.user.uid === post.authorUid);
         const showApproveDelete = !!(isAdmin(state.user) && post.deleteRequested);
         const showPin = !!isAdmin(state.user);
+        const interactionsEnabled = canInteract();
 
         return `
           <article class="post-card" id="post-${post.id}">
@@ -1884,17 +1989,17 @@
             </div>
 
             <div class="post-actions">
-              <button class="action-btn ${liked ? "active" : ""}" data-like="${post.id}">❤️ ${liked ? "Liké" : "Liker"}</button>
-              <button class="action-btn green" data-toggle-comments="${post.id}">💬 Commenter</button>
-              <button class="action-btn" data-share="${post.id}">🔁 Partager</button>
-              <button class="action-btn" data-scroll-comments="${post.id}">🧾 Répondre</button>
+              <button class="action-btn ${liked ? "active" : ""}" data-like="${post.id}" ${interactionsEnabled ? "" : "disabled"}>❤️ ${liked ? "Liké" : "Liker"}</button>
+              <button class="action-btn green" data-toggle-comments="${post.id}" ${interactionsEnabled ? "" : "disabled"}>💬 Commenter</button>
+              <button class="action-btn" data-share="${post.id}" ${interactionsEnabled ? "" : "disabled"}>🔁 Partager</button>
+              <button class="action-btn" data-scroll-comments="${post.id}" ${interactionsEnabled ? "" : "disabled"}>🧾 Répondre</button>
               <button class="action-btn" data-copy-link="${post.id}">🔗 Lien</button>
             </div>
 
             <div class="comments-wrap" id="comments-wrap-${post.id}">
               <div class="comment-form">
-                <input id="comment-input-${post.id}" type="text" placeholder="Écrire un commentaire..." />
-                <button class="btn primary" data-comment="${post.id}" type="button">Envoyer</button>
+                <input id="comment-input-${post.id}" type="text" placeholder="Écrire un commentaire..." ${interactionsEnabled ? "" : "disabled"} />
+                <button class="btn primary" data-comment="${post.id}" type="button" ${interactionsEnabled ? "" : "disabled"}>Envoyer</button>
               </div>
 
               <div class="comment-list">
@@ -1936,13 +2041,14 @@
       document.querySelectorAll("[data-toggle-comments]").forEach(btn => {
         btn.addEventListener("click", () => {
           const wrap = document.getElementById(`comments-wrap-${btn.dataset.toggleComments}`);
-          wrap.classList.toggle("show");
+          if (wrap) wrap.classList.toggle("show");
         });
       });
 
       document.querySelectorAll("[data-scroll-comments]").forEach(btn => {
         btn.addEventListener("click", () => {
           const wrap = document.getElementById(`comments-wrap-${btn.dataset.scrollComments}`);
+          if (!wrap) return;
           wrap.classList.add("show");
           const input = document.getElementById(`comment-input-${btn.dataset.scrollComments}`);
           input?.focus();
@@ -2027,9 +2133,15 @@
     }
 
     function bindStaticEvents(){
-      saveProfileBtn.addEventListener("click", () => saveProfileBasics().catch(console.error));
+      loginBtn.addEventListener("click", () => doLogin().catch(console.error));
+      loginPassword.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") doLogin().catch(console.error);
+      });
+
       publishBtn.addEventListener("click", () => createPost().catch(console.error));
       clearComposerBtn.addEventListener("click", clearComposer);
+
+      postImageFile.addEventListener("change", updateFileLabel);
 
       searchInput.addEventListener("input", renderFeed);
       typeFilter.addEventListener("change", renderFeed);
@@ -2070,6 +2182,8 @@
         }
         closeMenu();
       });
+
+      updateFileLabel();
     }
 
     function watchPosts(){
@@ -2091,6 +2205,23 @@
         state.likes = snap.exists() ? snap.val() : {};
         renderFeed();
       });
+    }
+
+    async function registerView(postId){
+      const viewerKey = state.user?.uid || state.visitorKey;
+      const viewRef = ref(db, `championnatPostViews/${postId}/${viewerKey}`);
+      const seenKey = `${postId}_${viewerKey}`;
+
+      if (state.seenPosts.has(seenKey)) return;
+
+      const snap = await get(viewRef);
+      if (!snap.exists()) {
+        await set(viewRef, { viewedAt: Date.now() });
+        await runTransaction(ref(db, `championnatPosts/${postId}/viewsCount`), current => (current || 0) + 1);
+      }
+
+      state.seenPosts.add(seenKey);
+      sessionStorage.setItem("champSeenPosts", JSON.stringify([...state.seenPosts]));
     }
 
     function bootAuth(){
