@@ -276,6 +276,7 @@
     .nav-dot.purple{ background:#b29bff; }
     .nav-dot.orange{ background:#ffb347; }
     .nav-dot.pink{ background:#ff7cc7; }
+    .nav-dot.blue{ background:#88bfff; }
 
     .sidebar-note{
       margin-top:8px;
@@ -691,6 +692,7 @@
       background:linear-gradient(135deg,var(--blue),var(--purple));
       box-shadow:0 10px 18px rgba(47,140,255,.16);
       flex:0 0 auto;
+      text-decoration:none;
     }
 
     .author-meta{
@@ -704,6 +706,16 @@
       font-weight:800;
       color:#102f59;
       word-break:break-word;
+    }
+
+    .author-link{
+      color:#102f59;
+      text-decoration:none;
+    }
+
+    .author-link:hover{
+      text-decoration:underline;
+      color:#145bd6;
     }
 
     .author-sub{
@@ -1221,7 +1233,7 @@
       <a class="mobile-link" href="./faq.html">FAQ</a>
       <a class="mobile-link" href="./contact.html">Contact</a>
       <a class="mobile-link" href="./verify-certificate.html">Vérifier certificat</a>
-      <a class="mobile-link" href="./login.html">Connexion</a>
+      <a class="mobile-link" id="mobileAuthLink" href="./login.html">Connexion</a>
       <a class="mobile-link" href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
       <a class="mobile-link" href="./login.html?redirect=jury.html">Jury</a>
       <a class="mobile-link" href="./login.html?redirect=admin.html">Administration</a>
@@ -1242,7 +1254,7 @@
         <a class="nav-link" href="./faq.html"><span class="nav-dot blue"></span><span>FAQ</span></a>
         <a class="nav-link" href="./contact.html"><span class="nav-dot red"></span><span>Contact</span></a>
         <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
-        <a class="nav-link" href="./login.html"><span class="nav-dot orange"></span><span>Connexion</span></a>
+        <a class="nav-link" id="desktopAuthLink" href="./login.html"><span class="nav-dot orange"></span><span id="desktopAuthLabel">Connexion</span></a>
         <a class="nav-link" href="./login.html?redirect=dashboard-candidat.html"><span class="nav-dot green"></span><span>Espace candidat</span></a>
         <a class="nav-link" href="./login.html?redirect=jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
         <a class="nav-link" href="./login.html?redirect=admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
@@ -1250,21 +1262,21 @@
 
       <div class="sidebar-section-title">Rôle de cette page</div>
       <div class="sidebar-note">
-        Les visiteurs voient les publications publiées. Les comptes connectés avec email vérifié peuvent ensuite publier, aimer, commenter, partager et demander la suppression de leurs propres publications.
+        Les visiteurs voient les annonces et publications visibles. Les comptes déjà connectés avec email vérifié accèdent directement aux interactions, aux publications et aux profils.
       </div>
     </aside>
 
     <main class="content" id="mainContent">
       <section class="hero">
         <div class="hero-box">
-          <h1>Un espace vivant pour les publications du championnat</h1>
+          <h1>Un espace vivant pour les annonces du championnat</h1>
           <p>
-            Cette page devient le cœur communautaire du site : annonces, publications des membres, images, liens, commentaires, likes, partages et suivi des vues, tout en restant reliée à l’administration du championnat.
+            Cette page rassemble les publications de la communauté et les annonces publiées par l’administration du championnat, avec likes, commentaires, partages et accès aux profils quand on est connecté.
           </p>
           <div class="hero-meta">
-            <span class="badge">🏆 Coupe visible</span>
+            <span class="badge">🏆 Annonces officielles</span>
             <span class="badge">Publications ouvertes</span>
-            <span class="badge">Admin prioritaire</span>
+            <span class="badge">Profils accessibles</span>
             <span class="badge">Communauté vérifiée</span>
           </div>
         </div>
@@ -1295,13 +1307,13 @@
           <section class="panel" id="loginPanel">
             <div class="panel-head">
               <h2>Connexion requise</h2>
-              <p>Pour publier, liker, commenter ou partager, il faut être connecté avec email vérifié.</p>
+              <p>Pour publier, aimer, commenter ou partager, il faut être connecté avec email vérifié.</p>
             </div>
             <div class="panel-body">
               <div class="login-box">
                 <h3>Se connecter</h3>
                 <p>
-                  Tant que la personne n’est pas connectée, elle voit uniquement les publications déjà publiées.
+                  Les visiteurs voient les publications déjà publiées. Dès que la connexion est active, les interactions deviennent disponibles.
                 </p>
 
                 <div class="field">
@@ -1316,11 +1328,11 @@
 
                 <div class="btn-row">
                   <button class="btn primary" id="loginBtn" type="button">Connexion</button>
-                  <a class="btn soft" href="./login.html">Ouvrir login.html</a>
+                  <a class="btn soft" href="./login.html" id="loginPageBtn">Connexion</a>
                 </div>
 
                 <div id="loginMsg" class="inline-note info show">
-                  Connecte-toi ici ou utilise la page de connexion du site.
+                  Connecte-toi ici ou via la page de connexion du site.
                 </div>
               </div>
             </div>
@@ -1414,7 +1426,7 @@
             <div class="panel-head">
               <h2>Fil des publications</h2>
               <p id="feedIntroText">
-                Les visiteurs voient les publications publiées. Après connexion avec email vérifié, les boutons publier, commenter, liker et partager deviennent actifs.
+                Les visiteurs voient les annonces et publications visibles. Après connexion avec email vérifié, publier, commenter, aimer, partager et ouvrir les profils deviennent actifs.
               </p>
             </div>
             <div class="panel-body">
@@ -1428,7 +1440,7 @@
 
       <div class="page-footer">
         <strong>Championnat de Chimie</strong>
-        Tous droits réservés © 2026 — Fil communautaire, publications, annonces et interactions du championnat.
+        Tous droits réservés © 2026 — Fil communautaire, annonces officielles et interactions du championnat.
       </div>
     </main>
   </div>
@@ -1452,6 +1464,29 @@
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
 
+    const POST_SOURCES = [
+      {
+        key: "community",
+        path: "championnatPosts",
+        origin: "community"
+      },
+      {
+        key: "competition",
+        path: "competitionAnnouncements",
+        origin: "competition"
+      },
+      {
+        key: "competitionAdmin",
+        path: "competitionAdminAnnouncements",
+        origin: "competition"
+      },
+      {
+        key: "challenge",
+        path: "challengeAnnouncements",
+        origin: "competition"
+      }
+    ];
+
     const menuBtn = document.getElementById("menuBtn");
     const mobileMenu = document.getElementById("mobileMenu");
     const mobileOverlay = document.getElementById("mobileOverlay");
@@ -1469,6 +1504,7 @@
     const loginPassword = document.getElementById("loginPassword");
     const loginBtn = document.getElementById("loginBtn");
     const loginMsg = document.getElementById("loginMsg");
+    const loginPageBtn = document.getElementById("loginPageBtn");
 
     const postText = document.getElementById("postText");
     const postLink = document.getElementById("postLink");
@@ -1489,9 +1525,14 @@
     const statViews = document.getElementById("statViews");
     const feedList = document.getElementById("feedList");
 
+    const desktopAuthLink = document.getElementById("desktopAuthLink");
+    const desktopAuthLabel = document.getElementById("desktopAuthLabel");
+    const mobileAuthLink = document.getElementById("mobileAuthLink");
+
     const state = {
       user: null,
       profile: null,
+      sourcePosts: {},
       posts: {},
       comments: {},
       likes: {},
@@ -1574,20 +1615,62 @@
       return !!(state.user && state.user.emailVerified);
     }
 
+    function getCompositeId(sourceKey, rawId){
+      return `${sourceKey}__${rawId}`;
+    }
+
+    function getViewerKey(){
+      return state.user?.uid || state.visitorKey;
+    }
+
+    function isOwnPost(post){
+      return !!(state.user && state.user.uid === post.authorUid);
+    }
+
+    function canManagePost(post){
+      return !!(isAdmin(state.user) && post.manageable !== false);
+    }
+
+    function authorProfileHref(post){
+      const uid = String(post.authorUid || "").trim();
+      if (!uid) return "./profile.html";
+      return `./profile.html?uid=${encodeURIComponent(uid)}`;
+    }
+
+    function applyAuthLinks(){
+      if (state.user) {
+        desktopAuthLink.href = "./profile.html";
+        desktopAuthLabel.textContent = "Mon compte";
+        mobileAuthLink.href = "./profile.html";
+        mobileAuthLink.textContent = "Mon compte";
+        loginPageBtn.href = "./profile.html";
+        loginPageBtn.textContent = "Mon compte";
+      } else {
+        desktopAuthLink.href = "./login.html";
+        desktopAuthLabel.textContent = "Connexion";
+        mobileAuthLink.href = "./login.html";
+        mobileAuthLink.textContent = "Connexion";
+        loginPageBtn.href = "./login.html";
+        loginPageBtn.textContent = "Connexion";
+      }
+    }
+
     function updateFileLabel(){
       const file = postImageFile.files?.[0];
       fileNameLabel.textContent = file ? file.name : "Aucun fichier choisi";
     }
 
     function applyUserHeader(){
+      applyAuthLinks();
+
       if (!state.user) {
         statusText.textContent = "Espace annonces";
         loginPanel.classList.remove("gated-hidden");
         composerPanel.classList.add("gated-hidden");
         filtersPanel.classList.add("gated-hidden");
         feedLayout.classList.add("feed-public");
-        feedIntroText.textContent = "Les visiteurs voient uniquement les publications publiées. Après connexion avec email vérifié, les boutons publier, commenter, liker et partager deviennent actifs.";
-        showNote(loginMsg, "Connecte-toi pour publier et interagir.", "info");
+        feedIntroText.textContent = "Les visiteurs voient uniquement les annonces et publications visibles. Après connexion avec email vérifié, les interactions et les profils deviennent accessibles.";
+        showNote(loginMsg, "Connecte-toi pour publier, interagir et ouvrir les profils.", "info");
         return;
       }
 
@@ -1602,13 +1685,13 @@
         filtersPanel.classList.add("gated-hidden");
         feedLayout.classList.add("feed-public");
         feedIntroText.textContent = "Ton compte est connecté mais ton email n’est pas encore vérifié. Les publications visibles restent accessibles en lecture.";
-        showNote(loginMsg, "Ton compte est connecté, mais il faut vérifier ton email avant de publier, liker, commenter ou partager.", "err");
+        showNote(loginMsg, "Ton compte est connecté, mais il faut vérifier ton email avant de publier, aimer, commenter ou partager.", "err");
       } else {
         loginPanel.classList.add("gated-hidden");
         composerPanel.classList.remove("gated-hidden");
         filtersPanel.classList.remove("gated-hidden");
         feedLayout.classList.remove("feed-public");
-        feedIntroText.textContent = "Les comptes connectés avec email vérifié peuvent publier, liker, commenter, partager et demander la suppression de leurs publications.";
+        feedIntroText.textContent = "Les comptes connectés avec email vérifié peuvent publier, aimer, commenter, partager et ouvrir les profils.";
       }
     }
 
@@ -1732,7 +1815,9 @@
           viewsCount: 0,
           sharesCount: 0,
           deleted: false,
-          status: "published"
+          status: "published",
+          sourceLabel: "Communauté",
+          manageable: true
         };
 
         await set(postRef, payload);
@@ -1748,12 +1833,12 @@
 
     async function toggleLike(postId){
       if (!canInteract()) {
-        alert("Connecte-toi avec un email vérifié pour liker.");
+        alert("Connecte-toi avec un email vérifié pour aimer.");
         return;
       }
 
       const likeRef = ref(db, `championnatPostLikes/${postId}/${state.user.uid}`);
-      const postLikesCountRef = ref(db, `championnatPosts/${postId}/likesCount`);
+      const postLikesCountRef = ref(db, `championnatFeedIndex/${postId}/likesCount`);
 
       const snap = await get(likeRef);
       const exists = snap.exists();
@@ -1768,6 +1853,11 @@
           createdAt: Date.now()
         });
         await runTransaction(postLikesCountRef, current => (current || 0) + 1);
+      }
+
+      if (state.posts[postId]) {
+        state.posts[postId].likesCount = Math.max(0, (state.posts[postId].likesCount || 0) + (exists ? -1 : 1));
+        renderFeed();
       }
     }
 
@@ -1795,8 +1885,14 @@
         createdAt: Date.now()
       });
 
-      await runTransaction(ref(db, `championnatPosts/${postId}/commentsCount`), current => (current || 0) + 1);
+      await runTransaction(ref(db, `championnatFeedIndex/${postId}/commentsCount`), current => (current || 0) + 1);
+
+      if (state.posts[postId]) {
+        state.posts[postId].commentsCount = (state.posts[postId].commentsCount || 0) + 1;
+      }
+
       input.value = "";
+      renderFeed();
     }
 
     async function incrementShare(postId){
@@ -1805,7 +1901,11 @@
         return;
       }
 
-      await runTransaction(ref(db, `championnatPosts/${postId}/sharesCount`), current => (current || 0) + 1);
+      await runTransaction(ref(db, `championnatFeedIndex/${postId}/sharesCount`), current => (current || 0) + 1);
+
+      if (state.posts[postId]) {
+        state.posts[postId].sharesCount = (state.posts[postId].sharesCount || 0) + 1;
+      }
 
       const shareUrl = `${location.origin}${location.pathname}#post-${postId}`;
       try{
@@ -1818,10 +1918,12 @@
       }catch(err){
         console.error(err);
       }
+
+      renderFeed();
     }
 
     async function registerView(postId){
-      const viewerKey = state.user?.uid || state.visitorKey;
+      const viewerKey = getViewerKey();
       const viewRef = ref(db, `championnatPostViews/${postId}/${viewerKey}`);
       const seenKey = `${postId}_${viewerKey}`;
 
@@ -1830,7 +1932,10 @@
       const snap = await get(viewRef);
       if (!snap.exists()) {
         await set(viewRef, { viewedAt: Date.now() });
-        await runTransaction(ref(db, `championnatPosts/${postId}/viewsCount`), current => (current || 0) + 1);
+        await runTransaction(ref(db, `championnatFeedIndex/${postId}/viewsCount`), current => (current || 0) + 1);
+        if (state.posts[postId]) {
+          state.posts[postId].viewsCount = (state.posts[postId].viewsCount || 0) + 1;
+        }
       }
 
       state.seenPosts.add(seenKey);
@@ -1838,9 +1943,14 @@
     }
 
     async function requestDelete(postId, post){
-      if (!state.user || state.user.uid !== post.authorUid) return;
+      if (!isOwnPost(post)) return;
 
-      await update(ref(db, `championnatPosts/${postId}`), {
+      if (post.sourceKey !== "community") {
+        alert("La demande de suppression sera gérée depuis l’administration de la publication.");
+        return;
+      }
+
+      await update(ref(db, `${post.sourcePath}/${post.rawId}`), {
         deleteRequested: true,
         deleteRequestAt: Date.now(),
         deleteRequestBy: state.user.email || ""
@@ -1856,7 +1966,6 @@
         message: `Demande de suppression de la publication : ${String(post.text || "").slice(0, 180)}`,
         category: "other",
         status: "new",
-        sourcePage: "announcements.html",
         relatedPostId: postId,
         createdAt: Date.now(),
         updatedAt: Date.now()
@@ -1864,28 +1973,64 @@
     }
 
     async function approveDelete(postId){
-      if (!isAdmin(state.user)) return;
-      await remove(ref(db, `championnatPosts/${postId}`));
+      const post = state.posts[postId];
+      if (!post || !canManagePost(post)) return;
+
+      await remove(ref(db, `${post.sourcePath}/${post.rawId}`));
       await remove(ref(db, `championnatPostComments/${postId}`));
       await remove(ref(db, `championnatPostLikes/${postId}`));
       await remove(ref(db, `championnatPostViews/${postId}`));
+      await remove(ref(db, `championnatFeedIndex/${postId}`));
     }
 
     async function togglePin(postId, currentPinned){
-      if (!isAdmin(state.user)) return;
-      await update(ref(db, `championnatPosts/${postId}`), {
+      const post = state.posts[postId];
+      if (!post || !canManagePost(post)) return;
+
+      await update(ref(db, `${post.sourcePath}/${post.rawId}`), {
         pinned: !currentPinned,
         updatedAt: Date.now()
       });
+    }
+
+    function rebuildMergedPosts(){
+      const merged = {};
+
+      POST_SOURCES.forEach(source => {
+        const bucket = state.sourcePosts[source.key] || {};
+        Object.entries(bucket).forEach(([rawId, value]) => {
+          if (!value || typeof value !== "object") return;
+
+          const compositeId = getCompositeId(source.key, rawId);
+          const indexNode = state.posts[compositeId] || {};
+          merged[compositeId] = {
+            ...value,
+            ...indexNode,
+            id: compositeId,
+            rawId,
+            sourceKey: source.key,
+            sourcePath: source.path,
+            origin: source.origin,
+            sourceLabel: value.sourceLabel || (source.origin === "competition" ? "Annonce officielle" : "Communauté"),
+            manageable: value.manageable !== false,
+            likesCount: Number(indexNode.likesCount ?? value.likesCount ?? 0),
+            commentsCount: Number(indexNode.commentsCount ?? value.commentsCount ?? 0),
+            viewsCount: Number(indexNode.viewsCount ?? value.viewsCount ?? 0),
+            sharesCount: Number(indexNode.sharesCount ?? value.sharesCount ?? 0)
+          };
+        });
+      });
+
+      state.posts = merged;
+      renderFeed();
     }
 
     function getFilteredPosts(){
       const query = (searchInput?.value || "").trim().toLowerCase();
       const type = typeFilter?.value || "all";
 
-      let list = Object.entries(state.posts || {})
-        .map(([id, value]) => ({ id, ...value }))
-        .filter(post => !post.deleted && post.status !== "archived");
+      let list = Object.values(state.posts || {})
+        .filter(post => !post.deleted && post.status !== "archived" && post.status !== "draft");
 
       if (type !== "all") {
         list = list.filter(post => slugType(post.category) === type);
@@ -1906,12 +2051,13 @@
           String(post.text || "").toLowerCase().includes(query) ||
           String(post.authorName || "").toLowerCase().includes(query) ||
           String(post.linkUrl || "").toLowerCase().includes(query) ||
+          String(post.sourceLabel || "").toLowerCase().includes(query) ||
           humanType(post.category).toLowerCase().includes(query)
         );
       }
 
       list.sort((a,b) => {
-        if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+        if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
         return (b.createdAt || 0) - (a.createdAt || 0);
       });
 
@@ -1920,9 +2066,9 @@
 
     function renderStats(posts){
       statPosts.textContent = posts.length;
-      statLikes.textContent = posts.reduce((s,p) => s + (p.likesCount || 0), 0);
-      statComments.textContent = posts.reduce((s,p) => s + (p.commentsCount || 0), 0);
-      statViews.textContent = posts.reduce((s,p) => s + (p.viewsCount || 0), 0);
+      statLikes.textContent = posts.reduce((s,p) => s + (Number(p.likesCount) || 0), 0);
+      statComments.textContent = posts.reduce((s,p) => s + (Number(p.commentsCount) || 0), 0);
+      statViews.textContent = posts.reduce((s,p) => s + (Number(p.viewsCount) || 0), 0);
     }
 
     function renderFeed(){
@@ -1940,23 +2086,31 @@
           .sort((a,b) => (a.createdAt || 0) - (b.createdAt || 0));
 
         const liked = !!(state.user && state.likes?.[post.id] && state.likes[post.id][state.user.uid]);
-        const canRequestDelete = !!(state.user && state.user.uid === post.authorUid);
-        const showApproveDelete = !!(isAdmin(state.user) && post.deleteRequested);
-        const showPin = !!isAdmin(state.user);
+        const canRequestDelete = !!(isOwnPost(post) && post.sourceKey === "community");
+        const showApproveDelete = !!(canManagePost(post) && post.deleteRequested);
+        const showPin = !!canManagePost(post);
         const interactionsEnabled = canInteract();
+        const profileHref = authorProfileHref(post);
+        const avatarTag = state.user
+          ? `<a class="avatar" href="${profileHref}" title="Ouvrir le profil">${escapeHtml(initials(post.authorName))}</a>`
+          : `<div class="avatar">${escapeHtml(initials(post.authorName))}</div>`;
+        const authorTag = state.user
+          ? `<a class="author-link" href="${profileHref}">${escapeHtml(post.authorName || "Membre")}</a>`
+          : `${escapeHtml(post.authorName || "Membre")}`;
 
         return `
           <article class="post-card" id="post-${post.id}">
             <div class="post-head">
               <div class="post-author">
-                <div class="avatar">${escapeHtml(initials(post.authorName))}</div>
+                ${avatarTag}
                 <div class="author-meta">
-                  <div class="author-name">${escapeHtml(post.authorName || "Membre")}</div>
+                  <div class="author-name">${authorTag}</div>
                   <div class="author-sub">
                     <span>${escapeHtml(post.authorTagline || "Membre du championnat")}</span>
                     <span>•</span>
                     <span>${escapeHtml(formatDate(post.createdAt))}</span>
-                    ${post.emailVerified ? `<span>•</span><span class="badge green">Email vérifié</span>` : ``}
+                    <span class="badge ${post.origin === "competition" ? "gold" : "blue"}">${escapeHtml(post.sourceLabel || "Communauté")}</span>
+                    ${post.emailVerified ? `<span class="badge green">Email vérifié</span>` : ``}
                     ${post.pinned ? `<span class="badge gold">Épinglé</span>` : ``}
                     ${post.deleteRequested ? `<span class="badge red">Suppression demandée</span>` : ``}
                     <span class="badge ${badgeClass(post.category)}">${escapeHtml(humanType(post.category))}</span>
@@ -1989,7 +2143,7 @@
             </div>
 
             <div class="post-actions">
-              <button class="action-btn ${liked ? "active" : ""}" data-like="${post.id}" ${interactionsEnabled ? "" : "disabled"}>❤️ ${liked ? "Liké" : "Liker"}</button>
+              <button class="action-btn ${liked ? "active" : ""}" data-like="${post.id}" ${interactionsEnabled ? "" : "disabled"}>❤️ ${liked ? "Aimé" : "Aimer"}</button>
               <button class="action-btn green" data-toggle-comments="${post.id}" ${interactionsEnabled ? "" : "disabled"}>💬 Commenter</button>
               <button class="action-btn" data-share="${post.id}" ${interactionsEnabled ? "" : "disabled"}>🔁 Partager</button>
               <button class="action-btn" data-scroll-comments="${post.id}" ${interactionsEnabled ? "" : "disabled"}>🧾 Répondre</button>
@@ -2186,10 +2340,12 @@
       updateFileLabel();
     }
 
-    function watchPosts(){
-      onValue(ref(db, "championnatPosts"), snap => {
-        state.posts = snap.exists() ? snap.val() : {};
-        renderFeed();
+    function watchPostSources(){
+      POST_SOURCES.forEach(source => {
+        onValue(ref(db, source.path), snap => {
+          state.sourcePosts[source.key] = snap.exists() ? snap.val() : {};
+          rebuildMergedPosts();
+        });
       });
     }
 
@@ -2207,21 +2363,19 @@
       });
     }
 
-    async function registerView(postId){
-      const viewerKey = state.user?.uid || state.visitorKey;
-      const viewRef = ref(db, `championnatPostViews/${postId}/${viewerKey}`);
-      const seenKey = `${postId}_${viewerKey}`;
-
-      if (state.seenPosts.has(seenKey)) return;
-
-      const snap = await get(viewRef);
-      if (!snap.exists()) {
-        await set(viewRef, { viewedAt: Date.now() });
-        await runTransaction(ref(db, `championnatPosts/${postId}/viewsCount`), current => (current || 0) + 1);
-      }
-
-      state.seenPosts.add(seenKey);
-      sessionStorage.setItem("champSeenPosts", JSON.stringify([...state.seenPosts]));
+    function watchFeedIndex(){
+      onValue(ref(db, "championnatFeedIndex"), snap => {
+        const liveIndex = snap.exists() ? snap.val() : {};
+        Object.keys(state.posts).forEach(id => {
+          if (liveIndex[id]) {
+            state.posts[id] = {
+              ...state.posts[id],
+              ...liveIndex[id]
+            };
+          }
+        });
+        renderFeed();
+      });
     }
 
     function bootAuth(){
@@ -2245,9 +2399,10 @@
 
     bindStaticEvents();
     bootAuth();
-    watchPosts();
+    watchPostSources();
     watchComments();
     watchLikes();
+    watchFeedIndex();
   </script>
 </body>
 </html>
