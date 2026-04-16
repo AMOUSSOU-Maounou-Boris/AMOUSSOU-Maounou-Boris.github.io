@@ -168,7 +168,11 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
+      transition:.16s ease;
     }
+
+    .home-btn:hover{ transform:translateY(-1px); }
+    .home-btn:active{ transform:scale(.97); }
 
     .menu-btn{
       width:40px;
@@ -183,7 +187,11 @@
       position:relative;
       box-shadow:var(--shadow);
       flex:0 0 auto;
+      transition:.16s ease;
     }
+
+    .menu-btn:hover{ transform:translateY(-1px); }
+    .menu-btn:active{ transform:scale(.96); }
 
     .menu-btn span,
     .menu-btn::before,
@@ -255,6 +263,7 @@
     }
 
     .nav-link:hover{ background:rgba(255,255,255,.08); }
+    .nav-link:active{ transform:scale(.985); }
 
     .nav-link.active{
       background:rgba(255,159,26,.20);
@@ -337,15 +346,21 @@
       font-weight:800;
       font-size:14px;
       cursor:pointer;
-      transition:.18s ease;
+      transition:.16s ease;
       text-decoration:none;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       min-width:160px;
+      position:relative;
     }
 
     .head-btn:hover{ transform:translateY(-1px); }
+    .head-btn:active{ transform:scale(.97); }
+    .head-btn.is-pressed{
+      box-shadow:inset 0 2px 8px rgba(0,0,0,.12);
+      transform:scale(.98);
+    }
 
     .head-btn.primary{
       color:#fff;
@@ -407,8 +422,9 @@
     .mini-card p{
       color:var(--muted);
       line-height:1.7;
-      font-size:14px;
+      font-size:22px;
       margin:0;
+      font-weight:800;
     }
 
     .grid-main{
@@ -562,9 +578,17 @@
       padding:12px 14px;
       font-weight:800;
       font-size:13px;
-      transition:.18s ease;
+      transition:.16s ease;
       width:100%;
       text-align:left;
+      position:relative;
+    }
+
+    .tool-btn:hover{ transform:translateY(-1px); }
+    .tool-btn:active{ transform:scale(.98); }
+    .tool-btn.is-active{
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.55), 0 8px 18px rgba(13,37,71,.10);
+      transform:translateY(-1px);
     }
 
     .tool-btn.blue{
@@ -598,21 +622,22 @@
       border-radius:14px;
       background:#f9fbfe;
       border:1px solid var(--line-soft);
+      transition:.16s ease;
     }
 
-    .list-card:nth-child(3n+1){
-      background:linear-gradient(180deg,#fff,#fff8f8);
-      border-color:#ffdede;
+    .list-card:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 24px rgba(13,37,71,.06);
     }
 
-    .list-card:nth-child(3n+2){
-      background:linear-gradient(180deg,#fff,#fffaf3);
-      border-color:#ffe7c6;
+    .list-card.status-new{
+      border-left:5px solid var(--red);
     }
-
-    .list-card:nth-child(3n+3){
-      background:linear-gradient(180deg,#fff,#faf7ff);
-      border-color:#eadfff;
+    .list-card.status-in_progress{
+      border-left:5px solid var(--orange);
+    }
+    .list-card.status-done{
+      border-left:5px solid var(--green);
     }
 
     .list-card strong{
@@ -629,11 +654,26 @@
       line-height:1.65;
     }
 
+    .message-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin:10px 0 8px;
+    }
+
+    .message-body{
+      margin-top:8px;
+      color:#12355e;
+      font-size:13px;
+      line-height:1.72;
+      white-space:pre-wrap;
+    }
+
     .list-actions{
       display:flex;
       flex-wrap:wrap;
       gap:8px;
-      margin-top:10px;
+      margin-top:12px;
     }
 
     .mini-btn{
@@ -643,7 +683,14 @@
       padding:10px 12px;
       font-weight:800;
       font-size:12px;
-      transition:.18s ease;
+      transition:.16s ease;
+    }
+
+    .mini-btn:hover{ transform:translateY(-1px); }
+    .mini-btn:active{ transform:scale(.97); }
+    .mini-btn.is-current{
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);
+      opacity:1;
     }
 
     .mini-btn.blue{
@@ -665,6 +712,40 @@
     .mini-btn.purple{
       background:rgba(123,97,255,.12);
       color:#5d46c7;
+    }
+
+    .inbox-groups{
+      display:grid;
+      gap:18px;
+    }
+
+    .group-block{
+      display:grid;
+      gap:10px;
+    }
+
+    .group-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      background:linear-gradient(180deg,#fff,#fbfcff);
+      border:1px solid var(--line-soft);
+      color:#12355e;
+      font-size:14px;
+      font-weight:800;
+    }
+
+    .group-count{
+      font-size:12px;
+      font-weight:800;
+      color:#6a7d95;
+      background:#f3f7fc;
+      border:1px solid #e0e9f3;
+      border-radius:999px;
+      padding:5px 9px;
     }
 
     .page-footer{
@@ -1022,8 +1103,8 @@
             </div>
 
             <div class="panel-body">
-              <div class="toolbar">
-                <button class="tool-btn blue" data-filter="all" type="button">Tous les messages</button>
+              <div class="toolbar" id="filterToolbar">
+                <button class="tool-btn blue is-active" data-filter="all" type="button">Tous les messages</button>
                 <button class="tool-btn red" data-filter="new" type="button">Nouveaux</button>
                 <button class="tool-btn gold" data-filter="in_progress" type="button">En cours</button>
                 <button class="tool-btn green" data-filter="done" type="button">Traités</button>
@@ -1031,6 +1112,8 @@
                 <button class="tool-btn blue" data-filter="candidate" type="button">Messages candidats</button>
                 <button class="tool-btn gold" data-filter="partner" type="button">Partenaires / sponsors</button>
                 <button class="tool-btn red" data-filter="technical" type="button">Technique</button>
+                <button class="tool-btn purple" data-filter="certificate" type="button">Certificats</button>
+                <button class="tool-btn blue" data-filter="other" type="button">Autres</button>
               </div>
             </div>
           </section>
@@ -1076,8 +1159,8 @@
         <section class="grid-stack">
           <section class="panel">
             <div class="panel-head">
-              <h2>Boîte de réception</h2>
-              <p>Les messages peuvent provenir du jury, des candidats, des formulaires de support ou de l’administration elle-même.</p>
+              <h2>Boîte de réception classée</h2>
+              <p>Les messages sont triés par priorité, puis regroupés par catégorie pour que l’admin s’y retrouve vite.</p>
             </div>
 
             <div class="panel-body">
@@ -1124,6 +1207,9 @@
     const mobileOverlay = $("mobileOverlay");
     const topbar = $("topbar");
     const mainContent = $("mainContent");
+    const filterToolbar = $("filterToolbar");
+    const refreshBtn = $("refreshBtn");
+    const createMessageBtn = $("createMessageBtn");
 
     function normalizeEmail(value = ""){
       return String(value || "").trim().toLowerCase();
@@ -1149,6 +1235,48 @@
 
     function getMessagesArray(){
       return Object.entries(state.messages || {}).map(([id, value]) => ({ id, ...value }));
+    }
+
+    function statusPriority(status){
+      if (status === "new") return 0;
+      if (status === "in_progress") return 1;
+      if (status === "done") return 2;
+      return 3;
+    }
+
+    function categoryLabel(category){
+      const map = {
+        candidate: "Candidats",
+        jury: "Jury",
+        technical: "Technique",
+        partner: "Partenaires / sponsors",
+        certificate: "Certificats",
+        other: "Autres"
+      };
+      return map[category] || "Autres";
+    }
+
+    function categoryBadge(category){
+      if (category === "candidate") return '<span class="badge blue">Candidat</span>';
+      if (category === "jury") return '<span class="badge purple">Jury</span>';
+      if (category === "technical") return '<span class="badge red">Technique</span>';
+      if (category === "partner") return '<span class="badge gold">Partenaire</span>';
+      if (category === "certificate") return '<span class="badge purple">Certificat</span>';
+      return '<span class="badge blue">Autre</span>';
+    }
+
+    function statusBadge(status){
+      if (status === "new") return '<span class="badge red">Nouveau</span>';
+      if (status === "in_progress") return '<span class="badge orange">En cours</span>';
+      if (status === "done") return '<span class="badge green">Traité</span>';
+      return '<span class="badge blue">Statut inconnu</span>';
+    }
+
+    function roleBadge(role){
+      if (role === "admin") return '<span class="badge red">Admin</span>';
+      if (role === "jury") return '<span class="badge gold">Jury</span>';
+      if (role === "candidate") return '<span class="badge blue">Candidat</span>';
+      return '<span class="badge blue">Visiteur</span>';
     }
 
     function applyFilter(items){
@@ -1205,8 +1333,83 @@
       await loadMessages();
     }
 
+    function setPressedEffect(el){
+      if (!el) return;
+      el.classList.add("is-pressed");
+      setTimeout(() => el.classList.remove("is-pressed"), 180);
+    }
+
+    function renderGroups(items){
+      const groupsOrder = ["candidate","jury","technical","partner","certificate","other"];
+      const grouped = new Map();
+
+      groupsOrder.forEach(key => grouped.set(key, []));
+      items.forEach(item => {
+        const key = grouped.has(item.category) ? item.category : "other";
+        grouped.get(key).push(item);
+      });
+
+      const blocks = [];
+
+      groupsOrder.forEach(groupKey => {
+        const groupItems = grouped.get(groupKey);
+        if (!groupItems || !groupItems.length) return;
+
+        const groupHtml = groupItems.map(item => {
+          const body = escapeHtml(item.message || "");
+          const subject = escapeHtml(item.subject || "Sans sujet");
+          const senderName = escapeHtml(item.senderName || item.senderEmail || "Inconnu");
+          const senderEmail = escapeHtml(item.senderEmail || "—");
+          const role = escapeHtml(item.senderRole || "visitor");
+          const currentStatus = item.status || "new";
+
+          return `
+            <div class="list-card status-${escapeHtml(currentStatus)}">
+              <strong>${subject}</strong>
+
+              <div class="message-meta">
+                ${categoryBadge(item.category)}
+                ${statusBadge(currentStatus)}
+                ${roleBadge(role)}
+              </div>
+
+              <p>
+                De : ${senderName}<br>
+                Email : ${senderEmail}
+              </p>
+
+              <div class="message-body">${body}</div>
+
+              <div class="list-actions">
+                <button class="mini-btn red ${currentStatus === "new" ? "is-current" : ""}" data-action="new" data-id="${item.id}">Nouveau</button>
+                <button class="mini-btn gold ${currentStatus === "in_progress" ? "is-current" : ""}" data-action="in_progress" data-id="${item.id}">En cours</button>
+                <button class="mini-btn green ${currentStatus === "done" ? "is-current" : ""}" data-action="done" data-id="${item.id}">Traité</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        blocks.push(`
+          <section class="group-block">
+            <div class="group-title">
+              <span>${categoryLabel(groupKey)}</span>
+              <span class="group-count">${groupItems.length}</span>
+            </div>
+            <div class="list-grid">${groupHtml}</div>
+          </section>
+        `);
+      });
+
+      return `<div class="inbox-groups">${blocks.join("")}</div>`;
+    }
+
     function renderMessages(){
-      const all = getMessagesArray().sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+      const all = getMessagesArray().sort((a,b) => {
+        const byStatus = statusPriority(a.status) - statusPriority(b.status);
+        if (byStatus !== 0) return byStatus;
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      });
+
       updateStats(all);
 
       const filtered = applyFilter(all);
@@ -1221,30 +1424,12 @@
         return;
       }
 
-      inboxList.innerHTML = filtered.map(item => `
-        <div class="list-card">
-          <strong>${escapeHtml(item.subject || "Sans sujet")}</strong>
-          <p>
-            De : ${escapeHtml(item.senderName || item.senderEmail || "Inconnu")}<br>
-            Email : ${escapeHtml(item.senderEmail || "—")}<br>
-            Rôle : ${escapeHtml(item.senderRole || "—")}<br>
-            Catégorie : ${escapeHtml(item.category || "other")}<br>
-            Statut : ${escapeHtml(item.status || "new")}
-          </p>
-          <div style="margin-top:10px;color:#12355e;font-size:13px;line-height:1.7;">
-            ${escapeHtml(item.message || "")}
-          </div>
-          <div class="list-actions">
-            <button class="mini-btn red" data-action="new" data-id="${item.id}">Nouveau</button>
-            <button class="mini-btn gold" data-action="in_progress" data-id="${item.id}">En cours</button>
-            <button class="mini-btn green" data-action="done" data-id="${item.id}">Traité</button>
-          </div>
-        </div>
-      `).join("");
+      inboxList.innerHTML = renderGroups(filtered);
 
       document.querySelectorAll("[data-action]").forEach(btn => {
         btn.addEventListener("click", async () => {
           try{
+            setPressedEffect(btn);
             await setStatus(btn.dataset.id, btn.dataset.action);
           }catch(err){
             console.error(err);
@@ -1308,18 +1493,29 @@
       });
     }
 
-    document.querySelectorAll("[data-filter]").forEach(btn => {
+    filterToolbar.querySelectorAll("[data-filter]").forEach(btn => {
       btn.addEventListener("click", () => {
+        filterToolbar.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
         state.currentFilter = btn.dataset.filter;
+        setPressedEffect(btn);
         renderMessages();
       });
     });
 
-    $("createMessageBtn").addEventListener("click", createInternalMessage);
-    $("refreshBtn").addEventListener("click", loadMessages);
+    createMessageBtn.addEventListener("click", () => {
+      setPressedEffect(createMessageBtn);
+      createInternalMessage();
+    });
+
+    refreshBtn.addEventListener("click", () => {
+      setPressedEffect(refreshBtn);
+      loadMessages();
+    });
 
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
+      setPressedEffect(menuBtn);
       if (mobileMenu.classList.contains("show")) {
         closeMenu();
       } else {
