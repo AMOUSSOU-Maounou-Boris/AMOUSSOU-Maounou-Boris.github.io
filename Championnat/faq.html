@@ -21,13 +21,14 @@
       --blue:#2f8cff;
       --blue-dark:#145bd6;
       --red:#ff4b4b;
+      --red-dark:#d73333;
       --green:#18c34a;
       --gold:#d8a72f;
       --orange:#ff9f1a;
+      --orange-dark:#df7f00;
       --purple:#7b61ff;
       --purple-dark:#5a3ff0;
-      --violet-soft:#f4f1ff;
-      --pink-soft:#fff2fb;
+      --pink:#ff63b5;
       --shadow:0 10px 24px rgba(13,37,71,.08);
       --radius:18px;
       --radius-lg:22px;
@@ -89,8 +90,8 @@
       border-radius:14px;
       position:relative;
       background:
-        radial-gradient(circle at 30% 30%, #fff 0%, #f4e9ff 24%, #b58cff 55%, #6b43f2 100%);
-      box-shadow:0 10px 20px rgba(123,97,255,.20), inset 0 1px 8px rgba(255,255,255,.7);
+        radial-gradient(circle at 30% 30%, #fff 0%, #ffe4ef 20%, #ffb347 42%, #ff5f6d 68%, #7b61ff 100%);
+      box-shadow:0 10px 20px rgba(255,95,109,.18), inset 0 1px 8px rgba(255,255,255,.7);
       flex:0 0 auto;
     }
 
@@ -109,7 +110,7 @@
     .brand-title{
       font-size:14px;
       font-weight:800;
-      color:#30206f;
+      color:#7a1f2e;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -117,7 +118,7 @@
 
     .brand-sub{
       font-size:12px;
-      color:#7a72a0;
+      color:#8a7392;
       margin-top:2px;
       white-space:nowrap;
       overflow:hidden;
@@ -138,8 +139,8 @@
       padding:9px 14px;
       border-radius:999px;
       background:#fff;
-      border:1px solid #e7ddff;
-      color:#5b4f8a;
+      border:1px solid #ffd8dc;
+      color:#7b4250;
       font-weight:700;
       font-size:13px;
       box-shadow:var(--shadow);
@@ -149,8 +150,8 @@
       width:10px;
       height:10px;
       border-radius:50%;
-      background:var(--purple);
-      box-shadow:0 0 0 5px rgba(123,97,255,.14);
+      background:var(--orange);
+      box-shadow:0 0 0 5px rgba(255,159,26,.14);
     }
 
     .home-btn{
@@ -160,9 +161,9 @@
       font-weight:800;
       font-size:13px;
       text-decoration:none;
-      color:#4b3d82;
+      color:#8b3f00;
       background:#fff;
-      border:1px solid #e7ddff;
+      border:1px solid #ffe3c2;
       box-shadow:var(--shadow);
       display:inline-flex;
       align-items:center;
@@ -173,8 +174,8 @@
       width:40px;
       height:40px;
       border-radius:12px;
-      border:1px solid #e7ddff;
-      background:linear-gradient(180deg,#fff,#faf7ff);
+      border:1px solid #ffd6de;
+      background:linear-gradient(180deg,#fff,#fff6f8);
       display:none;
       place-items:center;
       cursor:pointer;
@@ -192,7 +193,7 @@
       width:18px;
       height:2px;
       border-radius:999px;
-      background:#5b46bd;
+      background:#b13f55;
       transition:.18s ease;
     }
 
@@ -254,9 +255,10 @@
     }
 
     .nav-link:hover{ background:rgba(255,255,255,.08); }
+
     .nav-link.active{
-      background:rgba(123,97,255,.20);
-      border:1px solid rgba(179,161,255,.18);
+      background:rgba(255,159,26,.20);
+      border:1px solid rgba(255,214,146,.18);
     }
 
     .nav-dot{
@@ -271,6 +273,8 @@
     .nav-dot.red{ background:#ff7777; }
     .nav-dot.gold{ background:#e7c15a; }
     .nav-dot.purple{ background:#b29bff; }
+    .nav-dot.orange{ background:#ffb347; }
+    .nav-dot.pink{ background:#ff7cc7; }
 
     .sidebar-note{
       margin-top:8px;
@@ -307,7 +311,7 @@
     .title-wrap h1{
       font-size:34px;
       line-height:1.05;
-      color:#4e34c4;
+      color:#a12d38;
       letter-spacing:-1px;
       margin:0 0 10px;
     }
@@ -345,14 +349,14 @@
 
     .head-btn.primary{
       color:#fff;
-      background:linear-gradient(135deg,var(--purple),var(--purple-dark));
-      box-shadow:0 16px 28px rgba(123,97,255,.18);
+      background:linear-gradient(135deg,var(--red),var(--orange));
+      box-shadow:0 16px 28px rgba(255,95,109,.18);
     }
 
     .head-btn.soft{
-      color:#5a469f;
+      color:#8d3f00;
       background:#fff;
-      border:1px solid #e7ddff;
+      border:1px solid #ffe0bc;
       box-shadow:var(--shadow);
     }
 
@@ -377,31 +381,32 @@
     }
 
     .mini-card:nth-child(1){
-      border-color:#eadfff;
+      border-color:#ffdede;
+      background:linear-gradient(180deg,#fff,#fff7f7);
+    }
+
+    .mini-card:nth-child(1) strong{ color:#c63838; }
+
+    .mini-card:nth-child(2){
+      border-color:#ffe7c6;
+      background:linear-gradient(180deg,#fff,#fffaf3);
+    }
+
+    .mini-card:nth-child(2) strong{ color:#d97c00; }
+
+    .mini-card:nth-child(3){
+      border-color:#e7ddff;
       background:linear-gradient(180deg,#fff,#faf7ff);
     }
 
-    .mini-card:nth-child(2){
-      border-color:#e1ebff;
-      background:linear-gradient(180deg,#fff,#f7fbff);
-    }
-
-    .mini-card:nth-child(3){
-      border-color:#ffe3f3;
-      background:linear-gradient(180deg,#fff,#fff8fc);
-    }
+    .mini-card:nth-child(3) strong{ color:#6a45d7; }
 
     .mini-card:nth-child(4){
-      border-color:#efe3ff;
-      background:linear-gradient(180deg,#fff,#fbf7ff);
+      border-color:#ffd8f1;
+      background:linear-gradient(180deg,#fff,#fff7fc);
     }
 
-    .mini-card strong{
-      display:block;
-      font-size:16px;
-      color:#402b8f;
-      margin-bottom:8px;
-    }
+    .mini-card:nth-child(4) strong{ color:#c73d8e; }
 
     .mini-card p{
       color:var(--muted);
@@ -430,7 +435,7 @@
 
     .panel-head h2{
       font-size:24px;
-      color:#5036c6;
+      color:#7a3048;
       margin:0 0 8px;
       letter-spacing:-.5px;
     }
@@ -453,9 +458,24 @@
 
     .faq-item{
       border-radius:16px;
-      background:linear-gradient(180deg,#fff,#fcfbff);
-      border:1px solid #ece4ff;
+      background:linear-gradient(180deg,#fff,#fffafc);
+      border:1px solid #ffe0e7;
       overflow:hidden;
+    }
+
+    .faq-item:nth-child(3n+1){
+      border-color:#ffdede;
+      background:linear-gradient(180deg,#fff,#fff7f7);
+    }
+
+    .faq-item:nth-child(3n+2){
+      border-color:#ffe4c4;
+      background:linear-gradient(180deg,#fff,#fff9f2);
+    }
+
+    .faq-item:nth-child(3n+3){
+      border-color:#eadfff;
+      background:linear-gradient(180deg,#fff,#faf7ff);
     }
 
     .faq-question{
@@ -469,18 +489,18 @@
       align-items:center;
       justify-content:space-between;
       gap:16px;
-      color:#47319f;
+      color:#7a3048;
       font-weight:800;
       font-size:15px;
     }
 
     .faq-question:hover{
-      background:#f8f5ff;
+      background:rgba(255,255,255,.45);
     }
 
     .faq-sign{
       font-size:18px;
-      color:#6b43f2;
+      color:#ff7a00;
       flex:0 0 auto;
       transition:transform .18s ease;
     }
@@ -504,19 +524,33 @@
     .side-note{
       padding:14px;
       border-radius:14px;
-      background:linear-gradient(180deg,#fff,#fbf9ff);
-      border:1px solid #ece4ff;
-      color:#4a3b86;
+      color:#5b4566;
       font-size:14px;
       line-height:1.7;
+      border:1px solid transparent;
+    }
+
+    .grid-stack .panel:nth-child(1) .side-note{
+      background:linear-gradient(180deg,#fff,#fff7f7);
+      border-color:#ffdede;
+    }
+
+    .grid-stack .panel:nth-child(2) .side-note{
+      background:linear-gradient(180deg,#fff,#fff9f2);
+      border-color:#ffe5c9;
+    }
+
+    .grid-stack .panel:nth-child(3) .side-note{
+      background:linear-gradient(180deg,#fff,#faf7ff);
+      border-color:#eadfff;
     }
 
     .cta-box{
       padding:20px 18px;
       border-radius:18px;
-      background:linear-gradient(135deg, rgba(106,67,242,.98), rgba(47,140,255,.88));
+      background:linear-gradient(135deg, rgba(255,75,75,.98), rgba(255,159,26,.96), rgba(123,97,255,.90));
       color:#fff;
-      box-shadow:0 18px 36px rgba(106,67,242,.16);
+      box-shadow:0 18px 36px rgba(255,95,109,.16);
       position:relative;
       overflow:hidden;
     }
@@ -571,7 +605,7 @@
 
     .cta-link.primary{
       background:#fff;
-      color:#5a3ff0;
+      color:#c54430;
     }
 
     .cta-link.soft{
@@ -584,14 +618,14 @@
       margin-top:26px;
       padding:20px 16px 26px;
       text-align:center;
-      color:#6a6390;
+      color:#76677b;
       font-size:14px;
       line-height:1.75;
     }
 
     .page-footer strong{
       display:block;
-      color:#4b35b7;
+      color:#a0363e;
       font-size:15px;
       margin-bottom:4px;
     }
@@ -604,7 +638,7 @@
       max-height:72vh;
       overflow:auto;
       background:rgba(255,255,255,.98);
-      border:1px solid #e7ddff;
+      border:1px solid #ffd8de;
       border-radius:18px;
       box-shadow:0 24px 48px rgba(10,37,73,.18);
       padding:14px;
@@ -617,7 +651,7 @@
     .mobile-menu h3{
       margin:2px 4px 12px;
       font-size:15px;
-      color:#4d38b0;
+      color:#94384a;
     }
 
     .mobile-group{
@@ -628,9 +662,9 @@
 
     .mobile-link{
       text-decoration:none;
-      color:#4d3f84;
-      background:#faf7ff;
-      border:1px solid #ece4ff;
+      color:#6c4c54;
+      background:#fff8fa;
+      border:1px solid #ffe0e7;
       border-radius:12px;
       padding:11px 12px;
       font-weight:700;
@@ -864,13 +898,17 @@
       <div class="sidebar-section-title">Navigation</div>
       <nav class="nav-list">
         <a class="nav-link" href="./index.html"><span class="nav-dot green"></span><span>Accueil</span></a>
+        <a class="nav-link" href="./about.html"><span class="nav-dot purple"></span><span>À propos</span></a>
         <a class="nav-link" href="./competition.html"><span class="nav-dot green"></span><span>Championnat</span></a>
         <a class="nav-link" href="./rules.html"><span class="nav-dot gold"></span><span>Règlement</span></a>
-        <a class="nav-link" href="./results.html"><span class="nav-dot purple"></span><span>Résultats</span></a>
-        <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
+        <a class="nav-link" href="./results.html"><span class="nav-dot orange"></span><span>Résultats</span></a>
+        <a class="nav-link" href="./laureats.html"><span class="nav-dot gold"></span><span>Lauréats</span></a>
+        <a class="nav-link" href="./announcements.html"><span class="nav-dot pink"></span><span>Annonces</span></a>
         <a class="nav-link active" href="./faq.html"><span class="nav-dot purple"></span><span>FAQ</span></a>
-        <a class="nav-link" href="./contact.html"><span class="nav-dot"></span><span>Contact</span></a>
-        <a class="nav-link" href="./login.html"><span class="nav-dot"></span><span>Connexion</span></a>
+        <a class="nav-link" href="./contact.html"><span class="nav-dot red"></span><span>Contact</span></a>
+        <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
+        <a class="nav-link" href="./login.html"><span class="nav-dot orange"></span><span>Connexion</span></a>
+        <a class="nav-link" href="./login.html?redirect=dashboard-candidat.html"><span class="nav-dot green"></span><span>Espace candidat</span></a>
         <a class="nav-link" href="./login.html?redirect=jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
         <a class="nav-link" href="./login.html?redirect=admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
       </nav>
