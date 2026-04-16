@@ -460,6 +460,61 @@
       cursor:pointer;
     }
 
+    .cookie-banner{
+      position:fixed;
+      left:18px;
+      right:18px;
+      bottom:18px;
+      z-index:90;
+      background:rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:0 24px 48px rgba(10,37,73,.18);
+      padding:18px;
+      display:none;
+      gap:14px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      backdrop-filter:blur(14px);
+    }
+
+    .cookie-banner.show{display:flex}
+
+    .cookie-text{
+      flex:1 1 420px;
+      color:#45627e;
+      font-size:.95rem;
+      line-height:1.7;
+    }
+
+    .cookie-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .cookie-btn{
+      border:none;
+      cursor:pointer;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:800;
+      font-size:.92rem;
+    }
+
+    .cookie-btn.accept{
+      color:#fff;
+      background:linear-gradient(135deg,var(--red),var(--red-dark));
+      box-shadow:0 12px 24px rgba(255,75,75,.20);
+    }
+
+    .cookie-btn.reject{
+      color:#163861;
+      background:#fff;
+      border:1px solid var(--line);
+    }
+
     footer{
       border-top:1px solid rgba(219,231,242,.9);
       background:rgba(255,255,255,.66);
@@ -502,6 +557,7 @@
       .hero-info{padding:26px 20px}
       .auth-card{padding:18px}
       .status-chip{display:none}
+      .cookie-banner{left:12px;right:12px;bottom:12px}
     }
 
     @media (max-width:480px){
@@ -511,6 +567,8 @@
       .header-inner,.footer-inner{padding-left:14px;padding-right:14px}
       .quick-links{grid-template-columns:1fr}
       .tabs{grid-template-columns:1fr}
+      .cookie-actions{width:100%}
+      .cookie-btn{width:100%}
     }
   </style>
 </head>
@@ -543,22 +601,21 @@
         <div class="eyebrow">🔐 Connexion centrale • Candidat • Jury • Admin</div>
         <h1>Une seule entrée pour accéder au bon espace.</h1>
         <p class="lead">
-          Cette page sert d’entrée privée pour les candidats, le jury et l’administration.
-          Le championnat reste public, mais les zones privées passent ici avant d’ouvrir la bonne section.
+          Cette page devient l’entrée privée centrale du site. Connexion, création de compte, présence, redirection, profil public et contrôle d’activité passent ici.
         </p>
 
         <div class="hero-grid">
           <div class="mini">
             <strong>Championnat public</strong>
-            <p><code>competition.html</code> reste visible à tous. La connexion est demandée seulement pour les espaces privés.</p>
+            <p>Les sections publiques restent visibles. Les espaces privés passent ici avant d’ouvrir la bonne zone.</p>
           </div>
           <div class="mini">
             <strong>Redirection simple</strong>
-            <p>Après connexion, le système t’envoie automatiquement vers la bonne page selon ton rôle.</p>
+            <p>Après connexion, le système envoie l’utilisateur vers la bonne page selon son rôle et la demande de départ.</p>
           </div>
           <div class="mini">
-            <strong>Même Firebase</strong>
-            <p>Cette version est adaptée à ton ancien Firebase et au même <code>firebase-config.js</code>.</p>
+            <strong>Présence & sécurité</strong>
+            <p>Le statut en ligne, l’activité, les cookies utiles et la déconnexion automatique sont gérés depuis cette page.</p>
           </div>
         </div>
       </div>
@@ -574,7 +631,7 @@
         <section class="form-panel active" id="loginPanel">
           <h2 class="panel-title">Connexion</h2>
           <p class="panel-desc">
-            Connecte-toi avec ton email et ton mot de passe. La redirection vers l’espace candidat, jury ou admin se fera automatiquement.
+            Connecte-toi avec ton email et ton mot de passe. La redirection vers l’espace candidat, jury, admin ou profil se fera automatiquement.
           </p>
 
           <form id="loginForm">
@@ -593,7 +650,7 @@
 
           <div class="sub-actions">
             <a href="competition.html">Voir le championnat</a>
-            <a href="rules.html">Lire le règlement</a>
+            <a href="announcements.html">Voir les annonces</a>
           </div>
 
           <div class="msg" id="loginMsg"></div>
@@ -602,8 +659,7 @@
         <section class="form-panel" id="signupPanel">
           <h2 class="panel-title">Créer un compte</h2>
           <p class="panel-desc">
-            Crée ton compte pour ce site. Le rôle admin reste réservé à l’email principal.
-            Le jury et le candidat peuvent être enregistrés via leur rôle.
+            Crée ton compte ici. Les données essentielles seront ensuite réutilisées partout sur les sections privées et les profils publics du site.
           </p>
 
           <form id="signupForm">
@@ -622,6 +678,7 @@
               <select id="signupRole" required>
                 <option value="candidate">Candidat</option>
                 <option value="jury">Jury</option>
+                <option value="member">Membre</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
@@ -655,6 +712,17 @@
     </section>
   </main>
 
+  <div class="cookie-banner" id="cookieBanner">
+    <div class="cookie-text">
+      En acceptant, tu autorises l’enregistrement des données techniques essentielles du site : type d’appareil, navigateur, langue, fuseau horaire, plateforme, dernière activité et statut de connexion.  
+      Si tu refuses, tu es renvoyé vers les annonces publiques.
+    </div>
+    <div class="cookie-actions">
+      <button class="cookie-btn accept" id="acceptCookiesBtn" type="button">Accepter</button>
+      <button class="cookie-btn reject" id="rejectCookiesBtn" type="button">Refuser</button>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-inner">
       <div>© 2026 Championnat de Chimie — Connexion centrale sécurisée.</div>
@@ -680,10 +748,16 @@
       ref,
       set,
       get,
-      update
+      update,
+      onDisconnect
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+    const COOKIE_KEY = "champCookiesChoice";
+    const LAST_ACTIVITY_KEY = "champ_last_activity";
+    const INACTIVITY_LIMIT = 15 * 60 * 1000;
+
+    let activityTimeout = null;
 
     const showLogin = document.getElementById("showLogin");
     const showSignup = document.getElementById("showSignup");
@@ -704,6 +778,10 @@
     const statusText = document.getElementById("statusText");
     const quickExamBtn = document.getElementById("quickExamBtn");
 
+    const cookieBanner = document.getElementById("cookieBanner");
+    const acceptCookiesBtn = document.getElementById("acceptCookiesBtn");
+    const rejectCookiesBtn = document.getElementById("rejectCookiesBtn");
+
     const params = new URLSearchParams(window.location.search);
     const requestedRedirectRaw = (params.get("redirect") || "").trim();
 
@@ -714,7 +792,11 @@
       "dashboard-candidat.html",
       "competition.html",
       "index.html",
-      "results.html"
+      "results.html",
+      "profile.html",
+      "announcements.html",
+      "competition-admin.html",
+      "competition-support-admin.html"
     ]);
 
     const requestedRedirect = allowedRedirects.has(requestedRedirectRaw)
@@ -724,14 +806,19 @@
     const redirectLabels = {
       "examen.html": "Vous vous connectez pour accéder à l’examen.",
       "admin.html": "Vous vous connectez pour accéder à l’administration.",
+      "competition-admin.html": "Vous vous connectez pour accéder à l’administration du championnat.",
+      "competition-support-admin.html": "Vous vous connectez pour accéder au support administration.",
       "jury.html": "Vous vous connectez pour accéder à l’espace jury.",
-      "dashboard-candidat.html": "Vous vous connectez pour accéder à votre espace candidat."
+      "dashboard-candidat.html": "Vous vous connectez pour accéder à votre espace candidat.",
+      "profile.html": "Vous vous connectez pour accéder au profil.",
+      "announcements.html": "Vous vous connectez pour interagir avec les annonces."
     };
 
     const state = {
       user: null,
       profile: null,
-      role: "visitor"
+      role: "visitor",
+      cookiesAccepted: false
     };
 
     if (requestedRedirect && redirectLabels[requestedRedirect]) {
@@ -766,6 +853,23 @@
       return String(email || "").trim().toLowerCase();
     }
 
+    function getCookieChoice(){
+      return localStorage.getItem(COOKIE_KEY) || "";
+    }
+
+    function hasAcceptedCookies(){
+      return getCookieChoice() === "accepted";
+    }
+
+    function requireCookiesOrRedirect(){
+      if (!hasAcceptedCookies()) {
+        cookieBanner.classList.add("show");
+        return false;
+      }
+      cookieBanner.classList.remove("show");
+      return true;
+    }
+
     function resolveRole(user, profile){
       const email = sanitizeEmail(user?.email);
       if (!user) return "visitor";
@@ -780,7 +884,47 @@
 
       if (role === "jury") return "jury";
       if (role === "admin") return "admin";
+      if (role === "member") return "member";
       return "candidate";
+    }
+
+    function buildPublicRole(role){
+      if (role === "admin") return "Administration";
+      if (role === "jury") return "Jury";
+      if (role === "candidate") return "Candidat";
+      return "Membre";
+    }
+
+    function splitName(fullName = ""){
+      const parts = String(fullName || "").trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return { firstName: "", lastName: "" };
+      if (parts.length === 1) return { firstName: parts[0], lastName: "" };
+      return {
+        firstName: parts[0],
+        lastName: parts.slice(1).join(" ")
+      };
+    }
+
+    function getDeviceInfo(){
+      const ua = navigator.userAgent || "";
+      const platform = navigator.platform || "";
+      const language = navigator.language || "";
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      const localeParts = String(language).split("-");
+      const localeCountry = localeParts.length > 1 ? localeParts[1] : "";
+      const deviceType =
+        /Mobi|Android|iPhone|iPad|Phone/i.test(ua) ? "mobile" : "desktop";
+
+      return {
+        userAgent: ua,
+        platform,
+        language,
+        timezone,
+        localeCountry,
+        deviceType,
+        screenWidth: window.screen?.width || 0,
+        screenHeight: window.screen?.height || 0
+      };
     }
 
     async function getUserProfile(uid){
@@ -797,9 +941,11 @@
       if (role === "admin") {
         return `
           <a href="./index.html">Accueil</a>
+          <a href="./announcements.html">Annonces</a>
           <a href="./competition.html">Championnat</a>
-          <a href="./admin.html">Admin</a>
-          <a href="./jury.html">Jury</a>
+          <a href="./profile.html">Mon profil</a>
+          <a href="./competition-admin.html">Admin championnat</a>
+          <a href="./competition-support-admin.html">Support admin</a>
           <a href="./results.html">Résultats</a>
           <button type="button" data-action="logout">Déconnexion</button>
         `;
@@ -808,7 +954,9 @@
       if (role === "jury") {
         return `
           <a href="./index.html">Accueil</a>
+          <a href="./announcements.html">Annonces</a>
           <a href="./competition.html">Championnat</a>
+          <a href="./profile.html">Mon profil</a>
           <a href="./jury.html">Espace jury</a>
           <a href="./results.html">Résultats</a>
           <button type="button" data-action="logout">Déconnexion</button>
@@ -818,7 +966,9 @@
       if (role === "candidate") {
         return `
           <a href="./index.html">Accueil</a>
+          <a href="./announcements.html">Annonces</a>
           <a href="./competition.html">Championnat</a>
+          <a href="./profile.html">Mon profil</a>
           <a href="./dashboard-candidat.html">Mon espace candidat</a>
           <a href="./examen.html">Passer l’examen</a>
           <a href="./results.html">Résultats</a>
@@ -826,8 +976,19 @@
         `;
       }
 
+      if (role === "member") {
+        return `
+          <a href="./index.html">Accueil</a>
+          <a href="./announcements.html">Annonces</a>
+          <a href="./competition.html">Championnat</a>
+          <a href="./profile.html">Mon profil</a>
+          <button type="button" data-action="logout">Déconnexion</button>
+        `;
+      }
+
       return `
         <a href="./index.html">Accueil</a>
+        <a href="./announcements.html">Annonces</a>
         <a href="./competition.html">Championnat</a>
         <a href="./rules.html">Règlement</a>
         <a href="./results.html">Résultats</a>
@@ -840,12 +1001,7 @@
       const logoutBtn = menuPanel.querySelector('[data-action="logout"]');
       if (logoutBtn) {
         logoutBtn.addEventListener("click", async () => {
-          try{
-            await signOut(auth);
-            window.location.href = "./login.html";
-          }catch(err){
-            console.error(err);
-          }
+          await forceOfflineAndSignOut();
         });
       }
     }
@@ -866,6 +1022,11 @@
         statusText.textContent = "Candidat connecté";
         return;
       }
+      if (role === "member") {
+        statusDot.classList.add("ok");
+        statusText.textContent = "Membre connecté";
+        return;
+      }
       statusDot.classList.remove("ok");
       statusText.textContent = "Visiteur public";
     }
@@ -880,61 +1041,186 @@
           ? "admin"
           : (extra.role || "candidate");
 
-      if (!existingSnap.exists()) {
-        await set(userRef, {
-          uid: user.uid,
-          displayName: extra.displayName || user.displayName || "",
-          email,
-          role: roleToSave,
-          competitionRole: roleToSave,
-          createdAt: Date.now(),
+      const fullName = extra.displayName || user.displayName || existingSnap.val()?.displayName || "";
+      const names = splitName(fullName);
+      const deviceInfo = state.cookiesAccepted ? getDeviceInfo() : {};
+
+      const basePayload = {
+        uid: user.uid,
+        displayName: fullName,
+        email,
+        role: roleToSave,
+        competitionRole: roleToSave,
+        updatedAt: Date.now(),
+        publicProfile: {
+          firstName: names.firstName || existingSnap.val()?.publicProfile?.firstName || "",
+          lastName: names.lastName || existingSnap.val()?.publicProfile?.lastName || "",
+          displayName: fullName || existingSnap.val()?.publicProfile?.displayName || "",
+          university: existingSnap.val()?.publicProfile?.university || "",
+          country: existingSnap.val()?.publicProfile?.country || deviceInfo.localeCountry || "",
+          city: existingSnap.val()?.publicProfile?.city || "",
+          fieldStudy: existingSnap.val()?.publicProfile?.fieldStudy || "",
+          tagline: existingSnap.val()?.publicProfile?.tagline || "",
+          role: existingSnap.val()?.publicProfile?.role || buildPublicRole(roleToSave),
+          bio: existingSnap.val()?.publicProfile?.bio || "",
+          photoUrl: existingSnap.val()?.publicProfile?.photoUrl || ""
+        },
+        privacy: {
+          showEmail: false
+        }
+      };
+
+      if (state.cookiesAccepted) {
+        basePayload.lastLoginContext = {
+          deviceType: deviceInfo.deviceType,
+          platform: deviceInfo.platform,
+          language: deviceInfo.language,
+          timezone: deviceInfo.timezone,
+          localeCountry: deviceInfo.localeCountry,
+          screenWidth: deviceInfo.screenWidth,
+          screenHeight: deviceInfo.screenHeight,
+          userAgent: deviceInfo.userAgent,
           updatedAt: Date.now()
-        });
-      } else {
-        await update(userRef, {
-          displayName: extra.displayName || existingSnap.val()?.displayName || user.displayName || "",
-          email: email || existingSnap.val()?.email || "",
-          updatedAt: Date.now()
-        });
+        };
       }
+
+      if (!existingSnap.exists()) {
+        basePayload.createdAt = Date.now();
+        await set(userRef, basePayload);
+      } else {
+        await update(userRef, basePayload);
+      }
+    }
+
+    async function updatePresenceOnline(){
+      if (!auth.currentUser || !state.cookiesAccepted) return;
+
+      const user = auth.currentUser;
+      const profile = await getUserProfile(user.uid);
+      const role = resolveRole(user, profile);
+      const deviceInfo = getDeviceInfo();
+
+      const presenceRef = ref(db, `users/${user.uid}/presence`);
+      await update(ref(db, `users/${user.uid}`), {
+        lastSeenAt: Date.now()
+      });
+
+      await set(presenceRef, {
+        online: true,
+        uid: user.uid,
+        displayName:
+          profile?.publicProfile?.displayName ||
+          profile?.displayName ||
+          user.displayName ||
+          (user.email ? user.email.split("@")[0] : "Membre"),
+        role,
+        deviceType: deviceInfo.deviceType,
+        platform: deviceInfo.platform,
+        localeCountry: deviceInfo.localeCountry || "",
+        timezone: deviceInfo.timezone || "",
+        language: deviceInfo.language || "",
+        lastActivityAt: Date.now(),
+        connectedAt: Date.now()
+      });
+
+      try{
+        await onDisconnect(presenceRef).update({
+          online: false,
+          lastActivityAt: Date.now(),
+          disconnectedAt: Date.now()
+        });
+      }catch(err){
+        console.error("onDisconnect indisponible :", err);
+      }
+    }
+
+    async function updatePresenceActivity(){
+      if (!auth.currentUser || !state.cookiesAccepted) return;
+      try{
+        await update(ref(db, `users/${auth.currentUser.uid}/presence`), {
+          online: true,
+          lastActivityAt: Date.now()
+        });
+      }catch(err){
+        console.error(err);
+      }
+    }
+
+    async function updatePresenceOffline(){
+      if (!auth.currentUser) return;
+      try{
+        await update(ref(db, `users/${auth.currentUser.uid}/presence`), {
+          online: false,
+          lastActivityAt: Date.now(),
+          disconnectedAt: Date.now()
+        });
+      }catch(err){
+        console.error(err);
+      }
+    }
+
+    async function forceOfflineAndSignOut(){
+      try { await updatePresenceOffline(); } catch(e) {}
+      try { await signOut(auth); } catch(e) {}
+      window.location.replace("./login.html");
+    }
+
+    function resetInactivityTimer(){
+      if (!auth.currentUser) return;
+      localStorage.setItem(LAST_ACTIVITY_KEY, String(Date.now()));
+      clearTimeout(activityTimeout);
+      activityTimeout = setTimeout(async () => {
+        await forceOfflineAndSignOut();
+      }, INACTIVITY_LIMIT);
+      updatePresenceActivity().catch(console.error);
+    }
+
+    function bindActivityListeners(){
+      ["click","keydown","mousemove","scroll","touchstart"].forEach(evt => {
+        window.addEventListener(evt, () => {
+          if (auth.currentUser) resetInactivityTimer();
+        }, { passive:true });
+      });
     }
 
     function routeAfterAuth(user, profile){
       const role = resolveRole(user, profile);
 
+      if (requestedRedirect) {
+        if (role !== "admin" && (requestedRedirect === "admin.html" || requestedRedirect === "competition-admin.html" || requestedRedirect === "competition-support-admin.html")) {
+          if (role === "jury") {
+            window.location.href = "./jury.html";
+            return;
+          }
+          window.location.href = "./dashboard-candidat.html";
+          return;
+        }
+
+        if (role !== "jury" && requestedRedirect === "jury.html") {
+          if (role === "admin") {
+            window.location.href = "./competition-admin.html";
+            return;
+          }
+          window.location.href = "./dashboard-candidat.html";
+          return;
+        }
+
+        window.location.href = "./" + requestedRedirect;
+        return;
+      }
+
       if (role === "admin") {
-        if (requestedRedirect === "jury.html") {
-          window.location.href = "./jury.html";
-          return;
-        }
-        if (requestedRedirect === "examen.html") {
-          window.location.href = "./examen.html";
-          return;
-        }
-        window.location.href = "./admin.html";
+        window.location.href = "./competition-admin.html";
         return;
       }
 
       if (role === "jury") {
-        if (requestedRedirect === "admin.html") {
-          window.location.href = "./jury.html";
-          return;
-        }
-        if (requestedRedirect === "examen.html") {
-          window.location.href = "./jury.html";
-          return;
-        }
-        window.location.href = requestedRedirect || "./jury.html";
+        window.location.href = "./jury.html";
         return;
       }
 
-      if (requestedRedirect === "admin.html" || requestedRedirect === "jury.html") {
-        window.location.href = "./dashboard-candidat.html";
-        return;
-      }
-
-      if (requestedRedirect === "examen.html") {
-        window.location.href = "./examen.html";
+      if (role === "member") {
+        window.location.href = "./profile.html";
         return;
       }
 
@@ -943,7 +1229,7 @@
 
     function goToExam(){
       if (state.role === "admin") {
-        window.location.href = "./admin.html";
+        window.location.href = "./competition-admin.html";
         return;
       }
       if (state.role === "jury") {
@@ -952,6 +1238,10 @@
       }
       if (state.role === "candidate") {
         window.location.href = "./examen.html";
+        return;
+      }
+      if (state.role === "member") {
+        window.location.href = "./profile.html";
         return;
       }
       window.location.href = "./login.html?redirect=examen.html";
@@ -969,14 +1259,56 @@
       }
     });
 
+    acceptCookiesBtn.addEventListener("click", async () => {
+      localStorage.setItem(COOKIE_KEY, "accepted");
+      state.cookiesAccepted = true;
+      cookieBanner.classList.remove("show");
+
+      if (auth.currentUser) {
+        try{
+          await ensureUserRecord(auth.currentUser, { role: state.role });
+          await updatePresenceOnline();
+          resetInactivityTimer();
+        }catch(err){
+          console.error(err);
+        }
+      }
+    });
+
+    rejectCookiesBtn.addEventListener("click", async () => {
+      localStorage.setItem(COOKIE_KEY, "rejected");
+      state.cookiesAccepted = false;
+      if (auth.currentUser) {
+        try { await updatePresenceOffline(); } catch(e) {}
+        try { await signOut(auth); } catch(e) {}
+      }
+      window.location.replace("./announcements.html");
+    });
+
+    window.addEventListener("beforeunload", () => {
+      if (auth.currentUser) {
+        updatePresenceOffline().catch(() => {});
+      }
+    });
+
+    bindActivityListeners();
+
     onAuthStateChanged(auth, async (user) => {
       state.user = user || null;
+      state.cookiesAccepted = hasAcceptedCookies();
 
       if (!user) {
+        clearTimeout(activityTimeout);
         state.profile = null;
         state.role = "visitor";
         renderMenu("visitor");
         setStatus("visitor");
+        requireCookiesOrRedirect();
+        return;
+      }
+
+      if (!requireCookiesOrRedirect()) {
+        try { await signOut(auth); } catch(e) {}
         return;
       }
 
@@ -985,6 +1317,8 @@
 
       try{
         await ensureUserRecord(user, { role: state.role });
+        await updatePresenceOnline();
+        resetInactivityTimer();
       }catch(err){
         console.error(err);
       }
@@ -998,12 +1332,21 @@
       clearMessages();
       loginBtn.disabled = true;
 
+      if (!requireCookiesOrRedirect()) {
+        loginBtn.disabled = false;
+        return;
+      }
+
       const email = document.getElementById("loginEmail").value.trim();
       const password = document.getElementById("loginPassword").value;
 
       try{
         const cred = await signInWithEmailAndPassword(auth, email, password);
         const profile = await getUserProfile(cred.user.uid);
+        const role = resolveRole(cred.user, profile);
+
+        await ensureUserRecord(cred.user, { role });
+        await updatePresenceOnline();
 
         showMessage(loginMsg, "Connexion réussie. Redirection en cours...", "ok");
 
@@ -1028,6 +1371,11 @@
       e.preventDefault();
       clearMessages();
       signupBtn.disabled = true;
+
+      if (!requireCookiesOrRedirect()) {
+        signupBtn.disabled = false;
+        return;
+      }
 
       const name = document.getElementById("signupName").value.trim();
       const email = document.getElementById("signupEmail").value.trim();
@@ -1055,16 +1403,12 @@
           sanitizeEmail(email) === sanitizeEmail(ADMIN_EMAIL)
             ? "admin"
             : selectedRole;
-
-        await set(ref(db, "users/" + cred.user.uid), {
-          uid: cred.user.uid,
-          displayName: name,
-          email: email,
+                await ensureUserRecord(cred.user, {
           role: finalRole,
-          competitionRole: finalRole,
-          createdAt: Date.now(),
-          updatedAt: Date.now()
+          displayName: name
         });
+
+        await updatePresenceOnline();
 
         showMessage(signupMsg, "Compte créé avec succès. Redirection en cours...", "ok");
         signupForm.reset();
@@ -1081,7 +1425,7 @@
         const code = String(err?.code || "");
 
         if (code.includes("email-already-in-use")) {
-          showMessage(signupMsg, "Cet email est déjà utilisé dans ce Firebase. Connecte-toi directement avec ce compte.", "err");
+          showMessage(signupMsg, "Cet email est déjà utilisé. Connecte-toi directement avec ce compte.", "err");
         } else if (code.includes("weak-password")) {
           showMessage(signupMsg, "Mot de passe trop faible. Utilise au moins 6 caractères.", "err");
         } else {
@@ -1094,6 +1438,7 @@
 
     renderMenu("visitor");
     setStatus("visitor");
+    requireCookiesOrRedirect();
   </script>
 </body>
 </html>
