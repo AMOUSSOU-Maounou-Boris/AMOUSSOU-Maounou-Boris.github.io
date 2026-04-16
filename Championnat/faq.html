@@ -28,21 +28,33 @@
       --shadow:0 10px 24px rgba(13,37,71,.08);
       --radius:18px;
       --radius-lg:22px;
-      --topbar-h:70px;
-      --sidebar-w:272px;
+      --topbar-h:62px;
+      --sidebar-w:244px;
     }
 
-    body{
+    html,body{
       margin:0;
       background:var(--bg);
       color:var(--text);
       min-height:100vh;
     }
 
+    body{
+      overflow:hidden;
+      padding-top:var(--topbar-h);
+      transition:padding-top .24s ease;
+    }
+
+    body.topbar-collapsed{
+      padding-top:0;
+    }
+
     .topbar{
-      position:sticky;
+      position:fixed;
       top:0;
-      z-index:40;
+      left:0;
+      right:0;
+      z-index:60;
       height:var(--topbar-h);
       background:rgba(255,255,255,.94);
       backdrop-filter:blur(14px);
@@ -51,6 +63,12 @@
       align-items:center;
       justify-content:space-between;
       padding:0 18px;
+      transition:transform .24s ease, opacity .24s ease, height .18s ease;
+    }
+
+    .topbar.topbar-hidden{
+      transform:translateY(-100%);
+      opacity:.98;
     }
 
     .brand{
@@ -107,13 +125,14 @@
       display:flex;
       align-items:center;
       gap:12px;
+      flex:0 0 auto;
     }
 
     .status-chip{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:10px 14px;
+      padding:9px 14px;
       border-radius:999px;
       background:#fff;
       border:1px solid var(--line);
@@ -131,23 +150,62 @@
       box-shadow:0 0 0 5px rgba(123,97,255,.14);
     }
 
-    .avatar-btn{
-      width:38px;
-      height:38px;
-      border-radius:50%;
+    .home-btn{
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
+      font-weight:800;
+      font-size:13px;
+      text-decoration:none;
+      color:#173760;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .menu-btn{
+      width:40px;
+      height:40px;
+      border-radius:12px;
       border:1px solid var(--line);
       background:linear-gradient(180deg,#fff,#f3f7fc);
-      display:grid;
+      display:none;
       place-items:center;
-      font-weight:800;
-      color:#163861;
       cursor:pointer;
+      padding:0;
+      position:relative;
+      box-shadow:var(--shadow);
+      flex:0 0 auto;
     }
+
+    .menu-btn span,
+    .menu-btn::before,
+    .menu-btn::after{
+      content:"";
+      position:absolute;
+      width:18px;
+      height:2px;
+      border-radius:999px;
+      background:#163861;
+      transition:.18s ease;
+    }
+
+    .menu-btn span{ transform:translateY(0); }
+    .menu-btn::before{ transform:translateY(-6px); }
+    .menu-btn::after{ transform:translateY(6px); }
 
     .layout{
       display:grid;
       grid-template-columns:var(--sidebar-w) minmax(0,1fr);
-      min-height:calc(100vh - var(--topbar-h));
+      height:calc(100vh - var(--topbar-h));
+      transition:height .24s ease;
+    }
+
+    body.topbar-collapsed .layout{
+      height:100vh;
     }
 
     .sidebar{
@@ -155,6 +213,13 @@
       color:#fff;
       padding:18px 14px 20px;
       border-right:1px solid rgba(255,255,255,.06);
+      height:calc(100vh - var(--topbar-h));
+      overflow-y:auto;
+      transition:height .24s ease;
+    }
+
+    body.topbar-collapsed .sidebar{
+      height:100vh;
     }
 
     .sidebar-section-title{
@@ -217,6 +282,14 @@
 
     .content{
       padding:20px;
+      height:calc(100vh - var(--topbar-h));
+      overflow-y:auto;
+      overflow-x:hidden;
+      transition:height .24s ease;
+    }
+
+    body.topbar-collapsed .content{
+      height:100vh;
     }
 
     .content-head{
@@ -233,7 +306,7 @@
       line-height:1.05;
       color:#112f59;
       letter-spacing:-1px;
-      margin-bottom:10px;
+      margin:0 0 10px;
     }
 
     .title-wrap p{
@@ -241,6 +314,7 @@
       max-width:920px;
       line-height:1.75;
       font-size:15px;
+      margin:0;
     }
 
     .head-actions{
@@ -315,7 +389,7 @@
 
     .grid-main{
       display:grid;
-      grid-template-columns:1fr 340px;
+      grid-template-columns:1fr 320px;
       gap:18px;
       align-items:start;
     }
@@ -334,7 +408,7 @@
     .panel-head h2{
       font-size:24px;
       color:#102f59;
-      margin-bottom:8px;
+      margin:0 0 8px;
       letter-spacing:-.5px;
     }
 
@@ -342,7 +416,7 @@
       color:var(--muted);
       line-height:1.75;
       font-size:14px;
-      margin-bottom:18px;
+      margin:0 0 18px;
     }
 
     .panel-body{
@@ -385,6 +459,7 @@
       font-size:18px;
       color:#1459b1;
       flex:0 0 auto;
+      transition:transform .18s ease;
     }
 
     .faq-answer{
@@ -482,70 +557,242 @@
       color:#fff;
     }
 
-    footer{
-      border-top:1px solid rgba(220,231,243,.92);
-      background:rgba(255,255,255,.68);
-      backdrop-filter:blur(10px);
-      margin-top:30px;
+    .page-footer{
+      margin-top:26px;
+      padding:20px 16px 26px;
+      text-align:center;
+      color:#5f728a;
+      font-size:14px;
+      line-height:1.75;
     }
 
-    .footer-inner{
-      max-width:1100px;
-      margin:0 auto;
-      padding:22px 18px 28px;
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      align-items:center;
-      flex-wrap:wrap;
-      color:#61758f;
-      font-size:.94rem;
+    .page-footer strong{
+      display:block;
+      color:#123861;
+      font-size:15px;
+      margin-bottom:4px;
     }
 
-    .footer-links{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
+    .mobile-menu{
+      position:fixed;
+      top:72px;
+      right:12px;
+      width:min(285px, calc(100vw - 24px));
+      max-height:72vh;
+      overflow:auto;
+      background:rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:0 24px 48px rgba(10,37,73,.18);
+      padding:14px;
+      z-index:80;
+      display:none;
     }
 
-    .footer-links a{
-      color:#1559bf;
+    .mobile-menu.show{ display:block; }
+
+    .mobile-menu h3{
+      margin:2px 4px 12px;
+      font-size:15px;
+      color:#0f2f58;
+    }
+
+    .mobile-group{
+      display:grid;
+      gap:8px;
+      margin-bottom:14px;
+    }
+
+    .mobile-link{
       text-decoration:none;
+      color:#11345d;
+      background:#f8fbff;
+      border:1px solid #e6eef8;
+      border-radius:12px;
+      padding:11px 12px;
       font-weight:700;
+      font-size:14px;
     }
+
+    .mobile-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(3,18,42,.12);
+      z-index:70;
+      display:none;
+    }
+
+    .mobile-overlay.show{ display:block; }
 
     @media (max-width:1120px){
+      body{
+        overflow:auto;
+        padding-top:var(--topbar-h);
+      }
+
+      body.topbar-collapsed{
+        padding-top:var(--topbar-h);
+      }
+
       .layout,
+      body.topbar-collapsed .layout,
       .grid-main{
         grid-template-columns:1fr;
+      }
+
+      .layout{
+        height:auto;
       }
 
       .cards-4{
         grid-template-columns:repeat(2,1fr);
       }
+
+      .sidebar{
+        height:auto;
+      }
+
+      .content{
+        height:auto;
+        overflow:visible;
+      }
     }
 
     @media (max-width:820px){
-      .content{ padding:16px; }
       .sidebar{ display:none; }
+      .content{ padding:16px; }
+      .status-chip{ display:none; }
+      .menu-btn{ display:grid; }
       .cards-4{
         grid-template-columns:1fr;
+      }
+      .topbar{
+        padding:0 12px;
+        display:grid;
+        grid-template-columns:32px 1fr 32px;
+        align-items:center;
+        gap:8px;
+      }
+      .brand{
+        grid-column:1 / 4;
+        display:grid;
+        grid-template-columns:44px 1fr 32px;
+        align-items:center;
+        gap:8px;
+        width:100%;
+      }
+      .brand-mark{
+        width:44px;
+        height:44px;
+        border-radius:14px;
+      }
+      .brand-text{
+        min-width:0;
+        text-align:center;
+        width:100%;
+      }
+      .brand-title{
+        font-size:17px;
+        line-height:1.1;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        text-align:center;
+      }
+      .brand-sub{ display:none; }
+      .topbar-right{
+        position:absolute;
+        right:12px;
+        top:50%;
+        transform:translateY(-50%);
+        margin-left:0;
+        gap:6px;
+        justify-content:flex-end;
+      }
+      .home-btn{ display:none; }
+      .menu-btn{
+        width:32px;
+        height:32px;
+        border-radius:10px;
+      }
+      .menu-btn span,
+      .menu-btn::before,
+      .menu-btn::after{
+        width:14px;
+      }
+      .menu-btn::before{ transform:translateY(-5px); }
+      .menu-btn::after{ transform:translateY(5px); }
+      .grid-main{ grid-template-columns:1fr; }
+      .mobile-menu{
+        width:min(250px, calc(100vw - 20px));
+        right:10px;
       }
     }
 
     @media (max-width:520px){
-      .status-chip{ display:none; }
       .content-head{
         flex-direction:column;
         align-items:stretch;
       }
       .head-actions{ width:100%; }
       .head-btn{ width:100%; }
+      .topbar{
+        padding:0 10px;
+      }
+      .brand{
+        grid-template-columns:40px 1fr 30px;
+        gap:8px;
+      }
+      .brand-mark{
+        width:40px;
+        height:40px;
+        border-radius:13px;
+      }
+      .brand-title{
+        font-size:18px;
+        line-height:1.08;
+        text-align:center;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+      .topbar-right{
+        right:10px;
+        gap:6px;
+      }
+      .menu-btn{
+        width:30px;
+        height:30px;
+        border-radius:9px;
+      }
+      .menu-btn span,
+      .menu-btn::before,
+      .menu-btn::after{
+        width:13px;
+      }
+      .menu-btn::before{ transform:translateY(-4px); }
+      .menu-btn::after{ transform:translateY(4px); }
+      .title-wrap h1{
+        font-size:28px;
+        line-height:1.08;
+      }
+      .title-wrap p{
+        font-size:15px;
+        line-height:1.8;
+      }
+      .mobile-menu{
+        width:min(230px, calc(100vw - 18px));
+        right:9px;
+        top:68px;
+      }
+      .page-footer{
+        padding-bottom:22px;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
+  <header class="topbar" id="topbar">
     <a href="./index.html" class="brand">
       <div class="brand-mark"></div>
       <div class="brand-text">
@@ -559,9 +806,35 @@
         <span class="status-dot"></span>
         <span>Informations & réponses</span>
       </div>
-      <div class="avatar-btn" id="avatarBtn">☰</div>
+      <a href="./index.html" class="home-btn">Accueil</a>
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="Ouvrir le menu">
+        <span></span>
+      </button>
     </div>
   </header>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="mobile-menu" id="mobileMenu">
+    <h3>Explorer le site</h3>
+
+    <div class="mobile-group">
+      <a class="mobile-link" href="./index.html">Accueil</a>
+      <a class="mobile-link" href="./about.html">À propos</a>
+      <a class="mobile-link" href="./competition.html">Championnat</a>
+      <a class="mobile-link" href="./rules.html">Règlement</a>
+      <a class="mobile-link" href="./results.html">Résultats</a>
+      <a class="mobile-link" href="./laureats.html">Lauréats</a>
+      <a class="mobile-link" href="./announcements.html">Annonces</a>
+      <a class="mobile-link" href="./faq.html">FAQ</a>
+      <a class="mobile-link" href="./contact.html">Contact</a>
+      <a class="mobile-link" href="./verify-certificate.html">Vérifier certificat</a>
+      <a class="mobile-link" href="./login.html">Connexion</a>
+      <a class="mobile-link" href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
+      <a class="mobile-link" href="./login.html?redirect=jury.html">Jury</a>
+      <a class="mobile-link" href="./login.html?redirect=admin.html">Administration</a>
+    </div>
+  </aside>
 
   <div class="layout">
     <aside class="sidebar">
@@ -572,9 +845,9 @@
         <a class="nav-link" href="./rules.html"><span class="nav-dot gold"></span><span>Règlement</span></a>
         <a class="nav-link" href="./results.html"><span class="nav-dot purple"></span><span>Résultats</span></a>
         <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
-        <a class="nav-link active" href="./faq.html"><span class="nav-dot blue"></span><span>FAQ</span></a>
-        <a class="nav-link" href="./contact.html"><span class="nav-dot blue"></span><span>Contact</span></a>
-        <a class="nav-link" href="./login.html"><span class="nav-dot blue"></span><span>Connexion</span></a>
+        <a class="nav-link active" href="./faq.html"><span class="nav-dot purple"></span><span>FAQ</span></a>
+        <a class="nav-link" href="./contact.html"><span class="nav-dot"></span><span>Contact</span></a>
+        <a class="nav-link" href="./login.html"><span class="nav-dot"></span><span>Connexion</span></a>
         <a class="nav-link" href="./login.html?redirect=jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
         <a class="nav-link" href="./login.html?redirect=admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
       </nav>
@@ -585,7 +858,7 @@
       </div>
     </aside>
 
-    <main class="content">
+    <main class="content" id="mainContent">
       <div class="content-head">
         <div class="title-wrap">
           <h1>Questions fréquentes</h1>
@@ -639,7 +912,7 @@
                     <span class="faq-sign">+</span>
                   </button>
                   <div class="faq-answer">
-                    Tout le monde peut consulter les pages publiques : accueil, présentation du championnat, règlement, résultats publiés, vérification certificat, FAQ et contact.
+                    Tout le monde peut consulter les pages publiques : accueil, championnat, règlement, résultats publiés, vérification certificat, FAQ et contact.
                   </div>
                 </div>
 
@@ -849,32 +1122,95 @@
           </section>
         </aside>
       </section>
+
+      <div class="page-footer">
+        <strong>Championnat de Chimie</strong>
+        Tous droits réservés © 2026 — FAQ, informations utiles et réponses aux questions fréquentes.
+      </div>
     </main>
   </div>
 
-  <footer>
-    <div class="footer-inner">
-      <div>© 2026 Championnat de Chimie — FAQ.</div>
-      <div class="footer-links">
-        <a href="./index.html">Accueil</a>
-        <a href="./competition.html">Championnat</a>
-        <a href="./rules.html">Règlement</a>
-        <a href="./results.html">Résultats</a>
-        <a href="./verify-certificate.html">Certificat</a>
-        <a href="./contact.html">Contact</a>
-      </div>
-    </div>
-  </footer>
-
   <script>
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const mobileOverlay = document.getElementById("mobileOverlay");
+    const topbar = document.getElementById("topbar");
+    const mainContent = document.getElementById("mainContent");
+
     document.querySelectorAll(".faq-question").forEach(btn => {
       btn.addEventListener("click", () => {
         btn.parentElement.classList.toggle("active");
       });
     });
 
-    document.getElementById("avatarBtn").addEventListener("click", () => {
-      window.location.href = "./index.html";
+    function closeMenu(){
+      mobileMenu.classList.remove("show");
+      mobileOverlay.classList.remove("show");
+    }
+
+    function openMenu(){
+      mobileMenu.classList.add("show");
+      mobileOverlay.classList.add("show");
+    }
+
+    menuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (mobileMenu.classList.contains("show")) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    mobileOverlay.addEventListener("click", closeMenu);
+
+    document.addEventListener("click", (e) => {
+      const insideMenu = mobileMenu.contains(e.target);
+      const onBtn = menuBtn.contains(e.target);
+      if (!insideMenu && !onBtn) {
+        closeMenu();
+      }
+    });
+
+    document.querySelectorAll(".mobile-link").forEach(link => {
+      link.addEventListener("click", closeMenu);
+    });
+
+    let lastScrollTop = 0;
+
+    function handleTopbarOnScroll() {
+      const isDesktop = window.innerWidth > 1120;
+
+      if (!isDesktop) {
+        topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
+        return;
+      }
+
+      const currentScroll = mainContent.scrollTop;
+
+      if (currentScroll <= 6) {
+        topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
+      } else if (currentScroll > lastScrollTop + 4) {
+        topbar.classList.add("topbar-hidden");
+        document.body.classList.add("topbar-collapsed");
+      } else if (currentScroll < lastScrollTop - 4) {
+        topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
+      }
+
+      lastScrollTop = currentScroll < 0 ? 0 : currentScroll;
+    }
+
+    mainContent.addEventListener("scroll", handleTopbarOnScroll);
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth <= 1120) {
+        topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
+      }
+      closeMenu();
     });
   </script>
 </body>
