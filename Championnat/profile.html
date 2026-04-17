@@ -148,6 +148,11 @@
       box-shadow:0 0 0 5px rgba(123,97,255,.14);
     }
 
+    .status-dot.ok{
+      background:var(--green);
+      box-shadow:0 0 0 5px rgba(24,195,74,.14);
+    }
+
     .home-btn{
       border:none;
       border-radius:12px;
@@ -841,7 +846,7 @@
 
     <div class="topbar-right">
       <div class="status-chip">
-        <span class="status-dot"></span>
+        <span class="status-dot" id="statusDot"></span>
         <span id="statusText">Profil</span>
       </div>
       <a href="./index.html" class="home-btn">Accueil</a>
@@ -868,7 +873,7 @@
       <a class="mobile-link" href="./verify-certificate.html">Vérifier certificat</a>
       <a class="mobile-link" href="./profile.html">Mon profil</a>
       <a class="mobile-link" href="./login.html" id="mobileAuthLink">Connexion</a>
-      <a class="mobile-link" href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
+      <a class="mobile-link" href="./dashboard-candidat.html">Espace candidat</a>
       <a class="mobile-link" href="./login.html?redirect=jury.html">Jury</a>
       <a class="mobile-link" href="./login.html?redirect=competition-admin.html">Administration</a>
       <a class="mobile-link" href="./competition-admin.html" id="mobileAdminLink" style="display:none;">Tableau de bord admin</a>
@@ -892,7 +897,7 @@
         <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
         <a class="nav-link active" href="./profile.html"><span class="nav-dot blue"></span><span>Mon profil</span></a>
         <a class="nav-link" href="./login.html" id="desktopAuthLink"><span class="nav-dot orange"></span><span id="desktopAuthLabel">Connexion</span></a>
-        <a class="nav-link" href="./login.html?redirect=dashboard-candidat.html"><span class="nav-dot green"></span><span>Espace candidat</span></a>
+        <a class="nav-link" href="./dashboard-candidat.html"><span class="nav-dot green"></span><span>Espace candidat</span></a>
         <a class="nav-link" href="./login.html?redirect=jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
         <a class="nav-link" href="./login.html?redirect=competition-admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
         <a class="nav-link" href="./competition-admin.html" id="desktopAdminLink" style="display:none;"><span class="nav-dot red"></span><span>Tableau de bord admin</span></a>
@@ -957,11 +962,11 @@
 
               <div class="info-grid" style="margin-top:16px;">
                 <div class="info-card">
-                  <div class="label">Nom</div>
+                  <div class="label">Prénom</div>
                   <div class="value" id="viewFirstName">—</div>
                 </div>
                 <div class="info-card">
-                  <div class="label">Prénom</div>
+                  <div class="label">Nom</div>
                   <div class="value" id="viewLastName">—</div>
                 </div>
                 <div class="info-card">
@@ -1024,12 +1029,12 @@
 
               <div class="row-2">
                 <div class="field">
-                  <label for="firstName">Nom</label>
-                  <input id="firstName" type="text" placeholder="Nom" />
+                  <label for="firstName">Prénom</label>
+                  <input id="firstName" type="text" placeholder="Prénom" />
                 </div>
                 <div class="field">
-                  <label for="lastName">Prénom</label>
-                  <input id="lastName" type="text" placeholder="Prénom" />
+                  <label for="lastName">Nom</label>
+                  <input id="lastName" type="text" placeholder="Nom" />
                 </div>
               </div>
 
@@ -1132,7 +1137,7 @@
               </div>
             </div>
           </section>
-                  </div>
+        </div>
       </section>
 
       <div class="page-footer">
@@ -1157,6 +1162,7 @@
     const mobileOverlay = document.getElementById("mobileOverlay");
 
     const statusText = document.getElementById("statusText");
+    const statusDot = document.getElementById("statusDot");
     const heroTitle = document.getElementById("heroTitle");
     const heroText = document.getElementById("heroText");
     const heroPhoto = document.getElementById("heroPhoto");
@@ -1540,6 +1546,8 @@
         heroName.textContent = "Profil indisponible";
         heroSub.textContent = "Aucun membre sélectionné";
         viewBio.textContent = "Aucune donnée à afficher.";
+        statusText.textContent = "Profil";
+        statusDot.classList.remove("ok");
         return;
       }
 
@@ -1558,6 +1566,8 @@
         heroName.textContent = "Introuvable";
         heroSub.textContent = "Profil non disponible";
         viewBio.textContent = "Aucune donnée publique disponible.";
+        statusText.textContent = "Introuvable";
+        statusDot.classList.remove("ok");
         return;
       }
 
@@ -1568,10 +1578,12 @@
         fillEditForm(state.targetProfile);
         metaMode.textContent = state.currentUser?.uid === state.targetUid ? "Mon profil" : "Admin";
         statusText.textContent = state.currentUser?.uid === state.targetUid ? "Mon profil" : "Profil administrable";
+        statusDot.classList.add("ok");
       } else {
         editPanel.style.display = "none";
         metaMode.textContent = "Lecture";
         statusText.textContent = "Profil public";
+        statusDot.classList.remove("ok");
       }
     }
 
