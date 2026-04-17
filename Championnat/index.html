@@ -13,10 +13,10 @@
       font-family:Arial, Helvetica, sans-serif;
       color:#0b2340;
       background:
-        radial-gradient(circle at top left, rgba(46,140,255,.18), transparent 28%),
-        radial-gradient(circle at top right, rgba(0,214,201,.16), transparent 22%),
-        radial-gradient(circle at bottom left, rgba(20,115,230,.12), transparent 26%),
-        linear-gradient(180deg, #eef7ff 0%, #f7fbff 45%, #eef6ff 100%);
+        radial-gradient(circle at top left, rgba(255,180,120,.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(123,97,255,.12), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(255,95,109,.10), transparent 26%),
+        linear-gradient(180deg, #fffaf6 0%, #fffdfb 42%, #f8f6ff 100%);
       min-height:100vh;
       overflow-x:hidden;
     }
@@ -30,11 +30,11 @@
       --cyan-dark:#00b7ad;
       --text:#0b2340;
       --muted:#61748d;
-      --line:#dbe9f6;
+      --line:#e9edf6;
       --card:rgba(255,255,255,.78);
       --card-strong:rgba(255,255,255,.92);
-      --shadow:0 18px 45px rgba(9,45,92,.12);
-      --shadow-soft:0 10px 25px rgba(10,37,73,.08);
+      --shadow:0 18px 45px rgba(9,45,92,.10);
+      --shadow-soft:0 10px 25px rgba(10,37,73,.07);
       --radius-xl:28px;
       --radius-lg:22px;
       --radius-md:16px;
@@ -56,12 +56,12 @@
     body::before{
       top:-120px;
       left:-120px;
-      background:rgba(47,140,255,.18);
+      background:rgba(255,180,120,.14);
     }
     body::after{
       right:-120px;
       top:140px;
-      background:rgba(0,214,201,.12);
+      background:rgba(123,97,255,.10);
     }
 
     .page-wrap{
@@ -80,8 +80,8 @@
     .orb{
       position:absolute;
       border-radius:50%;
-      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(47,140,255,.38) 45%, rgba(47,140,255,.10) 70%, transparent 74%);
-      box-shadow:0 0 40px rgba(47,140,255,.15);
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,159,26,.26) 45%, rgba(123,97,255,.10) 70%, transparent 74%);
+      box-shadow:0 0 40px rgba(255,159,26,.12);
       animation:floatOrb 8s ease-in-out infinite;
     }
     .orb.o1{width:120px;height:120px;top:90px;left:6%}
@@ -91,7 +91,7 @@
 
     .line{
       position:absolute;
-      background:linear-gradient(90deg, rgba(47,140,255,.05), rgba(47,140,255,.30), rgba(0,214,201,.18));
+      background:linear-gradient(90deg, rgba(255,159,26,.06), rgba(123,97,255,.28), rgba(47,140,255,.14));
       border-radius:999px;
       transform-origin:left center;
       opacity:.55;
@@ -106,9 +106,9 @@
       top:0;
       z-index:50;
       backdrop-filter:blur(18px);
-      background:rgba(255,255,255,.68);
-      border-bottom:1px solid rgba(219,233,246,.9);
-      box-shadow:0 6px 24px rgba(8,46,91,.05);
+      background:rgba(255,255,255,.70);
+      border-bottom:1px solid rgba(233,237,246,.95);
+      box-shadow:0 6px 24px rgba(8,46,91,.04);
     }
 
     .header-inner{
@@ -137,9 +137,9 @@
       border-radius:15px;
       position:relative;
       background:
-        radial-gradient(circle at 30% 30%, #ffffff 0%, #c9e3ff 22%, #4fa7ff 52%, #1559bf 100%);
+        radial-gradient(circle at 30% 30%, #ffffff 0%, #ffe4c6 24%, #ff9f1a 52%, #7b61ff 100%);
       box-shadow:
-        0 10px 28px rgba(47,140,255,.25),
+        0 10px 28px rgba(255,159,26,.24),
         inset 0 1px 8px rgba(255,255,255,.7);
       flex:0 0 auto;
     }
@@ -200,8 +200,8 @@
     }
 
     .nav-main a:hover{
-      background:rgba(47,140,255,.10);
-      color:#0f4d92;
+      background:rgba(123,97,255,.08);
+      color:#7b61ff;
     }
 
     .header-actions{
@@ -230,13 +230,13 @@
       padding:13px 20px;
       border-radius:999px;
       color:#fff;
-      background:linear-gradient(135deg, var(--blue), var(--blue-dark));
-      box-shadow:0 14px 34px rgba(47,140,255,.28);
+      background:linear-gradient(135deg, #ff8a3d, #ff5f6d 60%, #7b61ff);
+      box-shadow:0 14px 34px rgba(255,95,109,.24);
     }
 
     .btn:hover{
       transform:translateY(-2px);
-      box-shadow:0 18px 36px rgba(47,140,255,.34);
+      box-shadow:0 18px 36px rgba(255,95,109,.28);
     }
 
     .btn-outline{
@@ -247,9 +247,9 @@
       gap:10px;
       padding:12px 18px;
       border-radius:999px;
-      color:#0f4d92;
-      background:rgba(255,255,255,.78);
-      border:1px solid rgba(47,140,255,.18);
+      color:#7b61ff;
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(123,97,255,.14);
       box-shadow:var(--shadow-soft);
     }
 
@@ -265,7 +265,7 @@
       display:grid;
       place-items:center;
       background:rgba(255,255,255,.86);
-      border:1px solid rgba(47,140,255,.14);
+      border:1px solid rgba(123,97,255,.12);
       box-shadow:var(--shadow-soft);
       position:relative;
     }
@@ -278,7 +278,7 @@
       width:21px;
       height:2.4px;
       border-radius:999px;
-      background:#0f4d92;
+      background:#7b61ff;
       transition:.22s ease;
     }
     .menu-btn span{transform:translateY(0)}
@@ -295,9 +295,9 @@
       right:-360px;
       width:min(88vw, 330px);
       height:100vh;
-      background:rgba(255,255,255,.92);
+      background:rgba(255,255,255,.94);
       backdrop-filter:blur(22px);
-      border-left:1px solid rgba(219,233,246,.95);
+      border-left:1px solid rgba(233,237,246,.96);
       box-shadow:-18px 0 40px rgba(8,46,91,.12);
       padding:24px 18px 24px;
       z-index:80;
@@ -334,8 +334,8 @@
     .side-menu a{
       text-decoration:none;
       color:#0f2747;
-      background:rgba(255,255,255,.76);
-      border:1px solid rgba(47,140,255,.12);
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(123,97,255,.10);
       border-radius:16px;
       padding:14px 14px;
       font-weight:700;
@@ -346,15 +346,15 @@
     .side-menu a:hover{
       transform:translateX(-2px);
       background:#fff;
-      color:#0f4d92;
+      color:#7b61ff;
     }
 
     .menu-note{
       margin:18px 4px 0;
       padding:14px;
       border-radius:18px;
-      background:linear-gradient(180deg, rgba(47,140,255,.09), rgba(0,214,201,.08));
-      border:1px solid rgba(47,140,255,.14);
+      background:linear-gradient(180deg, rgba(255,159,26,.08), rgba(123,97,255,.08));
+      border:1px solid rgba(123,97,255,.12);
       color:#45617e;
       font-size:.92rem;
       line-height:1.55;
@@ -399,8 +399,8 @@
 
     .hero-card{
       position:relative;
-      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.78));
-      border:1px solid rgba(219,233,246,.92);
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+      border:1px solid rgba(233,237,246,.96);
       border-radius:34px;
       box-shadow:var(--shadow);
       padding:34px 30px 30px;
@@ -414,7 +414,7 @@
       width:260px;
       height:260px;
       border-radius:50%;
-      background:radial-gradient(circle, rgba(47,140,255,.14), transparent 70%);
+      background:radial-gradient(circle, rgba(255,159,26,.12), transparent 70%);
       pointer-events:none;
     }
 
@@ -424,12 +424,12 @@
       gap:8px;
       padding:8px 14px;
       border-radius:999px;
-      background:rgba(47,140,255,.10);
-      color:#0f4d92;
+      background:rgba(123,97,255,.08);
+      color:#7b61ff;
       font-weight:800;
       font-size:.86rem;
       margin-bottom:18px;
-      border:1px solid rgba(47,140,255,.12);
+      border:1px solid rgba(123,97,255,.10);
     }
 
     .hero h1{
@@ -463,11 +463,11 @@
     }
 
     .stat{
-      background:rgba(255,255,255,.82);
-      border:1px solid rgba(47,140,255,.10);
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(233,237,246,.96);
       border-radius:20px;
       padding:18px 16px;
-      box-shadow:0 10px 20px rgba(8,46,91,.05);
+      box-shadow:0 10px 20px rgba(8,46,91,.04);
     }
 
     .stat strong{
@@ -490,8 +490,8 @@
     }
 
     .glass-box{
-      background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.74));
-      border:1px solid rgba(219,233,246,.95);
+      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.78));
+      border:1px solid rgba(233,237,246,.96);
       border-radius:30px;
       box-shadow:var(--shadow);
       padding:24px;
@@ -506,7 +506,7 @@
       width:180px;
       height:180px;
       border-radius:50%;
-      background:radial-gradient(circle, rgba(0,214,201,.14), transparent 68%);
+      background:radial-gradient(circle, rgba(123,97,255,.12), transparent 68%);
       pointer-events:none;
     }
 
@@ -522,8 +522,8 @@
       align-items:flex-start;
       padding:16px;
       border-radius:20px;
-      background:linear-gradient(135deg, rgba(47,140,255,.10), rgba(0,214,201,.08));
-      border:1px solid rgba(47,140,255,.12);
+      background:linear-gradient(135deg, rgba(255,159,26,.10), rgba(123,97,255,.08));
+      border:1px solid rgba(255,159,26,.10);
     }
 
     .badge-dot{
@@ -560,9 +560,9 @@
     .mini-card{
       padding:16px;
       border-radius:18px;
-      background:rgba(255,255,255,.82);
-      border:1px solid rgba(47,140,255,.10);
-      box-shadow:0 10px 22px rgba(8,46,91,.05);
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(233,237,246,.96);
+      box-shadow:0 10px 22px rgba(8,46,91,.04);
     }
 
     .mini-card strong{
@@ -620,8 +620,8 @@
 
     .card{
       position:relative;
-      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.78));
-      border:1px solid rgba(219,233,246,.96);
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+      border:1px solid rgba(233,237,246,.96);
       border-radius:26px;
       padding:22px 20px;
       box-shadow:var(--shadow-soft);
@@ -634,7 +634,7 @@
       inset:0 auto auto 0;
       width:100%;
       height:4px;
-      background:linear-gradient(90deg, var(--blue), var(--cyan));
+      background:linear-gradient(90deg, #ff8a3d, #ff5f6d, #7b61ff);
       opacity:.85;
     }
 
@@ -645,7 +645,7 @@
       display:grid;
       place-items:center;
       font-size:1.35rem;
-      background:linear-gradient(135deg, rgba(47,140,255,.12), rgba(0,214,201,.12));
+      background:linear-gradient(135deg, rgba(255,159,26,.12), rgba(123,97,255,.12));
       box-shadow:inset 0 1px 6px rgba(255,255,255,.6);
       margin-bottom:14px;
     }
@@ -670,8 +670,8 @@
     }
 
     .time-card{
-      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.78));
-      border:1px solid rgba(219,233,246,.95);
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+      border:1px solid rgba(233,237,246,.96);
       border-radius:28px;
       padding:22px;
       box-shadow:var(--shadow-soft);
@@ -683,12 +683,12 @@
       justify-content:center;
       padding:8px 12px;
       border-radius:999px;
-      background:rgba(47,140,255,.10);
-      color:#0f4d92;
+      background:rgba(255,159,26,.10);
+      color:#c86c00;
       font-weight:800;
       font-size:.82rem;
       margin-bottom:12px;
-      border:1px solid rgba(47,140,255,.10);
+      border:1px solid rgba(255,159,26,.10);
     }
 
     .time-card h3{
@@ -705,13 +705,13 @@
     }
 
     .highlight{
-      background:linear-gradient(135deg, rgba(8,46,91,.98), rgba(15,77,146,.95));
+      background:linear-gradient(135deg, rgba(255,95,109,.98), rgba(255,159,26,.96), rgba(123,97,255,.94));
       border-radius:34px;
       padding:34px 28px;
       color:#fff;
       position:relative;
       overflow:hidden;
-      box-shadow:0 22px 48px rgba(8,46,91,.22);
+      box-shadow:0 22px 48px rgba(255,95,109,.18);
     }
 
     .highlight::before{
@@ -742,7 +742,7 @@
 
     .highlight p{
       margin:0;
-      color:rgba(255,255,255,.86);
+      color:rgba(255,255,255,.88);
       line-height:1.8;
       max-width:750px;
     }
@@ -755,12 +755,12 @@
     .highlight-box{
       padding:16px 18px;
       border-radius:20px;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.16);
       backdrop-filter:blur(8px);
       font-weight:700;
       line-height:1.55;
-      color:#eef6ff;
+      color:#fff6fb;
     }
 
     .faq-list{
@@ -769,8 +769,8 @@
     }
 
     .faq-item{
-      background:linear-gradient(180deg, rgba(255,255,255,.90), rgba(255,255,255,.78));
-      border:1px solid rgba(219,233,246,.95);
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+      border:1px solid rgba(233,237,246,.96);
       border-radius:22px;
       padding:20px 20px;
       box-shadow:var(--shadow-soft);
@@ -795,8 +795,8 @@
     }
 
     .cta-card{
-      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
-      border:1px solid rgba(219,233,246,.95);
+      background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.84));
+      border:1px solid rgba(233,237,246,.96);
       border-radius:34px;
       box-shadow:var(--shadow);
       padding:34px 28px;
@@ -813,7 +813,7 @@
       border-radius:50%;
       left:-110px;
       bottom:-130px;
-      background:radial-gradient(circle, rgba(47,140,255,.15), transparent 72%);
+      background:radial-gradient(circle, rgba(255,159,26,.12), transparent 72%);
     }
 
     .cta-card h2{
@@ -838,8 +838,8 @@
     }
 
     footer{
-      border-top:1px solid rgba(219,233,246,.95);
-      background:rgba(255,255,255,.65);
+      border-top:1px solid rgba(233,237,246,.96);
+      background:rgba(255,255,255,.68);
       backdrop-filter:blur(10px);
     }
 
@@ -863,7 +863,7 @@
     }
 
     .footer-links a{
-      color:#0f4d92;
+      color:#7b61ff;
       text-decoration:none;
       font-weight:700;
     }
@@ -985,11 +985,11 @@
           <a href="./competition.html">Championnat</a>
           <a href="./rules.html">Règlement</a>
           <a href="./results.html">Résultats</a>
-          <a href="./verify-certificate.html">Vérifier certificat</a>
-          <a href="./about.html">À propos</a>
+          <a href="./laureats.html">Lauréats</a>
+          <a href="./announcements.html">Annonces</a>
+          <a href="./verify-certificate.html">Certificat</a>
           <a href="./faq.html">FAQ</a>
           <a href="./contact.html">Contact</a>
-          <a href="./announcements.html">Annonces</a>
           <a href="./login.html">Connexion</a>
         </nav>
 
@@ -1005,21 +1005,25 @@
           <aside class="side-menu">
             <h3>Explorer le site</h3>
             <div class="menu-group">
+              <a href="./index.html">Accueil</a>
               <a href="./about.html">À propos</a>
-              <a href="./competition.html">Comment ça marche</a>
-              <a href="./rules.html">Calendrier & règlement</a>
-              <a href="./login.html?redirect=jury.html">Jury & organisation</a>
-              <a href="./faq.html">FAQ</a>
               <a href="./competition.html">Championnat</a>
               <a href="./rules.html">Règlement</a>
               <a href="./results.html">Résultats</a>
-              <a href="./verify-certificate.html">Vérifier certificat</a>
-              <a href="./login.html">Connexion</a>
+              <a href="./laureats.html">Lauréats</a>
+              <a href="./announcements.html">Annonces</a>
+              <a href="./faq.html">FAQ</a>
               <a href="./contact.html">Contact</a>
-              <a href="./login.html?redirect=admin.html">Administration</a>
+              <a href="./verify-certificate.html">Vérifier certificat</a>
+              <a href="./profile.html">Mon profil</a>
+              <a href="./login.html">Connexion</a>
+              <a href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
+              <a href="./login.html?redirect=jury.html">Jury</a>
+              <a href="./login.html?redirect=competition-admin.html">Administration</a>
+              <a href="./login.html?redirect=competition-support-admin.html">Support admin</a>
             </div>
             <div class="menu-note">
-              Le jury et l’administration ne sont pas des zones publiques. L’accès se fait après connexion, selon l’autorisation accordée par l’administrateur principal.
+              L’accueil reste public. Les espaces candidat, jury, administration et support admin passent par la connexion et les autorisations déjà prévues.
             </div>
           </aside>
 
@@ -1034,9 +1038,9 @@
           <div class="hero-grid">
             <div class="hero-card">
               <div class="eyebrow">🏆 Excellence académique • Chimie • Francophonie</div>
-              <h1>Le championnat académique de chimie, pensé pour briller.</h1>
+              <h1>Le point central du Championnat de Chimie.</h1>
               <p class="lead">
-                Une plateforme moderne, claire et attractive pour mettre en valeur les talents, organiser les épreuves, publier les annonces importantes, afficher les résultats officiels et vérifier les certificats dans un cadre sérieux et académique.
+                Une page d’accueil claire, moderne et reliée à tout le site : participation, règlement, annonces, résultats, lauréats, certificats, espaces privés et administration.
               </p>
 
               <div class="hero-actions">
@@ -1046,49 +1050,49 @@
 
               <div class="hero-stats">
                 <div class="stat">
-                  <strong>01</strong>
-                  <span>Entrée principale de tout le site</span>
+                  <strong>Public</strong>
+                  <span>Vitrine, annonces, résultats et certificat</span>
                 </div>
                 <div class="stat">
-                  <strong>100%</strong>
-                  <span>Organisation académique cohérente</span>
+                  <strong>Privé</strong>
+                  <span>Espace candidat, jury, admin</span>
                 </div>
                 <div class="stat">
-                  <strong>24/7</strong>
-                  <span>Vitrine publique et accès privés</span>
+                  <strong>Central</strong>
+                  <span>Direction vers toutes les sections</span>
                 </div>
               </div>
             </div>
 
             <div class="hero-panel">
               <div class="glass-box">
-                <h2 class="panel-title">Annonce du moment</h2>
+                <h2 class="panel-title">Accès direct</h2>
                 <div class="announcement">
                   <div class="badge-dot"></div>
                   <div>
-                    <strong>Le championnat s’organise autour d’un centre unique</strong>
+                    <strong>Une seule vitrine, plusieurs parcours</strong>
                     <p>
-                      L’accueil sert désormais de vitrine générale, puis oriente chaque profil vers la bonne section : participation, règlement, résultats, certificats, jury ou administration.
+                      Le visiteur découvre. Le candidat participe. Le jury suit. L’administration pilote. Tout part d’ici.
                     </p>
                   </div>
                 </div>
 
                 <div class="mini-grid">
                   <div class="mini-card">
-                    <strong>Candidats</strong>
-                    <p>Découvrent, se connectent, participent et suivent leur parcours.</p>
+                    <strong>Championnat</strong>
+                    <p>Entrée principale vers la compétition et le parcours public.</p>
                   </div>
                   <div class="mini-card">
-                    <strong>Jury</strong>
-                    <p>Accès privé après autorisation administrateur sur email validé.</p>
+                    <strong>Résultats</strong>
+                    <p>Classement visible selon la publication officielle.</p>
                   </div>
                   <div class="mini-card">
-                    <strong>Administration</strong>
-                    <p>Pilote l’épreuve, les résultats, les certificats et les annonces.</p>
+                    <strong>Annonces</strong>
+                    <p>Le cœur vivant du site, connecté aux autres sections.</p>
                   </div>
                   <div class="mini-card">
-                    <strong>Public</strong>
-                    <p>Consulte la vitrine, les résultats publiés et la vérification des certificats.</p>
+                    <strong>Certificat</strong>
+                    <p>Vérification publique quand l’administration l’active.</p>
                   </div>
                 </div>
               </div>
@@ -1097,74 +1101,94 @@
         </div>
       </section>
 
-      <section id="about-home">
+      <section id="sections-home">
         <div class="container">
           <div class="section-head">
             <div>
-              <h2>À propos du championnat</h2>
+              <h2>Toutes les sections du site</h2>
               <p>
-                Le Championnat de Chimie est conçu comme une plateforme académique francophone orientée vers la rigueur, la clarté et la valorisation des compétences en chimie. L’accueil reste public, mais le site distribue ensuite proprement vers les espaces adaptés à chaque rôle.
+                Accès rapide vers les pages déjà construites, sans changer leur logique actuelle.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-4">
+            <a class="card" href="./competition.html" style="text-decoration:none;color:inherit;">
+              <div class="icon-bubble">🏆</div>
+              <h3>Championnat</h3>
+              <p>Présentation générale et point d’entrée vers la compétition.</p>
+            </a>
+            <a class="card" href="./rules.html" style="text-decoration:none;color:inherit;">
+              <div class="icon-bubble">📘</div>
+              <h3>Règlement</h3>
+              <p>Conditions, organisation et cadre officiel du championnat.</p>
+            </a>
+            <a class="card" href="./results.html" style="text-decoration:none;color:inherit;">
+              <div class="icon-bubble">📊</div>
+              <h3>Résultats</h3>
+              <p>Classement officiel et publication décidée par l’administration.</p>
+            </a>
+            <a class="card" href="./laureats.html" style="text-decoration:none;color:inherit;">
+              <div class="icon-bubble">🥇</div>
+              <h3>Lauréats</h3>
+              <p>Mise en valeur des meilleurs profils et de l’excellence scientifique.</p>
+            </a>
+            <a class="card" href="./announcements.html" style="text-decoration:none;color:inherit;">
+              <div class="icon-bubble">📢</div>
+              <h3>Annonces</h3>
+              <p>Publications, actualités, interactions et relais central du site.</p>
+            </a>
+            <a class="card" href="./faq.html" style="text-decoration:none;color:inherit;">
+              <div class="icon-bubble">❓</div>
+              <h3>FAQ</h3>
+              <p>Réponses rapides sur les accès, l’examen et les certificats.</p>
+            </a>
+            <a class="card" href="./contact.html" style="text-decoration:none;color:inherit;">
+              <div class="icon-bubble">✉️</div>
+              <h3>Contact</h3>
+              <p>Message direct vers la boîte interne du support administration.</p>
+            </a>
+            <a class="card" href="./verify-certificate.html" style="text-decoration:none;color:inherit;">
+              <div class="icon-bubble">✅</div>
+              <h3>Vérifier certificat</h3>
+              <p>Contrôle public d’authenticité à partir du numéro enregistré.</p>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="parcours-home">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Parcours utilisateur</h2>
+              <p>
+                L’accueil oriente chaque profil vers sa bonne destination, sans refaire les autres pages.
               </p>
             </div>
           </div>
 
           <div class="cards-3">
             <div class="card">
-              <div class="icon-bubble">🧪</div>
-              <h3>Esprit scientifique</h3>
+              <div class="icon-bubble">👨‍🎓</div>
+              <h3>Candidat</h3>
               <p>
-                Une identité visuelle brillante et sérieuse, inspirée du monde académique, des laboratoires et des compétitions d’excellence.
+                Découvre le championnat, se connecte, accède à son espace, rejoint l’examen et suit sa progression.
               </p>
             </div>
             <div class="card">
-              <div class="icon-bubble">🌍</div>
-              <h3>Orientation francophone</h3>
+              <div class="icon-bubble">👨‍🏫</div>
+              <h3>Jury</h3>
               <p>
-                Une plateforme pensée d’abord pour un public francophone, avec une présentation claire et accessible à plusieurs pays.
+                Passe par la connexion, puis rejoint l’espace jury seulement si l’email a été autorisé.
               </p>
             </div>
             <div class="card">
-              <div class="icon-bubble">🎓</div>
-              <h3>Crédibilité institutionnelle</h3>
+              <div class="icon-bubble">🛠️</div>
+              <h3>Administration</h3>
               <p>
-                Une structure propre pour accueillir règlement, participation, résultats, vérification de certificat et zones privées contrôlées.
+                Lance l’épreuve, publie, corrige, gère le support, les résultats et la vérification certificat.
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="how-home">
-        <div class="container">
-          <div class="section-head">
-            <div>
-              <h2>Comment fonctionne le site</h2>
-              <p>
-                La plateforme reste simple pour le visiteur, mais elle est structurée pour guider chaque utilisateur vers son bon espace sans confusion.
-              </p>
-            </div>
-          </div>
-
-          <div class="cards-4">
-            <div class="card">
-              <div class="icon-bubble">1</div>
-              <h3>Découvrir</h3>
-              <p>Le visiteur consulte l’accueil, le championnat, le règlement, les résultats publiés et la vérification certificat.</p>
-            </div>
-            <div class="card">
-              <div class="icon-bubble">2</div>
-              <h3>Se connecter</h3>
-              <p>Le candidat, le jury ou l’administrateur passe par une seule entrée : la page de connexion.</p>
-            </div>
-            <div class="card">
-              <div class="icon-bubble">3</div>
-              <h3>Être orienté</h3>
-              <p>Après connexion, chacun est redirigé vers l’espace qui lui correspond : candidat, jury ou admin.</p>
-            </div>
-            <div class="card">
-              <div class="icon-bubble">4</div>
-              <h3>Agir</h3>
-              <p>Le candidat participe, le jury propose et suit, l’admin valide, lance, publie et certifie.</p>
             </div>
           </div>
         </div>
@@ -1174,9 +1198,9 @@
         <div class="container">
           <div class="section-head">
             <div>
-              <h2>Calendrier du championnat</h2>
+              <h2>Parcours du championnat</h2>
               <p>
-                Cette zone résume les grandes étapes du parcours sans alourdir la page d’accueil.
+                Trois grandes étapes simples pour comprendre la logique générale du site.
               </p>
             </div>
           </div>
@@ -1184,23 +1208,23 @@
           <div class="timeline">
             <div class="time-card">
               <div class="time-pill">Étape 1</div>
-              <h3>Découverte & règlement</h3>
+              <h3>Découvrir</h3>
               <p>
-                Le visiteur découvre la plateforme, le règlement et les conditions générales de participation.
+                Le visiteur lit la présentation, le règlement, la FAQ, les annonces et les résultats visibles.
               </p>
             </div>
             <div class="time-card">
               <div class="time-pill">Étape 2</div>
-              <h3>Connexion & participation</h3>
+              <h3>Se connecter</h3>
               <p>
-                Le candidat se connecte, accède à son espace, puis peut rejoindre l’épreuve lorsque l’administration la lance.
+                L’entrée unique mène ensuite vers l’espace candidat, le jury ou l’administration selon le rôle.
               </p>
             </div>
             <div class="time-card">
               <div class="time-pill">Étape 3</div>
-              <h3>Résultats & certificat</h3>
+              <h3>Participer et suivre</h3>
               <p>
-                Les résultats sont publiés selon la décision admin, puis la vérification certificat devient possible si elle est activée.
+                Examen, résultats, lauréats, support et certificats suivent la logique décidée par l’administration.
               </p>
             </div>
           </div>
@@ -1212,53 +1236,16 @@
           <div class="highlight">
             <div class="highlight-grid">
               <div>
-                <h2>Une vitrine centrale, élégante et utile.</h2>
+                <h2>Une vitrine centrale, propre et reliée à tout.</h2>
                 <p>
-                  Cette page ne remplace pas les autres : elle les organise. Elle agit comme le centre général du site, distribue vers chaque section déjà codée et garde l’ensemble lisible, beau et cohérent.
+                  Cette page d’accueil devient le centre général du site. Elle présente, rassure et envoie directement vers les sections déjà prêtes, sur mobile comme sur ordinateur.
                 </p>
               </div>
               <div class="highlight-boxes">
-                <div class="highlight-box">Les pages publiques restent visibles et valorisent le championnat.</div>
-                <div class="highlight-box">Les zones privées passent par la connexion unique et les autorisations.</div>
-                <div class="highlight-box">Le jury n’est pas public : l’accès dépend d’un email autorisé par l’admin.</div>
+                <div class="highlight-box">Pages publiques : accueil, championnat, règlement, résultats, lauréats, FAQ, contact, certificat.</div>
+                <div class="highlight-box">Pages privées : profil, espace candidat, jury, administration, support admin.</div>
+                <div class="highlight-box">Annonces : espace central vivant, déjà connecté au reste du système.</div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="roles-home">
-        <div class="container">
-          <div class="section-head">
-            <div>
-              <h2>Profils et accès</h2>
-              <p>
-                Chaque profil a sa logique, son rôle et sa section correspondante dans le système.
-              </p>
-            </div>
-          </div>
-
-          <div class="cards-3">
-            <div class="card">
-              <div class="icon-bubble">👨‍🎓</div>
-              <h3>Candidat</h3>
-              <p>
-                Découvre le championnat, se connecte, participe à l’épreuve, suit ses résultats et son parcours.
-              </p>
-            </div>
-            <div class="card">
-              <div class="icon-bubble">👨‍🏫</div>
-              <h3>Jury</h3>
-              <p>
-                Rôle privé : proposer des questions, suivre la compétition et collaborer avec l’administration après autorisation sur email.
-              </p>
-            </div>
-            <div class="card">
-              <div class="icon-bubble">🛠️</div>
-              <h3>Administration</h3>
-              <p>
-                Contrôle les candidatures, le lancement de l’épreuve, les résultats, les certificats et les messages internes.
-              </p>
             </div>
           </div>
         </div>
@@ -1268,30 +1255,30 @@
         <div class="container">
           <div class="section-head">
             <div>
-              <h2>Questions fréquentes</h2>
+              <h2>Questions rapides</h2>
               <p>
-                Quelques réponses courtes suffisent pour rassurer les visiteurs dès la première visite.
+                Quelques réponses courtes dès l’accueil.
               </p>
             </div>
           </div>
 
           <div class="faq-list">
             <div class="faq-item">
-              <h3>Le site est-il accessible sans mot de passe ?</h3>
+              <h3>Le site est-il public ?</h3>
               <p>
-                Oui. Les pages de présentation comme l’accueil, le championnat, le règlement, les résultats publiés et la vérification certificat peuvent rester visibles sans connexion.
+                Oui pour la vitrine générale. Les sections privées passent par la connexion et les autorisations prévues.
               </p>
             </div>
             <div class="faq-item">
-              <h3>Le jury est-il public ?</h3>
+              <h3>Le jury est-il ouvert à tous ?</h3>
               <p>
-                Non. L’espace jury n’est pas une page publique ouverte. L’accès est réservé aux emails autorisés par l’administrateur principal, puis passe par la connexion.
+                Non. L’accès jury reste privé et dépend d’une autorisation administrative sur email.
               </p>
             </div>
             <div class="faq-item">
-              <h3>L’administration est-elle ouverte à tous ?</h3>
+              <h3>Où commencer ?</h3>
               <p>
-                Non. L’administration reste protégée et n’est accessible qu’après vérification du compte autorisé.
+                Soit par le championnat pour découvrir, soit par la connexion pour rejoindre ton espace.
               </p>
             </div>
           </div>
@@ -1301,13 +1288,14 @@
       <section class="cta" id="contact-home">
         <div class="container">
           <div class="cta-card">
-            <h2>Prêt à entrer dans le championnat ?</h2>
+            <h2>Prêt à continuer ?</h2>
             <p>
-              Cette vitrine sert désormais de centre général : elle présente, rassure et oriente chaque profil vers la bonne page déjà existante dans le même dossier.
+              L’accueil reste simple, élégant et central. Il dirige maintenant vers toutes les autres sections sans te faire revenir en arrière.
             </p>
             <div class="cta-actions">
               <a href="./competition.html" class="btn">Découvrir le championnat</a>
               <a href="./login.html" class="btn-outline">Se connecter</a>
+              <a href="./announcements.html" class="btn-outline">Voir les annonces</a>
             </div>
           </div>
         </div>
@@ -1322,7 +1310,10 @@
           <a href="./competition.html">Championnat</a>
           <a href="./rules.html">Règlement</a>
           <a href="./results.html">Résultats</a>
+          <a href="./laureats.html">Lauréats</a>
+          <a href="./announcements.html">Annonces</a>
           <a href="./verify-certificate.html">Certificat</a>
+          <a href="./contact.html">Contact</a>
           <a href="./login.html">Connexion</a>
         </div>
       </div>
