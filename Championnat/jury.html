@@ -265,6 +265,10 @@
       border:1px solid rgba(98,180,255,.18);
     }
 
+    .nav-link.nav-disabled{
+      opacity:.78;
+    }
+
     .nav-dot{
       width:8px;
       height:8px;
@@ -615,6 +619,12 @@
       box-shadow:0 16px 28px rgba(223,75,75,.18);
     }
 
+    .btn-gold{
+      color:#fff;
+      background:linear-gradient(135deg,#e0a126,#b47c12);
+      box-shadow:0 16px 28px rgba(180,124,18,.18);
+    }
+
     .form-group{
       margin-bottom:14px;
     }
@@ -721,6 +731,32 @@
       color:#14375f;
       font-size:14px;
       line-height:1.7;
+    }
+
+    .correction-box{
+      margin-top:12px;
+      padding:14px;
+      border-radius:14px;
+      background:#f9fbfe;
+      border:1px solid var(--line-soft);
+    }
+
+    .answers-preview{
+      margin-top:10px;
+      display:grid;
+      gap:8px;
+    }
+
+    .answer-preview-item{
+      border-radius:12px;
+      padding:10px 12px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#14375f;
+      font-size:13px;
+      line-height:1.65;
+      white-space:pre-wrap;
+      word-break:break-word;
     }
 
     .mobile-menu{
@@ -974,6 +1010,7 @@
       <a class="mobile-link" href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
       <a class="mobile-link" href="./jury.html">Jury</a>
       <a class="mobile-link" href="./login.html?redirect=competition-admin.html">Administration</a>
+      <a class="mobile-link" href="./competition-admin.html">Tableau de bord admin</a>
       <a class="mobile-link" href="./competition-support-admin.html">Support admin</a>
     </div>
   </aside>
@@ -995,7 +1032,7 @@
           <h1>Espace jury</h1>
           <p>
             Le jury peut ici proposer des questions, suivre le championnat, consulter les candidatures, surveiller l’état du chrono,
-            voir les copies et préparer ses retours avant validation finale par l’administration.
+            voir les copies, commencer la correction et préparer ses retours avant validation finale par l’administration.
           </p>
         </div>
 
@@ -1182,7 +1219,7 @@
           <section class="panel">
             <div class="panel-head">
               <h2>Copies reçues</h2>
-              <p>Le jury peut suivre les copies soumises, même si la publication officielle reste contrôlée plus loin.</p>
+              <p>Le jury peut suivre les copies soumises, commencer la correction et faire évoluer le statut visible dans le système.</p>
             </div>
 
             <div class="panel-body">
@@ -1236,6 +1273,8 @@
           </section>
         </aside>
       </section>
+    </main>
+  </div>
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
@@ -1305,6 +1344,15 @@
       return String(value || "").trim().toLowerCase();
     }
 
+    function escapeHtml(value = ""){
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     function getRole(user, profile = {}){
       if (!user) return "guest";
       const email = normalizeEmail(user.email || "");
@@ -1320,6 +1368,7 @@
       if (role.includes("admin")) return "admin";
       if (role.includes("jury")) return "jury";
       if (role.includes("candidate") || role.includes("candidat")) return "candidate";
+      if (role.includes("member")) return "member";
       return "candidate";
     }
 
@@ -1343,24 +1392,26 @@
         { label:"Espace candidat", href:"./login.html?redirect=dashboard-candidat.html", color:"green" },
         { label:"Jury", href:"./jury.html", color:"gold", active:true },
         { label:"Administration", href:"./login.html?redirect=competition-admin.html", color:"red" },
-        { label:"Support admin", href:"./competition-support-admin.html", color:"red" }
+        { label:"Tableau de bord admin", href:"./competition-admin.html", color:"red" },
+        { label:"Examen", href:"./examen.html", color:"red" },
+        { label:"Support admin", href:"./competition-support-admin.html", color:"orange" }
       ];
 
       if (role === "admin") {
-        return common.map(item => {
-          if (item.label === "Administration") {
-            return { ...item, href:"./competition-admin.html" };
-          }
-          return item;
-        });
+        return common;
       }
 
-      return common;
+      return common.map(item => {
+        if (item.label === "Tableau de bord admin") {
+          return { ...item, href:"./login.html?redirect=competition-admin.html", disabled:true };
+        }
+        return item;
+      });
     }
 
     function renderSidebar(role){
       ui.sidebarNav.innerHTML = buildSidebar(role).map(item => `
-        <a class="nav-link ${item.active ? "active" : ""}" href="${item.href}">
+        <a class="nav-link ${item.active ? "active" : ""} ${item.disabled ? "nav-disabled" : ""}" href="${item.href}">
           <span class="nav-dot ${item.color || ""}"></span>
           <span>${item.label}</span>
         </a>
@@ -1372,7 +1423,7 @@
         return;
       }
 
-      ui.sidebarNote.textContent = "Le jury peut suivre les candidatures, proposer des questions, surveiller l’épreuve et préparer des retours internes.";
+      ui.sidebarNote.textContent = "Le jury peut suivre les candidatures, proposer des questions, surveiller l’épreuve, corriger les copies et préparer des retours internes.";
       ui.brandSub.textContent = "Espace jury opérationnel";
     }
 
@@ -1383,6 +1434,7 @@
         role === "admin" ? "Administrateur principal" :
         role === "jury" ? "Jury" :
         role === "candidate" ? "Candidat" :
+        role === "member" ? "Membre connecté" :
         "Invité"
       );
 
@@ -1390,6 +1442,7 @@
         role === "admin" ? "Pilotage total" :
         role === "jury" ? "Session jury" :
         role === "candidate" ? "Session candidat" :
+        role === "member" ? "Compte connecté" :
         "Accès non autorisé"
       );
 
@@ -1397,6 +1450,7 @@
         role === "admin" ? "red" :
         role === "jury" ? "gold" :
         role === "candidate" ? "green" :
+        role === "member" ? "blue" :
         "blue"
       );
     }
@@ -1421,6 +1475,15 @@
       const m = Math.floor((total % 3600) / 60);
       const s = total % 60;
       return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
+
+    function getCorrectionStatusLabel(item){
+      const status = String(item?.reviewStatus || item?.correctionStatus || item?.status || "").toLowerCase();
+      if (status.includes("corrected") || status.includes("corrig")) return { text:"Corrigée", cls:"green" };
+      if (status.includes("review")) return { text:"En correction", cls:"purple" };
+      if (status.includes("submitted") || status.includes("auto_submitted")) return { text:"Copie reçue", cls:"blue" };
+      if (status.includes("in_progress")) return { text:"En cours", cls:"orange" };
+      return { text:"En attente", cls:"orange" };
     }
 
     function startTimer(){
@@ -1469,7 +1532,7 @@
       ui.activeExamLabel.textContent = control.title || control.activeExamId || control.currentExamId || "Aucun sujet actif";
 
       if (launched) {
-        setNotice("ok", "L’épreuve semble officiellement lancée. Le jury peut suivre le déroulement en temps réel.");
+        setNotice("ok", "L’épreuve semble officiellement lancée. Le jury peut suivre le déroulement et faire avancer la correction.");
       } else {
         setNotice("info", "Le jury peut préparer et proposer, mais la visibilité réelle côté candidats dépend encore de l’admin.");
       }
@@ -1495,7 +1558,7 @@
         const uid = item.uid || item.userUid || "";
         const name = item.fullName || item.displayName || item.email || "Candidat";
         const titleHtml = uid
-          ? `<a class="list-link" href="${profileHref(uid)}">${name}</a>`
+          ? `<a class="list-link" href="${profileHref(uid)}">${escapeHtml(name)}</a>`
           : escapeHtml(name);
 
         return `
@@ -1508,6 +1571,25 @@
           </div>
         `;
       }).join("");
+    }
+
+    function renderSubmissionAnswers(item){
+      const answers = item?.answers || {};
+      const keys = Object.keys(answers);
+      if (!keys.length) {
+        return `<div class="answers-preview"><div class="answer-preview-item">Aucune réponse enregistrée.</div></div>`;
+      }
+
+      return `
+        <div class="answers-preview">
+          ${keys.slice(0, 8).map((key, index) => `
+            <div class="answer-preview-item">
+              <strong>Réponse ${index + 1}</strong><br>
+              ${escapeHtml(String(answers[key] ?? ""))}
+            </div>
+          `).join("")}
+        </div>
+      `;
     }
 
     function renderSubmissions(){
@@ -1524,6 +1606,12 @@
         });
       });
 
+      all.sort((a,b) => {
+        const aa = Number(a.submittedAt || a.updatedAt || 0);
+        const bb = Number(b.submittedAt || b.updatedAt || 0);
+        return bb - aa;
+      });
+
       ui.miniSubmissions.textContent = String(all.length);
 
       if (!all.length) {
@@ -1536,23 +1624,58 @@
         return;
       }
 
-      ui.submissionList.innerHTML = all.slice(0, 10).map(item => {
+      ui.submissionList.innerHTML = all.slice(0, 12).map((item, idx) => {
         const name = item.displayName || item.userEmail || item.uid || "Copie";
         const titleHtml = item.uid
           ? `<a class="list-link" href="${profileHref(item.uid)}">${escapeHtml(name)}</a>`
           : escapeHtml(name);
+
+        const review = getCorrectionStatusLabel(item);
+        const scoreId = `score_${idx}`;
+        const noteId = `note_${idx}`;
+        const selectId = `review_${idx}`;
 
         return `
           <div class="list-card">
             <strong>${titleHtml}</strong>
             <p>
               Épreuve : ${escapeHtml(item.examId || "—")}<br>
-              Statut : ${escapeHtml(item.status || "—")}<br>
-              Dernière mise à jour : ${item.updatedAt ? "enregistrée" : "—"}
+              Statut copie : ${escapeHtml(item.status || "—")}<br>
+              Correction : <span class="badge ${review.cls}">${review.text}</span>
             </p>
+
+            ${renderSubmissionAnswers(item)}
+
+            <div class="correction-box">
+              <div class="form-group">
+                <label class="form-label" for="${scoreId}">Note / score</label>
+                <input id="${scoreId}" type="number" min="0" step="0.1" value="${escapeHtml(String(item.score ?? ""))}" placeholder="Ex : 14.5" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="${selectId}">Statut de correction</label>
+                <select id="${selectId}">
+                  <option value="review_pending" ${String(item.reviewStatus || "").toLowerCase() === "review_pending" ? "selected" : ""}>En attente</option>
+                  <option value="in_review" ${String(item.reviewStatus || "").toLowerCase() === "in_review" ? "selected" : ""}>En correction</option>
+                  <option value="corrected" ${String(item.reviewStatus || "").toLowerCase() === "corrected" ? "selected" : ""}>Corrigée</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="${noteId}">Remarque jury</label>
+                <textarea id="${noteId}" placeholder="Observation de correction...">${escapeHtml(String(item.juryNote || ""))}</textarea>
+              </div>
+
+              <div class="actions-row">
+                <button class="btn btn-soft" data-action="save-correction" data-exam="${escapeHtml(item.examId || "")}" data-uid="${escapeHtml(item.uid || "")}" data-score="${scoreId}" data-review="${selectId}" data-note="${noteId}">Enregistrer correction</button>
+                <button class="btn btn-gold" data-action="mark-review" data-exam="${escapeHtml(item.examId || "")}" data-uid="${escapeHtml(item.uid || "")}">Passer en correction</button>
+              </div>
+            </div>
           </div>
         `;
       }).join("");
+
+      bindCorrectionActions();
     }
 
     function renderProposalPreview(){
@@ -1591,7 +1714,10 @@
         return;
       }
 
-      ui.proposalHistory.innerHTML = entries.slice(0, 8).map(([id, item]) => `
+      ui.proposalHistory.innerHTML = entries
+        .sort((a,b) => Number(b[1]?.createdAt || 0) - Number(a[1]?.createdAt || 0))
+        .slice(0, 8)
+        .map(([id, item]) => `
         <div class="list-card">
           <strong>${escapeHtml(item.title || "Proposition jury")}</strong>
           <p>
@@ -1625,7 +1751,8 @@
       $("optionC").value = "";
       $("optionD").value = "";
     }
-        async function saveJuryOpinion(){
+
+    async function saveJuryOpinion(){
       const opinion = $("juryOpinion").value.trim();
       if (!opinion || !state.user) {
         ui.juryOpinionMsg.className = "helper err show";
@@ -1727,6 +1854,71 @@
       }
     }
 
+    async function saveCorrection(examId, uid, scoreInputId, reviewInputId, noteInputId){
+      const score = document.getElementById(scoreInputId)?.value ?? "";
+      const reviewStatus = document.getElementById(reviewInputId)?.value ?? "review_pending";
+      const juryNote = document.getElementById(noteInputId)?.value?.trim() ?? "";
+
+      try{
+        await update(ref(db, `examSubmissions/${examId}/${uid}`), {
+          score: score === "" ? null : Number(score),
+          reviewStatus,
+          correctionStatus: reviewStatus,
+          juryNote,
+          reviewedByUid: state.user?.uid || "",
+          reviewedByEmail: state.user?.email || "",
+          reviewedAt: Date.now(),
+          updatedAt: Date.now()
+        });
+
+        setNotice("ok", "Correction jury enregistrée.");
+      }catch(err){
+        console.error(err);
+        setNotice("err", "Impossible d’enregistrer cette correction pour le moment.");
+      }
+    }
+
+    async function markSubmissionInReview(examId, uid){
+      try{
+        await update(ref(db, `examSubmissions/${examId}/${uid}`), {
+          reviewStatus: "in_review",
+          correctionStatus: "in_review",
+          reviewedByUid: state.user?.uid || "",
+          reviewedByEmail: state.user?.email || "",
+          reviewedAt: Date.now(),
+          updatedAt: Date.now()
+        });
+
+        setNotice("ok", "La copie est maintenant marquée en correction.");
+      }catch(err){
+        console.error(err);
+        setNotice("err", "Impossible de mettre cette copie en correction.");
+      }
+    }
+
+    function bindCorrectionActions(){
+      document.querySelectorAll("[data-action='save-correction']").forEach(btn => {
+        btn.addEventListener("click", () => {
+          saveCorrection(
+            btn.dataset.exam,
+            btn.dataset.uid,
+            btn.dataset.score,
+            btn.dataset.review,
+            btn.dataset.note
+          ).catch(console.error);
+        });
+      });
+
+      document.querySelectorAll("[data-action='mark-review']").forEach(btn => {
+        btn.addEventListener("click", () => {
+          markSubmissionInReview(
+            btn.dataset.exam,
+            btn.dataset.uid
+          ).catch(console.error);
+        });
+      });
+    }
+
     function closeMenu(){
       mobileMenu.classList.remove("show");
       mobileOverlay.classList.remove("show");
@@ -1784,7 +1976,7 @@
 
         state.role = getRole(user, state.profile);
 
-        if (state.role === "candidate") {
+        if (state.role === "candidate" || state.role === "member") {
           window.location.replace("./dashboard-candidat.html");
           return;
         }
@@ -1883,7 +2075,5 @@
     renderProposalHistory();
     boot();
   </script>
-    </main>
-  </div>
 </body>
 </html>
