@@ -1828,72 +1828,69 @@
     document.querySelectorAll("[data-edition-year]").forEach(el => {
       el.textContent = EDITION_YEAR;
     });
-
+  
     const siteHeader = document.getElementById("siteHeader");
     const sideMenu = document.getElementById("sideMenu");
     const menuBtn = document.getElementById("menuBtn");
     const menuOverlay = document.getElementById("menuOverlay");
-
+  
     function openMenu() {
       sideMenu.classList.add("is-open");
       menuOverlay.classList.add("is-open");
     }
-
+  
     function closeMenu() {
       sideMenu.classList.remove("is-open");
       menuOverlay.classList.remove("is-open");
     }
-
+  
     function toggleMenu(e) {
       if (e) e.stopPropagation();
-      if (sideMenu.classList.contains("is-open")) closeMenu();
-      else openMenu();
+      if (sideMenu.classList.contains("is-open")) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
     }
-
+  
     menuBtn.addEventListener("click", toggleMenu);
     menuOverlay.addEventListener("click", closeMenu);
-
+  
     document.addEventListener("click", (e) => {
       const insideMenu = sideMenu.contains(e.target);
       const onBtn = menuBtn.contains(e.target);
-      if (!insideMenu && !onBtn) closeMenu();
+  
+      if (!insideMenu && !onBtn) {
+        closeMenu();
+      }
     });
-
+  
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeMenu();
     });
-
+  
     document.querySelectorAll(".side-menu a").forEach(link => {
       link.addEventListener("click", closeMenu);
     });
-
-    function handleDesktopHeaderScroll() {
-      const isDesktop = window.innerWidth > 820;
-
-      if (!isDesktop) {
-        siteHeader.classList.remove("header-hidden");
-        return;
-      }
-
+  
+    /* même comportement mobile + ordinateur */
+    function handleHeaderScroll() {
       const currentScrollY = window.scrollY || window.pageYOffset || 0;
-
+  
       if (currentScrollY > 1) {
         siteHeader.classList.add("header-hidden");
-        closeMenu();
       } else {
         siteHeader.classList.remove("header-hidden");
       }
     }
-
-    window.addEventListener("scroll", handleDesktopHeaderScroll, { passive: true });
-
+  
+    window.addEventListener("scroll", handleHeaderScroll, { passive:true });
+  
     window.addEventListener("resize", () => {
-      if (window.innerWidth < 861) {
-        siteHeader.classList.remove("header-hidden");
-      }
+      handleHeaderScroll();
     });
-
-    handleDesktopHeaderScroll();
+  
+    handleHeaderScroll();
   </script>
 </body>
 </html>
