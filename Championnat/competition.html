@@ -2,10 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Championnat | Championnat de Chimie</title>
+  <meta name="description" content="Page publique du Championnat de Chimie, avec accès intelligent aux espaces privés selon le rôle." />
+
   <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial, Helvetica, sans-serif}
+    *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif}
 
     :root{
       --bg:#f5f7fb;
@@ -22,24 +24,38 @@
       --red:#ff4b4b;
       --green:#18c34a;
       --gold:#d8a72f;
+      --orange:#ff9f1a;
+      --purple:#7b61ff;
       --shadow:0 10px 24px rgba(13,37,71,.08);
       --radius:18px;
       --radius-lg:22px;
-      --topbar-h:70px;
-      --sidebar-w:272px;
+      --topbar-h:62px;
+      --sidebar-w:244px;
     }
 
-    body{
+    html,body{
       margin:0;
       background:var(--bg);
       color:var(--text);
       min-height:100vh;
     }
 
+    body{
+      overflow:hidden;
+      padding-top:var(--topbar-h);
+      transition:padding-top .24s ease;
+    }
+
+    body.topbar-collapsed{
+      padding-top:0;
+    }
+
     .topbar{
-      position:sticky;
+      position:fixed;
       top:0;
-      z-index:40;
+      left:0;
+      right:0;
+      z-index:60;
       height:var(--topbar-h);
       background:rgba(255,255,255,.94);
       backdrop-filter:blur(14px);
@@ -48,6 +64,12 @@
       align-items:center;
       justify-content:space-between;
       padding:0 18px;
+      transition:transform .24s ease, opacity .24s ease, height .18s ease;
+    }
+
+    .topbar.topbar-hidden{
+      transform:translateY(-100%);
+      opacity:.98;
     }
 
     .brand{
@@ -55,6 +77,8 @@
       align-items:center;
       gap:12px;
       min-width:0;
+      text-decoration:none;
+      color:inherit;
     }
 
     .brand-mark{
@@ -77,11 +101,13 @@
     }
 
     .brand-mark::before{ inset:8px; }
-    .brand-mark::after{ inset:5px 12px; transform:rotate(55deg); border-color:rgba(255,255,255,.56); }
-
-    .brand-text{
-      min-width:0;
+    .brand-mark::after{
+      inset:5px 12px;
+      transform:rotate(55deg);
+      border-color:rgba(255,255,255,.56);
     }
+
+    .brand-text{ min-width:0; }
 
     .brand-title{
       font-size:14px;
@@ -105,13 +131,14 @@
       display:flex;
       align-items:center;
       gap:12px;
+      flex:0 0 auto;
     }
 
     .status-chip{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:10px 14px;
+      padding:9px 14px;
       border-radius:999px;
       background:#fff;
       border:1px solid var(--line);
@@ -134,23 +161,113 @@
       box-shadow:0 0 0 5px rgba(24,195,74,.14);
     }
 
-    .avatar-btn{
-      width:38px;
-      height:38px;
-      border-radius:50%;
+    .home-btn{
+      border:none;
+      border-radius:12px;
+      padding:10px 14px;
+      font-weight:800;
+      font-size:13px;
+      text-decoration:none;
+      color:#173760;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .menu-btn{
+      width:40px;
+      height:40px;
+      border-radius:12px;
       border:1px solid var(--line);
       background:linear-gradient(180deg,#fff,#f3f7fc);
-      display:grid;
+      display:none;
       place-items:center;
-      font-weight:800;
-      color:#163861;
       cursor:pointer;
+      padding:0;
+      position:relative;
+      box-shadow:var(--shadow);
+      flex:0 0 auto;
+    }
+
+    .menu-btn span,
+    .menu-btn::before,
+    .menu-btn::after{
+      content:"";
+      position:absolute;
+      width:18px;
+      height:2px;
+      border-radius:999px;
+      background:#173760;
+      transition:.18s ease;
+    }
+
+    .menu-btn span{ transform:translateY(0); }
+    .menu-btn::before{ transform:translateY(-6px); }
+    .menu-btn::after{ transform:translateY(6px); }
+
+    .mobile-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(3,18,42,.12);
+      z-index:70;
+      display:none;
+    }
+
+    .mobile-overlay.show{ display:block; }
+
+    .mobile-menu{
+      position:fixed;
+      top:72px;
+      right:12px;
+      width:min(285px, calc(100vw - 24px));
+      max-height:72vh;
+      overflow:auto;
+      background:rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:0 24px 48px rgba(10,37,73,.18);
+      padding:14px;
+      z-index:80;
+      display:none;
+    }
+
+    .mobile-menu.show{ display:block; }
+
+    .mobile-menu h3{
+      margin:2px 4px 12px;
+      font-size:15px;
+      color:#0f2f58;
+    }
+
+    .mobile-group{
+      display:grid;
+      gap:8px;
+      margin-bottom:14px;
+    }
+
+    .mobile-link{
+      text-decoration:none;
+      color:#11345d;
+      background:#f8fbff;
+      border:1px solid #e6eef8;
+      border-radius:12px;
+      padding:11px 12px;
+      font-weight:700;
+      font-size:14px;
     }
 
     .layout{
       display:grid;
       grid-template-columns:var(--sidebar-w) minmax(0,1fr);
-      min-height:calc(100vh - var(--topbar-h));
+      height:calc(100vh - var(--topbar-h));
+      transition:height .24s ease;
+    }
+
+    body.topbar-collapsed .layout{
+      height:100vh;
     }
 
     .sidebar{
@@ -158,6 +275,13 @@
       color:#fff;
       padding:18px 14px 20px;
       border-right:1px solid rgba(255,255,255,.06);
+      height:calc(100vh - var(--topbar-h));
+      overflow-y:auto;
+      transition:height .24s ease;
+    }
+
+    body.topbar-collapsed .sidebar{
+      height:100vh;
     }
 
     .sidebar-section-title{
@@ -188,9 +312,7 @@
       transition:.18s ease;
     }
 
-    .nav-link:hover{
-      background:rgba(255,255,255,.08);
-    }
+    .nav-link:hover{ background:rgba(255,255,255,.08); }
 
     .nav-link.active{
       background:rgba(47,140,255,.20);
@@ -208,6 +330,8 @@
     .nav-dot.green{ background:#1ed760; }
     .nav-dot.red{ background:#ff7777; }
     .nav-dot.gold{ background:#e7c15a; }
+    .nav-dot.purple{ background:#b29bff; }
+    .nav-dot.orange{ background:#ffb347; }
 
     .sidebar-note{
       margin-top:8px;
@@ -222,6 +346,18 @@
 
     .content{
       padding:20px;
+      height:calc(100vh - var(--topbar-h));
+      overflow-y:auto;
+      overflow-x:hidden;
+      transition:height .24s ease;
+      background:
+        radial-gradient(circle at top right, rgba(123,97,255,.05), transparent 24%),
+        radial-gradient(circle at top left, rgba(47,140,255,.06), transparent 20%),
+        var(--bg);
+    }
+
+    body.topbar-collapsed .content{
+      height:100vh;
     }
 
     .content-head{
@@ -238,7 +374,7 @@
       line-height:1.05;
       color:#112f59;
       letter-spacing:-1px;
-      margin-bottom:10px;
+      margin:0 0 10px;
     }
 
     .title-wrap p{
@@ -246,6 +382,7 @@
       max-width:860px;
       line-height:1.75;
       font-size:15px;
+      margin:0;
     }
 
     .head-actions{
@@ -315,6 +452,7 @@
       color:var(--muted);
       line-height:1.7;
       font-size:14px;
+      margin:0;
     }
 
     .grid-main{
@@ -324,9 +462,7 @@
       align-items:start;
     }
 
-    .panel{
-      overflow:hidden;
-    }
+    .panel{ overflow:hidden; }
 
     .panel-head{
       padding:20px 22px 0;
@@ -335,7 +471,7 @@
     .panel-head h2{
       font-size:28px;
       color:#102f59;
-      margin-bottom:8px;
+      margin:0 0 8px;
       letter-spacing:-.5px;
     }
 
@@ -343,7 +479,7 @@
       color:var(--muted);
       line-height:1.75;
       font-size:14px;
-      margin-bottom:18px;
+      margin:0 0 18px;
     }
 
     .panel-body{
@@ -445,13 +581,14 @@
     .side-box h3{
       color:#102f59;
       font-size:18px;
-      margin-bottom:10px;
+      margin:0 0 10px;
     }
 
     .side-box p{
       color:var(--muted);
       line-height:1.75;
       font-size:14px;
+      margin:0;
     }
 
     .quick-links{
@@ -498,30 +635,121 @@
       font-size:12px;
     }
 
-    @media (max-width:1100px){
-      .layout{
-        grid-template-columns:1fr;
+    .hidden{
+      display:none !important;
+    }
+
+    @media (max-width:1120px){
+      body{
+        overflow:auto;
+        padding-top:var(--topbar-h);
       }
 
-      .sidebar{
-        display:none;
+      body.topbar-collapsed{
+        padding-top:var(--topbar-h);
       }
 
+      .layout,
+      body.topbar-collapsed .layout,
       .grid-main,
       .cards-3{
         grid-template-columns:1fr;
       }
 
+      .layout{
+        height:auto;
+      }
+
+      .sidebar{
+        height:auto;
+      }
+
       .content{
+        height:auto;
+        overflow:visible;
         padding:16px;
       }
     }
 
-    @media (max-width:720px){
+    @media (max-width:820px){
+      .sidebar{ display:none; }
+      .status-chip{ display:none; }
+      .menu-btn{ display:grid; }
+
       .topbar{
         padding:0 12px;
+        display:grid;
+        grid-template-columns:32px 1fr 32px;
+        align-items:center;
+        gap:8px;
       }
 
+      .brand{
+        grid-column:1 / 4;
+        display:grid;
+        grid-template-columns:44px 1fr 32px;
+        align-items:center;
+        gap:8px;
+        width:100%;
+      }
+
+      .brand-mark{
+        width:44px;
+        height:44px;
+        border-radius:14px;
+      }
+
+      .brand-text{
+        min-width:0;
+        text-align:center;
+        width:100%;
+      }
+
+      .brand-title{
+        font-size:17px;
+        line-height:1.1;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        text-align:center;
+      }
+
+      .brand-sub{ display:none; }
+
+      .topbar-right{
+        position:absolute;
+        right:12px;
+        top:50%;
+        transform:translateY(-50%);
+        margin-left:0;
+        gap:6px;
+        justify-content:flex-end;
+      }
+
+      .home-btn{ display:none; }
+
+      .menu-btn{
+        width:32px;
+        height:32px;
+        border-radius:10px;
+      }
+
+      .menu-btn span,
+      .menu-btn::before,
+      .menu-btn::after{
+        width:14px;
+      }
+
+      .menu-btn::before{ transform:translateY(-5px); }
+      .menu-btn::after{ transform:translateY(5px); }
+
+      .mobile-menu{
+        width:min(250px, calc(100vw - 20px));
+        right:10px;
+      }
+    }
+
+    @media (max-width:520px){
       .content-head{
         flex-direction:column;
         align-items:stretch;
@@ -537,32 +765,110 @@
 
       .title-wrap h1{
         font-size:28px;
+        line-height:1.08;
       }
 
-      .status-chip{
-        display:none;
+      .title-wrap p{
+        font-size:15px;
+        line-height:1.8;
+      }
+
+      .topbar{
+        padding:0 10px;
+      }
+
+      .brand{
+        grid-template-columns:40px 1fr 30px;
+        gap:8px;
+      }
+
+      .brand-mark{
+        width:40px;
+        height:40px;
+        border-radius:13px;
+      }
+
+      .brand-title{
+        font-size:18px;
+        line-height:1.08;
+        text-align:center;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+
+      .topbar-right{
+        right:10px;
+        gap:6px;
+      }
+
+      .menu-btn{
+        width:30px;
+        height:30px;
+        border-radius:9px;
+      }
+
+      .menu-btn span,
+      .menu-btn::before,
+      .menu-btn::after{
+        width:13px;
+      }
+
+      .menu-btn::before{ transform:translateY(-4px); }
+      .menu-btn::after{ transform:translateY(4px); }
+
+      .mobile-menu{
+        width:min(230px, calc(100vw - 18px));
+        right:9px;
+        top:68px;
       }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
+  <header class="topbar" id="topbar">
+    <a href="./competition.html" class="brand">
       <div class="brand-mark"></div>
       <div class="brand-text">
         <div class="brand-title">Championnat de Chimie</div>
         <div class="brand-sub" id="brandSub">Espace public du championnat</div>
       </div>
-    </div>
+    </a>
 
     <div class="topbar-right">
       <div class="status-chip">
         <span id="statusDot" class="status-dot"></span>
         <span id="statusText">Visiteur public</span>
       </div>
-      <div class="avatar-btn" id="avatarBtn">☰</div>
+      <a href="./index.html" class="home-btn">Accueil</a>
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="Ouvrir le menu">
+        <span></span>
+      </button>
     </div>
   </header>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="mobile-menu" id="mobileMenu">
+    <h3>Explorer le site</h3>
+    <div class="mobile-group">
+      <a class="mobile-link" href="./index.html">Accueil</a>
+      <a class="mobile-link" href="./about.html">À propos</a>
+      <a class="mobile-link" href="./competition.html">Championnat</a>
+      <a class="mobile-link" href="./rules.html">Règlement</a>
+      <a class="mobile-link" href="./results.html">Résultats</a>
+      <a class="mobile-link" href="./laureats.html">Lauréats</a>
+      <a class="mobile-link" href="./announcements.html">Annonces</a>
+      <a class="mobile-link" href="./faq.html">FAQ</a>
+      <a class="mobile-link" href="./contact.html">Contact</a>
+      <a class="mobile-link" href="./verify-certificate.html">Vérifier certificat</a>
+      <a class="mobile-link" id="mobileAuthLink" href="./login.html">Connexion</a>
+      <a class="mobile-link" href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
+      <a class="mobile-link" href="./login.html?redirect=jury.html">Jury</a>
+      <a class="mobile-link" href="./login.html?redirect=competition-admin.html">Administration</a>
+      <a class="mobile-link" href="./profile.html">Mon profil</a>
+    </div>
+  </aside>
 
   <div class="layout">
     <aside class="sidebar">
@@ -575,7 +881,7 @@
       </div>
     </aside>
 
-    <main class="content">
+    <main class="content" id="mainContent">
       <div class="content-head">
         <div class="title-wrap">
           <h1>Participer au Championnat de Chimie</h1>
@@ -594,17 +900,17 @@
       <section class="cards-3">
         <article class="card mini-card">
           <strong>Visibilité publique</strong>
-          <p>La page reste ouverte aux visiteurs. Le règlement, les résultats et les informations générales restent consultables librement.</p>
+          <p>La page reste ouverte aux visiteurs. Le règlement, les résultats, les annonces et les informations générales restent consultables librement.</p>
         </article>
 
         <article class="card mini-card">
           <strong>Accès examen sécurisé</strong>
-          <p>L’examen passe par <code>login.html</code>, puis une redirection intelligente vers <code>examen.html</code> selon le rôle et la session.</p>
+          <p>L’examen passe par <strong>login.html</strong>, puis une redirection intelligente vers <strong>examen.html</strong> selon le rôle et la session.</p>
         </article>
 
         <article class="card mini-card">
           <strong>Pilotage centralisé</strong>
-          <p>L’administrateur principal contrôle l’ouverture de la compétition, l’épreuve active, le jury et la publication finale.</p>
+          <p>L’administrateur principal contrôle l’ouverture de la compétition, l’épreuve active, le jury, les annonces, les profils et la publication finale.</p>
         </article>
       </section>
 
@@ -657,10 +963,10 @@
               Les pages publiques restent ouvertes. Les pages privées sont accessibles après authentification
               et selon le rôle reconnu dans Firebase.
             </p>
-            <div class="mini-links"> 
+            <div class="quick-links">
               <a href="./rules.html">Lire le règlement</a>
               <a href="./results.html">Voir les résultats</a>
-              <a href="./announcements.html" target="_blank">Annonces</a>
+              <a href="./announcements.html">Annonces</a>
               <a href="./login.html?redirect=examen.html">Connexion pour examen</a>
               <a href="./login.html?redirect=dashboard-candidat.html">Connexion espace candidat</a>
             </div>
@@ -689,10 +995,20 @@
           </section>
         </aside>
       </section>
+            <div class="page-footer">
+        <strong>Championnat de Chimie</strong>
+        Tous droits réservés © 2026 — accès public, connexion centralisée et redirections intelligentes selon le rôle.
+      </div>
     </main>
   </div>
 
   <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+
     const statusDot = document.getElementById("statusDot");
     const statusText = document.getElementById("statusText");
     const mainActionBtn = document.getElementById("mainActionBtn");
@@ -704,19 +1020,21 @@
     const sidebarNav = document.getElementById("sidebarNav");
     const sidebarNote = document.getElementById("sidebarNote");
     const brandSub = document.getElementById("brandSub");
-    const avatarBtn = document.getElementById("avatarBtn");
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    const mobileOverlay = document.getElementById("mobileOverlay");
+    const topbar = document.getElementById("topbar");
+    const mainContent = document.getElementById("mainContent");
+    const mobileAuthLink = document.getElementById("mobileAuthLink");
 
     const fullNameInput = document.getElementById("fullName");
     const emailInput = document.getElementById("email");
     const levelInput = document.getElementById("level");
 
-    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
-
     const state = {
       user: null,
       profile: null,
-      role: "visitor",
-      firebaseReady: false
+      role: "visitor"
     };
 
     function setMessage(text, type = "info"){
@@ -731,7 +1049,7 @@
     function resolveRole(user, profile){
       const email = normalizeEmail(user?.email);
       if (!user) return "visitor";
-      if (email === ADMIN_EMAIL) return "admin";
+      if (email === normalizeEmail(ADMIN_EMAIL)) return "admin";
 
       const role = String(
         profile?.competitionRole ||
@@ -748,30 +1066,38 @@
     function getSidebarLinks(role){
       if (role === "admin") {
         return [
-          { label:"Tableau de bord admin", href:"./admin.html", color:"red" },
+          { label:"Accueil", href:"./index.html", color:"green" },
           { label:"Championnat", href:"./competition.html", color:"green", active:true },
-          { label:"Espace jury", href:"./jury.html", color:"gold" },
-          { label:"Résultats", href:"./results.html", color:"green" },
-          { label:"Support admin", href:"./competition-support-admin.html", color:"red" }
+          { label:"Annonces", href:"./announcements.html", color:"purple" },
+          { label:"Jury", href:"./jury.html", color:"gold" },
+          { label:"Tableau de bord admin", href:"./competition-admin.html", color:"red" },
+          { label:"Support admin", href:"./competition-support-admin.html", color:"red" },
+          { label:"Résultats", href:"./results.html", color:"gold" },
+          { label:"Profil", href:"./profile.html", color:"orange" }
         ];
       }
 
       if (role === "jury") {
         return [
-          { label:"Espace jury", href:"./jury.html", color:"gold" },
+          { label:"Accueil", href:"./index.html", color:"green" },
           { label:"Championnat", href:"./competition.html", color:"green", active:true },
-          { label:"Résultats", href:"./results.html", color:"green" },
+          { label:"Annonces", href:"./announcements.html", color:"purple" },
+          { label:"Jury", href:"./jury.html", color:"gold" },
+          { label:"Résultats", href:"./results.html", color:"gold" },
+          { label:"Profil", href:"./profile.html", color:"orange" },
           { label:"Connexion", href:"./login.html", color:"red" }
         ];
       }
 
       if (role === "candidate") {
         return [
-          { label:"Mon espace candidat", href:"./dashboard-candidat.html", color:"green" },
+          { label:"Accueil", href:"./index.html", color:"green" },
           { label:"Championnat", href:"./competition.html", color:"green", active:true },
+          { label:"Annonces", href:"./announcements.html", color:"purple" },
+          { label:"Espace candidat", href:"./dashboard-candidat.html", color:"green" },
           { label:"Passer l’examen", href:"./examen.html", color:"red" },
-          { label:"Résultats", href:"./results.html", color:"green" },
-          { label:"Connexion", href:"./login.html", color:"red" }
+          { label:"Résultats", href:"./results.html", color:"gold" },
+          { label:"Profil", href:"./profile.html", color:"orange" }
         ];
       }
 
@@ -779,8 +1105,10 @@
         { label:"Accueil", href:"./index.html", color:"green" },
         { label:"Championnat", href:"./competition.html", color:"green", active:true },
         { label:"Règlement", href:"./rules.html", color:"gold" },
-        { label:"Résultats", href:"./results.html", color:"green" },
-        { label:"Connexion", href:"./login.html", color:"red" }
+        { label:"Résultats", href:"./results.html", color:"gold" },
+        { label:"Annonces", href:"./announcements.html", color:"purple" },
+        { label:"Connexion", href:"./login.html", color:"red" },
+        { label:"Profil", href:"./profile.html", color:"orange" }
       ];
     }
 
@@ -794,7 +1122,7 @@
       `).join("");
 
       if (role === "admin") {
-        sidebarNote.textContent = "Session administrateur reconnue. Depuis ici, tu peux piloter le championnat, le jury, les examens et les résultats.";
+        sidebarNote.textContent = "Session administrateur reconnue. Depuis ici, tu peux piloter le championnat, les annonces, le jury, les résultats et les profils.";
         brandSub.textContent = "Pilotage du championnat";
         return;
       }
@@ -815,8 +1143,19 @@
       brandSub.textContent = "Espace public du championnat";
     }
 
+    function applyAuthLinks(){
+      if (state.user) {
+        mobileAuthLink.href = "./profile.html";
+        mobileAuthLink.textContent = "Mon profil";
+      } else {
+        mobileAuthLink.href = "./login.html";
+        mobileAuthLink.textContent = "Connexion";
+      }
+    }
+
     function applyRoleUI(){
       renderSidebar(state.role);
+      applyAuthLinks();
 
       if (state.role === "admin") {
         statusDot.classList.add("ok");
@@ -854,7 +1193,7 @@
 
     function goMainAction(){
       if (state.role === "admin") {
-        window.location.href = "./admin.html";
+        window.location.href = "./competition-admin.html";
         return;
       }
       if (state.role === "jury") {
@@ -870,7 +1209,7 @@
 
     function goPrivateSpace(){
       if (state.role === "admin") {
-        window.location.href = "./admin.html";
+        window.location.href = "./competition-admin.html";
         return;
       }
       if (state.role === "jury") {
@@ -884,27 +1223,7 @@
       window.location.href = "./login.html?redirect=dashboard-candidat.html";
     }
 
-    avatarBtn.addEventListener("click", () => {
-      if (state.role === "admin") {
-        window.location.href = "./admin.html";
-        return;
-      }
-      if (state.role === "jury") {
-        window.location.href = "./jury.html";
-        return;
-      }
-      if (state.role === "candidate") {
-        window.location.href = "./dashboard-candidat.html";
-        return;
-      }
-      window.location.href = "./login.html";
-    });
-
-    mainActionBtn.addEventListener("click", goMainAction);
-    spaceBtn.addEventListener("click", goPrivateSpace);
-    examBtn.addEventListener("click", goMainAction);
-
-    interestForm.addEventListener("submit", async (e) => {
+    async function submitInterest(e){
       e.preventDefault();
 
       const fullName = fullNameInput.value.trim();
@@ -916,7 +1235,7 @@
         return;
       }
 
-      if (!state.firebaseReady || !state.user) {
+      if (!state.user) {
         window.location.href = "./login.html?redirect=dashboard-candidat.html";
         return;
       }
@@ -924,11 +1243,6 @@
       submitInterestBtn.disabled = true;
 
       try {
-        const [{ ref, get, set, update }, { db }] = await Promise.all([
-          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"),
-          import("./firebase-config.js")
-        ]);
-
         const candidateRef = ref(db, "competitionCandidates/" + state.user.uid);
         const existingSnap = await get(candidateRef);
 
@@ -965,68 +1279,120 @@
       } finally {
         submitInterestBtn.disabled = false;
       }
-    });
-
-    applyRoleUI();
-
-    async function bootFirebase(){
-      try{
-        const [{ auth, db }, authMod, dbMod] = await Promise.all([
-          import("./firebase-config.js"),
-          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"),
-          import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js")
-        ]);
-
-        const { onAuthStateChanged } = authMod;
-        const { ref, get } = dbMod;
-
-        state.firebaseReady = true;
-
-        onAuthStateChanged(auth, async (user) => {
-          state.user = user || null;
-
-          if (!user) {
-            state.profile = null;
-            state.role = "visitor";
-            applyRoleUI();
-            return;
-          }
-
-          try{
-            const snap = await get(ref(db, "users/" + user.uid));
-            state.profile = snap.exists() ? snap.val() : null;
-          }catch(err){
-            console.error(err);
-            state.profile = null;
-          }
-
-          state.role = resolveRole(user, state.profile);
-
-          if (!fullNameInput.value && (state.profile?.displayName || user.displayName)) {
-            fullNameInput.value = state.profile?.displayName || user.displayName || "";
-          }
-
-          if (!emailInput.value && user.email) {
-            emailInput.value = user.email;
-          }
-
-          if (state.profile?.level && !levelInput.value) {
-            levelInput.value = state.profile.level;
-          }
-
-          applyRoleUI();
-        });
-      } catch (err) {
-        console.error("Firebase indisponible sur competition.html :", err);
-        state.firebaseReady = false;
-        state.user = null;
-        state.profile = null;
-        state.role = "visitor";
-        applyRoleUI();
-        setMessage("Mode public actif. Si la connexion privée ne répond pas encore, utilise le bouton de connexion pour continuer.", "info");
-      }
     }
 
+    function closeMenu(){
+      mobileMenu.classList.remove("show");
+      mobileOverlay.classList.remove("show");
+    }
+
+    function openMenu(){
+      mobileMenu.classList.add("show");
+      mobileOverlay.classList.add("show");
+    }
+
+    let lastScrollTop = 0;
+
+    function handleTopbarOnScroll(){
+      const isDesktop = window.innerWidth > 1120;
+
+      if (!isDesktop) {
+        topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
+        return;
+      }
+
+      const currentScroll = mainContent.scrollTop;
+
+      if (currentScroll <= 6) {
+        topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
+      } else if (currentScroll > lastScrollTop + 4) {
+        topbar.classList.add("topbar-hidden");
+        document.body.classList.add("topbar-collapsed");
+      } else if (currentScroll < lastScrollTop - 4) {
+        topbar.classList.remove("topbar-hidden");
+        document.body.classList.remove("topbar-collapsed");
+      }
+
+      lastScrollTop = currentScroll < 0 ? 0 : currentScroll;
+    }
+
+    function bindUI(){
+      mainActionBtn.addEventListener("click", goMainAction);
+      spaceBtn.addEventListener("click", goPrivateSpace);
+      examBtn.addEventListener("click", goMainAction);
+      interestForm.addEventListener("submit", submitInterest);
+
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (mobileMenu.classList.contains("show")) closeMenu();
+        else openMenu();
+      });
+
+      mobileOverlay.addEventListener("click", closeMenu);
+
+      document.addEventListener("click", (e) => {
+        const insideMenu = mobileMenu.contains(e.target);
+        const onBtn = menuBtn.contains(e.target);
+        if (!insideMenu && !onBtn) closeMenu();
+      });
+
+      document.querySelectorAll(".mobile-link").forEach(link => {
+        link.addEventListener("click", closeMenu);
+      });
+
+      mainContent.addEventListener("scroll", handleTopbarOnScroll);
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth <= 1120) {
+          topbar.classList.remove("topbar-hidden");
+          document.body.classList.remove("topbar-collapsed");
+        }
+        closeMenu();
+      });
+    }
+
+    async function bootFirebase(){
+      applyRoleUI();
+
+      onAuthStateChanged(auth, async (user) => {
+        state.user = user || null;
+
+        if (!user) {
+          state.profile = null;
+          state.role = "visitor";
+          applyRoleUI();
+          return;
+        }
+
+        try{
+          const snap = await get(ref(db, "users/" + user.uid));
+          state.profile = snap.exists() ? snap.val() : null;
+        }catch(err){
+          console.error(err);
+          state.profile = null;
+        }
+
+        state.role = resolveRole(user, state.profile);
+
+        if (!fullNameInput.value && (state.profile?.displayName || user.displayName)) {
+          fullNameInput.value = state.profile?.displayName || user.displayName || "";
+        }
+
+        if (!emailInput.value && user.email) {
+          emailInput.value = user.email;
+        }
+
+        if (state.profile?.level && !levelInput.value) {
+          levelInput.value = state.profile.level;
+        }
+
+        applyRoleUI();
+      });
+    }
+
+    bindUI();
     bootFirebase();
   </script>
 </body>
