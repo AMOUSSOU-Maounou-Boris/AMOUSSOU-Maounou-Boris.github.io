@@ -515,6 +515,11 @@
       color:#5d46c7;
       border:1px solid rgba(123,97,255,.16);
     }
+    .badge.gray{
+      background:rgba(120,132,150,.10);
+      color:#61748d;
+      border:1px solid rgba(120,132,150,.16);
+    }
 
     .helper{
       margin-top:16px;
@@ -620,6 +625,10 @@
     .tool-btn.purple{
       background:rgba(123,97,255,.12);
       color:#5d46c7;
+    }
+
+    .search-box{
+      margin-top:14px;
     }
 
     .list-grid{
@@ -734,6 +743,46 @@
     .mini-btn.purple{
       background:rgba(123,97,255,.12);
       color:#5d46c7;
+    }
+
+    .reply-box{
+      margin-top:12px;
+      padding-top:12px;
+      border-top:1px dashed #dbe7f2;
+    }
+
+    .reply-item{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:#fff;
+      border:1px solid #e5eef8;
+    }
+
+    .reply-head{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-bottom:6px;
+      font-size:12px;
+      color:#61748d;
+      font-weight:800;
+    }
+
+    .reply-text{
+      color:#14375f;
+      font-size:13px;
+      line-height:1.7;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .reply-actions{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      margin-top:10px;
     }
 
     .inbox-groups{
@@ -1000,6 +1049,9 @@
       .page-footer{
         padding-bottom:22px;
       }
+      .reply-actions{
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
@@ -1076,7 +1128,7 @@
 
       <div class="sidebar-section-title">À quoi ça sert</div>
       <div class="sidebar-note">
-        Cette page centralise les messages internes : candidats, jury, partenaires, support technique, certificats et demandes liées au championnat.
+        Cette page centralise les messages internes : candidats, jury, partenaires, support technique, certificats, demandes de partage et signalements liés au championnat.
       </div>
     </aside>
 
@@ -1085,8 +1137,8 @@
         <div class="title-wrap">
           <h1>Support administrateur</h1>
           <p>
-            Cette boîte de réception permet de suivre et traiter les demandes liées au championnat :
-            jury, candidats, partenaires, support, questions techniques, certificats et signalements.
+            Cette boîte de réception suit les demandes liées au championnat :
+            jury, candidats, partenaires, support, questions techniques, certificats, demandes de partage issues des annonces et notes internes.
           </p>
         </div>
 
@@ -1123,7 +1175,7 @@
           <section class="panel">
             <div class="panel-head">
               <h2>Filtres</h2>
-              <p>Trie la boîte de réception selon le type ou le statut.</p>
+              <p>Trie la boîte de réception selon le type, le statut ou un mot-clé.</p>
             </div>
 
             <div class="panel-body">
@@ -1137,7 +1189,13 @@
                 <button class="tool-btn gold" data-filter="partner" type="button">Partenaires / sponsors</button>
                 <button class="tool-btn red" data-filter="technical" type="button">Technique</button>
                 <button class="tool-btn purple" data-filter="certificate" type="button">Certificats</button>
+                <button class="tool-btn blue" data-filter="share" type="button">Demandes de partage</button>
                 <button class="tool-btn blue" data-filter="other" type="button">Autres</button>
+              </div>
+
+              <div class="search-box">
+                <label class="form-label" for="searchInput">Recherche</label>
+                <input id="searchInput" type="text" placeholder="Sujet, nom, email, contenu..." />
               </div>
             </div>
           </section>
@@ -1157,6 +1215,7 @@
                   <option value="jury">Jury</option>
                   <option value="partner">Partenaire</option>
                   <option value="certificate">Certificat</option>
+                  <option value="share">Partage</option>
                   <option value="other">Autre</option>
                 </select>
               </div>
@@ -1174,7 +1233,7 @@
               <button class="head-btn primary" id="createMessageBtn" type="button" style="width:100%;">Créer le message</button>
 
               <div id="createMsg" class="helper info show">
-                Cette zone peut aussi servir à garder une trace interne côté administration.
+                Cette zone peut aussi servir à garder une vraie trace interne côté administration.
               </div>
             </div>
           </section>
@@ -1209,15 +1268,25 @@
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { ref, get, push, set, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { ref, get, push, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+
+    const SOURCES = [
+      { key: "native", path: "competitionSupportInbox", type: "native" },
+      { key: "shares", path: "championnatShareRequests", type: "share_requests" },
+      { key: "juryOpinions", path: "juryOpinions", type: "jury_opinions" }
+    ];
+
     const $ = (id) => document.getElementById(id);
 
     const state = {
       user: null,
-      messages: {},
-      currentFilter: "all"
+      currentFilter: "all",
+      search: "",
+      buckets: {},
+      adminMeta: {},
+      replies: {}
     };
 
     const inboxList = $("inboxList");
@@ -1234,6 +1303,7 @@
     const filterToolbar = $("filterToolbar");
     const refreshBtn = $("refreshBtn");
     const createMessageBtn = $("createMessageBtn");
+    const searchInput = $("searchInput");
 
     function normalizeEmail(value = ""){
       return String(value || "").trim().toLowerCase();
@@ -1261,8 +1331,13 @@
       return uid ? `./profile.html?uid=${encodeURIComponent(uid)}` : "";
     }
 
-    function getMessagesArray(){
-      return Object.entries(state.messages || {}).map(([id, value]) => ({ id, ...value }));
+    function formatDate(ts){
+      if (!ts) return "Date inconnue";
+      try{
+        return new Date(ts).toLocaleString("fr-FR");
+      }catch{
+        return "Date inconnue";
+      }
     }
 
     function statusPriority(status){
@@ -1279,6 +1354,7 @@
         technical: "Technique",
         partner: "Partenaires / sponsors",
         certificate: "Certificats",
+        share: "Demandes de partage",
         other: "Autres"
       };
       return map[category] || "Autres";
@@ -1290,6 +1366,7 @@
       if (category === "technical") return '<span class="badge red">Technique</span>';
       if (category === "partner") return '<span class="badge gold">Partenaire</span>';
       if (category === "certificate") return '<span class="badge purple">Certificat</span>';
+      if (category === "share") return '<span class="badge blue">Partage</span>';
       return '<span class="badge blue">Autre</span>';
     }
 
@@ -1305,15 +1382,150 @@
       if (role === "jury") return '<span class="badge gold">Jury</span>';
       if (role === "candidate") return '<span class="badge blue">Candidat</span>';
       if (role === "partner") return '<span class="badge gold">Partenaire</span>';
-      return '<span class="badge blue">Visiteur</span>';
+      return '<span class="badge gray">Visiteur</span>';
+    }
+
+    function getCompositeId(sourceKey, rawId){
+      return `${sourceKey}__${rawId}`;
+    }
+
+    function getMeta(compositeId){
+      return state.adminMeta?.[compositeId] || {};
+    }
+
+    function getReplies(compositeId){
+      return Object.entries(state.replies?.[compositeId] || {})
+        .map(([id, value]) => ({ id, ...value }))
+        .sort((a,b) => (a.createdAt || 0) - (b.createdAt || 0));
+    }
+
+    function normalizeNativeMessage(rawId, item){
+      const compositeId = getCompositeId("native", rawId);
+      return {
+        id: compositeId,
+        rawId,
+        sourceKey: "native",
+        sourceType: "native",
+        subject: item.subject || "Sans sujet",
+        message: item.message || "",
+        category: item.category || "other",
+        status: item.status || "new",
+        senderUid: item.senderUid || "",
+        senderEmail: item.senderEmail || "",
+        senderRole: item.senderRole || "visitor",
+        senderName: item.senderName || item.senderEmail || "Inconnu",
+        sourcePage: item.sourcePage || "competition-support-admin.html",
+        createdAt: item.createdAt || 0,
+        updatedAt: item.updatedAt || item.createdAt || 0,
+        requesterName: "",
+        requesterUid: "",
+        requesterEmail: ""
+      };
+    }
+
+    function normalizeShareRequest(rawId, item){
+      const meta = getMeta(getCompositeId("shares", rawId));
+      return {
+        id: getCompositeId("shares", rawId),
+        rawId,
+        sourceKey: "shares",
+        sourceType: "share_requests",
+        subject: item.subject || "Demande de partage interne",
+        message: `Le membre ${item.requesterName || "Inconnu"} demande le partage interne d’une publication.\nPost ciblé : ${item.postId || "—"}\nSource : ${item.postSourceKey || "—"}`,
+        category: "share",
+        status: meta.status || item.status || "new",
+        senderUid: item.requesterUid || "",
+        senderEmail: item.requesterEmail || "",
+        senderRole: "member",
+        senderName: item.requesterName || "Membre",
+        sourcePage: "announcements.html",
+        createdAt: item.createdAt || 0,
+        updatedAt: meta.updatedAt || item.createdAt || 0,
+        requesterName: item.requesterName || "",
+        requesterUid: item.requesterUid || "",
+        requesterEmail: item.requesterEmail || "",
+        linkedPostId: item.postId || "",
+        linkedPostSourceKey: item.postSourceKey || "",
+        linkedPostRawId: item.postRawId || ""
+      };
+    }
+
+    function normalizeJuryOpinion(rawId, item){
+      const meta = getMeta(getCompositeId("juryOpinions", rawId));
+      return {
+        id: getCompositeId("juryOpinions", rawId),
+        rawId,
+        sourceKey: "juryOpinions",
+        sourceType: "jury_opinions",
+        subject: item.subject || "Avis jury",
+        message: item.opinion || item.message || "Aucun avis",
+        category: "jury",
+        status: meta.status || "new",
+        senderUid: item.uid || "",
+        senderEmail: item.email || "",
+        senderRole: item.role || "jury",
+        senderName: item.displayName || item.email || "Jury",
+        sourcePage: "jury.html",
+        createdAt: item.createdAt || 0,
+        updatedAt: meta.updatedAt || item.createdAt || 0,
+        requesterName: "",
+        requesterUid: "",
+        requesterEmail: ""
+      };
+    }
+
+    function getAllMessagesArray(){
+      const items = [];
+
+      const native = state.buckets.native || {};
+      Object.entries(native).forEach(([rawId, item]) => {
+        if (item && typeof item === "object") items.push(normalizeNativeMessage(rawId, item));
+      });
+
+      const shares = state.buckets.shares || {};
+      Object.entries(shares).forEach(([rawId, item]) => {
+        if (item && typeof item === "object") items.push(normalizeShareRequest(rawId, item));
+      });
+
+      const opinions = state.buckets.juryOpinions || {};
+      Object.entries(opinions).forEach(([rawId, item]) => {
+        if (item && typeof item === "object") items.push(normalizeJuryOpinion(rawId, item));
+      });
+
+      return items.sort((a,b) => {
+        const byStatus = statusPriority(a.status) - statusPriority(b.status);
+        if (byStatus !== 0) return byStatus;
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      });
     }
 
     function applyFilter(items){
-      if (state.currentFilter === "all") return items;
-      if (["new","in_progress","done"].includes(state.currentFilter)) {
-        return items.filter(item => item.status === state.currentFilter);
+      let filtered = [...items];
+
+      if (state.currentFilter !== "all") {
+        if (["new", "in_progress", "done"].includes(state.currentFilter)) {
+          filtered = filtered.filter(item => item.status === state.currentFilter);
+        } else {
+          filtered = filtered.filter(item =>
+            item.category === state.currentFilter ||
+            item.senderRole === state.currentFilter
+          );
+        }
       }
-      return items.filter(item => item.category === state.currentFilter || item.senderRole === state.currentFilter);
+
+      const q = state.search.trim().toLowerCase();
+      if (q) {
+        filtered = filtered.filter(item =>
+          String(item.subject || "").toLowerCase().includes(q) ||
+          String(item.message || "").toLowerCase().includes(q) ||
+          String(item.senderName || "").toLowerCase().includes(q) ||
+          String(item.senderEmail || "").toLowerCase().includes(q) ||
+          String(item.category || "").toLowerCase().includes(q) ||
+          String(item.sourcePage || "").toLowerCase().includes(q)
+        );
+      }
+
+      return filtered;
     }
 
     function updateStats(items){
@@ -1323,13 +1535,21 @@
       statDone.textContent = String(items.filter(i => i.status === "done").length);
     }
 
-    async function setStatus(messageId, status){
-      await update(ref(db, `competitionSupportInbox/${messageId}`), {
+    async function setMessageStatus(message, status){
+      if (message.sourceType === "native") {
+        await update(ref(db, `competitionSupportInbox/${message.rawId}`), {
+          status,
+          updatedAt: Date.now(),
+          updatedBy: state.user?.email || ADMIN_EMAIL
+        });
+        return;
+      }
+
+      await update(ref(db, `competitionSupportAdminMeta/${message.id}`), {
         status,
         updatedAt: Date.now(),
         updatedBy: state.user?.email || ADMIN_EMAIL
       });
-      await loadMessages();
     }
 
     async function createInternalMessage(){
@@ -1342,25 +1562,58 @@
         return;
       }
 
-      const msgRef = push(ref(db, "competitionSupportInbox"));
-      await set(msgRef, {
-        senderUid: state.user?.uid || "",
-        senderEmail: state.user?.email || ADMIN_EMAIL,
-        senderRole: "admin",
-        senderName: state.user?.displayName || "Administrateur",
-        subject,
-        message,
-        category,
-        status: "new",
-        sourcePage: "competition-support-admin.html",
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      });
+      try{
+        const msgRef = push(ref(db, "competitionSupportInbox"));
+        await set(msgRef, {
+          senderUid: state.user?.uid || "",
+          senderEmail: state.user?.email || ADMIN_EMAIL,
+          senderRole: "admin",
+          senderName: state.user?.displayName || "Administrateur",
+          subject,
+          message,
+          category,
+          status: "new",
+          sourcePage: "competition-support-admin.html",
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        });
 
-      $("newSubject").value = "";
-      $("newMessage").value = "";
-      setCreateMessage("Message interne créé avec succès.", "ok");
-      await loadMessages();
+        $("newSubject").value = "";
+        $("newMessage").value = "";
+        setCreateMessage("Message interne créé avec succès.", "ok");
+      }catch(err){
+        console.error(err);
+        setCreateMessage("Impossible de créer le message pour le moment.", "err");
+      }
+    }
+
+    async function sendReply(compositeId){
+      const input = document.getElementById(`reply-input-${compositeId}`);
+      if (!input) return;
+
+      const text = input.value.trim();
+      if (!text) return;
+
+      try{
+        const replyRef = push(ref(db, `competitionSupportReplies/${compositeId}`));
+        await set(replyRef, {
+          authorUid: state.user?.uid || "",
+          authorEmail: state.user?.email || ADMIN_EMAIL,
+          authorName: state.user?.displayName || "Administrateur",
+          text,
+          createdAt: Date.now()
+        });
+
+        await update(ref(db, `competitionSupportAdminMeta/${compositeId}`), {
+          status: "in_progress",
+          updatedAt: Date.now(),
+          updatedBy: state.user?.email || ADMIN_EMAIL
+        });
+
+        input.value = "";
+      }catch(err){
+        console.error(err);
+      }
     }
 
     function setPressedEffect(el){
@@ -1369,8 +1622,31 @@
       setTimeout(() => el.classList.remove("is-pressed"), 180);
     }
 
+    function renderReplies(message){
+      const replies = getReplies(message.id);
+      const listHtml = replies.map(reply => `
+        <div class="reply-item">
+          <div class="reply-head">
+            <span>${escapeHtml(reply.authorName || "Admin")}</span>
+            <span class="badge gray">${escapeHtml(formatDate(reply.createdAt))}</span>
+          </div>
+          <div class="reply-text">${escapeHtml(reply.text || "")}</div>
+        </div>
+      `).join("");
+
+      return `
+        <div class="reply-box">
+          ${listHtml}
+          <div class="reply-actions">
+            <input id="reply-input-${message.id}" type="text" placeholder="Répondre à ce message..." />
+            <button class="mini-btn blue" data-reply="${message.id}" type="button">Répondre</button>
+          </div>
+        </div>
+      `;
+    }
+
     function renderGroups(items){
-      const groupsOrder = ["candidate","jury","technical","partner","certificate","other"];
+      const groupsOrder = ["candidate","jury","technical","partner","certificate","share","other"];
       const grouped = new Map();
 
       groupsOrder.forEach(key => grouped.set(key, []));
@@ -1405,11 +1681,13 @@
                 ${categoryBadge(item.category)}
                 ${statusBadge(currentStatus)}
                 ${roleBadge(role)}
+                <span class="badge gray">${escapeHtml(item.sourcePage || "source inconnue")}</span>
               </div>
 
               <p>
                 De : ${senderHtml}<br>
-                Email : ${senderEmail}
+                Email : ${senderEmail}<br>
+                Créé le : ${escapeHtml(formatDate(item.createdAt))}
               </p>
 
               <div class="message-body">${body}</div>
@@ -1419,6 +1697,8 @@
                 <button class="mini-btn gold ${currentStatus === "in_progress" ? "is-current" : ""}" data-action="in_progress" data-id="${item.id}">En cours</button>
                 <button class="mini-btn green ${currentStatus === "done" ? "is-current" : ""}" data-action="done" data-id="${item.id}">Traité</button>
               </div>
+
+              ${renderReplies(item)}
             </div>
           `;
         }).join("");
@@ -1438,12 +1718,7 @@
     }
 
     function renderMessages(){
-      const all = getMessagesArray().sort((a,b) => {
-        const byStatus = statusPriority(a.status) - statusPriority(b.status);
-        if (byStatus !== 0) return byStatus;
-        return (b.createdAt || 0) - (a.createdAt || 0);
-      });
-
+      const all = getAllMessagesArray();
       updateStats(all);
 
       const filtered = applyFilter(all);
@@ -1464,7 +1739,20 @@
         btn.addEventListener("click", async () => {
           try{
             setPressedEffect(btn);
-            await setStatus(btn.dataset.id, btn.dataset.action);
+            const message = getAllMessagesArray().find(m => m.id === btn.dataset.id);
+            if (!message) return;
+            await setMessageStatus(message, btn.dataset.action);
+          }catch(err){
+            console.error(err);
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-reply]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          try{
+            setPressedEffect(btn);
+            await sendReply(btn.dataset.reply);
           }catch(err){
             console.error(err);
           }
@@ -1472,9 +1760,40 @@
       });
     }
 
-    async function loadMessages(){
-      const snap = await get(ref(db, "competitionSupportInbox"));
-      state.messages = snap.exists() ? snap.val() : {};
+    function watchSources(){
+      SOURCES.forEach(source => {
+        onValue(ref(db, source.path), snap => {
+          state.buckets[source.key] = snap.exists() ? snap.val() : {};
+          renderMessages();
+        });
+      });
+
+      onValue(ref(db, "competitionSupportAdminMeta"), snap => {
+        state.adminMeta = snap.exists() ? snap.val() : {};
+        renderMessages();
+      });
+
+      onValue(ref(db, "competitionSupportReplies"), snap => {
+        state.replies = snap.exists() ? snap.val() : {};
+        renderMessages();
+      });
+    }
+
+    async function loadOnce(){
+      const [nativeSnap, shareSnap, jurySnap, metaSnap, replySnap] = await Promise.all([
+        get(ref(db, "competitionSupportInbox")),
+        get(ref(db, "championnatShareRequests")),
+        get(ref(db, "juryOpinions")),
+        get(ref(db, "competitionSupportAdminMeta")),
+        get(ref(db, "competitionSupportReplies"))
+      ]);
+
+      state.buckets.native = nativeSnap.exists() ? nativeSnap.val() : {};
+      state.buckets.shares = shareSnap.exists() ? shareSnap.val() : {};
+      state.buckets.juryOpinions = jurySnap.exists() ? jurySnap.val() : {};
+      state.adminMeta = metaSnap.exists() ? metaSnap.val() : {};
+      state.replies = replySnap.exists() ? replySnap.val() : {};
+
       renderMessages();
     }
 
@@ -1523,10 +1842,12 @@
         }
 
         state.user = user;
-        await loadMessages();
+        await loadOnce();
+        watchSources();
       });
     }
-        filterToolbar.querySelectorAll("[data-filter]").forEach(btn => {
+
+    filterToolbar.querySelectorAll("[data-filter]").forEach(btn => {
       btn.addEventListener("click", () => {
         filterToolbar.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("is-active"));
         btn.classList.add("is-active");
@@ -1536,14 +1857,19 @@
       });
     });
 
-    createMessageBtn.addEventListener("click", () => {
-      setPressedEffect(createMessageBtn);
-      createInternalMessage();
+    searchInput.addEventListener("input", () => {
+      state.search = searchInput.value || "";
+      renderMessages();
     });
 
-    refreshBtn.addEventListener("click", () => {
+    createMessageBtn.addEventListener("click", async () => {
+      setPressedEffect(createMessageBtn);
+      await createInternalMessage();
+    });
+
+    refreshBtn.addEventListener("click", async () => {
       setPressedEffect(refreshBtn);
-      loadMessages();
+      await loadOnce();
     });
 
     menuBtn.addEventListener("click", (e) => {
