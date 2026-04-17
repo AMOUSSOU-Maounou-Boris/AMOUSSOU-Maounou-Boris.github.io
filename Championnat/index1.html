@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Championnat de Chimie</title>
+  <meta name="description" content="Championnat de Chimie — prochaine édition prévue le vendredi 18 décembre 2026." />
+  <style>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    :root{
+      --blue:#2f8cff;
+      --blue-dark:#145bd6;
+      --gold:#d8a72f;
+      --gold-dark:#b98312;
+      --text:#0b2340;
+      --muted:#61748d;
+      --line:#dbe9f6;
+      --card:rgba(255,255,255,.90);
+      --card-strong:rgba(255,255,255,.96);
+      --shadow:0 18px 45px rgba(9,45,92,.12);
+      --shadow-soft:0 10px 25px rgba(10,37,73,.08);
+      --radius-xl:28px;
+      --radius-lg:22px;
+      --radius-md:16px;
+      --edge-space:4cm;
+      --max:min(100vw - var(--edge-space), 1700px);
+      --header-h:92px;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,214,153,.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(47,140,255,.11), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(212,167,47,.10), transparent 24%),
+        linear-gradient(180deg,#f8f5ef 0%, #fcfbf8 42%, #f7f8fb 100%);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      width:380px;
+      height:380px;
+      border-radius:50%;
+      filter:blur(58px);
+      z-index:-2;
+      pointer-events:none;
+    }
+    body::before{
+      top:-120px;
+      left:-120px;
+      background:rgba(229,184,90,.18);
+    }
+    body::after{
+      right:-120px;
+      top:120px;
+      background:rgba(47,140,255,.10);
+    }
+
+    .page-wrap{
+      position:relative;
+      min-height:100vh;
+    }
+
+    .molecule-bg{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .orb{
+      position:absolute;
+      border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(216,167,47,.28) 42%, rgba(216,167,47,.08) 70%, transparent 74%);
+      box-shadow:0 0 40px rgba(216,167,47,.12);
+      animation:floatOrb 8s ease-in-out infinite;
+    }
+    .orb.o1{width:120px;height:120px;top:96px;left:7%}
+    .orb.o2{width:84px;height:84px;top:240px;right:12%;animation-delay:1.1s}
+    .orb.o3{width:160px;height:160px;bottom:120px;left:10%;animation-delay:2s}
+    .orb.o4{width:96px;height:96px;bottom:90px;right:8%;animation-delay:3s}
+
+    .line{
+      position:absolute;
+      background:linear-gradient(90deg, rgba(216,167,47,.05), rgba(216,167,47,.28), rgba(47,140,255,.16));
+      border-radius:999px;
+      transform-origin:left center;
+      opacity:.52;
+    }
+    .l1{width:180px;height:2px;top:148px;left:10%;transform:rotate(24deg)}
+    .l2{width:220px;height:2px;top:260px;right:8%;transform:rotate(-18deg)}
+    .l3{width:230px;height:2px;bottom:210px;left:12%;transform:rotate(-22deg)}
+    .l4{width:170px;height:2px;bottom:140px;right:12%;transform:rotate(16deg)}
+
+    .site-header{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(255,255,255,.84);
+      border-bottom:1px solid rgba(219,233,246,.9);
+      box-shadow:0 6px 24px rgba(8,46,91,.05);
+      transition:transform .12s linear, opacity .12s linear;
+    }
+
+    .site-header.header-hidden{
+      transform:translateY(-100%);
+      opacity:.98;
+    }
+
+    .header-inner{
+      width:var(--max);
+      margin:0 auto;
+      padding:14px 0;
+      min-height:var(--header-h);
+      display:grid;
+      grid-template-columns:minmax(220px, 320px) 1fr auto;
+      align-items:center;
+      gap:18px;
+      position:relative;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+      text-decoration:none;
+      color:inherit;
+      justify-self:start;
+      width:100%;
+      max-width:320px;
+    }
+
+    .brand-mark{
+      width:46px;
+      height:46px;
+      border-radius:15px;
+      position:relative;
+      background:
+        radial-gradient(circle at 30% 30%, #ffffff 0%, #ffe5bf 22%, #efbf54 52%, #b47c12 100%);
+      box-shadow:
+        0 10px 28px rgba(216,167,47,.25),
+        inset 0 1px 8px rgba(255,255,255,.7);
+      flex:0 0 auto;
+    }
+    .brand-mark::before,
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.85);
+      inset:10px;
+    }
+    .brand-mark::after{
+      inset:5px 14px;
+      border-color:rgba(255,255,255,.55);
+      transform:rotate(55deg);
+    }
+
+    .brand-text{ min-width:0; }
+
+    .brand-title{
+      margin:0;
+      font-size:1.06rem;
+      font-weight:800;
+      letter-spacing:.2px;
+      color:#0a2f5d;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .brand-sub{
+      margin-top:2px;
+      font-size:.78rem;
+      color:#5f7491;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .nav-main{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:center;
+      justify-self:center;
+      max-width:100%;
+      margin:0 auto;
+    }
+
+    .nav-main a{
+      text-decoration:none;
+      color:#0b2340;
+      font-weight:700;
+      font-size:.95rem;
+      padding:10px 14px;
+      border-radius:999px;
+      transition:.14s ease;
+      white-space:nowrap;
+    }
+
+    .nav-main a:hover{
+      background:rgba(47,140,255,.08);
+      color:#0f4d92;
+    }
+
+    .header-actions{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex:0 0 auto;
+      position:relative;
+      justify-self:end;
+      margin-left:auto;
+    }
+
+    .btn,
+    .btn-outline,
+    .menu-btn{
+      border:none;
+      cursor:pointer;
+      transition:.14s ease;
+      font-weight:800;
+      font-family:inherit;
+    }
+
+    .btn{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:13px 20px;
+      border-radius:999px;
+      color:#fff;
+      background:linear-gradient(135deg, var(--blue), var(--blue-dark));
+      box-shadow:0 14px 34px rgba(47,140,255,.28);
+      white-space:nowrap;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 18px 36px rgba(47,140,255,.34);
+    }
+
+    .btn-outline{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      color:#0f4d92;
+      background:rgba(255,255,255,.86);
+      border:1px solid rgba(47,140,255,.16);
+      box-shadow:var(--shadow-soft);
+      white-space:nowrap;
+    }
+
+    .btn-outline:hover{
+      transform:translateY(-2px);
+      background:#fff;
+    }
+
+    .menu-btn{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.90);
+      border:1px solid rgba(47,140,255,.14);
+      box-shadow:var(--shadow-soft);
+      position:relative;
+      flex:0 0 auto;
+      z-index:82;
+    }
+
+    .menu-btn span,
+    .menu-btn::before,
+    .menu-btn::after{
+      content:"";
+      position:absolute;
+      width:21px;
+      height:2.4px;
+      border-radius:999px;
+      background:#7867df;
+      transition:.08s linear;
+    }
+    .menu-btn span{transform:translateY(0)}
+    .menu-btn::before{transform:translateY(-7px)}
+    .menu-btn::after{transform:translateY(7px)}
+
+    .side-menu{
+      position:fixed;
+      top:10px;
+      right:-250px;
+      width:min(230px, calc(100vw - 20px));
+      height:calc(100vh - 20px);
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(22px);
+      border:1px solid rgba(219,233,246,.95);
+      box-shadow:-18px 0 40px rgba(8,46,91,.12);
+      padding:16px 12px 16px;
+      z-index:80;
+      transition:right .08s linear, opacity .08s linear;
+      overflow-y:auto;
+      border-radius:22px 0 0 22px;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .side-menu.is-open{
+      right:0;
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .side-menu h3{
+      margin:6px 4px 14px;
+      font-size:1.18rem;
+      color:#0a2f5d;
+      white-space:nowrap;
+    }
+
+    .side-menu .menu-group{
+      display:grid;
+      gap:10px;
+    }
+
+    .side-menu a{
+      text-decoration:none;
+      color:#0f2747;
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(47,140,255,.10);
+      border-radius:16px;
+      padding:14px 16px;
+      font-weight:700;
+      box-shadow:0 8px 22px rgba(10,37,73,.05);
+      transition:.12s ease;
+      display:block;
+      width:100%;
+      min-width:0;
+      white-space:nowrap;
+    }
+
+    .side-menu a:hover{
+      transform:translateX(-2px);
+      background:#fff;
+      color:#0f4d92;
+    }
+
+    .menu-note{
+      margin:18px 4px 0;
+      padding:14px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(216,167,47,.09), rgba(47,140,255,.06));
+      border:1px solid rgba(216,167,47,.14);
+      color:#45617e;
+      font-size:.92rem;
+      line-height:1.55;
+    }
+
+    .menu-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(2,18,38,.24);
+      opacity:0;
+      visibility:hidden;
+      z-index:70;
+      transition:opacity .08s linear, visibility .08s linear;
+    }
+
+    .menu-overlay.is-open{
+      opacity:1;
+      visibility:visible;
+    }
+
+    main{
+      position:relative;
+      z-index:1;
+      padding-top:calc(var(--header-h) + 8px);
+    }
+
+    .container{
+      width:var(--max);
+      margin:0 auto;
+      padding:0;
+    }
+
+    .hero{
+      padding:24px 0 34px;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.02fr .98fr;
+      gap:26px;
+      align-items:stretch;
+    }
+
+    .hero-card{
+      position:relative;
+      background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.86));
+      border:1px solid rgba(219,233,246,.92);
+      border-radius:34px;
+      box-shadow:var(--shadow);
+      padding:30px 28px 28px;
+      overflow:hidden;
+      height:auto;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      inset:-120px auto auto -100px;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(216,167,47,.13), transparent 70%);
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(120,103,223,.10);
+      color:#7867df;
+      font-weight:800;
+      font-size:.86rem;
+      margin-bottom:16px;
+      border:1px solid rgba(120,103,223,.10);
+      max-width:100%;
+      flex-wrap:wrap;
+    }
+
+    .edition-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-left:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(216,167,47,.10);
+      color:#916912;
+      border:1px solid rgba(216,167,47,.14);
+      font-weight:800;
+      font-size:.82rem;
+      max-width:100%;
+      white-space:nowrap;
+    }
+
+    .hero h1{
+      margin:0 0 14px;
+      font-size:clamp(2.1rem, 4vw, 4.1rem);
+      line-height:1.03;
+      letter-spacing:-1.2px;
+      color:#072a54;
+    }
+
+    .hero p.lead{
+      margin:0;
+      max-width:700px;
+      font-size:1rem;
+      line-height:1.82;
+      color:#596f89;
+    }
+
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:24px;
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+      margin-top:24px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(47,140,255,.10);
+      border-radius:20px;
+      padding:16px 14px;
+      box-shadow:0 10px 20px rgba(8,46,91,.05);
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.25rem;
+      color:#0a2f5d;
+      margin-bottom:5px;
+      word-break:break-word;
+    }
+
+    .stat span{
+      color:#657a95;
+      font-size:.9rem;
+      font-weight:700;
+      line-height:1.55;
+      display:block;
+      word-break:break-word;
+    }
+
+    .hero-visual{
+      position:relative;
+      background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.84));
+      border:1px solid rgba(219,233,246,.95);
+      border-radius:34px;
+      box-shadow:var(--shadow);
+      padding:22px;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:auto;
+    }
+
+    .hero-visual::before{
+      content:"";
+      position:absolute;
+      width:300px;
+      height:300px;
+      border-radius:50%;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-58%);
+      background:radial-gradient(circle, rgba(216,167,47,.20), rgba(216,167,47,.07) 55%, transparent 70%);
+      pointer-events:none;
+    }
+
+    .scene{
+      position:relative;
+      width:min(100%, 520px);
+      aspect-ratio:1 / 1;
+      min-height:0;
+      max-width:100%;
+      flex:0 1 auto;
+    }
+
+    .trophy-core{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:46%;
+      height:54%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      z-index:3;
+    }
+
+    .trophy-glow{
+      position:absolute;
+      width:72%;
+      height:72%;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(216,167,47,.28), rgba(216,167,47,.10) 55%, transparent 72%);
+      filter:blur(6px);
+      z-index:1;
+    }
+
+    .trophy-emoji{
+      font-size:clamp(4.8rem, 14vw, 8.3rem);
+      line-height:1;
+      z-index:3;
+      filter:drop-shadow(0 20px 30px rgba(185,131,18,.25));
+    }
+
+    .edition-badge{
+      margin-top:8px;
+      padding:9px 16px;
+      border-radius:999px;
+      background:rgba(255,255,255,.94);
+      border:1px solid rgba(216,167,47,.18);
+      color:#916912;
+      font-weight:900;
+      font-size:clamp(.82rem, 2.3vw, .95rem);
+      z-index:3;
+      box-shadow:0 10px 24px rgba(185,131,18,.10);
+      white-space:nowrap;
+      max-width:100%;
+    }
+
+    .discussion-line{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      width:78%;
+      aspect-ratio:1/1;
+      border-radius:50%;
+      border:2px dashed rgba(216,167,47,.18);
+      z-index:0;
+    }
+
+    .student{
+      position:absolute;
+      width:26%;
+      min-height:22%;
+      border-radius:22px;
+      padding:2.4% 1.8% 2%;
+      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(249,251,255,.90));
+      border:1px solid rgba(219,233,246,.95);
+      box-shadow:0 12px 24px rgba(10,37,73,.08);
+      text-align:center;
+      z-index:2;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      height:auto;
+    }
+
+    .student .face{
+      font-size:clamp(.95rem, 3.4vw, 2rem);
+      line-height:1;
+      margin-bottom:6px;
+    }
+
+    .student .name{
+      font-size:clamp(.58rem, 2vw, .83rem);
+      font-weight:800;
+      color:#14365e;
+      margin-bottom:4px;
+      line-height:1.2;
+      word-break:break-word;
+    }
+
+    .student .talk{
+      font-size:clamp(.48rem, 1.8vw, .74rem);
+      line-height:1.28;
+      color:#647891;
+      word-break:break-word;
+    }
+
+    .student.s1{top:4%;left:50%;transform:translateX(-50%)}
+    .student.s2{top:25%;right:2%}
+    .student.s3{bottom:9%;right:11%}
+    .student.s4{bottom:9%;left:11%}
+    .student.s5{top:25%;left:2%}
+
+    section{
+      padding:22px 0;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:clamp(1.5rem, 2.3vw, 2.2rem);
+      color:#082e5b;
+      letter-spacing:-.4px;
+    }
+
+    .section-head p{
+      margin:8px 0 0;
+      color:#61758f;
+      max-width:760px;
+      line-height:1.75;
+    }
+
+    .cards-3{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+      align-items:start;
+    }
+
+    .cards-4{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:16px;
+      align-items:start;
+    }
+
+    .card{
+      position:relative;
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.84));
+      border:1px solid rgba(219,233,246,.96);
+      border-radius:26px;
+      padding:22px 20px;
+      box-shadow:var(--shadow-soft);
+      overflow:hidden;
+      height:auto;
+      min-height:0;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0 auto auto 0;
+      width:100%;
+      height:4px;
+      background:linear-gradient(90deg, var(--gold), var(--blue));
+      opacity:.85;
+    }
+
+    .icon-bubble{
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      font-size:1.35rem;
+      background:linear-gradient(135deg, rgba(216,167,47,.12), rgba(47,140,255,.10));
+      box-shadow:inset 0 1px 6px rgba(255,255,255,.6);
+      margin-bottom:14px;
+    }
+
+    .card h3{
+      margin:0 0 10px;
+      color:#082e5b;
+      font-size:1.08rem;
+      word-break:break-word;
+    }
+
+    .card p{
+      margin:0;
+      color:#647891;
+      line-height:1.7;
+      font-size:.95rem;
+      word-break:break-word;
+    }
+
+    .timeline{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:18px;
+      align-items:start;
+    }
+
+    .time-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.84));
+      border:1px solid rgba(219,233,246,.95);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:var(--shadow-soft);
+      height:auto;
+      min-height:0;
+    }
+
+    .time-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(216,167,47,.10);
+      color:#916912;
+      font-weight:800;
+      font-size:.82rem;
+      margin-bottom:12px;
+      border:1px solid rgba(216,167,47,.10);
+      max-width:100%;
+      white-space:nowrap;
+    }
+
+    .time-card h3{
+      margin:0 0 8px;
+      color:#082e5b;
+      font-size:1.07rem;
+      word-break:break-word;
+    }
+
+    .time-card p{
+      margin:0;
+      color:#627791;
+      line-height:1.7;
+      font-size:.95rem;
+      word-break:break-word;
+    }
+
+    .highlight{
+      background:linear-gradient(135deg, rgba(8,46,91,.98), rgba(15,77,146,.95));
+      border-radius:34px;
+      padding:34px 28px;
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 22px 48px rgba(8,46,91,.22);
+    }
+
+    .highlight::before{
+      content:"";
+      position:absolute;
+      width:220px;
+      height:220px;
+      right:-80px;
+      top:-80px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.16), transparent 70%);
+    }
+
+    .highlight-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:24px;
+      align-items:center;
+      position:relative;
+      z-index:1;
+    }
+
+    .highlight h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.5rem);
+      letter-spacing:-.6px;
+      word-break:break-word;
+    }
+
+    .highlight p{
+      margin:0;
+      color:rgba(255,255,255,.86);
+      line-height:1.8;
+      max-width:780px;
+      word-break:break-word;
+    }
+
+    .highlight-boxes{
+      display:grid;
+      gap:12px;
+    }
+
+    .highlight-box{
+      padding:16px 18px;
+      border-radius:20px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      backdrop-filter:blur(8px);
+      font-weight:700;
+      line-height:1.55;
+      color:#eef6ff;
+      word-break:break-word;
+      height:auto;
+    }
+
+    .faq-list{
+      display:grid;
+      gap:14px;
+    }
+
+    .faq-item{
+      background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.84));
+      border:1px solid rgba(219,233,246,.95);
+      border-radius:22px;
+      padding:20px 20px;
+      box-shadow:var(--shadow-soft);
+      height:auto;
+    }
+
+    .faq-item h3{
+      margin:0 0 8px;
+      color:#082e5b;
+      font-size:1rem;
+      word-break:break-word;
+    }
+
+    .faq-item p{
+      margin:0;
+      color:#647891;
+      line-height:1.72;
+      font-size:.95rem;
+      word-break:break-word;
+    }
+
+    .cta{
+      padding-top:10px;
+      padding-bottom:54px;
+    }
+
+    .cta-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.86));
+      border:1px solid rgba(219,233,246,.95);
+      border-radius:34px;
+      box-shadow:var(--shadow);
+      padding:34px 28px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+      height:auto;
+    }
+
+    .cta-card::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      left:-110px;
+      bottom:-130px;
+      background:radial-gradient(circle, rgba(216,167,47,.14), transparent 72%);
+    }
+
+    .cta-card h2{
+      margin:0 0 12px;
+      font-size:clamp(1.7rem, 2.8vw, 2.4rem);
+      color:#082e5b;
+      word-break:break-word;
+    }
+
+    .cta-card p{
+      margin:0 auto;
+      max-width:760px;
+      color:#627791;
+      line-height:1.8;
+      word-break:break-word;
+    }
+
+    .cta-actions{
+      margin-top:24px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    footer{
+      border-top:1px solid rgba(219,233,246,.95);
+      background:rgba(255,255,255,.72);
+      backdrop-filter:blur(10px);
+    }
+
+    .footer-inner{
+      width:var(--max);
+      margin:0 auto;
+      padding:22px 0 28px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      color:#61758f;
+      font-size:.94rem;
+    }
+
+    .footer-links{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .footer-links a{
+      color:#0f4d92;
+      text-decoration:none;
+      font-weight:700;
+    }
+
+    @keyframes floatOrb{
+      0%,100%{transform:translateY(0px)}
+      50%{transform:translateY(-12px)}
+    }
+
+    @media (max-width:1280px){
+      :root{
+        --edge-space:28px;
+      }
+      .header-inner{
+        grid-template-columns:minmax(220px, 280px) 1fr auto;
+        gap:14px;
+      }
+      .nav-main{
+        gap:4px;
+      }
+      .nav-main a{
+        padding:10px 11px;
+        font-size:.92rem;
+      }
+      .header-actions{
+        gap:8px;
+      }
+    }
+
+    @media (max-width:1100px){
+      .hero-grid,
+      .highlight-grid,
+      .cards-4,
+      .cards-3,
+      .timeline{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .hero-grid{
+        grid-template-columns:1fr;
+      }
+
+      .highlight-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:860px){
+      .nav-main{
+        display:none;
+      }
+
+      .hero{
+        padding:18px 0 20px;
+      }
+
+      .hero-card,
+      .hero-visual,
+      .cta-card,
+      .highlight{
+        border-radius:26px;
+      }
+
+      .hero-card{
+        padding:22px 18px 20px;
+      }
+
+      .hero-stats{
+        grid-template-columns:1fr;
+      }
+
+      .cards-3,
+      .cards-4,
+      .timeline{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:820px){
+      :root{
+        --edge-space:12px;
+      }
+
+      .site-header{
+        background:rgba(255,255,255,.94);
+      }
+
+      .site-header.header-hidden{
+        transform:none;
+        opacity:1;
+      }
+
+      .header-inner{
+        padding:0;
+        height:74px;
+        min-height:74px;
+        display:block;
+      }
+
+      .brand{
+        position:relative;
+        display:grid;
+        grid-template-columns:44px 1fr;
+        align-items:center;
+        gap:10px;
+        width:100%;
+        height:74px;
+        padding-right:56px;
+        max-width:none;
+      }
+
+      .brand-mark{
+        width:44px;
+        height:44px;
+        border-radius:14px;
+      }
+
+      .brand-text{
+        min-width:0;
+        width:100%;
+        text-align:center;
+      }
+
+      .brand-title{
+        font-size:clamp(1.02rem, 5vw, 2rem);
+        line-height:1.08;
+        text-align:center;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+
+      .brand-sub{
+        display:none;
+      }
+
+      .header-actions{
+        position:absolute;
+        right:0;
+        top:50%;
+        transform:translateY(-50%);
+        gap:6px;
+        justify-content:flex-end;
+      }
+
+      .header-actions .btn,
+      .header-actions .btn-outline{
+        display:none;
+      }
+
+      .menu-btn{
+        width:48px;
+        height:48px;
+        border-radius:15px;
+      }
+
+      .menu-btn span,
+      .menu-btn::before,
+      .menu-btn::after{
+        width:20px;
+      }
+
+      .hero-visual{
+        padding:14px;
+      }
+
+      .scene{
+        width:min(100%, 480px);
+      }
+
+      .student{
+        border-radius:18px;
+      }
+
+      .student.s2{right:1%}
+      .student.s5{left:1%}
+
+      .side-menu{
+        width:min(250px, calc(100vw - 20px));
+        right:-270px;
+        top:68px;
+        height:calc(100vh - 68px);
+        border-radius:22px 0 0 22px;
+      }
+
+      main{
+        padding-top:82px;
+      }
+
+      .hero-card,
+      .hero-card h1,
+      .hero-card .lead,
+      .hero-card .eyebrow,
+      .hero-card .hero-actions,
+      .stat,
+      .card,
+      .time-card,
+      .faq-item,
+      .cta-card,
+      .section-head,
+      .section-head h2,
+      .section-head p{
+        text-align:center;
+      }
+
+      .hero-card .eyebrow,
+      .hero-card .edition-pill,
+      .time-pill{
+        justify-content:center;
+        margin-left:auto;
+        margin-right:auto;
+      }
+
+      .hero-card .hero-actions,
+      .cta-actions{
+        justify-content:center;
+      }
+
+      .icon-bubble{
+        margin-left:auto;
+        margin-right:auto;
+      }
+
+      .section-head{
+        justify-content:center;
+      }
+
+      .section-head > div{
+        width:100%;
+      }
+
+      .footer-inner{
+        text-align:center;
+        justify-content:center;
+        align-items:center;
+      }
+
+      .footer-inner > div{
+        width:100%;
+        text-align:center;
+      }
+
+      .footer-links{
+        justify-content:center;
+        width:100%;
+      }
+    }
+
+    @media (max-width:640px){
+      .brand-title{
+        font-size:clamp(1.18rem, 5vw, 1.9rem);
+      }
+
+      .hero h1{
+        font-size:2.1rem;
+        line-height:1.04;
+        margin-bottom:10px;
+      }
+
+      .hero p.lead{
+        font-size:.98rem;
+        line-height:1.72;
+      }
+
+      .hero-actions,
+      .cta-actions{
+        flex-direction:column;
+      }
+
+      .btn,
+      .btn-outline{
+        width:100%;
+      }
+
+      .hero-visual{
+        order:-1;
+      }
+
+      .scene{
+        width:min(100%, 440px);
+      }
+
+      .student{
+        width:27%;
+        min-height:22%;
+      }
+
+      .student .face{
+        font-size:clamp(.95rem, 5vw, 1.5rem);
+      }
+
+      .student .name{
+        font-size:clamp(.58rem, 2.4vw, .74rem);
+      }
+
+      .student .talk{
+        font-size:clamp(.46rem, 2vw, .64rem);
+      }
+
+      .footer-inner{
+        align-items:center;
+        flex-direction:column;
+        text-align:center;
+      }
+
+      .footer-inner > div{
+        width:100%;
+        text-align:center;
+      }
+
+      .footer-links{
+        justify-content:center;
+      }
+    }
+
+    @media (max-width:520px){
+      :root{
+        --edge-space:10px;
+      }
+
+      .brand{
+        grid-template-columns:40px 1fr;
+        gap:8px;
+        height:72px;
+        padding-right:52px;
+      }
+
+      .brand-mark{
+        width:40px;
+        height:40px;
+        border-radius:13px;
+      }
+
+      .brand-title{
+        font-size:clamp(1.14rem, 5.2vw, 1.7rem);
+      }
+
+      .header-actions{
+        right:0;
+      }
+
+      .menu-btn{
+        width:44px;
+        height:44px;
+        border-radius:14px;
+      }
+
+      .menu-btn span,
+      .menu-btn::before,
+      .menu-btn::after{
+        width:18px;
+      }
+
+      .menu-btn::before{ transform:translateY(-6px); }
+      .menu-btn::after{ transform:translateY(6px); }
+
+      .hero-card{
+        padding:20px 16px 18px;
+      }
+
+      .hero h1{
+        font-size:1.9rem;
+      }
+
+      .eyebrow{
+        font-size:.8rem;
+        line-height:1.35;
+      }
+
+      .edition-pill{
+        display:inline-flex;
+        margin-left:0;
+        margin-top:8px;
+      }
+
+      .hero-visual{
+        padding:12px;
+      }
+
+      .scene{
+        width:min(100%, 380px);
+      }
+
+      .trophy-core{
+        width:48%;
+        height:56%;
+      }
+
+      .student{
+        width:28%;
+        min-height:23%;
+        padding:2.5% 1.6% 2.2%;
+      }
+
+      .student.s1{top:4.5%}
+      .student.s2{top:25%; right:.5%}
+      .student.s3{bottom:8%; right:8%}
+      .student.s4{bottom:8%; left:8%}
+      .student.s5{top:25%; left:.5%}
+
+      .side-menu{
+        width:min(230px, calc(100vw - 18px));
+        right:-248px;
+        top:68px;
+        height:calc(100vh - 68px);
+      }
+
+      .hero-card,
+      .hero-visual,
+      .card,
+      .time-card,
+      .faq-item,
+      .cta-card,
+      .highlight{
+        border-radius:24px;
+      }
+
+      .card,
+      .time-card,
+      .faq-item{
+        padding-left:18px;
+        padding-right:18px;
+      }
+
+      .highlight{
+        text-align:center;
+      }
+
+      .highlight-boxes{
+        justify-content:center;
+      }
+
+      .highlight-box{
+        text-align:center;
+      }
+
+      .footer-inner{
+        padding:20px 0 26px;
+      }
+
+      .footer-links{
+        gap:10px 16px;
+      }
+    }
+
+    @media (max-width:390px){
+      .brand-title{
+        font-size:clamp(1.02rem, 5.3vw, 1.4rem);
+      }
+
+      .hero h1{
+        font-size:1.75rem;
+      }
+
+      .scene{
+        width:min(100%, 340px);
+      }
+
+      .student{
+        width:29%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="molecule-bg">
+      <div class="orb o1"></div>
+      <div class="orb o2"></div>
+      <div class="orb o3"></div>
+      <div class="orb o4"></div>
+      <div class="line l1"></div>
+      <div class="line l2"></div>
+      <div class="line l3"></div>
+      <div class="line l4"></div>
+    </div>
+
+    <header class="site-header" id="siteHeader">
+      <div class="header-inner">
+        <a href="./index1.html" class="brand">
+          <div class="brand-mark"></div>
+          <div class="brand-text">
+            <div class="brand-title">Championnat de Chimie</div>
+            <div class="brand-sub">Présence officielle en ligne</div>
+          </div>
+        </a>
+
+        <nav class="nav-main">
+          <a href="./index1.html">Accueil</a>
+          <a href="./about.html">À propos</a>
+          <a href="./faq.html">FAQ</a>
+          <a href="./contact.html">Contact</a>
+        </nav>
+
+        <div class="header-actions">
+          <a class="btn-outline" href="./about.html">Découvrir</a>
+          <a class="btn" href="./contact.html">Nous contacter</a>
+
+          <button class="menu-btn" id="menuBtn" aria-label="Ouvrir le menu" type="button">
+            <span></span>
+          </button>
+
+          <aside class="side-menu" id="sideMenu">
+            <h3>Visiter</h3>
+            <div class="menu-group">
+              <a href="./index1.html">Accueil</a>
+              <a href="./about.html">À propos</a>
+              <a href="./faq.html">FAQ</a>
+              <a href="./contact.html">Contact</a>
+            </div>
+            <div class="menu-note">
+              Le championnat n’est pas encore lancé. Les informations officielles de la prochaine édition seront publiées progressivement sur cette plateforme.
+            </div>
+          </aside>
+
+          <div class="menu-overlay" id="menuOverlay"></div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <div class="hero-grid">
+            <div class="hero-card">
+              <div class="eyebrow">🏆 Présence officielle • Chimie • Francophonie</div>
+              <span class="edition-pill" data-edition-label>Édition 2026</span>
+
+              <h1>Championnat non lancé.</h1>
+
+              <p class="lead">
+                La prochaine édition du Championnat de Chimie est prévue pour le <strong>vendredi 18 décembre 2026</strong>.
+                Cette plateforme reste en ligne pour annoncer les informations officielles, confirmer la date de l’événement et maintenir une présence publique claire et élégante.
+              </p>
+
+              <div class="hero-actions">
+                <a href="./about.html" class="btn">En savoir plus</a>
+                <a href="./contact.html" class="btn-outline">Nous contacter</a>
+              </div>
+
+              <div class="hero-stats">
+                <div class="stat">
+                  <strong data-edition-year>2026</strong>
+                  <span>Prochaine édition annoncée</span>
+                </div>
+                <div class="stat">
+                  <strong>18 Déc.</strong>
+                  <span>Date officielle prévue</span>
+                </div>
+                <div class="stat">
+                  <strong>En ligne</strong>
+                  <span>Présence publique légère</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-visual">
+              <div class="scene">
+                <div class="discussion-line"></div>
+
+                <div class="student s1">
+                  <div class="face">👩🏿‍🎓</div>
+                  <div class="name">Étudiante</div>
+                  <div class="talk">On attend la prochaine édition.</div>
+                </div>
+
+                <div class="student s2">
+                  <div class="face">👨🏻‍🎓</div>
+                  <div class="name">Étudiant</div>
+                  <div class="talk">Le rendez-vous est déjà fixé.</div>
+                </div>
+
+                <div class="student s3">
+                  <div class="face">👩🏼‍🔬</div>
+                  <div class="name">Jury</div>
+                  <div class="talk">Les informations viendront ici.</div>
+                </div>
+
+                <div class="student s4">
+                  <div class="face">👨🏾‍🔬</div>
+                  <div class="name">Candidat</div>
+                  <div class="talk">La présence du site est maintenue.</div>
+                </div>
+
+                <div class="student s5">
+                  <div class="face">👩🏻‍🎓</div>
+                  <div class="name">Étudiante</div>
+                  <div class="talk">La prochaine édition approche.</div>
+                </div>
+
+                <div class="trophy-core">
+                  <div class="trophy-glow"></div>
+                  <div class="trophy-emoji">🏆</div>
+                  <div class="edition-badge">Vendredi 18 décembre 2026</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about-home">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Une présence sobre et officielle</h2>
+              <p>
+                Cette version publique du site a pour rôle d’annoncer la prochaine édition, de rassurer les visiteurs, et de conserver une identité institutionnelle visible sans activer les fonctionnalités lourdes du championnat.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-3">
+            <div class="card">
+              <div class="icon-bubble">📅</div>
+              <h3>Date annoncée</h3>
+              <p>
+                La plateforme affiche dès maintenant la date prévue de la prochaine édition afin que les étudiants et visiteurs puissent identifier le rendez-vous officiel.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">🌍</div>
+              <h3>Présence publique</h3>
+              <p>
+                Le site reste visible en ligne, accessible à tous, sans exiger de connexion ni activer les parties coûteuses tant que le championnat n’est pas lancé.
+              </p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">🎓</div>
+              <h3>Image sérieuse</h3>
+              <p>
+                Une page élégante et académique suffit pour installer la crédibilité du projet en attendant l’ouverture officielle des activités.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-home">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Ce que les visiteurs verront</h2>
+              <p>
+                Cette version en ligne reste volontairement simple et légère, tout en montrant que le projet existe déjà.
+              </p>
+            </div>
+          </div>
+
+          <div class="cards-4">
+            <div class="card">
+              <div class="icon-bubble">1</div>
+              <h3>Une annonce claire</h3>
+              <p>Le championnat n’est pas encore lancé, mais la date de la prochaine édition est déjà communiquée publiquement.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">2</div>
+              <h3>Une vitrine propre</h3>
+              <p>Le site présente une image propre, stable et crédible sans dépendre de systèmes actifs toute l’année.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">3</div>
+              <h3>Des pages utiles</h3>
+              <p>Les visiteurs peuvent encore lire quelques pages simples comme À propos, FAQ et Contact.</p>
+            </div>
+            <div class="card">
+              <div class="icon-bubble">4</div>
+              <h3>Un futur lancement</h3>
+              <p>Quand le moment viendra, les autres sections pourront être réactivées progressivement.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="dates-home">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Prochaine échéance</h2>
+              <p>
+                La page donne un repère simple pour garder le projet vivant et identifiable jusqu’au lancement officiel.
+              </p>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <div class="time-card">
+              <div class="time-pill">Maintenant</div>
+              <h3>Présence publique</h3>
+              <p>
+                Le site reste en ligne dans une version légère, élégante et publique.
+              </p>
+            </div>
+            <div class="time-card">
+              <div class="time-pill">Avant lancement</div>
+              <h3>Communication</h3>
+              <p>
+                Les informations essentielles, la date et les mises à jour officielles pourront être publiées ici.
+              </p>
+            </div>
+            <div class="time-card">
+              <div class="time-pill">Vendredi 18 décembre 2026</div>
+              <h3>Prochaine édition</h3>
+              <p>
+                Le rendez-vous prévu pour la prochaine édition du Championnat de Chimie.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="container">
+          <div class="highlight">
+            <div class="highlight-grid">
+              <div>
+                <h2>Une présence durable sans lourdeur inutile.</h2>
+                <p>
+                  Cette version du site permet de garder le domaine actif, visible et élégant, sans lancer dès maintenant les parties interactives qui ne sont utiles qu’au moment du championnat.
+                </p>
+              </div>
+              <div class="highlight-boxes">
+                <div class="highlight-box">Le site reste visible et professionnel toute l’année.</div>
+                <div class="highlight-box">La prochaine édition est annoncée clairement.</div>
+                <div class="highlight-box">Les pages dynamiques peuvent être remises plus tard, au bon moment.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq-home">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Questions rapides</h2>
+              <p>
+                Quelques réponses simples pour les visiteurs dès la première arrivée sur le site.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-list">
+            <div class="faq-item">
+              <h3>Le championnat est-il déjà lancé ?</h3>
+              <p>
+                Non. Le championnat n’est pas encore lancé. Cette page maintient la présence officielle du projet en attendant l’ouverture de la prochaine édition.
+              </p>
+            </div>
+            <div class="faq-item">
+              <h3>Quand aura lieu la prochaine édition ?</h3>
+              <p>
+                La prochaine édition est prévue pour le <strong>vendredi 18 décembre 2026</strong>.
+              </p>
+            </div>
+            <div class="faq-item">
+              <h3>Le site évoluera-t-il plus tard ?</h3>
+              <p>
+                Oui. Cette version est volontairement légère. Les autres sections pourront être remises en ligne au moment opportun.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta" id="contact-home">
+        <div class="container">
+          <div class="cta-card">
+            <h2>Rendez-vous pour la prochaine édition</h2>
+            <p>
+              Le Championnat de Chimie prépare sa prochaine édition. Les informations officielles continueront d’être diffusées sur cette plateforme.
+            </p>
+            <div class="cta-actions">
+              <a href="./about.html" class="btn">En savoir plus</a>
+              <a href="./contact.html" class="btn-outline">Contacter l’organisation</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <div>© 2026 Championnat de Chimie — présence officielle en ligne.</div>
+        <div class="footer-links">
+          <a href="./index1.html">Accueil</a>
+          <a href="./about.html">À propos</a>
+          <a href="./faq.html">FAQ</a>
+          <a href="./contact.html">Contact</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const EDITION_YEAR = "2026";
+    document.querySelectorAll("[data-edition-label]").forEach(el => {
+      el.textContent = "Édition " + EDITION_YEAR;
+    });
+    document.querySelectorAll("[data-edition-year]").forEach(el => {
+      el.textContent = EDITION_YEAR;
+    });
+
+    const siteHeader = document.getElementById("siteHeader");
+    const sideMenu = document.getElementById("sideMenu");
+    const menuBtn = document.getElementById("menuBtn");
+    const menuOverlay = document.getElementById("menuOverlay");
+
+    function openMenu() {
+      sideMenu.classList.add("is-open");
+      menuOverlay.classList.add("is-open");
+    }
+
+    function closeMenu() {
+      sideMenu.classList.remove("is-open");
+      menuOverlay.classList.remove("is-open");
+    }
+
+    function toggleMenu(e) {
+      if (e) e.stopPropagation();
+      if (sideMenu.classList.contains("is-open")) closeMenu();
+      else openMenu();
+    }
+
+    menuBtn.addEventListener("click", toggleMenu);
+    menuOverlay.addEventListener("click", closeMenu);
+
+    document.addEventListener("click", (e) => {
+      const insideMenu = sideMenu.contains(e.target);
+      const onBtn = menuBtn.contains(e.target);
+      if (!insideMenu && !onBtn) closeMenu();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMenu();
+    });
+
+    document.querySelectorAll(".side-menu a").forEach(link => {
+      link.addEventListener("click", closeMenu);
+    });
+
+    function handleHeaderScroll() {
+      const currentScrollY = window.scrollY || window.pageYOffset || 0;
+      if (currentScrollY > 1) siteHeader.classList.add("header-hidden");
+      else siteHeader.classList.remove("header-hidden");
+    }
+
+    window.addEventListener("scroll", handleHeaderScroll, { passive:true });
+    window.addEventListener("resize", handleHeaderScroll);
+    handleHeaderScroll();
+  </script>
+</body>
+</html>
