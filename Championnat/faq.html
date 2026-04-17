@@ -4,13 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FAQ | Championnat de Chimie</title>
-  <meta name="description" content="Questions fréquentes du Championnat de Chimie." />
 
   <style>
     *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif}
 
     :root{
-      --bg:#f5f7fb;
+      --bg:#f6f8fb;
       --panel:#ffffff;
       --panel-soft:#fbfcfe;
       --sidebar:#05293d;
@@ -21,16 +20,13 @@
       --line-soft:#edf2f8;
       --blue:#2f8cff;
       --blue-dark:#145bd6;
-      --red:#ff4b4b;
-      --red-dark:#d73333;
+      --red:#d95c5c;
       --green:#18c34a;
-      --gold:#d8a72f;
-      --orange:#ff9f1a;
-      --orange-dark:#df7f00;
-      --purple:#7b61ff;
-      --purple-dark:#5a3ff0;
-      --pink:#ff63b5;
-      --shadow:0 10px 24px rgba(13,37,71,.08);
+      --gold:#c9a03a;
+      --orange:#d39b2d;
+      --purple:#6f6ad8;
+      --pink:#c97aa8;
+      --shadow:0 10px 24px rgba(13,37,71,.07);
       --radius:18px;
       --radius-lg:22px;
       --topbar-h:62px;
@@ -61,7 +57,7 @@
       right:0;
       z-index:60;
       height:var(--topbar-h);
-      background:rgba(255,255,255,.94);
+      background:rgba(255,255,255,.95);
       backdrop-filter:blur(14px);
       border-bottom:1px solid var(--line);
       display:flex;
@@ -91,8 +87,8 @@
       border-radius:14px;
       position:relative;
       background:
-        radial-gradient(circle at 30% 30%, #fff 0%, #ffe4ef 20%, #ffb347 42%, #ff5f6d 68%, #7b61ff 100%);
-      box-shadow:0 10px 20px rgba(255,95,109,.18), inset 0 1px 8px rgba(255,255,255,.7);
+        radial-gradient(circle at 30% 30%, #fff 0%, #dce8f7 24%, #7aa8d8 55%, #3d628f 100%);
+      box-shadow:0 10px 20px rgba(61,98,143,.15), inset 0 1px 8px rgba(255,255,255,.7);
       flex:0 0 auto;
     }
 
@@ -111,7 +107,7 @@
     .brand-title{
       font-size:14px;
       font-weight:800;
-      color:#7a1f2e;
+      color:#18385d;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -119,7 +115,7 @@
 
     .brand-sub{
       font-size:12px;
-      color:#8a7392;
+      color:#73859b;
       margin-top:2px;
       white-space:nowrap;
       overflow:hidden;
@@ -140,8 +136,8 @@
       padding:9px 14px;
       border-radius:999px;
       background:#fff;
-      border:1px solid #ffd8dc;
-      color:#7b4250;
+      border:1px solid #e5eaf2;
+      color:#5d6f86;
       font-weight:700;
       font-size:13px;
       box-shadow:var(--shadow);
@@ -151,13 +147,8 @@
       width:10px;
       height:10px;
       border-radius:50%;
-      background:var(--orange);
-      box-shadow:0 0 0 5px rgba(255,159,26,.14);
-    }
-
-    .status-dot.ok{
-      background:var(--green);
-      box-shadow:0 0 0 5px rgba(24,195,74,.14);
+      background:#8aa0b8;
+      box-shadow:0 0 0 5px rgba(138,160,184,.14);
     }
 
     .home-btn{
@@ -167,9 +158,9 @@
       font-weight:800;
       font-size:13px;
       text-decoration:none;
-      color:#8b3f00;
+      color:#35506d;
       background:#fff;
-      border:1px solid #ffe3c2;
+      border:1px solid #e5eaf2;
       box-shadow:var(--shadow);
       display:inline-flex;
       align-items:center;
@@ -180,8 +171,8 @@
       width:40px;
       height:40px;
       border-radius:12px;
-      border:1px solid #ffd6de;
-      background:linear-gradient(180deg,#fff,#fff6f8);
+      border:1px solid #e5eaf2;
+      background:linear-gradient(180deg,#fff,#f7f9fc);
       display:none;
       place-items:center;
       cursor:pointer;
@@ -199,7 +190,7 @@
       width:18px;
       height:2px;
       border-radius:999px;
-      background:#b13f55;
+      background:#5f738a;
       transition:.18s ease;
     }
 
@@ -263,8 +254,8 @@
     .nav-link:hover{ background:rgba(255,255,255,.08); }
 
     .nav-link.active{
-      background:rgba(255,159,26,.20);
-      border:1px solid rgba(255,214,146,.18);
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
     }
 
     .nav-dot{
@@ -275,13 +266,12 @@
       flex:0 0 auto;
     }
 
-    .nav-dot.green{ background:#1ed760; }
-    .nav-dot.red{ background:#ff7777; }
-    .nav-dot.gold{ background:#e7c15a; }
-    .nav-dot.purple{ background:#b29bff; }
-    .nav-dot.orange{ background:#ffb347; }
-    .nav-dot.pink{ background:#ff7cc7; }
-    .nav-dot.blue{ background:#88bfff; }
+    .nav-dot.green{ background:#7fcf98; }
+    .nav-dot.red{ background:#d98b8b; }
+    .nav-dot.gold{ background:#c8b07a; }
+    .nav-dot.purple{ background:#a8a1da; }
+    .nav-dot.orange{ background:#d9b179; }
+    .nav-dot.pink{ background:#d3a3be; }
 
     .sidebar-note{
       margin-top:8px;
@@ -300,6 +290,10 @@
       overflow-y:auto;
       overflow-x:hidden;
       transition:height .24s ease;
+      background:
+        radial-gradient(circle at top right, rgba(47,140,255,.04), transparent 22%),
+        radial-gradient(circle at top left, rgba(140,160,185,.05), transparent 18%),
+        var(--bg);
     }
 
     body.topbar-collapsed .content{
@@ -318,7 +312,7 @@
     .title-wrap h1{
       font-size:34px;
       line-height:1.05;
-      color:#a12d38;
+      color:#18385d;
       letter-spacing:-1px;
       margin:0 0 10px;
     }
@@ -356,14 +350,14 @@
 
     .head-btn.primary{
       color:#fff;
-      background:linear-gradient(135deg,var(--red),var(--orange));
-      box-shadow:0 16px 28px rgba(255,95,109,.18);
+      background:linear-gradient(135deg,#6783a3,#4f6783);
+      box-shadow:0 16px 28px rgba(79,103,131,.18);
     }
 
     .head-btn.soft{
-      color:#8d3f00;
+      color:#35506d;
       background:#fff;
-      border:1px solid #ffe0bc;
+      border:1px solid #e5eaf2;
       box-shadow:var(--shadow);
     }
 
@@ -384,37 +378,11 @@
 
     .mini-card{
       padding:18px;
-      background:linear-gradient(180deg,#fff,#fcfbff);
+      background:linear-gradient(180deg,#fff,#fbfcfe);
     }
-
-    .mini-card:nth-child(1){
-      border-color:#ffdede;
-      background:linear-gradient(180deg,#fff,#fff7f7);
-    }
-    .mini-card:nth-child(1) strong{ color:#c63838; }
-
-    .mini-card:nth-child(2){
-      border-color:#ffe7c6;
-      background:linear-gradient(180deg,#fff,#fffaf3);
-    }
-    .mini-card:nth-child(2) strong{ color:#d97c00; }
-
-    .mini-card:nth-child(3){
-      border-color:#e7ddff;
-      background:linear-gradient(180deg,#fff,#faf7ff);
-    }
-    .mini-card:nth-child(3) strong{ color:#6a45d7; }
-
-    .mini-card:nth-child(4){
-      border-color:#ffd8f1;
-      background:linear-gradient(180deg,#fff,#fff7fc);
-    }
-    .mini-card:nth-child(4) strong{ color:#c73d8e; }
 
     .mini-card strong{
-      display:block;
-      font-size:16px;
-      margin-bottom:8px;
+      color:#35506d;
     }
 
     .mini-card p{
@@ -444,7 +412,7 @@
 
     .panel-head h2{
       font-size:24px;
-      color:#7a3048;
+      color:#35506d;
       margin:0 0 8px;
       letter-spacing:-.5px;
     }
@@ -467,24 +435,9 @@
 
     .faq-item{
       border-radius:16px;
-      background:linear-gradient(180deg,#fff,#fffafc);
-      border:1px solid #ffe0e7;
+      background:linear-gradient(180deg,#fff,#fbfcfe);
+      border:1px solid #e7edf4;
       overflow:hidden;
-    }
-
-    .faq-item:nth-child(3n+1){
-      border-color:#ffdede;
-      background:linear-gradient(180deg,#fff,#fff7f7);
-    }
-
-    .faq-item:nth-child(3n+2){
-      border-color:#ffe4c4;
-      background:linear-gradient(180deg,#fff,#fff9f2);
-    }
-
-    .faq-item:nth-child(3n+3){
-      border-color:#eadfff;
-      background:linear-gradient(180deg,#fff,#faf7ff);
     }
 
     .faq-question{
@@ -498,18 +451,18 @@
       align-items:center;
       justify-content:space-between;
       gap:16px;
-      color:#7a3048;
+      color:#35506d;
       font-weight:800;
       font-size:15px;
     }
 
     .faq-question:hover{
-      background:rgba(255,255,255,.45);
+      background:rgba(245,248,252,.8);
     }
 
     .faq-sign{
       font-size:18px;
-      color:#ff7a00;
+      color:#7d8fa3;
       flex:0 0 auto;
       transition:transform .18s ease;
     }
@@ -520,10 +473,6 @@
       color:var(--muted);
       line-height:1.72;
       font-size:14px;
-    }
-
-    .faq-answer strong{
-      color:#153861;
     }
 
     .faq-item.active .faq-answer{
@@ -537,33 +486,19 @@
     .side-note{
       padding:14px;
       border-radius:14px;
-      color:#5b4566;
+      color:#5b6d81;
       font-size:14px;
       line-height:1.7;
-      border:1px solid transparent;
-    }
-
-    .grid-stack .panel:nth-child(1) .side-note{
-      background:linear-gradient(180deg,#fff,#fff7f7);
-      border-color:#ffdede;
-    }
-
-    .grid-stack .panel:nth-child(2) .side-note{
-      background:linear-gradient(180deg,#fff,#fff9f2);
-      border-color:#ffe5c9;
-    }
-
-    .grid-stack .panel:nth-child(3) .side-note{
-      background:linear-gradient(180deg,#fff,#faf7ff);
-      border-color:#eadfff;
+      border:1px solid #e7edf4;
+      background:linear-gradient(180deg,#fff,#fbfcfe);
     }
 
     .cta-box{
       padding:20px 18px;
       border-radius:18px;
-      background:linear-gradient(135deg, rgba(255,75,75,.98), rgba(255,159,26,.96), rgba(123,97,255,.90));
+      background:linear-gradient(135deg, rgba(92,115,142,.98), rgba(125,143,163,.94));
       color:#fff;
-      box-shadow:0 18px 36px rgba(255,95,109,.16);
+      box-shadow:0 18px 36px rgba(79,103,131,.14);
       position:relative;
       overflow:hidden;
     }
@@ -618,7 +553,7 @@
 
     .cta-link.primary{
       background:#fff;
-      color:#c54430;
+      color:#4f6783;
     }
 
     .cta-link.soft{
@@ -638,7 +573,7 @@
 
     .page-footer strong{
       display:block;
-      color:#a0363e;
+      color:#35506d;
       font-size:15px;
       margin-bottom:4px;
     }
@@ -651,7 +586,7 @@
       max-height:72vh;
       overflow:auto;
       background:rgba(255,255,255,.98);
-      border:1px solid #ffd8de;
+      border:1px solid #e5eaf2;
       border-radius:18px;
       box-shadow:0 24px 48px rgba(10,37,73,.18);
       padding:14px;
@@ -664,7 +599,7 @@
     .mobile-menu h3{
       margin:2px 4px 12px;
       font-size:15px;
-      color:#94384a;
+      color:#35506d;
     }
 
     .mobile-group{
@@ -675,9 +610,9 @@
 
     .mobile-link{
       text-decoration:none;
-      color:#6c4c54;
-      background:#fff8fa;
-      border:1px solid #ffe0e7;
+      color:#5f738a;
+      background:#fbfcfe;
+      border:1px solid #e7edf4;
       border-radius:12px;
       padding:11px 12px;
       font-weight:700;
@@ -867,14 +802,14 @@
       <div class="brand-mark"></div>
       <div class="brand-text">
         <div class="brand-title">Championnat de Chimie</div>
-        <div class="brand-sub" id="brandSub">Questions fréquentes</div>
+        <div class="brand-sub">Questions fréquentes</div>
       </div>
     </a>
 
     <div class="topbar-right">
       <div class="status-chip">
-        <span id="statusDot" class="status-dot"></span>
-        <span id="statusText">Informations & réponses</span>
+        <span class="status-dot"></span>
+        <span>Informations & réponses</span>
       </div>
       <a href="./index.html" class="home-btn">Accueil</a>
       <button class="menu-btn" id="menuBtn" type="button" aria-label="Ouvrir le menu">
@@ -899,13 +834,10 @@
       <a class="mobile-link" href="./faq.html">FAQ</a>
       <a class="mobile-link" href="./contact.html">Contact</a>
       <a class="mobile-link" href="./verify-certificate.html">Vérifier certificat</a>
-      <a class="mobile-link" href="./profile.html">Mon profil</a>
-      <a class="mobile-link" id="mobileAuthLink" href="./login.html">Connexion</a>
+      <a class="mobile-link" href="./login.html">Connexion</a>
       <a class="mobile-link" href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
       <a class="mobile-link" href="./login.html?redirect=jury.html">Jury</a>
-      <a class="mobile-link" href="./login.html?redirect=competition-admin.html">Administration</a>
-      <a class="mobile-link" id="mobileAdminLink" href="./competition-admin.html" style="display:none;">Tableau de bord admin</a>
-      <a class="mobile-link" id="mobileSupportLink" href="./competition-support-admin.html" style="display:none;">Support admin</a>
+      <a class="mobile-link" href="./login.html?redirect=admin.html">Administration</a>
     </div>
   </aside>
 
@@ -923,17 +855,14 @@
         <a class="nav-link active" href="./faq.html"><span class="nav-dot purple"></span><span>FAQ</span></a>
         <a class="nav-link" href="./contact.html"><span class="nav-dot red"></span><span>Contact</span></a>
         <a class="nav-link" href="./verify-certificate.html"><span class="nav-dot green"></span><span>Certificat</span></a>
-        <a class="nav-link" href="./profile.html"><span class="nav-dot blue"></span><span>Mon profil</span></a>
-        <a class="nav-link" id="desktopAuthLink" href="./login.html"><span class="nav-dot orange"></span><span id="desktopAuthLabel">Connexion</span></a>
+        <a class="nav-link" href="./login.html"><span class="nav-dot orange"></span><span>Connexion</span></a>
         <a class="nav-link" href="./login.html?redirect=dashboard-candidat.html"><span class="nav-dot green"></span><span>Espace candidat</span></a>
         <a class="nav-link" href="./login.html?redirect=jury.html"><span class="nav-dot gold"></span><span>Jury</span></a>
-        <a class="nav-link" href="./login.html?redirect=competition-admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
-        <a class="nav-link" id="desktopAdminLink" href="./competition-admin.html" style="display:none;"><span class="nav-dot red"></span><span>Tableau de bord admin</span></a>
-        <a class="nav-link" id="desktopSupportLink" href="./competition-support-admin.html" style="display:none;"><span class="nav-dot orange"></span><span>Support admin</span></a>
+        <a class="nav-link" href="./login.html?redirect=admin.html"><span class="nav-dot red"></span><span>Administration</span></a>
       </nav>
 
       <div class="sidebar-section-title">Rôle de cette page</div>
-      <div class="sidebar-note" id="sidebarNote">
+      <div class="sidebar-note">
         Cette FAQ répond aux questions les plus probables sur les accès, la participation, l’examen, les résultats, le jury, l’administration et les certificats.
       </div>
     </aside>
@@ -986,7 +915,7 @@
 
             <div class="panel-body">
               <div class="faq-list">
-                <div class="faq-item active">
+                <div class="faq-item">
                   <button class="faq-question" type="button">
                     <span>Qui peut accéder au site ?</span>
                     <span class="faq-sign">+</span>
@@ -1128,16 +1057,6 @@
 
                 <div class="faq-item">
                   <button class="faq-question" type="button">
-                    <span>Comment contacter l’organisation ?</span>
-                    <span class="faq-sign">+</span>
-                  </button>
-                  <div class="faq-answer">
-                    La page <strong>contact.html</strong> permet d’envoyer un message structuré à l’organisation. Le message est ensuite transmis dans la boîte de réception interne du support administration.
-                  </div>
-                </div>
-
-                <div class="faq-item">
-                  <button class="faq-question" type="button">
                     <span>Le site est-il prévu pour évoluer ?</span>
                     <span class="faq-sign">+</span>
                   </button>
@@ -1204,7 +1123,7 @@
                 </p>
                 <div class="cta-actions">
                   <a class="cta-link primary" href="./competition.html">Voir le championnat</a>
-                  <a class="cta-link soft" id="ctaLoginLink" href="./login.html">Se connecter</a>
+                  <a class="cta-link soft" href="./login.html">Se connecter</a>
                   <a class="cta-link soft" href="./contact.html">Contacter l’organisation</a>
                 </div>
               </div>
@@ -1220,40 +1139,18 @@
     </main>
   </div>
 
-  <script type="module">
-    import { auth } from "./firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    const ADMIN_EMAIL = "borisamoussou01@gmail.com";
-
+  <script>
     const menuBtn = document.getElementById("menuBtn");
     const mobileMenu = document.getElementById("mobileMenu");
     const mobileOverlay = document.getElementById("mobileOverlay");
     const topbar = document.getElementById("topbar");
     const mainContent = document.getElementById("mainContent");
 
-    const statusDot = document.getElementById("statusDot");
-    const statusText = document.getElementById("statusText");
-    const brandSub = document.getElementById("brandSub");
-    const sidebarNote = document.getElementById("sidebarNote");
-
-    const desktopAuthLink = document.getElementById("desktopAuthLink");
-    const desktopAuthLabel = document.getElementById("desktopAuthLabel");
-    const desktopAdminLink = document.getElementById("desktopAdminLink");
-    const desktopSupportLink = document.getElementById("desktopSupportLink");
-
-    const mobileAuthLink = document.getElementById("mobileAuthLink");
-    const mobileAdminLink = document.getElementById("mobileAdminLink");
-    const mobileSupportLink = document.getElementById("mobileSupportLink");
-    const ctaLoginLink = document.getElementById("ctaLoginLink");
-
-    function normalizeEmail(value = ""){
-      return String(value || "").trim().toLowerCase();
-    }
-
-    function isAdmin(user){
-      return normalizeEmail(user?.email || "") === normalizeEmail(ADMIN_EMAIL);
-    }
+    document.querySelectorAll(".faq-question").forEach(btn => {
+      btn.addEventListener("click", () => {
+        btn.parentElement.classList.toggle("active");
+      });
+    });
 
     function closeMenu(){
       mobileMenu.classList.remove("show");
@@ -1264,60 +1161,6 @@
       mobileMenu.classList.add("show");
       mobileOverlay.classList.add("show");
     }
-
-    function applyAuthUI(user){
-      if (user) {
-        desktopAuthLabel.textContent = "Mon profil";
-        desktopAuthLink.href = "./profile.html";
-        mobileAuthLink.textContent = "Mon profil";
-        mobileAuthLink.href = "./profile.html";
-        ctaLoginLink.textContent = "Mon profil";
-        ctaLoginLink.href = "./profile.html";
-      } else {
-        desktopAuthLabel.textContent = "Connexion";
-        desktopAuthLink.href = "./login.html";
-        mobileAuthLink.textContent = "Connexion";
-        mobileAuthLink.href = "./login.html";
-        ctaLoginLink.textContent = "Se connecter";
-        ctaLoginLink.href = "./login.html";
-      }
-
-      if (isAdmin(user)) {
-        desktopAdminLink.style.display = "";
-        desktopSupportLink.style.display = "";
-        mobileAdminLink.style.display = "";
-        mobileSupportLink.style.display = "";
-        statusDot.classList.add("ok");
-        statusText.textContent = "FAQ admin";
-        brandSub.textContent = "Questions fréquentes — vue admin";
-        sidebarNote.textContent = "Cette FAQ reste publique, mais ton compte admin voit aussi les accès rapides vers l’administration et le support.";
-      } else if (user) {
-        desktopAdminLink.style.display = "none";
-        desktopSupportLink.style.display = "none";
-        mobileAdminLink.style.display = "none";
-        mobileSupportLink.style.display = "none";
-        statusDot.classList.add("ok");
-        statusText.textContent = "FAQ connectée";
-        brandSub.textContent = "Questions fréquentes";
-        sidebarNote.textContent = "Cette FAQ répond aux questions les plus probables sur les accès, la participation, l’examen, les résultats, le jury, l’administration et les certificats.";
-      } else {
-        desktopAdminLink.style.display = "none";
-        desktopSupportLink.style.display = "none";
-        mobileAdminLink.style.display = "none";
-        mobileSupportLink.style.display = "none";
-        statusDot.classList.remove("ok");
-        statusText.textContent = "Informations & réponses";
-        brandSub.textContent = "Questions fréquentes";
-        sidebarNote.textContent = "Cette FAQ répond aux questions les plus probables sur les accès, la participation, l’examen, les résultats, le jury, l’administration et les certificats.";
-      }
-    }
-
-    document.querySelectorAll(".faq-question").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const item = btn.parentElement;
-        item.classList.toggle("active");
-      });
-    });
 
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -1377,10 +1220,6 @@
         document.body.classList.remove("topbar-collapsed");
       }
       closeMenu();
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      applyAuthUI(user || null);
     });
   </script>
 </body>
