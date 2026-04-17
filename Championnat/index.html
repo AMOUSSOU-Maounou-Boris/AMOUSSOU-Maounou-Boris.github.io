@@ -27,8 +27,8 @@
       --radius-xl:28px;
       --radius-lg:22px;
       --radius-md:16px;
-      --edge-space:1cm;
-      --max:min(100vw - var(--edge-space), 1920px);
+      --edge-space:4cm;
+      --max:min(100vw - var(--edge-space), 1800px);
       --header-h:92px;
     }
 
@@ -172,9 +172,7 @@
       transform:rotate(55deg);
     }
 
-    .brand-text{
-      min-width:0;
-    }
+    .brand-text{ min-width:0; }
 
     .brand-title{
       margin:0;
@@ -293,6 +291,7 @@
       box-shadow:var(--shadow-soft);
       position:relative;
       flex:0 0 auto;
+      z-index:82;
     }
 
     .menu-btn span,
@@ -310,8 +309,15 @@
     .menu-btn::before{transform:translateY(-7px)}
     .menu-btn::after{transform:translateY(7px)}
 
-    #menuToggle{
-      display:none;
+    .menu-btn.is-open::before{
+      transform:translateY(0) rotate(45deg);
+    }
+    .menu-btn.is-open::after{
+      transform:translateY(0) rotate(-45deg);
+    }
+    .menu-btn.is-open span{
+      opacity:0;
+      transform:scaleX(.5);
     }
 
     .side-menu{
@@ -329,21 +335,14 @@
       transition:right .08s linear, opacity .08s linear;
       overflow-y:auto;
       border-radius:22px 0 0 22px;
-    }
-
-    #menuToggle:checked ~ .side-menu{
-      right:0;
-    }
-
-    #menuToggle:checked + label.menu-btn::before{
-      transform:translateY(0) rotate(45deg);
-    }
-    #menuToggle:checked + label.menu-btn::after{
-      transform:translateY(0) rotate(-45deg);
-    }
-    #menuToggle:checked + label.menu-btn span{
       opacity:0;
-      transform:scaleX(.5);
+      pointer-events:none;
+    }
+
+    .side-menu.is-open{
+      right:0;
+      opacity:1;
+      pointer-events:auto;
     }
 
     .side-menu h3{
@@ -401,7 +400,7 @@
       transition:opacity .08s linear, visibility .08s linear;
     }
 
-    #menuToggle:checked ~ .menu-overlay{
+    .menu-overlay.is-open{
       opacity:1;
       visibility:visible;
     }
@@ -999,7 +998,7 @@
 
     @media (max-width:1280px){
       :root{
-        --edge-space:18px;
+        --edge-space:28px;
       }
       .header-inner{
         grid-template-columns:minmax(220px, 280px) 1fr auto;
@@ -1276,6 +1275,13 @@
       .menu-btn::before{ transform:translateY(-6px); }
       .menu-btn::after{ transform:translateY(6px); }
 
+      .menu-btn.is-open::before{
+        transform:translateY(0) rotate(45deg);
+      }
+      .menu-btn.is-open::after{
+        transform:translateY(0) rotate(-45deg);
+      }
+
       .hero-card{
         padding:20px 16px 18px;
       }
@@ -1375,8 +1381,6 @@
           <a href="./rules.html">Règlement</a>
           <a href="./results.html">Résultats</a>
           <a href="./verify-certificate.html">Vérifier certificat</a>
-          <a href="./about.html">À propos</a>
-          <a href="./faq.html">FAQ</a>
           <a href="./contact.html">Contact</a>
           <a href="./announcements.html">Annonces</a>
         </nav>
@@ -1385,22 +1389,19 @@
           <a class="btn-outline" href="./login.html">Connexion</a>
           <a class="btn" href="./competition.html">Participer</a>
 
-          <input type="checkbox" id="menuToggle" />
-          <label for="menuToggle" class="menu-btn" aria-label="Ouvrir le menu">
+          <button class="menu-btn" id="menuBtn" aria-label="Ouvrir le menu" type="button">
             <span></span>
-          </label>
+          </button>
 
           <aside class="side-menu" id="sideMenu">
             <h3>Explorer le site</h3>
             <div class="menu-group">
-              <a href="./about.html">À propos</a>
               <a href="./competition.html">Championnat</a>
               <a href="./rules.html">Règlement</a>
               <a href="./results.html">Résultats</a>
               <a href="./laureats.html">Lauréats</a>
               <a href="./announcements.html">Annonces</a>
               <a href="./verify-certificate.html">Vérifier certificat</a>
-              <a href="./faq.html">FAQ</a>
               <a href="./contact.html">Contact</a>
               <a href="./login.html">Connexion</a>
               <a href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
@@ -1412,7 +1413,7 @@
             </div>
           </aside>
 
-          <label for="menuToggle" class="menu-overlay" id="menuOverlay"></label>
+          <div class="menu-overlay" id="menuOverlay"></div>
         </div>
       </div>
     </header>
@@ -1738,36 +1739,47 @@
       el.textContent = EDITION_YEAR;
     });
 
-    const menuToggle = document.getElementById("menuToggle");
-    const sideMenu = document.getElementById("sideMenu");
-    const menuButton = document.querySelector(".menu-btn");
-    const menuOverlay = document.getElementById("menuOverlay");
     const siteHeader = document.getElementById("siteHeader");
+    const sideMenu = document.getElementById("sideMenu");
+    const menuBtn = document.getElementById("menuBtn");
+    const menuOverlay = document.getElementById("menuOverlay");
 
-    function closeDesktopMenu(){
-      if (menuToggle) menuToggle.checked = false;
+    function openMenu() {
+      sideMenu.classList.add("is-open");
+      menuOverlay.classList.add("is-open");
+      menuBtn.classList.add("is-open");
     }
 
-    if (menuOverlay) {
-      menuOverlay.addEventListener("click", closeDesktopMenu);
+    function closeMenu() {
+      sideMenu.classList.remove("is-open");
+      menuOverlay.classList.remove("is-open");
+      menuBtn.classList.remove("is-open");
     }
+
+    function toggleMenu(e) {
+      if (e) e.stopPropagation();
+      if (sideMenu.classList.contains("is-open")) closeMenu();
+      else openMenu();
+    }
+
+    menuBtn.addEventListener("click", toggleMenu);
+    menuOverlay.addEventListener("click", closeMenu);
 
     document.addEventListener("click", (e) => {
-      if (!menuToggle || !menuToggle.checked) return;
-
-      const clickedInsideMenu = sideMenu && sideMenu.contains(e.target);
-      const clickedButton = menuButton && menuButton.contains(e.target);
-
-      if (!clickedInsideMenu && !clickedButton) {
-        closeDesktopMenu();
-      }
+      const insideMenu = sideMenu.contains(e.target);
+      const onBtn = menuBtn.contains(e.target);
+      if (!insideMenu && !onBtn) closeMenu();
     });
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeDesktopMenu();
+      if (e.key === "Escape") closeMenu();
     });
 
-    function handleDesktopHeaderScroll(){
+    document.querySelectorAll(".side-menu a").forEach(link => {
+      link.addEventListener("click", closeMenu);
+    });
+
+    function handleDesktopHeaderScroll() {
       const isDesktop = window.innerWidth > 820;
 
       if (!isDesktop) {
@@ -1779,7 +1791,7 @@
 
       if (currentScrollY > 1) {
         siteHeader.classList.add("header-hidden");
-        closeDesktopMenu();
+        closeMenu();
       } else {
         siteHeader.classList.remove("header-hidden");
       }
@@ -1789,18 +1801,13 @@
 
     window.addEventListener("resize", () => {
       if (window.innerWidth < 861) {
-        closeDesktopMenu();
+        closeMenu();
         siteHeader.classList.remove("header-hidden");
       }
     });
 
-    window.addEventListener("wheel", () => {
-      if (menuToggle && menuToggle.checked) closeDesktopMenu();
-    }, { passive: true });
-
-    window.addEventListener("touchmove", () => {
-      if (menuToggle && menuToggle.checked) closeDesktopMenu();
-    }, { passive: true });
+    window.addEventListener("wheel", closeMenu, { passive: true });
+    window.addEventListener("touchmove", closeMenu, { passive: true });
 
     handleDesktopHeaderScroll();
   </script>
