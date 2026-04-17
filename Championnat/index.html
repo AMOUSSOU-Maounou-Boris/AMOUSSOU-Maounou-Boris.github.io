@@ -200,7 +200,7 @@
       font-size:.95rem;
       padding:10px 14px;
       border-radius:999px;
-      transition:.22s ease;
+      transition:.18s ease;
     }
 
     .nav-main a:hover{
@@ -221,7 +221,7 @@
     .menu-btn{
       border:none;
       cursor:pointer;
-      transition:.25s ease;
+      transition:.18s ease;
       font-weight:800;
       font-family:inherit;
     }
@@ -284,7 +284,7 @@
       height:2.4px;
       border-radius:999px;
       background:#7867df;
-      transition:.22s ease;
+      transition:.16s ease;
     }
     .menu-btn span{transform:translateY(0)}
     .menu-btn::before{transform:translateY(-7px)}
@@ -306,7 +306,7 @@
       box-shadow:-18px 0 40px rgba(8,46,91,.12);
       padding:24px 18px 24px;
       z-index:80;
-      transition:right .28s ease;
+      transition:right .14s ease;
       overflow-y:auto;
     }
 
@@ -345,7 +345,10 @@
       padding:14px 14px;
       font-weight:700;
       box-shadow:0 8px 22px rgba(10,37,73,.05);
-      transition:.22s ease;
+      transition:.16s ease;
+      display:block;
+      width:100%;
+      height:auto;
     }
 
     .side-menu a:hover{
@@ -372,7 +375,7 @@
       opacity:0;
       visibility:hidden;
       z-index:70;
-      transition:.22s ease;
+      transition:opacity .14s ease, visibility .14s ease;
     }
 
     #menuToggle:checked ~ .menu-overlay{
@@ -410,6 +413,7 @@
       box-shadow:var(--shadow);
       padding:30px 28px 28px;
       overflow:hidden;
+      height:auto;
     }
 
     .hero-card::before{
@@ -435,6 +439,8 @@
       font-size:.86rem;
       margin-bottom:16px;
       border:1px solid rgba(120,103,223,.10);
+      max-width:100%;
+      flex-wrap:wrap;
     }
 
     .edition-pill{
@@ -449,6 +455,8 @@
       border:1px solid rgba(216,167,47,.14);
       font-weight:800;
       font-size:.82rem;
+      max-width:100%;
+      white-space:nowrap;
     }
 
     .hero h1{
@@ -487,6 +495,8 @@
       border-radius:20px;
       padding:16px 14px;
       box-shadow:0 10px 20px rgba(8,46,91,.05);
+      height:auto;
+      min-height:0;
     }
 
     .stat strong{
@@ -494,12 +504,16 @@
       font-size:1.25rem;
       color:#0a2f5d;
       margin-bottom:5px;
+      word-break:break-word;
     }
 
     .stat span{
       color:#657a95;
       font-size:.9rem;
       font-weight:700;
+      line-height:1.55;
+      display:block;
+      word-break:break-word;
     }
 
     .hero-visual{
@@ -513,6 +527,7 @@
       display:flex;
       align-items:center;
       justify-content:center;
+      height:auto;
     }
 
     .hero-visual::before{
@@ -531,8 +546,10 @@
     .scene{
       position:relative;
       width:min(100%, 520px);
-      aspect-ratio:1/1;
-      min-height:320px;
+      aspect-ratio:1 / 1;
+      min-height:0;
+      max-width:100%;
+      flex:0 1 auto;
     }
 
     .trophy-core{
@@ -578,6 +595,7 @@
       z-index:3;
       box-shadow:0 10px 24px rgba(185,131,18,.10);
       white-space:nowrap;
+      max-width:100%;
     }
 
     .discussion-line{
@@ -607,6 +625,7 @@
       flex-direction:column;
       align-items:center;
       justify-content:flex-start;
+      height:auto;
     }
 
     .student .face{
@@ -621,12 +640,14 @@
       color:#14365e;
       margin-bottom:4px;
       line-height:1.2;
+      word-break:break-word;
     }
 
     .student .talk{
       font-size:clamp(.48rem, 1.8vw, .74rem);
       line-height:1.28;
       color:#647891;
+      word-break:break-word;
     }
 
     .student.s1{top:4%;left:50%;transform:translateX(-50%)}
@@ -666,12 +687,14 @@
       display:grid;
       grid-template-columns:repeat(3, 1fr);
       gap:18px;
+      align-items:start;
     }
 
     .cards-4{
       display:grid;
       grid-template-columns:repeat(4, 1fr);
       gap:16px;
+      align-items:start;
     }
 
     .card{
@@ -682,6 +705,8 @@
       padding:22px 20px;
       box-shadow:var(--shadow-soft);
       overflow:hidden;
+      height:auto;
+      min-height:0;
     }
 
     .card::before{
@@ -710,6 +735,7 @@
       margin:0 0 10px;
       color:#082e5b;
       font-size:1.08rem;
+      word-break:break-word;
     }
 
     .card p{
@@ -717,12 +743,14 @@
       color:#647891;
       line-height:1.7;
       font-size:.95rem;
+      word-break:break-word;
     }
 
     .timeline{
       display:grid;
       grid-template-columns:repeat(3, 1fr);
       gap:18px;
+      align-items:start;
     }
 
     .time-card{
@@ -731,6 +759,8 @@
       border-radius:28px;
       padding:22px;
       box-shadow:var(--shadow-soft);
+      height:auto;
+      min-height:0;
     }
 
     .time-pill{
@@ -745,12 +775,15 @@
       font-size:.82rem;
       margin-bottom:12px;
       border:1px solid rgba(216,167,47,.10);
+      max-width:100%;
+      white-space:nowrap;
     }
 
     .time-card h3{
       margin:0 0 8px;
       color:#082e5b;
       font-size:1.07rem;
+      word-break:break-word;
     }
 
     .time-card p{
@@ -758,6 +791,7 @@
       color:#627791;
       line-height:1.7;
       font-size:.95rem;
+      word-break:break-word;
     }
 
     .highlight{
@@ -794,6 +828,7 @@
       margin:0 0 12px;
       font-size:clamp(1.7rem, 2.8vw, 2.5rem);
       letter-spacing:-.6px;
+      word-break:break-word;
     }
 
     .highlight p{
@@ -801,6 +836,7 @@
       color:rgba(255,255,255,.86);
       line-height:1.8;
       max-width:750px;
+      word-break:break-word;
     }
 
     .highlight-boxes{
@@ -817,6 +853,8 @@
       font-weight:700;
       line-height:1.55;
       color:#eef6ff;
+      word-break:break-word;
+      height:auto;
     }
 
     .faq-list{
@@ -830,12 +868,14 @@
       border-radius:22px;
       padding:20px 20px;
       box-shadow:var(--shadow-soft);
+      height:auto;
     }
 
     .faq-item h3{
       margin:0 0 8px;
       color:#082e5b;
       font-size:1rem;
+      word-break:break-word;
     }
 
     .faq-item p{
@@ -843,6 +883,7 @@
       color:#647891;
       line-height:1.72;
       font-size:.95rem;
+      word-break:break-word;
     }
 
     .cta{
@@ -859,6 +900,7 @@
       text-align:center;
       position:relative;
       overflow:hidden;
+      height:auto;
     }
 
     .cta-card::before{
@@ -876,6 +918,7 @@
       margin:0 0 12px;
       font-size:clamp(1.7rem, 2.8vw, 2.4rem);
       color:#082e5b;
+      word-break:break-word;
     }
 
     .cta-card p{
@@ -883,6 +926,7 @@
       max-width:760px;
       color:#627791;
       line-height:1.8;
+      word-break:break-word;
     }
 
     .cta-actions{
@@ -1286,7 +1330,7 @@
             <span></span>
           </label>
 
-          <aside class="side-menu">
+          <aside class="side-menu" id="sideMenu">
             <h3>Explorer le site</h3>
             <div class="menu-group">
               <a href="./about.html">À propos</a>
@@ -1308,7 +1352,7 @@
             </div>
           </aside>
 
-          <label for="menuToggle" class="menu-overlay"></label>
+          <label for="menuToggle" class="menu-overlay" id="menuOverlay"></label>
         </div>
       </div>
     </header>
@@ -1455,12 +1499,12 @@
             <div class="card">
               <div class="icon-bubble">3</div>
               <h3>Être orienté</h3>
-              <p>Après connexion, chacun est redirigé vers l’espace qui lui correspond : candidat, jury ou admin.</p>
+              <p>Après connexion, chacun est redirigé vers l’espace qui lui correspond : candidat, jury ou administration.</p>
             </div>
             <div class="card">
               <div class="icon-bubble">4</div>
               <h3>Agir</h3>
-              <p>Le candidat participe, le jury suit, l’admin valide, lance, publie et certifie.</p>
+              <p>Le candidat participe, le jury suit, l’administration valide, lance, publie et certifie.</p>
             </div>
           </div>
         </div>
@@ -1496,7 +1540,7 @@
               <div class="time-pill">Étape 3</div>
               <h3>Résultats & certificat</h3>
               <p>
-                Les résultats sont publiés selon la décision admin, puis la vérification certificat devient possible si elle est activée.
+                Les résultats sont publiés selon la décision administrative, puis la vérification de certificat devient possible si elle est activée.
               </p>
             </div>
           </div>
@@ -1510,13 +1554,13 @@
               <div>
                 <h2>Une vitrine centrale, élégante et utile.</h2>
                 <p>
-                  Cette page ne remplace pas les autres : elle les organise. Elle agit comme le centre général du site, distribue vers chaque section déjà codée et garde l’ensemble lisible, beau et cohérent.
+                  Cette page organise les différentes sections du championnat et facilite l’orientation vers les espaces utiles, publics comme privés.
                 </p>
               </div>
               <div class="highlight-boxes">
                 <div class="highlight-box">Les pages publiques restent visibles et valorisent le championnat.</div>
                 <div class="highlight-box">Les zones privées passent par la connexion unique et les autorisations.</div>
-                <div class="highlight-box">Le jury n’est pas public : l’accès dépend d’un email autorisé par l’admin.</div>
+                <div class="highlight-box">Le jury n’est pas public : l’accès dépend d’un email autorisé par l’administration.</div>
               </div>
             </div>
           </div>
@@ -1599,7 +1643,7 @@
           <div class="cta-card">
             <h2>Prêt à entrer dans le championnat ?</h2>
             <p>
-              Cette vitrine sert de centre général : elle présente, rassure et oriente chaque profil vers la bonne page déjà existante dans le même dossier.
+              Cette vitrine sert de centre général : elle présente, rassure et oriente chaque profil vers la bonne section.
             </p>
             <div class="cta-actions">
               <a href="./competition.html" class="btn">Découvrir le championnat</a>
@@ -1632,6 +1676,42 @@
     });
     document.querySelectorAll("[data-edition-year]").forEach(el => {
       el.textContent = EDITION_YEAR;
+    });
+
+    const menuToggle = document.getElementById("menuToggle");
+    const sideMenu = document.getElementById("sideMenu");
+    const menuButton = document.querySelector('.menu-btn');
+    const menuOverlay = document.getElementById("menuOverlay");
+
+    function closeDesktopMenu(){
+      if (menuToggle) menuToggle.checked = false;
+    }
+
+    if (menuOverlay) {
+      menuOverlay.addEventListener("click", closeDesktopMenu);
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!menuToggle || !menuToggle.checked) return;
+
+      const clickedInsideMenu = sideMenu && sideMenu.contains(e.target);
+      const clickedButton = menuButton && menuButton.contains(e.target);
+      const clickedCheckbox = e.target === menuToggle;
+      const clickedOverlay = menuOverlay && menuOverlay.contains(e.target);
+
+      if (!clickedInsideMenu && !clickedButton && !clickedCheckbox && !clickedOverlay) {
+        closeDesktopMenu();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDesktopMenu();
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth < 861) {
+        closeDesktopMenu();
+      }
     });
   </script>
 </body>
