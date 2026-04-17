@@ -1332,13 +1332,6 @@
       .menu-btn::before{ transform:translateY(-6px); }
       .menu-btn::after{ transform:translateY(6px); }
 
-      .menu-btn.is-open::before{
-        transform:translateY(0) rotate(45deg);
-      }
-      .menu-btn.is-open::after{
-        transform:translateY(0) rotate(-45deg);
-      }
-
       .hero-card{
         padding:20px 16px 18px;
       }
@@ -1490,20 +1483,23 @@
           <aside class="side-menu" id="sideMenu">
             <h3>Visiter</h3>
             <div class="menu-group">
+              <a href="./index.html">Accueil</a>
+              <a href="./about.html">À propos</a>
               <a href="./competition.html">Championnat</a>
               <a href="./rules.html">Règlement</a>
               <a href="./results.html">Résultats</a>
               <a href="./laureats.html">Lauréats</a>
               <a href="./announcements.html">Annonces</a>
-              <a href="./verify-certificate.html">Vérifier certificat</a>
+              <a href="./faq.html">FAQ</a>
               <a href="./contact.html">Contact</a>
+              <a href="./verify-certificate.html">Vérifier certificat</a>
+              <a href="./profile.html">Mon profil</a>
               <a href="./login.html">Connexion</a>
-              <a href="./login.html?redirect=dashboard-candidat.html">Espace candidat</a>
-              <a href="./login.html?redirect=jury.html">Jury</a>
-              <a href="./login.html?redirect=admin.html">Administration</a>
+              <a href="./dashboard-candidat.html">Espace candidat</a>
+              <a href="./examen.html">Examen</a>
             </div>
             <div class="menu-note">
-              Le jury et l’administration ne sont pas publics. L’accès se fait après connexion, selon l’autorisation accordée par l’administrateur principal.
+              Les espaces privés restent accessibles selon les autorisations prévues dans le parcours du championnat.
             </div>
           </aside>
 
@@ -1893,13 +1889,9 @@
 
     window.addEventListener("resize", () => {
       if (window.innerWidth < 861) {
-        closeMenu();
         siteHeader.classList.remove("header-hidden");
       }
     });
-
-    window.addEventListener("wheel", closeMenu, { passive: true });
-    window.addEventListener("touchmove", closeMenu, { passive: true });
 
     handleDesktopHeaderScroll();
   </script>
