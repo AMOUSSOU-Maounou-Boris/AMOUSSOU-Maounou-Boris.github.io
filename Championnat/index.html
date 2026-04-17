@@ -309,17 +309,6 @@
     .menu-btn::before{transform:translateY(-7px)}
     .menu-btn::after{transform:translateY(7px)}
 
-    .menu-btn.is-open::before{
-      transform:translateY(0) rotate(45deg);
-    }
-    .menu-btn.is-open::after{
-      transform:translateY(0) rotate(-45deg);
-    }
-    .menu-btn.is-open span{
-      opacity:0;
-      transform:scaleX(.5);
-    }
-
     .side-menu{
       position:fixed;
       top:10px;
@@ -1747,13 +1736,11 @@
     function openMenu() {
       sideMenu.classList.add("is-open");
       menuOverlay.classList.add("is-open");
-      menuBtn.classList.add("is-open");
     }
 
     function closeMenu() {
       sideMenu.classList.remove("is-open");
       menuOverlay.classList.remove("is-open");
-      menuBtn.classList.remove("is-open");
     }
 
     function toggleMenu(e) {
