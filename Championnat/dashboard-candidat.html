@@ -906,6 +906,7 @@
       <a class="mobile-link" href="./contact.html">Contact</a>
       <a class="mobile-link" href="./verify-certificate.html">Vérifier certificat</a>
       <a class="mobile-link" href="./profile.html">Mon profil</a>
+      <a class="mobile-link" href="./subscription.html">Abonnement</a>
       <a class="mobile-link" href="./dashboard-candidat.html">Espace candidat</a>
       <a class="mobile-link" href="./login.html?redirect=jury.html">Jury</a>
       <a class="mobile-link" href="./login.html?redirect=competition-admin.html">Administration</a>
@@ -1076,6 +1077,7 @@
                 <a href="./verify-certificate.html">Vérifier un certificat</a>
                 <a href="./faq.html">FAQ</a>
                 <a href="./contact.html">Contact</a>
+                <a href="./subscription.html">Mon abonnement</a>
               </div>
             </div>
           </section>
@@ -1086,10 +1088,11 @@
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+    const STATIC_JURY_EMAILS = ["bienvenu.glinma@fast.uac.bj"];
 
     const sidebarNav = document.getElementById("sidebarNav");
     const sidebarNote = document.getElementById("sidebarNote");
@@ -1162,6 +1165,7 @@
       const email = normalizeEmail(user?.email);
       if (!user) return "visitor";
       if (email === normalizeEmail(ADMIN_EMAIL)) return "admin";
+      if (STATIC_JURY_EMAILS.map(normalizeEmail).includes(email)) return "jury";
 
       const role = String(
         profile?.competitionRole ||
@@ -1177,6 +1181,105 @@
       return "candidate";
     }
 
+    function getSubscriptionData(profile = {}){
+      const start =
+        profile?.subscriptionStart ||
+        profile?.planStart ||
+        profile?.forfaitStart ||
+        profile?.subscription?.start ||
+        null;
+
+      const end =
+        profile?.subscriptionEnd ||
+        profile?.planEnd ||
+        profile?.forfaitEnd ||
+        profile?.subscription?.end ||
+        null;
+
+      const status =
+        profile?.subscriptionStatus ||
+        profile?.planStatus ||
+        profile?.forfaitStatus ||
+        profile?.subscription?.status ||
+        "";
+
+      return {
+        start: Number(start) || null,
+        end: Number(end) || null,
+        status: String(status || "").toLowerCase()
+      };
+    }
+
+    function hasFreeAccess(user, role){
+      if (!user) return false;
+      const email = normalizeEmail(user.email || "");
+      if (email === normalizeEmail(ADMIN_EMAIL)) return true;
+      if (STATIC_JURY_EMAILS.map(normalizeEmail).includes(email)) return true;
+      return role === "admin" || role === "jury";
+    }
+
+    function isSubscriptionExpired(user, role, profile = {}){
+      if (!user) return false;
+      if (hasFreeAccess(user, role)) return false;
+
+      const sub = getSubscriptionData(profile);
+      if (!sub.end) return true;
+
+      return Date.now() > sub.end;
+    }
+
+    function hasValidSubscription(user, role, profile = {}){
+      if (!user) return false;
+      if (hasFreeAccess(user, role)) return true;
+
+      const sub = getSubscriptionData(profile);
+      if (!sub.start || !sub.end) return false;
+      if (sub.end <= sub.start) return false;
+      return Date.now() <= sub.end;
+    }
+
+    async function handleExpiredSubscription(){
+      statusText.textContent = "Forfait expiré";
+      statusDot.classList.remove("ok");
+
+      profileMsg.className = "helper show err";
+      profileMsg.textContent = "Votre forfait est épuisé. Retour à l’accueil…";
+
+      miniAccountText.textContent = "Accès privé bloqué : forfait expiré.";
+      miniCompetitionText.textContent = "Le chargement complet du tableau est interrompu.";
+      miniExamText.textContent = "L’accès à l’examen est bloqué tant que le forfait n’est pas réactivé.";
+
+      sidebarNote.textContent = "Votre forfait est épuisé. Retour à l’accueil en cours.";
+      brandSub.textContent = "Forfait expiré";
+
+      try { await signOut(auth); } catch(e) {}
+
+      setTimeout(() => {
+        window.location.replace("./index.html");
+      }, 1200);
+    }
+
+    async function handleMissingSubscription(){
+      statusText.textContent = "Forfait requis";
+      statusDot.classList.remove("ok");
+
+      profileMsg.className = "helper show warn";
+      profileMsg.textContent = "Aucun forfait actif détecté pour ce compte. Retour à l’accueil…";
+
+      miniAccountText.textContent = "Accès privé bloqué : forfait non défini.";
+      miniCompetitionText.textContent = "Le chargement complet du tableau est interrompu.";
+      miniExamText.textContent = "L’accès à l’examen reste bloqué sans forfait actif.";
+
+      sidebarNote.textContent = "Aucun forfait actif détecté pour ce compte. Retour à l’accueil en cours.";
+      brandSub.textContent = "Forfait requis";
+
+      try { await signOut(auth); } catch(e) {}
+
+      setTimeout(() => {
+        window.location.replace("./index.html");
+      }, 1200);
+    }
+
     function getSidebarLinks(role){
       if (role === "admin") {
         return [
@@ -1187,7 +1290,8 @@
           { label:"Tableau de bord admin", href:"./competition-admin.html", color:"red" },
           { label:"Résultats", href:"./results.html", color:"gold" },
           { label:"Examen", href:"./examen.html", color:"orange" },
-          { label:"Support admin", href:"./competition-support-admin.html", color:"red" }
+          { label:"Support admin", href:"./competition-support-admin.html", color:"red" },
+          { label:"Abonnement", href:"./subscription.html", color:"blue" }
         ];
       }
 
@@ -1198,7 +1302,8 @@
           { label:"Annonces", href:"./announcements.html", color:"purple" },
           { label:"Jury", href:"./jury.html", color:"gold" },
           { label:"Résultats", href:"./results.html", color:"gold" },
-          { label:"Examen", href:"./examen.html", color:"orange" }
+          { label:"Examen", href:"./examen.html", color:"orange" },
+          { label:"Abonnement", href:"./subscription.html", color:"blue" }
         ];
       }
 
@@ -1214,6 +1319,7 @@
         { label:"Contact", href:"./contact.html", color:"red" },
         { label:"Certificat", href:"./verify-certificate.html", color:"green" },
         { label:"Mon profil", href:"./profile.html", color:"blue" },
+        { label:"Mon abonnement", href:"./subscription.html", color:"blue" },
         { label:"Mon espace candidat", href:"./dashboard-candidat.html", color:"green", active:true },
         { label:"Passer l’examen", href:"./examen.html", color:"red" },
         { label:"Jury", href:"./login.html?redirect=jury.html", color:"gold" },
@@ -1272,6 +1378,9 @@
 
       const activeExamId = control.activeExamId || control.currentExamId || null;
 
+      const sub = getSubscriptionData(state.profile || {});
+      const freeAccess = hasFreeAccess(state.user, state.role);
+
       miniAccountText.textContent = state.user
         ? `Connecté en tant que ${state.user.email || "candidat"}`
         : "Aucune session détectée.";
@@ -1280,9 +1389,13 @@
         ? "Le championnat semble actuellement lancé ou disponible."
         : "Le championnat est visible, mais l’épreuve peut encore être verrouillée.";
 
-      miniExamText.textContent = activeExamId
-        ? `Une épreuve active est référencée (${activeExamId}).`
-        : "Aucune épreuve active n’est encore visible.";
+      if (freeAccess) {
+        miniExamText.textContent = "Compte à accès gratuit détecté.";
+      } else {
+        miniExamText.textContent = sub.end
+          ? `Forfait actif jusqu’au ${new Date(sub.end).toLocaleString("fr-FR")}.`
+          : "Aucune date de forfait détectée.";
+      }
 
       trackParticipation.textContent = candidate.status
         ? `Dossier ${candidate.status}`
@@ -1313,6 +1426,7 @@
       const publicProfile = profile.publicProfile || {};
       const fullName =
         publicProfile.displayName ||
+        [publicProfile.firstName, publicProfile.lastName].filter(Boolean).join(" ").trim() ||
         profile.displayName ||
         user?.displayName ||
         candidate.fullName ||
@@ -1521,8 +1635,20 @@
           state.user = user;
 
           try{
-            const [profileSnap, candidateSnap, controlSnap, submissionsSnap, adminAnnSnap, compAnnSnap] = await Promise.all([
-              get(ref(db, "users/" + user.uid)),
+            const profileSnap = await get(ref(db, "users/" + user.uid));
+            state.profile = profileSnap.exists() ? profileSnap.val() : null;
+            state.role = resolveRole(user, state.profile);
+
+            if (!hasValidSubscription(user, state.role, state.profile || {})) {
+              if (isSubscriptionExpired(user, state.role, state.profile || {})) {
+                await handleExpiredSubscription();
+              } else {
+                await handleMissingSubscription();
+              }
+              return;
+            }
+
+            const [candidateSnap, controlSnap, submissionsSnap, adminAnnSnap, compAnnSnap] = await Promise.all([
               get(ref(db, "competitionCandidates/" + user.uid)),
               get(ref(db, "competitionControl/current")),
               get(ref(db, "examSubmissions")),
@@ -1530,7 +1656,6 @@
               get(ref(db, "competitionAnnouncements"))
             ]);
 
-            state.profile = profileSnap.exists() ? profileSnap.val() : null;
             state.candidateRecord = candidateSnap.exists() ? candidateSnap.val() : null;
             state.competitionControl = controlSnap.exists() ? controlSnap.val() : null;
             state.submissions = submissionsSnap.exists() ? submissionsSnap.val() : {};
@@ -1546,7 +1671,6 @@
             state.competitionAnnouncements = {};
           }
 
-          state.role = resolveRole(user, state.profile);
           applyRoleUI();
         });
       }catch(err){
