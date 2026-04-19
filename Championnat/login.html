@@ -756,8 +756,12 @@
     const COOKIE_KEY = "champCookiesChoice";
     const LAST_ACTIVITY_KEY = "champ_last_activity";
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
+    const ACTIVITY_WRITE_INTERVAL = 60000;
+    const REDIRECT_FLAG_KEY = "champ_auth_redirect_in_progress";
 
     let activityTimeout = null;
+    let lastPresenceWriteAt = 0;
+    let authHandledOnce = false;
 
     const showLogin = document.getElementById("showLogin");
     const showSignup = document.getElementById("showSignup");
@@ -804,7 +808,6 @@
 
     const redirectLabels = {
       "examen.html": "Vous vous connectez pour accéder à l’examen.",
-      "competition-admin.html": "Vous vous connectez pour accéder à l’administration.",
       "competition-admin.html": "Vous vous connectez pour accéder à l’administration du championnat.",
       "competition-support-admin.html": "Vous vous connectez pour accéder au support administration.",
       "jury.html": "Vous vous connectez pour accéder à l’espace jury.",
@@ -936,6 +939,58 @@
       }
     }
 
+    function getSubscriptionData(profile){
+      const directStart =
+        profile?.subscriptionStart ||
+        profile?.planStart ||
+        profile?.forfaitStart ||
+        profile?.subscription?.start ||
+        null;
+
+      const directEnd =
+        profile?.subscriptionEnd ||
+        profile?.planEnd ||
+        profile?.forfaitEnd ||
+        profile?.subscription?.end ||
+        null;
+
+      const directStatus =
+        profile?.subscriptionStatus ||
+        profile?.planStatus ||
+        profile?.forfaitStatus ||
+        profile?.subscription?.status ||
+        "";
+
+      return {
+        start: directStart,
+        end: directEnd,
+        status: String(directStatus || "").toLowerCase()
+      };
+    }
+
+    function isSubscriptionExpired(role, profile){
+      if (!profile) return false;
+      if (role === "admin" || role === "jury") return false;
+
+      const sub = getSubscriptionData(profile);
+      if (!sub.end) return false;
+
+      const endTime = Number(sub.end);
+      if (!Number.isFinite(endTime) || endTime <= 0) return false;
+
+      return Date.now() > endTime;
+    }
+
+    async function handleExpiredSubscription(){
+      showMessage(loginMsg, "Votre forfait est épuisé. Retour à l’accueil...", "err");
+      clearTimeout(activityTimeout);
+      try { await updatePresenceOffline(); } catch(e) {}
+      try { await signOut(auth); } catch(e) {}
+      setTimeout(() => {
+        window.location.replace("./index.html");
+      }, 1100);
+    }
+
     function buildMenu(role){
       if (role === "admin") {
         return `
@@ -1033,44 +1088,49 @@
     async function ensureUserRecord(user, extra = {}){
       const userRef = ref(db, "users/" + user.uid);
       const existingSnap = await get(userRef);
+      const existing = existingSnap.exists() ? existingSnap.val() : null;
 
       const email = user.email || "";
       const roleToSave =
         sanitizeEmail(email) === sanitizeEmail(ADMIN_EMAIL)
           ? "admin"
-          : (extra.role || "candidate");
+          : (extra.role || existing?.role || "candidate");
 
-      const fullName = extra.displayName || user.displayName || existingSnap.val()?.displayName || "";
+      const fullName = extra.displayName || user.displayName || existing?.displayName || "";
       const names = splitName(fullName);
       const deviceInfo = state.cookiesAccepted ? getDeviceInfo() : {};
 
-      const basePayload = {
+      const payload = {
         uid: user.uid,
-        displayName: fullName,
         email,
+        displayName: fullName,
         role: roleToSave,
         competitionRole: roleToSave,
         updatedAt: Date.now(),
-        publicProfile: {
-          firstName: names.firstName || existingSnap.val()?.publicProfile?.firstName || "",
-          lastName: names.lastName || existingSnap.val()?.publicProfile?.lastName || "",
-          displayName: fullName || existingSnap.val()?.publicProfile?.displayName || "",
-          university: existingSnap.val()?.publicProfile?.university || "",
-          country: existingSnap.val()?.publicProfile?.country || deviceInfo.localeCountry || "",
-          city: existingSnap.val()?.publicProfile?.city || "",
-          fieldStudy: existingSnap.val()?.publicProfile?.fieldStudy || "",
-          tagline: existingSnap.val()?.publicProfile?.tagline || "",
-          role: existingSnap.val()?.publicProfile?.role || buildPublicRole(roleToSave),
-          bio: existingSnap.val()?.publicProfile?.bio || "",
-          photoUrl: existingSnap.val()?.publicProfile?.photoUrl || ""
-        },
         privacy: {
           showEmail: false
+        },
+        publicProfile: {
+          firstName: names.firstName || existing?.publicProfile?.firstName || "",
+          lastName: names.lastName || existing?.publicProfile?.lastName || "",
+          displayName: fullName || existing?.publicProfile?.displayName || "",
+          university: existing?.publicProfile?.university || "",
+          country: existing?.publicProfile?.country || deviceInfo.localeCountry || "",
+          city: existing?.publicProfile?.city || "",
+          fieldStudy: existing?.publicProfile?.fieldStudy || "",
+          tagline: existing?.publicProfile?.tagline || "",
+          role: existing?.publicProfile?.role || buildPublicRole(roleToSave),
+          bio: existing?.publicProfile?.bio || "",
+          photoUrl: existing?.publicProfile?.photoUrl || ""
         }
       };
 
+      if (!existing) {
+        payload.createdAt = Date.now();
+      }
+
       if (state.cookiesAccepted) {
-        basePayload.lastLoginContext = {
+        payload.lastLoginContext = {
           deviceType: deviceInfo.deviceType,
           platform: deviceInfo.platform,
           language: deviceInfo.language,
@@ -1084,32 +1144,36 @@
       }
 
       if (!existingSnap.exists()) {
-        basePayload.createdAt = Date.now();
-        await set(userRef, basePayload);
+        await set(userRef, payload);
       } else {
-        await update(userRef, basePayload);
+        await update(userRef, payload);
       }
     }
 
-    async function updatePresenceOnline(){
+    async function updatePresenceOnline(profile = null){
       if (!auth.currentUser || !state.cookiesAccepted) return;
 
+      const now = Date.now();
+      lastPresenceWriteAt = now;
+
       const user = auth.currentUser;
-      const profile = await getUserProfile(user.uid);
-      const role = resolveRole(user, profile);
+      const resolvedProfile = profile || state.profile || await getUserProfile(user.uid);
+      const role = resolveRole(user, resolvedProfile);
       const deviceInfo = getDeviceInfo();
 
+      const userRootRef = ref(db, `users/${user.uid}`);
       const presenceRef = ref(db, `users/${user.uid}/presence`);
-      await update(ref(db, `users/${user.uid}`), {
-        lastSeenAt: Date.now()
+
+      await update(userRootRef, {
+        lastSeenAt: now
       });
 
       await set(presenceRef, {
         online: true,
         uid: user.uid,
         displayName:
-          profile?.publicProfile?.displayName ||
-          profile?.displayName ||
+          resolvedProfile?.publicProfile?.displayName ||
+          resolvedProfile?.displayName ||
           user.displayName ||
           (user.email ? user.email.split("@")[0] : "Membre"),
         role,
@@ -1118,12 +1182,12 @@
         localeCountry: deviceInfo.localeCountry || "",
         timezone: deviceInfo.timezone || "",
         language: deviceInfo.language || "",
-        lastActivityAt: Date.now(),
-        connectedAt: Date.now()
+        lastActivityAt: now,
+        connectedAt: now
       });
 
       try{
-        await onDisconnect(presenceRef).update({
+        onDisconnect(presenceRef).update({
           online: false,
           lastActivityAt: Date.now(),
           disconnectedAt: Date.now()
@@ -1133,12 +1197,18 @@
       }
     }
 
-    async function updatePresenceActivity(){
+    async function updatePresenceActivity(force = false){
       if (!auth.currentUser || !state.cookiesAccepted) return;
+
+      const now = Date.now();
+      if (!force && now - lastPresenceWriteAt < ACTIVITY_WRITE_INTERVAL) return;
+
+      lastPresenceWriteAt = now;
+
       try{
         await update(ref(db, `users/${auth.currentUser.uid}/presence`), {
           online: true,
-          lastActivityAt: Date.now()
+          lastActivityAt: now
         });
       }catch(err){
         console.error(err);
@@ -1159,6 +1229,7 @@
     }
 
     async function forceOfflineAndSignOut(){
+      sessionStorage.removeItem(REDIRECT_FLAG_KEY);
       try { await updatePresenceOffline(); } catch(e) {}
       try { await signOut(auth); } catch(e) {}
       window.location.replace("./login.html");
@@ -1171,11 +1242,11 @@
       activityTimeout = setTimeout(async () => {
         await forceOfflineAndSignOut();
       }, INACTIVITY_LIMIT);
-      updatePresenceActivity().catch(console.error);
+      updatePresenceActivity(false).catch(console.error);
     }
 
     function bindActivityListeners(){
-      ["click","keydown","mousemove","scroll","touchstart"].forEach(evt => {
+      ["click","keydown","touchstart"].forEach(evt => {
         window.addEventListener(evt, () => {
           if (auth.currentUser) resetInactivityTimer();
         }, { passive:true });
@@ -1183,47 +1254,51 @@
     }
 
     function routeAfterAuth(user, profile){
+      if (!user) return;
+      if (sessionStorage.getItem(REDIRECT_FLAG_KEY) === "1") return;
+      sessionStorage.setItem(REDIRECT_FLAG_KEY, "1");
+
       const role = resolveRole(user, profile);
 
       if (requestedRedirect) {
         if (role !== "admin" && (requestedRedirect === "competition-admin.html" || requestedRedirect === "competition-support-admin.html")) {
           if (role === "jury") {
-            window.location.href = "./jury.html";
+            window.location.replace("./jury.html");
             return;
           }
-          window.location.href = "./dashboard-candidat.html";
+          window.location.replace("./dashboard-candidat.html");
           return;
         }
 
         if (role !== "jury" && requestedRedirect === "jury.html") {
           if (role === "admin") {
-            window.location.href = "./competition-admin.html";
+            window.location.replace("./competition-admin.html");
             return;
           }
-          window.location.href = "./dashboard-candidat.html";
+          window.location.replace("./dashboard-candidat.html");
           return;
         }
 
-        window.location.href = "./" + requestedRedirect;
+        window.location.replace("./" + requestedRedirect);
         return;
       }
 
       if (role === "admin") {
-        window.location.href = "./competition-admin.html";
+        window.location.replace("./competition-admin.html");
         return;
       }
 
       if (role === "jury") {
-        window.location.href = "./jury.html";
+        window.location.replace("./jury.html");
         return;
       }
 
       if (role === "member") {
-        window.location.href = "./profile.html";
+        window.location.replace("./profile.html");
         return;
       }
 
-      window.location.href = "./dashboard-candidat.html";
+      window.location.replace("./dashboard-candidat.html");
     }
 
     function goToExam(){
@@ -1266,7 +1341,7 @@
       if (auth.currentUser) {
         try{
           await ensureUserRecord(auth.currentUser, { role: state.role });
-          await updatePresenceOnline();
+          await updatePresenceOnline(state.profile);
           resetInactivityTimer();
         }catch(err){
           console.error(err);
@@ -1277,6 +1352,7 @@
     rejectCookiesBtn.addEventListener("click", async () => {
       localStorage.setItem(COOKIE_KEY, "rejected");
       state.cookiesAccepted = false;
+      clearTimeout(activityTimeout);
       if (auth.currentUser) {
         try { await updatePresenceOffline(); } catch(e) {}
         try { await signOut(auth); } catch(e) {}
@@ -1284,9 +1360,10 @@
       window.location.replace("./announcements.html");
     });
 
-    window.addEventListener("beforeunload", () => {
-      if (auth.currentUser) {
-        updatePresenceOffline().catch(() => {});
+    document.addEventListener("visibilitychange", () => {
+      if (!auth.currentUser || !state.cookiesAccepted) return;
+      if (document.visibilityState === "hidden") {
+        updatePresenceActivity(true).catch(() => {});
       }
     });
 
@@ -1298,32 +1375,63 @@
 
       if (!user) {
         clearTimeout(activityTimeout);
+        sessionStorage.removeItem(REDIRECT_FLAG_KEY);
         state.profile = null;
         state.role = "visitor";
         renderMenu("visitor");
         setStatus("visitor");
-        requireCookiesOrRedirect();
+        if (authHandledOnce) {
+          requireCookiesOrRedirect();
+        }
+        authHandledOnce = true;
         return;
       }
 
       if (!requireCookiesOrRedirect()) {
         try { await signOut(auth); } catch(e) {}
+        authHandledOnce = true;
         return;
       }
 
-      state.profile = await getUserProfile(user.uid);
-      state.role = resolveRole(user, state.profile);
-
       try{
+        state.profile = await getUserProfile(user.uid);
+        state.role = resolveRole(user, state.profile);
+
+        if (isSubscriptionExpired(state.role, state.profile)) {
+          await handleExpiredSubscription();
+          authHandledOnce = true;
+          return;
+        }
+
         await ensureUserRecord(user, { role: state.role });
-        await updatePresenceOnline();
+        await updatePresenceOnline(state.profile);
         resetInactivityTimer();
+
+        renderMenu(state.role);
+        setStatus(state.role);
+
+        if (!authHandledOnce) {
+          authHandledOnce = true;
+          const loginInProgress = sessionStorage.getItem(REDIRECT_FLAG_KEY) === "login-pending";
+          const signupInProgress = sessionStorage.getItem(REDIRECT_FLAG_KEY) === "signup-pending";
+
+          if (loginInProgress) {
+            showMessage(loginMsg, "Connexion réussie. Redirection en cours...", "ok");
+          }
+
+          if (signupInProgress) {
+            showMessage(signupMsg, "Compte créé avec succès. Redirection en cours...", "ok");
+          }
+
+          routeAfterAuth(user, state.profile);
+          return;
+        }
+
       }catch(err){
         console.error(err);
       }
 
-      renderMenu(state.role);
-      setStatus(state.role);
+      authHandledOnce = true;
     });
 
     loginForm.addEventListener("submit", async (e) => {
@@ -1340,20 +1448,10 @@
       const password = document.getElementById("loginPassword").value;
 
       try{
-        const cred = await signInWithEmailAndPassword(auth, email, password);
-        const profile = await getUserProfile(cred.user.uid);
-        const role = resolveRole(cred.user, profile);
-
-        await ensureUserRecord(cred.user, { role });
-        await updatePresenceOnline();
-
-        showMessage(loginMsg, "Connexion réussie. Redirection en cours...", "ok");
-
-        setTimeout(() => {
-          routeAfterAuth(cred.user, profile);
-        }, 500);
-
+        sessionStorage.setItem(REDIRECT_FLAG_KEY, "login-pending");
+        await signInWithEmailAndPassword(auth, email, password);
       }catch(err){
+        sessionStorage.removeItem(REDIRECT_FLAG_KEY);
         console.error(err);
         const code = String(err?.code || "");
         if (code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found")) {
@@ -1395,6 +1493,8 @@
       }
 
       try{
+        sessionStorage.setItem(REDIRECT_FLAG_KEY, "signup-pending");
+
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(cred.user, { displayName: name });
 
@@ -1402,24 +1502,23 @@
           sanitizeEmail(email) === sanitizeEmail(ADMIN_EMAIL)
             ? "admin"
             : selectedRole;
-                await ensureUserRecord(cred.user, {
+
+        await ensureUserRecord(cred.user, {
           role: finalRole,
           displayName: name
         });
 
-        await updatePresenceOnline();
+        state.profile = {
+          role: finalRole,
+          competitionRole: finalRole,
+          displayName: name
+        };
+        state.role = finalRole;
 
-        showMessage(signupMsg, "Compte créé avec succès. Redirection en cours...", "ok");
         signupForm.reset();
 
-        setTimeout(() => {
-          routeAfterAuth(cred.user, {
-            role: finalRole,
-            competitionRole: finalRole
-          });
-        }, 650);
-
       }catch(err){
+        sessionStorage.removeItem(REDIRECT_FLAG_KEY);
         console.error(err);
         const code = String(err?.code || "");
 
