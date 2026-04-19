@@ -19,13 +19,13 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 
-setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log("Auth persistence enabled.");
-  })
-  .catch((error) => {
+// Active la persistance de connexion une seule fois côté navigateur
+if (!window.__firebasePersistenceReady) {
+  window.__firebasePersistenceReady = true;
+  setPersistence(auth, browserLocalPersistence).catch((error) => {
     console.error("Persistence error:", error);
   });
+}
 
 export { app, auth, db, storage };
 export default app;
