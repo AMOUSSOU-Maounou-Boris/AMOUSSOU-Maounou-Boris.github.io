@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -1149,11 +1149,14 @@
 
   <script type="module">
     import { auth, db } from "./firebase-config.js";
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
-    const MAX_IMAGE_BYTES = 500 * 1024;
+    const STATIC_JURY_EMAILS = ["bienvenu.glinma@fast.uac.bj"];
+    const FREE_ACCESS_EMAILS = [ADMIN_EMAIL, ...STATIC_JURY_EMAILS].map(v => String(v).trim().toLowerCase());
+
+    const MAX_IMAGE_BYTES = 120 * 1024;
 
     const topbar = document.getElementById("topbar");
     const mainContent = document.getElementById("mainContent");
@@ -1225,7 +1228,8 @@
       viewerProfile: null,
       targetUid: new URLSearchParams(location.search).get("uid") || "",
       targetProfile: null,
-      selectedPhotoDataUrl: ""
+      selectedPhotoDataUrl: "",
+      lastSavedSnapshot: ""
     };
 
     function normalizeEmail(v=""){
@@ -1234,6 +1238,21 @@
 
     function isAdmin(user){
       return normalizeEmail(user?.email || "") === normalizeEmail(ADMIN_EMAIL);
+    }
+
+    function isStaticJury(user){
+      return STATIC_JURY_EMAILS.map(normalizeEmail).includes(normalizeEmail(user?.email || ""));
+    }
+
+    function hasFreeAccessUser(user){
+      return FREE_ACCESS_EMAILS.includes(normalizeEmail(user?.email || ""));
+    }
+
+    function getStaticRoleFromEmail(email=""){
+      const normalized = normalizeEmail(email);
+      if (normalized === normalizeEmail(ADMIN_EMAIL)) return "Administration";
+      if (STATIC_JURY_EMAILS.map(normalizeEmail).includes(normalized)) return "Jury";
+      return "";
     }
 
     function showNote(el, text, type="info"){
@@ -1264,15 +1283,68 @@
       return userNode.publicProfile || {};
     }
 
+    function getSubscriptionData(profile = {}){
+      const directStart =
+        profile?.subscriptionStart ||
+        profile?.planStart ||
+        profile?.forfaitStart ||
+        profile?.subscription?.start ||
+        null;
+
+      const directEnd =
+        profile?.subscriptionEnd ||
+        profile?.planEnd ||
+        profile?.forfaitEnd ||
+        profile?.subscription?.end ||
+        null;
+
+      const directStatus =
+        profile?.subscriptionStatus ||
+        profile?.planStatus ||
+        profile?.forfaitStatus ||
+        profile?.subscription?.status ||
+        "";
+
+      return {
+        start: directStart,
+        end: directEnd,
+        status: String(directStatus || "").toLowerCase()
+      };
+    }
+
+    function isSubscriptionExpired(user, profile = {}){
+      if (!user) return false;
+      if (hasFreeAccessUser(user)) return false;
+
+      const sub = getSubscriptionData(profile);
+      if (!sub.end) return false;
+
+      const endTime = Number(sub.end);
+      if (!Number.isFinite(endTime) || endTime <= 0) return false;
+
+      return Date.now() > endTime;
+    }
+
+    async function handleExpiredOwnAccess(){
+      showNote(profileMsg, "Votre forfait est épuisé. Retour à l’accueil…", "err");
+      setTimeout(async () => {
+        try { await signOut(auth); } catch(e) {}
+        window.location.replace("./index.html");
+      }, 900);
+    }
+
     function getDisplayProfile(userNode = {}){
       const pp = getPublicProfile(userNode);
+      const staticRole = getStaticRoleFromEmail(userNode.email || "");
       const roleRaw = String(pp.role || userNode.role || userNode.userType || userNode.competitionRole || "").toLowerCase();
 
       let role = pp.role || "Membre";
-      if (!pp.role) {
+      if (staticRole) {
+        role = staticRole;
+      } else if (!pp.role) {
         if (roleRaw.includes("jury")) role = "Jury";
         else if (roleRaw.includes("candidate") || roleRaw.includes("candidat")) role = "Candidat";
-        else if (normalizeEmail(userNode.email || "") === normalizeEmail(ADMIN_EMAIL)) role = "Administration";
+        else if (roleRaw.includes("admin")) role = "Administration";
       }
 
       const first = safeText(pp.firstName || "");
@@ -1298,6 +1370,10 @@
         bio: safeText(pp.bio || "", "Aucune présentation publique pour le moment."),
         photoUrl: String(pp.photoUrl || userNode.photoURL || "").trim()
       };
+    }
+
+    function serializeProfilePayload(payload){
+      return JSON.stringify(payload);
     }
 
     function applyAuthLinks(){
@@ -1374,6 +1450,7 @@
       bio.value = p.bio === "Aucune présentation publique pour le moment." ? "" : p.bio;
       state.selectedPhotoDataUrl = p.photoUrl || "";
       updatePhotoLabel();
+      state.lastSavedSnapshot = serializeProfilePayload(buildProfilePayload());
     }
 
     function updatePhotoLabel(){
@@ -1399,7 +1476,7 @@
       updatePhotoLabel();
     }
 
-    async function compressImageToUnder500KB(file){
+    async function compressImageToUnderLimit(file){
       const dataUrl = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(String(reader.result || ""));
@@ -1416,19 +1493,19 @@
 
       let width = img.width;
       let height = img.height;
-      const maxInitial = 1200;
-      const scale = Math.min(1, maxInitial / Math.max(width, height));
-      width = Math.max(1, Math.round(width * scale));
-      height = Math.max(1, Math.round(height * scale));
+      const maxInitial = 520;
+      const initialScale = Math.min(1, maxInitial / Math.max(width, height));
+      width = Math.max(1, Math.round(width * initialScale));
+      height = Math.max(1, Math.round(height * initialScale));
 
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
 
-      let quality = 0.84;
+      let quality = 0.76;
       let tries = 0;
       let result = "";
 
-      while (tries < 10) {
+      while (tries < 12) {
         canvas.width = width;
         canvas.height = height;
         ctx.clearRect(0, 0, width, height);
@@ -1440,12 +1517,20 @@
 
         if (sizeBytes <= MAX_IMAGE_BYTES) return result;
 
-        if (quality > 0.45) quality -= 0.08;
-        else {
-          width = Math.max(420, Math.round(width * 0.85));
-          height = Math.max(420, Math.round(height * 0.85));
+        if (quality > 0.42) {
+          quality -= 0.07;
+        } else {
+          width = Math.max(220, Math.round(width * 0.86));
+          height = Math.max(220, Math.round(height * 0.86));
         }
+
         tries += 1;
+      }
+
+      const base64 = result.split(",")[1] || "";
+      const sizeBytes = Math.ceil((base64.length * 3) / 4);
+      if (sizeBytes > MAX_IMAGE_BYTES) {
+        throw new Error("Image trop lourde");
       }
 
       return result;
@@ -1461,19 +1546,45 @@
       showNote(profileMsg, "Préparation de la photo en cours…", "info");
 
       try{
-        state.selectedPhotoDataUrl = await compressImageToUnder500KB(file);
+        state.selectedPhotoDataUrl = await compressImageToUnderLimit(file);
         updatePhotoLabel();
-        showNote(profileMsg, "Photo prête et optimisée.", "ok");
+        showNote(profileMsg, "Photo prête et allégée pour limiter le coût.", "ok");
       }catch(err){
         console.error(err);
         resetSelectedPhoto();
-        showNote(profileMsg, "Impossible de préparer cette photo.", "err");
+        showNote(profileMsg, "Impossible de préparer cette photo. Choisis une image plus légère.", "err");
       }
     }
 
     function canEditTarget(){
       if (!state.currentUser || !state.targetUid) return false;
       return state.currentUser.uid === state.targetUid || isAdmin(state.currentUser);
+    }
+
+    function buildProfilePayload(){
+      let chosenRole = publicRole.value;
+      const staticRole = getStaticRoleFromEmail(state.targetProfile?.email || state.currentUser?.email || "");
+
+      if (staticRole) {
+        chosenRole = staticRole;
+      }
+
+      return {
+        publicProfile: {
+          firstName: firstName.value.trim(),
+          lastName: lastName.value.trim(),
+          displayName: displayName.value.trim(),
+          university: university.value.trim(),
+          country: country.value.trim(),
+          city: city.value.trim(),
+          fieldStudy: fieldStudy.value.trim(),
+          tagline: tagline.value.trim(),
+          role: chosenRole,
+          bio: bio.value.trim(),
+          photoUrl: state.selectedPhotoDataUrl || ""
+        },
+        updatedAt: Date.now()
+      };
     }
 
     async function saveProfile(){
@@ -1490,27 +1601,23 @@
         return;
       }
 
-      const payload = {
-        publicProfile: {
-          firstName: firstName.value.trim(),
-          lastName: lastName.value.trim(),
-          displayName: displayName.value.trim(),
-          university: university.value.trim(),
-          country: country.value.trim(),
-          city: city.value.trim(),
-          fieldStudy: fieldStudy.value.trim(),
-          tagline: tagline.value.trim(),
-          role: publicRole.value,
-          bio: bio.value.trim(),
-          photoUrl: state.selectedPhotoDataUrl || ""
-        }
+      const payload = buildProfilePayload();
+      const comparablePayload = {
+        publicProfile: payload.publicProfile
       };
+      const snapshot = serializeProfilePayload(comparablePayload);
+
+      if (snapshot === state.lastSavedSnapshot) {
+        showNote(profileMsg, "Aucune modification détectée.", "info");
+        return;
+      }
 
       saveProfileBtn.disabled = true;
       showNote(profileMsg, "Enregistrement du profil…", "info");
 
       try{
         await update(ref(db, `users/${state.targetUid}`), payload);
+        state.lastSavedSnapshot = snapshot;
         showNote(profileMsg, "Profil public enregistré avec succès.", "ok");
 
         const fresh = await get(ref(db, `users/${state.targetUid}`));
@@ -1538,6 +1645,11 @@
       const requestedUid = state.targetUid || state.currentUser?.uid || "";
       state.targetUid = requestedUid;
       metaUid.textContent = requestedUid || "—";
+
+      if (state.currentUser && state.currentUser.uid === requestedUid && isSubscriptionExpired(state.currentUser, state.viewerProfile || {})) {
+        await handleExpiredOwnAccess();
+        return;
+      }
 
       if (!requestedUid) {
         metaLoaded.textContent = "Non";
@@ -1576,8 +1688,10 @@
       if (canEditTarget()) {
         editPanel.style.display = "";
         fillEditForm(state.targetProfile);
-        metaMode.textContent = state.currentUser?.uid === state.targetUid ? "Mon profil" : "Admin";
-        statusText.textContent = state.currentUser?.uid === state.targetUid ? "Mon profil" : "Profil administrable";
+
+        const ownProfile = state.currentUser?.uid === state.targetUid;
+        metaMode.textContent = ownProfile ? "Mon profil" : "Admin";
+        statusText.textContent = ownProfile ? "Mon profil" : "Profil administrable";
         statusDot.classList.add("ok");
       } else {
         editPanel.style.display = "none";
