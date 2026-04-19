@@ -753,6 +753,9 @@
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAIL = "borisamoussou01@gmail.com";
+    const STATIC_JURY_EMAILS = ["bienvenu.glinma@fast.uac.bj"];
+    const FREE_ACCESS_EMAILS = [ADMIN_EMAIL, ...STATIC_JURY_EMAILS];
+
     const COOKIE_KEY = "champCookiesChoice";
     const LAST_ACTIVITY_KEY = "champ_last_activity";
     const INACTIVITY_LIMIT = 15 * 60 * 1000;
@@ -855,6 +858,18 @@
       return String(email || "").trim().toLowerCase();
     }
 
+    function isAdminEmail(email = ""){
+      return sanitizeEmail(email) === sanitizeEmail(ADMIN_EMAIL);
+    }
+
+    function isStaticJuryEmail(email = ""){
+      return STATIC_JURY_EMAILS.includes(sanitizeEmail(email));
+    }
+
+    function hasFreeAccessEmail(email = ""){
+      return FREE_ACCESS_EMAILS.includes(sanitizeEmail(email));
+    }
+
     function getCookieChoice(){
       return localStorage.getItem(COOKIE_KEY) || "";
     }
@@ -875,7 +890,8 @@
     function resolveRole(user, profile){
       const email = sanitizeEmail(user?.email);
       if (!user) return "visitor";
-      if (email === sanitizeEmail(ADMIN_EMAIL)) return "admin";
+      if (isAdminEmail(email)) return "admin";
+      if (isStaticJuryEmail(email)) return "jury";
 
       const role = String(
         profile?.competitionRole ||
@@ -968,9 +984,10 @@
       };
     }
 
-    function isSubscriptionExpired(role, profile){
+    function isSubscriptionExpired(role, profile, user){
       if (!profile) return false;
       if (role === "admin" || role === "jury") return false;
+      if (hasFreeAccessEmail(user?.email)) return false;
 
       const sub = getSubscriptionData(profile);
       if (!sub.end) return false;
@@ -1091,10 +1108,10 @@
       const existing = existingSnap.exists() ? existingSnap.val() : null;
 
       const email = user.email || "";
-      const roleToSave =
-        sanitizeEmail(email) === sanitizeEmail(ADMIN_EMAIL)
-          ? "admin"
-          : (extra.role || existing?.role || "candidate");
+      let roleToSave = extra.role || existing?.role || "candidate";
+
+      if (isAdminEmail(email)) roleToSave = "admin";
+      if (isStaticJuryEmail(email)) roleToSave = "jury";
 
       const fullName = extra.displayName || user.displayName || existing?.displayName || "";
       const names = splitName(fullName);
@@ -1124,6 +1141,10 @@
           photoUrl: existing?.publicProfile?.photoUrl || ""
         }
       };
+
+      if (hasFreeAccessEmail(email)) {
+        payload.subscriptionStatus = "free";
+      }
 
       if (!existing) {
         payload.createdAt = Date.now();
@@ -1397,7 +1418,7 @@
         state.profile = await getUserProfile(user.uid);
         state.role = resolveRole(user, state.profile);
 
-        if (isSubscriptionExpired(state.role, state.profile)) {
+        if (isSubscriptionExpired(state.role, state.profile, user)) {
           await handleExpiredSubscription();
           authHandledOnce = true;
           return;
@@ -1498,10 +1519,9 @@
         const cred = await createUserWithEmailAndPassword(auth, email, password);
         await updateProfile(cred.user, { displayName: name });
 
-        const finalRole =
-          sanitizeEmail(email) === sanitizeEmail(ADMIN_EMAIL)
-            ? "admin"
-            : selectedRole;
+        let finalRole = selectedRole;
+        if (isAdminEmail(email)) finalRole = "admin";
+        if (isStaticJuryEmail(email)) finalRole = "jury";
 
         await ensureUserRecord(cred.user, {
           role: finalRole,
@@ -1511,7 +1531,8 @@
         state.profile = {
           role: finalRole,
           competitionRole: finalRole,
-          displayName: name
+          displayName: name,
+          subscriptionStatus: hasFreeAccessEmail(email) ? "free" : ""
         };
         state.role = finalRole;
 
